@@ -1,0 +1,9 @@
+{application, ca,
+ [
+  {description, "CA Certificate Authority"},
+  {vsn, "0.8.0"},
+  {registered, []},
+  {applications, [kernel,stdlib]},
+  {mod, { ca, []}},
+  {env, []}
+ ]}.
