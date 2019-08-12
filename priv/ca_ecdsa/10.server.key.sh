@@ -1,0 +1,2 @@
+# generate server key
+openssl req -config intermediate/server.cnf -new -newkey ec:<(openssl ecparam -name secp384r1) -keyout intermediate/private/server_ecdsa_key.pem -out intermediate/csr/server_ecdsa.csr
