@@ -75,7 +75,7 @@ authorityInfoAccess = @ocsp_info
 [ usr_cert ]
 basicConstraints = CA:FALSE
 nsCertType = client, email
-nsComment = "OpenSSL Generated Client Certificate"
+nsComment = "Synrc Client Certificate"
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer
 keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
@@ -85,7 +85,7 @@ subjectAltName = @alt_names
 [ server_cert ]
 basicConstraints = CA:FALSE
 nsCertType = server
-nsComment = "OpenSSL Genereated Server Cert"
+nsComment = "Synrc Server Certificate"
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
@@ -108,8 +108,8 @@ keyUsage = critical, digitalSignature
 extendedKeyUsage = critical, OCSPSigning
 
 [crl_info]
-URI.0 = http://crl.n2o.dev:8081/ecdsaroot.crl
+URI.0 = http://crl.n2o.dev:8081/rsaroot.crl
 
 [ocsp_info]
-caIssuers;URI.0 = http://crl.n2o.dev:8081/ecdsaroot.crt
+caIssuers;URI.0 = http://crl.n2o.dev:8081/rsaroot.crt
 OCSP;URI.0 = http://ocsp.n2o.dev:8081/
