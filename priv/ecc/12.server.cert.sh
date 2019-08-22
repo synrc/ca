@@ -1,5 +1,5 @@
 # generate server cert
-openssl ca -config intermediate/server.cnf -extensions server_cert -days 730 -in intermediate/csr/server_ecdsa.csr -out intermediate/certs/server_ecdsa_cert.pem
+openssl ca -config synrc.cnf -extensions server_cert -days 730 -in certs/server.csr -out certs/server.pem -cert certs/caroot.pem -keyfile certs/caroot.key
 
 # Remove encryption from private key:
 # openssl ec -in intermediate/private/server_ecdsa_key.pem -out intermediate/private/server_ecdsa_key_rp.pem

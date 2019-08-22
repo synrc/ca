@@ -2,25 +2,32 @@
 default_ca = CA_default
 
 [ CA_default ]
-dir               = /home/maxim/ca/priv/ca_ecdsa/intermediate
+dir               = /Users/maxim/depot/synrc/deps/ca/priv/rsa
 certs             = $dir/certs
 crl_dir           = $dir/crl
 new_certs_dir     = $dir/certs
 database          = $dir/index.txt
 serial            = $dir/serial
-RANDFILE          = $dir/private/.rand
-private_key       = $dir/private/int.ca.key.pem
-certificate       = $dir/certs/int.ca.crt.pem
+RANDFILE          = $dir/certs/.rand
+private_key       = $dir/certs/caroot.key
+certificate       = $dir/certs/caroot.pem
 crlnumber         = $dir/crlnumber
-crl               = $dir/crl/ecdsaint.crl
+crl               = $dir/crl/rsaroot.crl
 crl_extensions    = crl_ext
-default_crl_days  = 180
+default_crl_days  = 3650
 default_md        = sha384
 name_opt          = ca_default
 cert_opt          = ca_default
-default_days      = 3000
+default_days      = 3650
 preserve          = no
-policy            = policy_loose
+policy            = policy_strict
+
+[ policy_strict ]
+countryName             = match
+stateOrProvinceName     = match
+organizationName        = match
+organizationalUnitName  = optional
+commonName              = supplied
 
 [ policy_loose ]
 countryName             = optional
@@ -44,11 +51,12 @@ localityName                    = Locality Name
 0.organizationName              = Organization Name
 organizationalUnitName          = Organizational Unit Name
 commonName                      = Common Name
+commonName_default              = CA
 countryName_default             = UA
 stateOrProvinceName_default     = Kyiv
 localityName_default            = Kyiv
-0.organizationName_default      = Synrc Research Center
-organizationalUnitName_default  = Intermediate CA
+0.organizationName_default      = SYNRC
+organizationalUnitName_default  = HQ
 
 [ v3_ca ]
 subjectKeyIdentifier = hash
@@ -67,23 +75,17 @@ authorityInfoAccess = @ocsp_info
 [ usr_cert ]
 basicConstraints = CA:FALSE
 nsCertType = client, email
-nsComment = "Client Certificate"
+nsComment = "OpenSSL Generated Client Certificate"
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer
 keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, emailProtection
-
-[ codesign_req ]
-keyUsage = critical,digitalSignature
-extendedKeyUsage = critical,codeSigning
-subjectKeyIdentifier = hash
-basicConstraints = CA:FALSE
-authorityInfoAccess = @ocsp_info
+subjectAltName = @alt_names
 
 [ server_cert ]
 basicConstraints = CA:FALSE
 nsCertType = server
-nsComment = "Synrc Server Certificate"
+nsComment = "OpenSSL Genereated Server Cert"
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
@@ -93,8 +95,7 @@ authorityInfoAccess = @ocsp_info
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.0 = ca.n2o.dev
-DNS.1 = pki.n2o.dev
+DNS.0 = localhost
 
 [ crl_ext ]
 authorityKeyIdentifier=keyid:always
@@ -107,9 +108,8 @@ keyUsage = critical, digitalSignature
 extendedKeyUsage = critical, OCSPSigning
 
 [crl_info]
-URI.0 = http://crl.n2o.dev:8081/ecdsaint.crl
+URI.0 = http://crl.n2o.dev:8081/ecdsaroot.crl
 
 [ocsp_info]
 caIssuers;URI.0 = http://crl.n2o.dev:8081/ecdsaroot.crt
-caIssuers;URI.1 = http://crl.n2o.dev:8081/ecdsaint.crt
 OCSP;URI.0 = http://ocsp.n2o.dev:8081/

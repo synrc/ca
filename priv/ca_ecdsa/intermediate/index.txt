@@ -1,4 +1,0 @@
-V	210810030420Z		1000	unknown	/C=UA/ST=Kyiv/L=Kyiv/O=Synrc Research Center/OU=Intermediate CA/CN=OCSP
-V	210820030545Z		1001	unknown	/C=UA/ST=Kyiv/L=Kyiv/O=Synrc Research Center/OU=Intermediate CA/CN=SRV
-V	200820030601Z		1002	unknown	/C=UA/ST=Kyiv/L=Kyiv/O=Synrc Research Center/OU=Intermediate CA/CN=CODE
-R	210820030616Z	190821034625Z	1003	unknown	/C=UA/ST=Kyiv/L=Kyiv/O=Synrc Research Center/OU=Intermediate CA/CN=Maxim
