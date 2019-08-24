@@ -22,7 +22,8 @@
     </section>
     <section>
     <h4>CA KEY</h4>
-    <figure><code> openssl ecparam -genkey -name secp384r1 | openssl ec -aes256 -out cert/ecc/caroot.key</code>
+    <figure><code> openssl ecparam -genkey -name secp384r1 | \
+ openssl ec -aes256 -out cert/ecc/caroot.key</code>
     <code> openssl req -config cert/ecc/synrc.cnf -days 3650 \
          -new -x509 \
          -key cert/ecc/caroot.key \
@@ -37,11 +38,13 @@
     </section>
     <section>
     <h4>SERVER KEY</h4>
-    <figure><code> openssl req -config synrc.cnf \
+    <figure><code> openssl req -config cert/ecc/synrc.cnf \
          -new -newkey ec:&#60;(openssl ecparam -name secp384r1) \
-         -keyout cert/ecc/server.key \
+         -keyout cert/ecc/server.key.enc \
          -out cert/ecc/server.csr \
          -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=SERVER"</code>
+    <code> openssl ec -in cert/ecc/server.key.enc \
+         -out cert/ecc/server.key</code>
     </figure>
     </section>
     <section>
@@ -81,7 +84,7 @@
     <figure>
     <code> openssl pkcs12 -export \
          -inkey cert/ecc/client.key \
-         -in cert/ecc/client.pem
+         -in cert/ecc/client.pem \
          -out cert/ecc/client.p12</code></figure>
     </section>
     <section>
