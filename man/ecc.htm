@@ -1,0 +1,204 @@
+<html><head><meta charset="utf-8" /><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="" /><meta name="author" content="Maxim Sokhatsky" />
+<title>ECC</title>
+<link rel="stylesheet" href="https://n2o.dev/blank.css" />
+<link rel="stylesheet" href="https://n2o.dev/zima.css" />
+</head>
+<body>
+<nav>
+    <a href="https://n2o.space">SPACE</a>
+    <a href="https://ca.n2o.space">CA</a>
+    <a href="#" style="background:#ededed;">ECC</a>
+</nav>
+<header>
+    <a href="../index.html"><img src="https://n2o.space/img/Synrc Neo.svg" /></a>
+    <h1>ECC</h1>
+</header>
+<main>
+    <section>
+    <h3>ECC X.509</h3>
+    <figure><code> mkdir -p cert/ecc</code></figure>
+    </section>
+    <section>
+    <h4>CA KEY</h4>
+    <figure><code> openssl ecparam -genkey -name secp384r1 | openssl ec -aes256 -out certs/caroot.key</code>
+    <code> openssl req -config synrc.cnf -days 3650 \
+         -new -x509 \
+         -key certs/caroot.key \
+         -out certs/caroot.pem \
+         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=CA"</code>
+    </figure>
+    </section>
+    <section>
+    <h4>CA CRL</h4>
+    <figure><code> openssl ca -config cert/ecc/synrc.cnf \
+         -gencrl -out cert/ecc/eccroot.crl</code></figure>
+    </section>
+    <section>
+    <h4>SERVER KEY</h4>
+    <figure><code> openssl req -config synrc.cnf \
+         -new -newkey ec:&#60;(openssl ecparam -name secp384r1) \
+         -keyout cert/ecc/server.key \
+         -out cert/ecc/server.csr \
+         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=SERVER"</code>
+    </figure>
+    </section>
+    <section>
+    <h4>SERVER CERT</h4>
+    <figure>
+    <code> openssl ca -config cert/ecc/synrc.cnf \
+         -extensions server_cert \
+         -days 730 \
+         -in cert/ecc/server.csr \
+         -out cert/ecc/server.pem \
+         -cert cert/ecc/caroot.pem \
+         -keyfile cert/ecc/caroot.key</code></figure>
+    </section>
+    <section>
+    <h4>CLIENT KEY</h4>
+    <figure>
+    <code> openssl req -config cert/ecc/synrc.cnf \
+         -new -newkey ec:&#60;(openssl ecparam -name secp384r1) \
+         -keyout cert/ecc/client.key \
+         -out cert/ecc/client.csr \
+         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=Maxim"
+    </code>
+    </figure>
+    </section>
+    <section>
+    <h4>CLIENT CERT</h4>
+    <figure>
+    <code> openssl ca -config cert/ecc/synrc.cnf \
+         -extensions usr_cert \
+         -days 365 \
+         -in cert/ecc/client.csr \
+         -out cert/ecc/client.pem \
+         -cert cert/ecc/caroot.pem \
+         -keyfile cert/ecc/caroot.key
+</code></figure>
+    </section>
+    <section>
+    <h4>CLIENT PFX</h4>
+    <figure>
+    <code> openssl pkcs12 -export \
+         -inkey cert/ecc/client.key \
+         -in cert/ecc/client.pem
+         -out cert/ecc/client.p12
+</code></figure>
+    </section>
+    <section>
+    <h3>ECC CNF</h3>
+    <figure><code> [ ca ]
+ default_ca = CA_default
+
+ [ CA_default ]
+ dir               = /home/ubuntu/depot/synrc
+ certs             = $dir/cert/ecc
+ crl_dir           = $dir/cert/ecc
+ new_certs_dir     = $dir/cert/ecc
+ database          = $dir/cert/ecc/index.txt
+ serial            = $dir/cert/ecc/serial
+ RANDFILE          = $dir/cert/ecc/.rand
+ private_key       = $dir/cert/ecc/caroot.key
+ certificate       = $dir/cert/ecc/caroot.pem
+ crlnumber         = $dir/cert/ecc/crlnumber
+ crl               = $dir/cert/ecc/eccroot.crl
+ crl_extensions    = crl_ext
+ default_crl_days  = 3650
+ default_md        = sha384
+ name_opt          = ca_default
+ cert_opt          = ca_default
+ default_days      = 3650
+ preserve          = no
+ policy            = policy_strict
+
+ [ policy_strict ]
+ countryName             = match
+ stateOrProvinceName     = match
+ organizationName        = match
+ organizationalUnitName  = optional
+ commonName              = supplied
+
+ [ req ]
+ default_bits        = 2048
+ distinguished_name  = req_distinguished_name
+ string_mask         = utf8only
+ default_md          = sha384
+ x509_extensions     = v3_ca
+
+ [ req_distinguished_name ]
+ countryName                     = Country Name (2 letter code)
+ stateOrProvinceName             = State or Province Name
+ localityName                    = Locality Name
+ 0.organizationName              = Organization Name
+ organizationalUnitName          = Organizational Unit Name
+ commonName                      = Common Name
+ commonName_default              = CA
+ countryName_default             = UA
+ stateOrProvinceName_default     = Kyiv
+ localityName_default            = Kyiv
+ 0.organizationName_default      = SYNRC
+ organizationalUnitName_default  = HQ
+
+ [ v3_ca ]
+ subjectKeyIdentifier = hash
+ authorityKeyIdentifier = keyid:always,issuer
+ basicConstraints = critical, CA:true
+ keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+ [ v3_intermediate_ca ]
+ subjectKeyIdentifier = hash
+ authorityKeyIdentifier = keyid:always,issuer
+ basicConstraints = critical, CA:true, pathlen:0
+ keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+ crlDistributionPoints = @crl_info
+ authorityInfoAccess = @ocsp_info
+
+ [ usr_cert ]
+ basicConstraints = CA:FALSE
+ nsCertType = client, email
+ nsComment = "Synrc Client Certificate"
+ subjectKeyIdentifier = hash
+ authorityKeyIdentifier = keyid,issuer
+ keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
+ extendedKeyUsage = clientAuth, emailProtection
+ subjectAltName = @alt_names
+
+ [ server_cert ]
+ basicConstraints = CA:FALSE
+ nsCertType = server
+ nsComment = "Synrc Server Certificate"
+ subjectKeyIdentifier = hash
+ authorityKeyIdentifier = keyid,issuer:always
+ keyUsage = critical, digitalSignature, keyEncipherment
+ extendedKeyUsage = serverAuth
+ crlDistributionPoints = @crl_info
+ authorityInfoAccess = @ocsp_info
+ subjectAltName = @alt_names
+
+ [alt_names]
+ DNS.0 = localhost
+
+ [ crl_ext ]
+ authorityKeyIdentifier=keyid:always
+
+ [ ocsp ]
+ basicConstraints = CA:FALSE
+ subjectKeyIdentifier = hash
+ authorityKeyIdentifier = keyid,issuer
+ keyUsage = critical, digitalSignature
+ extendedKeyUsage = critical, OCSPSigning
+
+ [crl_info]
+ URI.0 = http://crl.n2o.dev:8081/eccroot.crl
+
+ [ocsp_info]
+ caIssuers;URI.0 = http://crl.n2o.dev:8081/eccroot.crt
+ OCSP;URI.0 = http://ocsp.n2o.dev:8081/
+    </code></figure>
+    </section>
+</main>
+<footer>2005—2019 © Synrc Research Center</footer>
+</body>
+</html>
