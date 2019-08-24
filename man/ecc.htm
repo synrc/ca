@@ -62,8 +62,7 @@
          -new -newkey ec:&#60;(openssl ecparam -name secp384r1) \
          -keyout cert/ecc/client.key \
          -out cert/ecc/client.csr \
-         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=Maxim"
-    </code>
+         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=Maxim"</code>
     </figure>
     </section>
     <section>
@@ -75,8 +74,7 @@
          -in cert/ecc/client.csr \
          -out cert/ecc/client.pem \
          -cert cert/ecc/caroot.pem \
-         -keyfile cert/ecc/caroot.key
-</code></figure>
+         -keyfile cert/ecc/caroot.key</code></figure>
     </section>
     <section>
     <h4>CLIENT PFX</h4>
@@ -84,8 +82,7 @@
     <code> openssl pkcs12 -export \
          -inkey cert/ecc/client.key \
          -in cert/ecc/client.pem
-         -out cert/ecc/client.p12
-</code></figure>
+         -out cert/ecc/client.p12</code></figure>
     </section>
     <section>
     <h3>ECC CNF</h3>
@@ -195,8 +192,7 @@
 
  [ocsp_info]
  caIssuers;URI.0 = http://crl.n2o.dev:8081/eccroot.crt
- OCSP;URI.0 = http://ocsp.n2o.dev:8081/
-    </code></figure>
+ OCSP;URI.0 = http://ocsp.n2o.dev:8081/</code></figure>
     </section>
 </main>
 <footer>2005—2019 © Synrc Research Center</footer>

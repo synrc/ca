@@ -40,8 +40,7 @@
     <code> openssl req -new -days 365 \
          -key cert/rsa/server.key \
          -out cert/rsa/server.csr \
-         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=SERVER"
-    </code>
+         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=SERVER"</code>
     </figure>
     </section>
     <section>
@@ -61,8 +60,7 @@
     <code> openssl req -new -days 365 \
          -key cert/rsa/client.key \
          -out cert/rsa/client.csr \
-         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=Maxim"
-    </code>
+         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=Maxim"</code>
     </figure>
     </section>
     <section>
@@ -74,8 +72,7 @@
          -in cert/rsa/client.csr \
          -out cert/rsa/client.pem \
          -cert cert/rsa/caroot.pem \
-         -keyfile cert/rsa/caroot.key
-</code></figure>
+         -keyfile cert/rsa/caroot.key</code></figure>
     </section>
     <section>
     <h4>CLIENT PFX</h4>
@@ -83,8 +80,7 @@
     <code> openssl pkcs12 -export \
          -inkey cert/rsa/client.key \
          -in cert/rsa/client.pem
-         -out cert/rsa/client.p12
-</code></figure>
+         -out cert/rsa/client.p12</code></figure>
     </section>
     <section>
     <h3>RSA CNF</h3>
@@ -194,8 +190,7 @@
 
  [ocsp_info]
  caIssuers;URI.0 = http://crl.n2o.dev:8081/rsaroot.crt
- OCSP;URI.0 = http://ocsp.n2o.dev:8081/
-    </code></figure>
+ OCSP;URI.0 = http://ocsp.n2o.dev:8081/</code></figure>
     </section>
 </main>
 <footer>2005—2019 © Synrc Research Center</footer>
