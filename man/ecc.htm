@@ -194,6 +194,17 @@
  caIssuers;URI.0 = http://crl.n2o.dev:8081/eccroot.crt
  OCSP;URI.0 = http://ocsp.n2o.dev:8081/</code></figure>
     </section>
+    <section>
+    <h3>LibreSSL</h3>
+    <figure><code> openssl s_server -accept 8772 \
+      -key certs/server.key \
+      -cert certs/server.pem \
+      -CAfile certs/caroot.pem -Verify 1</code>
+      <code> openssl s_client -connect localhost:8772 \
+      -key certs/client.key \
+      -cert certs/client.pem \
+      -CAfile certs/caroot.pem -showcerts</code></figure>
+    </section>
 </main>
 <footer>2005—2019 © Synrc Research Center</footer>
 </body>
