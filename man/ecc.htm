@@ -22,11 +22,11 @@
     </section>
     <section>
     <h4>CA KEY</h4>
-    <figure><code> openssl ecparam -genkey -name secp384r1 | openssl ec -aes256 -out certs/caroot.key</code>
-    <code> openssl req -config synrc.cnf -days 3650 \
+    <figure><code> openssl ecparam -genkey -name secp384r1 | openssl ec -aes256 -out cert/ecc/caroot.key</code>
+    <code> openssl req -config cert/ecc/synrc.cnf -days 3650 \
          -new -x509 \
-         -key certs/caroot.key \
-         -out certs/caroot.pem \
+         -key cert/ecc/caroot.key \
+         -out cert/ecc/caroot.pem \
          -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=CA"</code>
     </figure>
     </section>
