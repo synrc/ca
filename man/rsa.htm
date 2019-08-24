@@ -195,13 +195,13 @@
     <section>
     <h3>LibreSSL</h3>
     <figure><code> openssl s_server -accept 8771 \
-      -key certs/server.key \
-      -cert certs/server.pem \
-      -CAfile certs/caroot.pem -Verify 1</code>
+      -key cert/rsa/server.key \
+      -cert cert/rsa/server.pem \
+      -CAfile cert/rsa/caroot.pem -Verify 1</code>
       <code> openssl s_client -connect localhost:8771 \
-      -key certs/client.key \
-      -cert certs/client.pem \
-      -CAfile certs/caroot.pem -showcerts</code></figure>
+      -key cert/rsa/client.key \
+      -cert cert/rsa/client.pem \
+      -CAfile cert/rsa/caroot.pem -showcerts</code></figure>
     </section>
 </main>
 <footer>2005—2019 © Synrc Research Center</footer>
