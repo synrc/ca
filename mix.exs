@@ -23,11 +23,12 @@ defmodule CA.Mixfile do
   end
 
   def application() do
-    [mod: {:ca, []}]
+    [mod: {:ca, []}, applications: [:ranch,:cowboy]]
   end
 
   def deps() do
     [
+      {:cowboy, "~> 2.5.0"},
       {:ex_doc, "~> 0.11", only: :dev}
     ]
   end
