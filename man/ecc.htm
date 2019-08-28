@@ -61,7 +61,7 @@
     <section>
     <h4>CLIENT KEY</h4>
     <figure>
-    <code> openssl req -config cert/ecc/synrc.cnf \
+    <code> openssl req -config cert/ecc/synrc.cnf -passout pass:0 \
          -new -newkey ec:&#60;(openssl ecparam -name secp384r1) \
          -keyout cert/ecc/client.key \
          -out cert/ecc/client.csr \
