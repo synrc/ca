@@ -62,6 +62,6 @@ enroll(Crypto,Type,Req0)
     echo(Cert, Req);
 enroll(_,_,R) -> echo(<<>>,R).
 
-echo(<<>>, Req) -> reply(400,#{},<<"Enrolment Error">>,Req);
+echo(<<>>, Req) -> reply(400,#{},<<"General Enrolment Error">>,Req);
 echo(Echo, Req) -> reply(200,#{<<"content-type">> => <<"text/plain;charset=utf-8">>},Echo,Req).
 
