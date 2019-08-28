@@ -1,7 +1,7 @@
 {application, ca,
  [
   {description, "CA Certificate Authority"},
-  {vsn, "0.8.0"},
+  {vsn, "0.8.2"},
   {registered, []},
   {applications, [kernel,stdlib,ranch,cowboy]},
   {mod, { ca, []}},
