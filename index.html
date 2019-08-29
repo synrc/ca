@@ -81,8 +81,7 @@
         <section>
            <h3>ISSUE SERVER CERT</h3>
            <p>For securing your N2O application just issue server certificate
-              with your [unique] application name and cpecify the certificates
-              as a cowboy's variables.</p>
+              with your [unique] application name and specify the path to keys as a cowboy's variables.</p>
            <figure><code>
  $ mad ecc server BANK
  CERT: ECC SERVER 'BANK'
@@ -99,7 +98,7 @@
                252,49,202,98,5,109,204,254,111,103&#62;&#62;}}
  OK
            </code></figure>
-           <p>Here is example which you should include into ranch/cowboy server:</p>
+           <p>Here is example which you should include as s startup for <b>ranch/cowboy</b> server:</p>
            <figure><code>
    [
     {certfile,   "cert/ecc/BANK.pem"},
