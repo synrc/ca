@@ -38,7 +38,70 @@
             </div>
         </section>
     </article>
-</aside><main>
-</main><footer>
-    Made with <span class="heart">❤</span> to N2O
-</footer></body></html>
+</aside>
+<main>
+    <article>
+        <section>
+           <h3>INTRO</h3>
+           <p></p>
+        </section>
+        <section>
+           <h3>SETUP CA</h3>
+           <figure><code>
+ $ mad get ca
+ $ cd deps/ca
+ $ mad deps compile plan start
+           </code></figure>
+        </section>
+        <section>
+           <h3>ISSUE SERVER CERT</h3>
+           <figure><code>
+ $ mad ecc server BANK
+ CERT: ECC SERVER 'BANK'
+ KEY: {'OTPSubjectPublicKeyInfo',
+         {'PublicKeyAlgorithm',
+             {1,2,840,10045,2,1},
+             {namedCurve,{1,3,132,0,34}}},
+         {'ECPoint',
+             &#60;&#60;4,211,65,158,185,219,65,140,77,139,66,124,65,245,152,113,143,
+               20,103,239,206,247,99,56,248,242,0,167,24,212,86,194,228,60,
+               247,18,44,183,151,26,200,1,238,142,160,45,11,149,74,230,0,35,
+               12,134,179,219,81,230,83,214,39,1,189,223,201,49,216,66,71,42,
+               140,18,134,164,217,44,189,115,54,169,16,154,38,58,104,64,66,
+               252,49,202,98,5,109,204,254,111,103&#62;&#62;}}
+ OK
+           </code></figure>
+           <figure><code>
+ cowboy:start_tls(http, env(fin),
+    #{env => #{dispatch => n2o_cowboy2:points()} }).
+
+ env(App) ->
+  [ {port,       application:get_env(n2o,port,8041)},
+    {certfile,   "cert/ecc/BANK.pem"},
+    {keyfile,    "cert/ecc/BANK.key"},
+    {cacertfile, "cert/ecc/caroot.pem"}].
+           </code></figure>
+        </section>
+        <section>
+           <h3>ISSUE CLIENT CERT</h3>
+           <figure><code>
+ $ mad ecc client Maxim Sokhatsky
+ CERT: ECC CLIENT 'Maxim Sokhatsky'
+ KEY: {'OTPSubjectPublicKeyInfo',
+         {'PublicKeyAlgorithm',
+             {1,2,840,10045,2,1},
+             {namedCurve,{1,3,132,0,34}}},
+         {'ECPoint',
+             &#60;&#60;4,58,170,214,161,218,195,236,109,105,150,102,84,169,147,155,
+               27,88,54,237,210,191,172,253,170,212,32,92,146,239,99,135,91,
+               247,199,22,248,182,208,20,57,107,141,191,195,85,212,119,77,
+               179,139,125,95,139,42,18,55,0,85,158,77,147,60,37,215,151,39,
+               56,50,88,89,186,88,16,117,123,250,249,140,190,253,122,95,134,
+               177,127,165,172,194,178,103,113,211,118,87,134,11&#62;&#62;}}
+           </code></figure>
+        </section>
+    </article>
+</main>
+<footer>Made with <span class="heart">❤</span> to N2O</footer>
+</body>
+</html>
