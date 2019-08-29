@@ -99,15 +99,13 @@
                252,49,202,98,5,109,204,254,111,103&#62;&#62;}}
  OK
            </code></figure>
+           <p>Here is example which you should include into ranch/cowboy server:</p>
            <figure><code>
- cowboy:start_tls(http, env(fin),
-    #{env => #{dispatch => n2o_cowboy2:points()} }).
-
- env(App) ->
-  [ {port,       application:get_env(n2o,port,8041)},
+   [
     {certfile,   "cert/ecc/BANK.pem"},
     {keyfile,    "cert/ecc/BANK.key"},
-    {cacertfile, "cert/ecc/caroot.pem"}].
+    {cacertfile, "cert/ecc/caroot.pem"}
+   ]
            </code></figure>
         </section>
         <section>
@@ -129,6 +127,30 @@
                56,50,88,89,186,88,16,117,123,250,249,140,190,253,122,95,134,
                177,127,165,172,194,178,103,113,211,118,87,134,11&#62;&#62;}}
            </code></figure>
+           <p>Here is e.g. how to secure MQTT IoT connection with ECC cryptography.
+              First install XIO server and protect is with client cerficate.
+              And then use <b>emqtt</b> client and your personal client certificate:</p>
+           <figure><code>
+ 1> {ok, Conn2} = emqtt:start_link([{client_id, <<"5HT">>}, {ssl, true}, {ssl_opts,
+   [ {certfile,"cert/ecc/Maxim Sokhatsky.pem"},
+     {keyfile,"cert/ecc/Maxim Sokhatsky.key"},
+     {cacertfile,"synrc/cert/ecc/caroot.pem"}]},
+     {port, 8883}]).
+ {ok,&#60;0.193.0&#62;}
+ 2> emqtt:connect(Conn2).
+ {ok,undefined}
+ 3> emqtt:subscribe(Conn2, {&#60;&#60;"hello"&#62;&#62;, 0}).
+ {ok,undefined,[0]}
+ 4> emqtt:publish(Conn2, &#60;&#60;"hello"&#62;&#62;, &#60;&#60;"Hello World!"&#62;&#62;, 0).
+ ok
+ 5> flush().
+ Shell got {publish,#{client_pid => &#60;0.193.0&#62;,dup => false,
+                     packet_id => undefined,payload => &#60;&#60;"Hello World!"&#62;&#62;,
+                     properties => undefined,qos => 0,retain => false,
+                     topic => &#60;&#60;"hello"&#62;&#62;}}
+ ok
+           </code></figure>
+
         </section>
     </article>
 </main>
