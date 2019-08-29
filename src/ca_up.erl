@@ -14,9 +14,8 @@ bind(X,Y)       -> binary_to_list(cowboy_req:binding(X,Y)).
 echo(<<>>, Req) -> reply(400,#{},<<"General CA Sync Error">>,Req);
 echo(Echo, Req) -> reply(200,#{<<"content-type">> => <<"text/plain;charset=utf-8">>},Echo,Req).
 
-maybe_service(<<"POST">>, true,  R) -> service(bind('crypto',R),R);
-maybe_service(<<"POST">>, false, R) -> reply(400, #{}, <<"Missing body.">>, R);
-maybe_service(_, _, R)              -> reply(405, #{}, <<"Unknown.">>, R).
+maybe_service(<<"POST">>, _, R) -> service(bind('crypto',R),R);
+maybe_service(_, _, R)          -> reply(405, #{}, <<"Unknown.">>, R).
 
 service(Crypto,Req) ->
     {ok,PEM} = file:read_file("cert/"++Crypto++"/caroot.pem"),
