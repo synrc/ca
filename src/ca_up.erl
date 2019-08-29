@@ -15,6 +15,7 @@ echo(<<>>, Req) -> reply(400,#{},<<"General CA Sync Error">>,Req);
 echo(Echo, Req) -> reply(200,#{<<"content-type">> => <<"text/plain;charset=utf-8">>},Echo,Req).
 
 maybe_service(<<"POST">>, _, R) -> service(bind('crypto',R),R);
+maybe_service(<<"GET">>, _, R)  -> service(bind('crypto',R),R);
 maybe_service(_, _, R)          -> reply(405, #{}, <<"Unknown.">>, R).
 
 service(Crypto,Req) ->
