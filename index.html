@@ -130,7 +130,7 @@
               First install XIO server and protect is with client cerficate.
               And then use <b>emqtt</b> client and your personal client certificate:</p>
            <figure><code>
- 1> {ok, Conn2} = emqtt:start_link([{client_id, <<"5HT">>}, {ssl, true}, {ssl_opts,
+ 1> {ok, Conn2} = emqtt:start_link([{client_id, &#60;&#60;"5HT"&#62;&#62;}, {ssl, true}, {ssl_opts,
    [ {certfile,"cert/ecc/Maxim Sokhatsky.pem"},
      {keyfile,"cert/ecc/Maxim Sokhatsky.key"},
      {cacertfile,"synrc/cert/ecc/caroot.pem"}]},
