@@ -112,8 +112,8 @@
            <p>Here is an example how to obtain end-user certificate that should be installed
               manually at the device:</p>
            <figure><code>
- $ mad ecc client Maxim Sokhatsky
- CERT: ECC CLIENT 'Maxim Sokhatsky'
+ $ mad ecc client Max Socha
+ CERT: ECC CLIENT 'Max Socha'
  KEY: {'OTPSubjectPublicKeyInfo',
          {'PublicKeyAlgorithm',
              {1,2,840,10045,2,1},
@@ -131,20 +131,21 @@
               is with server cerficate (as described above).
               And then use <b>emqtt</b> client and your personal client certificate:</p>
            <figure><code>
- 1> {ok, Conn2} = emqtt:start_link([
+ 1> {ok, Conn} = emqtt:start_link([
        {client_id, &#60;&#60;"5HT"&#62;&#62;},
        {ssl, true},
        {port, 8883},
        {ssl_opts, [
-           {certfile,"cert/ecc/Maxim Sokhatsky.pem"},
-           {keyfile,"cert/ecc/Maxim Sokhatsky.key"},
-           {cacertfile,"synrc/cert/ecc/caroot.pem"}]}]).
+           {verify,verify_peer},
+           {certfile,"cert/ecc/Max Socha.pem"},
+           {keyfile,"cert/ecc/Max Socha.key"},
+           {cacertfile,"cert/ecc/caroot.pem"}]}]).
  {ok,&#60;0.193.0&#62;}
- 2> emqtt:connect(Conn2).
+ 2> emqtt:connect(Conn).
  {ok,undefined}
- 3> emqtt:subscribe(Conn2, {&#60;&#60;"hello"&#62;&#62;, 0}).
+ 3> emqtt:subscribe(Conn, {&#60;&#60;"hello"&#62;&#62;, 0}).
  {ok,undefined,[0]}
- 4> emqtt:publish(Conn2, &#60;&#60;"hello"&#62;&#62;, &#60;&#60;"Hello World!"&#62;&#62;, 0).
+ 4> emqtt:publish(Conn, &#60;&#60;"hello"&#62;&#62;, &#60;&#60;"Hello World!"&#62;&#62;, 0).
  ok
  5> flush().
  Shell got {publish,#{client_pid => &#60;0.193.0&#62;,dup => false,
