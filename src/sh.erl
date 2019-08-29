@@ -12,7 +12,7 @@ sh(Port) -> sh(Port, reduce(), []).
 sh(Port, Fun, Acc) ->
     receive
         {Port, {exit_status, Status}} -> {done, Status, iolist_to_binary(lists:reverse(Acc))};
-        {Port, {data, {eol, Line}}} -> sh(Port, Fun, Fun({eol, Line}, Acc));
+        {Port, {data, {eol, Line}}}   -> sh(Port, Fun, Fun({eol,   Line}, Acc));
         {Port, {data, {noeol, Line}}} -> sh(Port, Fun, Fun({noeol, Line}, Acc));
         {Port, {data, Data}} ->
            case {binary:match(Data,  <<"Sign the certificate? [y/n]:">>) =/= nomatch,

@@ -14,7 +14,7 @@ cat(X)          -> lists:concat(X).
 run(X)          -> sh:sh(sh:run(X)).
 reply(X,Y,Z,R)  -> cowboy_req:reply(X,Y,Z,R).
 bind(X,Y)       -> binary_to_list(cowboy_req:binding(X,Y)).
-template()      -> {ok,Bin} = file:read_file("priv/cnf/synrc.cnf"), Bin.
+cnf()           -> {ok,Bin} = file:read_file("priv/cnf/synrc.cnf"), Bin.
 replace(S,A,B)  -> re:replace(S,A,B,[global,{return,binary}]).
 echo(<<>>, Req) -> reply(400,#{},<<"General Enrolment Error">>,Req);
 echo(Echo, Req) -> reply(200,#{<<"content-type">> => <<"text/plain;charset=utf-8">>},Echo,Req).
@@ -27,13 +27,10 @@ boot(Crypto) ->
         {ok,_} -> skip end, {ok,Crypto}.
 
 do_boot(Crypto) ->
-   Num = <<"1000">>,
-   Bin = replace(replace(template(),"PATH",mad_utils:cwd()),"CRYPTO",Crypto),
-   {Dir,CNF} = root(Crypto),
-   filelib:ensure_dir(Dir),
-   lists:map(fun({A,B}) -> file:write_file(Dir++A,B) end,
-       [{"index.txt",<<>>},{"crlnumber",Num},{"serial",Num},{CNF,Bin}]),
-   ca(Crypto).
+   {Num,Bin} = {<<"1000">>,replace(replace(cnf(),"PATH",mad_utils:cwd()),"CRYPTO",Crypto)},
+   {Dir,CNF} = root(Crypto), filelib:ensure_dir(Dir),
+   Files     = [{"index.txt",<<>>},{"crlnumber",Num},{"serial",Num},{CNF,Bin}],
+   lists:map(fun({A,B}) -> file:write_file(Dir++A,B) end, Files), ca(Crypto).
 
 ca("rsa") ->
     {done,0,_} = run("openssl genrsa -out cert/rsa/caroot.key 2048"),
@@ -65,12 +62,12 @@ maybe_service(_, _, R)              -> reply(405, #{}, <<"Unknown.">>, R).
 service(Crypto,Type,Req) when (Crypto == "rsa" orelse Crypto == "ecc")
                       andalso (Type == "client" orelse Type == "server") ->
     {ok,CSR, _} = cowboy_req:read_body(Req),
-    {ok, Cert } = enroll(CSR,Crypto,Type),
-    {_,{_,D,_}} = lists:keysearch('Certificate',1,public_key:pem_decode(Cert)),
+    {ok,PEM}    = enroll(CSR,Crypto,Type),
+    {_,{_,D,_}} = lists:keysearch('Certificate',1,public_key:pem_decode(PEM)),
     OTPCert = public_key:pkix_decode_cert(D,otp),
     PKIInfo = OTPCert#'OTPCertificate'.tbsCertificate#'OTPTBSCertificate'.subjectPublicKeyInfo,
     io:format("ENROLL PUBLIC KEY [~s,~s] ~p~n",[Crypto,Type,PKIInfo]),
-    echo(Cert, Req);
+    echo(PEM,Req);
 
 service(_,_,R) ->
     echo(<<>>,R).
