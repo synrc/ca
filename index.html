@@ -17,10 +17,9 @@
             <div>Open Source Certificate Authority (CA) by SYNRC.
                  It provides Public Key Infrastructure (PKI) with both:
                  Elliptic Curve Cryptography (ECC), best suited for IoT security;
-                 and legacy Rivest–Shamir–Adleman (RSA) cryptography. It also
+                 and legacy Rivest–Shamir–Adleman (RSA) cryptography. It
                  supports CSR certificate enrollment and provides OCSP responder
-                 for fast revokation checking. As a dependency it contains LDAP directory
-                 server.</div>
+                 for fast revokation checking.</div>
 
         </section>
         <section>
@@ -42,19 +41,47 @@
 <main>
     <article>
         <section>
-           <h3>INTRO</h3>
-           <p></p>
+          <h3>INTRO</h3>
+           <p>The reason we chose Erlang for securing SSL connections
+              is simple — there was no heartbleed for Erlang SSL application yet!
+              Here you can find simple 200 LOC Certificate Authority Server
+              that is used to enroll server cerficates (for SYNRC applications)
+              and client certificates (for securing device connections).
+              </p>
         </section>
         <section>
            <h3>SETUP CA</h3>
+           <p>SYNRC CA supports all Erlang package managers: mix, mad, rebar3, rebar, erlang.mk.</p>
            <figure><code>
  $ mad get ca
  $ cd deps/ca
  $ mad deps compile plan start
+ OK
            </code></figure>
+           <p>You can either use you own instance or SYNRC CA instance.
+              Here is how to obtain the SYNRC root certificate:</p>
+           <figure><code>
+ $ curl http://ca.n2o.dev:8046/up/ecc
+
+ -----BEGIN CERTIFICATE-----
+ MIICCTCCAY+gAwIBAgIJAL7mRQ3V5XfRMAoGCCqGSM49BAMDMDkxCzAJBgNVBAYT
+ AlVBMQ0wCwYDVQQIDARLeWl2MQ4wDAYDVQQKDAVTWU5SQzELMAkGA1UEAwwCQ0Ew
+ HhcNMTkwODI4MTUxNjAwWhcNMjkwODI1MTUxNjAwWjA5MQswCQYDVQQGEwJVQTEN
+ MAsGA1UECAwES3lpdjEOMAwGA1UECgwFU1lOUkMxCzAJBgNVBAMMAkNBMHYwEAYH
+ KoZIzj0CAQYFK4EEACIDYgAETgSyGA+SvE1opUuTfgzB8l5v/oMrixxmiaL/0MBs
+ HfavVIc1kBccyVJLXa4hXkJ7gu29owsAQa8KqQbzOqE4z0O+Y0pveHayGAFOlKzg
+ Rzf1FPJwbgwKiE8DziiwXnGOo2MwYTAdBgNVHQ4EFgQUp+knJG+Hjx6QGSmL3XNr
+ VO8A5d8wHwYDVR0jBBgwFoAUp+knJG+Hjx6QGSmL3XNrVO8A5d8wDwYDVR0TAQH/
+ BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAYYwCgYIKoZIzj0EAwMDaAAwZQIwEmCAed7n
+ UdyIdmlbVq+b/ecUWx6DdqltragIeaNFXCA+2tFL071wJTId8HWl4xqrAjEAu8OE
+ AnIXa+Pv5M4XqjmqDwvx+6VffF2ZmSUrkV/FBG0tyPVwyfbwNODEcziUq++E
+ -----END CERTIFICATE-----
+          </code></figure>
         </section>
         <section>
            <h3>ISSUE SERVER CERT</h3>
+           <p>For securing your N2O application just issue server certificate
+              with your [unique] application name and specify the path to keys as a cowboy's variables.</p>
            <figure><code>
  $ mad ecc server BANK
  CERT: ECC SERVER 'BANK'
@@ -71,19 +98,19 @@
                252,49,202,98,5,109,204,254,111,103&#62;&#62;}}
  OK
            </code></figure>
+           <p>Here is example which you should include as a startup for <b>ranch/cowboy</b> server:</p>
            <figure><code>
- cowboy:start_tls(http, env(fin),
-    #{env => #{dispatch => n2o_cowboy2:points()} }).
-
- env(App) ->
-  [ {port,       application:get_env(n2o,port,8041)},
+   [
     {certfile,   "cert/ecc/BANK.pem"},
     {keyfile,    "cert/ecc/BANK.key"},
-    {cacertfile, "cert/ecc/caroot.pem"}].
+    {cacertfile, "cert/ecc/caroot.pem"}
+   ]
            </code></figure>
         </section>
         <section>
            <h3>ISSUE CLIENT CERT</h3>
+           <p>Here is an example how to obtain end-user certificate that should be installed
+              manually at the device:</p>
            <figure><code>
  $ mad ecc client Maxim Sokhatsky
  CERT: ECC CLIENT 'Maxim Sokhatsky'
@@ -99,6 +126,34 @@
                56,50,88,89,186,88,16,117,123,250,249,140,190,253,122,95,134,
                177,127,165,172,194,178,103,113,211,118,87,134,11&#62;&#62;}}
            </code></figure>
+           <p>Here is e.g. how to secure MQTT IoT connection with ECC cryptography.
+              First install <a href="https://xio.n2o.space">XIO</a> server and protect
+              is with server cerficate (as described above).
+              And then use <b>emqtt</b> client and your personal client certificate:</p>
+           <figure><code>
+ 1> {ok, Conn2} = emqtt:start_link([
+       {client_id, &#60;&#60;"5HT"&#62;&#62;},
+       {ssl, true},
+       {port, 8883},
+       {ssl_opts, [
+           {certfile,"cert/ecc/Maxim Sokhatsky.pem"},
+           {keyfile,"cert/ecc/Maxim Sokhatsky.key"},
+           {cacertfile,"synrc/cert/ecc/caroot.pem"}]}]).
+ {ok,&#60;0.193.0&#62;}
+ 2> emqtt:connect(Conn2).
+ {ok,undefined}
+ 3> emqtt:subscribe(Conn2, {&#60;&#60;"hello"&#62;&#62;, 0}).
+ {ok,undefined,[0]}
+ 4> emqtt:publish(Conn2, &#60;&#60;"hello"&#62;&#62;, &#60;&#60;"Hello World!"&#62;&#62;, 0).
+ ok
+ 5> flush().
+ Shell got {publish,#{client_pid => &#60;0.193.0&#62;,dup => false,
+                     packet_id => undefined,payload => &#60;&#60;"Hello World!"&#62;&#62;,
+                     properties => undefined,qos => 0,retain => false,
+                     topic => &#60;&#60;"hello"&#62;&#62;}}
+ ok
+           </code></figure>
+
         </section>
     </article>
 </main>
