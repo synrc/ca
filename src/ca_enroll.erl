@@ -49,7 +49,7 @@ ca("ecc") ->
 enroll(CSR,Crypto,Type) ->
     file:write_file(cat(["cert/",Crypto,"/",Type,".csr"]),CSR),
     Pass = application:get_env(ca,passin,"pass:0"),
-    Policy = case Type of "server" -> "server_cert"; "client" -> "usr_cert" end,
+    Policy = case Type of "server" -> "server_cert"; "client" -> "usr_cert"; _ -> Type end,
     {done,0,_} = run("openssl ca -config cert/"++Crypto++"/synrc.cnf -extensions "++Policy++" -days 365"
         " -in cert/"++Crypto++"/"++Type++".csr -out cert/"++Crypto++"/"++Type++".pem -passin "
      ++ Pass ++ " -cert cert/"++Crypto++"/caroot.pem -keyfile cert/"++Crypto++"/caroot.key"),
@@ -60,7 +60,7 @@ maybe_service(<<"POST">>, false, R) -> reply(400, #{}, <<"Missing body.">>, R);
 maybe_service(_, _, R)              -> reply(405, #{}, <<"Unknown.">>, R).
 
 service(Crypto,Type,Req) when (Crypto == "rsa" orelse Crypto == "ecc")
-                      andalso (Type == "client" orelse Type == "server") ->
+                      andalso (Type == "client" orelse Type == "server" orelse Type == "ocsp") ->
     {ok,CSR, _} = cowboy_req:read_body(Req),
     {ok,PEM}    = enroll(CSR,Crypto,Type),
     {_,{_,D,_}} = lists:keysearch('Certificate',1,public_key:pem_decode(PEM)),
