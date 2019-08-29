@@ -62,7 +62,6 @@
               Here is how to obtain the SYNRC root certificate:</p>
            <figure><code>
  $ curl http://ca.n2o.dev:8046/up/ecc
-
  -----BEGIN CERTIFICATE-----
  MIICCTCCAY+gAwIBAgIJAL7mRQ3V5XfRMAoGCCqGSM49BAMDMDkxCzAJBgNVBAYT
  AlVBMQ0wCwYDVQQIDARLeWl2MQ4wDAYDVQQKDAVTWU5SQzELMAkGA1UEAwwCQ0Ew
@@ -76,6 +75,10 @@
  UdyIdmlbVq+b/ecUWx6DdqltragIeaNFXCA+2tFL071wJTId8HWl4xqrAjEAu8OE
  AnIXa+Pv5M4XqjmqDwvx+6VffF2ZmSUrkV/FBG0tyPVwyfbwNODEcziUq++E
  -----END CERTIFICATE-----
+          </code></figure>
+           <p>It can be stored in <b>cert/ecc/caroot.pem</b> with followin command:</p>
+           <figure><code>
+ $ mad ecc ca
           </code></figure>
         </section>
         <section>
