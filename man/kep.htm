@@ -32,12 +32,17 @@
    <p>Decode Certificate</p>
     <figure><code> > {_,bin} = :file.read_file("priv/file.p7s")
  {:ok,<<...>>}
- > :"KEP".decode(:"ContentInfo", bin)
+ > {_,{:ContentInfo,_,cert}} = :"KEP".decode(:"ContentInfo", bin)
  {:ok,
   {:ContentInfo, {1, 2, 840, 113549, 1, 7, 2},
    <<48, 130, 36, 107, 2, 1, 1, 49, 14, 48, 12, 6, 10, 42, 134, 36, 2, 1, 1, 1,
     1, 2, 1, 48, 11, 6, 9, 42, 134, 72, 134, 247, 13, 1, 7, 1, 160, 130, 6, 192 ,
-    48, 130, 6, 188, 48, ...>>}}</code></figure>
+    48, 130, 6, 188, 48, ...>>}}
+ > {:ok,{:SignedData,:v1,alg,_,c,_,a}} = :"KEP".decode(:SignedData, cert)
+ {:ok,
+  {:SignedData, :v1,
+   [{:AlgorithmIdentifier, {1, 2, 804, 2, 1, 1, 1, 1, 2, 1}, :asn1_NOVALUE}],
+   {:EncapsulatedContentInfo, {1, 2, 840, 113549, 1, 7, 1}, :asn1_NOVALUE},...}}</code></figure>
    <p>Decode Signature</p>
     <figure><code> > {_,bin} = :file.read_file("priv/EU-2B6C7DF9A3891DA104000000C1401B0094F9F000.cer")
  {:ok,<<...>>}
