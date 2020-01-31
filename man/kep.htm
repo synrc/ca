@@ -30,7 +30,7 @@
     <section>
 <h3>USAGE</h3>
    <p>Decode Signature</p>
-    <figure><code> > {_,bin} = :file.read_file("priv/file.p7s")
+    <figure><code> > {_,bin} = :file.read_file("file.p7s")
  {:ok,<<...>>}
  > {_,{:ContentInfo,_,cert}} = :"KEP".decode(:"ContentInfo", bin)
  {:ok,
@@ -44,7 +44,7 @@
    [{:AlgorithmIdentifier, {1, 2, 804, 2, 1, 1, 1, 1, 2, 1}, :asn1_NOVALUE}],
    {:EncapsulatedContentInfo, {1, 2, 840, 113549, 1, 7, 1}, :asn1_NOVALUE},...}}</code></figure>
    <p>Decode Certificate</p>
-    <figure><code> > {_,bin} = :file.read_file("priv/EU-2B6C7DF9A3891DA104000000C1401B0094F9F000.cer")
+    <figure><code> > {_,bin} = :file.read_file("EU-2B6C7DF9A3891DA104000000C1401B0094F9F000.cer")
  {:ok,<<...>>}
  > :"AuthenticationFramework".decode(:Certificate, bin)
  {:ok,
