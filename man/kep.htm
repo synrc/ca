@@ -67,14 +67,14 @@
  id-messageDigest OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 4}
  id-signingTime   OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 5}
 
- id-aa-signatureTimeStampToken OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 14}
+ id-aa-signTSToken OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 14}
  id-aa-ets-sigPolicyId OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 15}
- id-aa-ets-ContentTimeStamp OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 20}
- id-aa-ets-certificateRefs OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 21}
+ id-aa-ets-ContentTS OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 20}
+ id-aa-ets-certRefs OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 21}
  id-aa-ets-revocationRefs OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 22}
  id-aa-ets-certValues OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 23}
- id-aa-ets-revocationValues OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 24}
- id-aa-signingCertificateV2 OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 47}
+ id-aa-ets-revoValues OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 24}
+ id-aa-signingCertV2 OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 47}
  id-spq-ets-uri OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-spq(5) 1}
  id-spq-ets-unotice OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-spq(5) 2}
 
@@ -167,12 +167,17 @@
  CertificateSerialNumber ::= INTEGER
  SignedAttributes ::= SET SIZE (1..MAX) OF Attribute
  UnsignedAttributes ::= SET SIZE (1..MAX) OF Attribute
- Attribute ::= SEQUENCE {attrType OBJECT IDENTIFIER, attrValues SET OF AttributeValue }
  AttributeValue ::= ANY
  MessageDigest ::= OCTET STRING
-
- SigningCertificateV2 ::= SEQUENCE {certs SEQUENCE OF ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL}
  SignaturePolicyImplied ::= NULL
+
+ Attribute ::= SEQUENCE {
+   attrType OBJECT IDENTIFIER,
+   attrValues SET OF AttributeValue }
+
+ SigningCertificateV2 ::= SEQUENCE {
+   certs SEQUENCE OF ESSCertIDv2,
+   policies SEQUENCE OF PolicyInformation OPTIONAL }
 
  DisplayText ::= CHOICE {
    visibleString VisibleString (SIZE (1..200)),
