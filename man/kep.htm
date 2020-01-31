@@ -23,10 +23,12 @@
  BEGIN
 
  IMPORTS Attribute, Name
-   FROM  InformationFramework {joint-iso-itu-t ds(5) module(1) informationFramework(1) 3}
+   FROM  InformationFramework
+         {joint-iso-itu-t ds(5) module(1) informationFramework(1) 3}
          AlgorithmIdentifier, AttributeCertificate, Certificate, CertificateList,
          CertificateSerialNumber, HASH{}, SIGNED{}, Extensions, Version
-    FROM AuthenticationFramework {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 3}
+    FROM AuthenticationFramework
+         {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 3}
          PolicyInformation, CRLReason
     FROM CertificateExtensions;
 
