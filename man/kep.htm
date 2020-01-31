@@ -18,244 +18,241 @@
 <p>KEP is Ukrainian Fully Quialified Digital Signature Envelop compliant with ДСТУ&nbsp;4145-2002.</p>
 
     <figure><code>
-KEP DEFINITIONS IMPLICIT TAGS ::=
+ KEP DEFINITIONS IMPLICIT TAGS ::=
 
-BEGIN
+ BEGIN
 
-IMPORTS Attribute, Name
-  FROM  InformationFramework {joint-iso-itu-t ds(5) module(1) informationFramework(1) 3}
-        AlgorithmIdentifier, AttributeCertificate, Certificate, CertificateList,
-        CertificateSerialNumber, HASH{}, SIGNED{}, Extensions, Version
-   FROM AuthenticationFramework {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 3}
-        PolicyInformation, CRLReason
-   FROM CertificateExtensions;
+ IMPORTS Attribute, Name
+   FROM  InformationFramework {joint-iso-itu-t ds(5) module(1) informationFramework(1) 3}
+         AlgorithmIdentifier, AttributeCertificate, Certificate, CertificateList,
+         CertificateSerialNumber, HASH{}, SIGNED{}, Extensions, Version
+    FROM AuthenticationFramework {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 3}
+         PolicyInformation, CRLReason
+    FROM CertificateExtensions;
 
-ContentInfo ::= SEQUENCE {
-  contentType ContentType,
-  content [0] EXPLICIT ANY DEFINED BY contentType }
+ ContentInfo ::= SEQUENCE {
+   contentType ContentType,
+   content [0] EXPLICIT ANY DEFINED BY contentType }
 
-UnknownInfo ::= NULL
+ UnknownInfo ::= NULL
 
-CrlValidatedID ::= SEQUENCE {
-  crlHash OtherHash,
-  crlIdentifier CrlIdentifier OPTIONAL}
+ CrlValidatedID ::= SEQUENCE {
+   crlHash OtherHash,
+   crlIdentifier CrlIdentifier OPTIONAL}
 
-OtherHash ::= CHOICE {
-  sha1Hash OtherHashValue,
-  otherHash OtherHashAlgAndValue}
+ OtherHash ::= CHOICE {
+   sha1Hash OtherHashValue,
+   otherHash OtherHashAlgAndValue}
 
-OcspListID ::= SEQUENCE {
-  ocspResponses SEQUENCE OF OcspResponsesID}
+ OcspListID ::= SEQUENCE {
+   ocspResponses SEQUENCE OF OcspResponsesID}
 
-OcspResponsesID ::= SEQUENCE {
-  ocspIdentifier OcspIdentifier,
-  ocspRepHash OtherHash OPTIONAL
-}
+ OcspResponsesID ::= SEQUENCE {
+   ocspIdentifier OcspIdentifier,
+   ocspRepHash OtherHash OPTIONAL }
 
-OtherRevRefs ::= SEQUENCE {
-  otherRevRefType OtherRevRefType,
-  otherRevRefs ANY DEFINED BY otherRevRefType
-}
+ OtherRevRefs ::= SEQUENCE {
+   otherRevRefType OtherRevRefType,
+   otherRevRefs ANY DEFINED BY otherRevRefType }
 
-OcspIdentifier ::= SEQUENCE {
-  ocspResponderID ResponderID,
-  producedAt GeneralizedTime
-}
+ OcspIdentifier ::= SEQUENCE {
+   ocspResponderID ResponderID,
+   producedAt GeneralizedTime }
 
-OtherRevRefType ::= OBJECT IDENTIFIER
-ContentType  ::= OBJECT IDENTIFIER
-id-data          OBJECT IDENTIFIER ::= {1 2 840 113549 1 7 1}
-id-signedData    OBJECT IDENTIFIER ::= {1 2 840 113549 1 7 2}
-id-contentType   OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 3}
-id-messageDigest OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 4}
-id-signingTime   OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 5}
+ OtherRevRefType ::= OBJECT IDENTIFIER
+ ContentType  ::= OBJECT IDENTIFIER
+ id-data          OBJECT IDENTIFIER ::= {1 2 840 113549 1 7 1}
+ id-signedData    OBJECT IDENTIFIER ::= {1 2 840 113549 1 7 2}
+ id-contentType   OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 3}
+ id-messageDigest OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 4}
+ id-signingTime   OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 5}
 
-id-spq-ets-uri                OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-spq(5) 1}
-id-spq-ets-unotice            OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-spq(5) 2}
-id-aa-signatureTimeStampToken OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 14}
-id-aa-ets-sigPolicyId         OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 15}
-id-aa-ets-ContentTimeStamp    OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 20}
-id-aa-ets-certificateRefs     OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 21}
-id-aa-ets-revocationRefs      OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 22}
-id-aa-ets-certValues          OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 23}
-id-aa-ets-revocationValues    OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 24}
-id-aa-signingCertificateV2    OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 47}
+ id-aa-signatureTimeStampToken OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 14}
+ id-aa-ets-sigPolicyId OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 15}
+ id-aa-ets-ContentTimeStamp OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 20}
+ id-aa-ets-certificateRefs OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 21}
+ id-aa-ets-revocationRefs OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 22}
+ id-aa-ets-certValues OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 23}
+ id-aa-ets-revocationValues OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 24}
+ id-aa-signingCertificateV2 OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 47}
+ id-spq-ets-uri OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-spq(5) 1}
+ id-spq-ets-unotice OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-spq(5) 2}
 
-CMSVersion ::= INTEGER {v0(0), v1(1), v2(2), v3(3), v4(4), v5(5)}
+ CMSVersion ::= INTEGER {v0(0), v1(1), v2(2), v3(3), v4(4), v5(5)}
 
-gost34311 OBJECT IDENTIFIER ::= {iso(1) member-body(2) ua(804)
-  root(2) security(1) cryptography(1) pki(1) pki-alg(1) pki-alg-hash (2) 1}
+ gost34311 OBJECT IDENTIFIER ::= {iso(1) member-body(2) ua(804)
+   root(2) security(1) cryptography(1) pki(1) pki-alg(1) pki-alg-hash (2) 1}
 
-OTHER-NAME ::= TYPE-IDENTIFIER
-GeneralNames ::= SEQUENCE SIZE (1..MAX) OF GeneralName
-GeneralName ::= CHOICE {
-  otherName                  [0]  INSTANCE OF OTHER-NAME,
-  rfc822Name                 [1]  IA5String,
-  dNSName                    [2]  IA5String,
-  directoryName              [4]  Name,
-  uniformResourceIdentifier  [6]  IA5String,
-  iPAddress                  [7]  OCTET STRING,
-  registeredID               [8]  OBJECT IDENTIFIER
-}
+ OTHER-NAME ::= TYPE-IDENTIFIER
+ GeneralNames ::= SEQUENCE SIZE (1..MAX) OF GeneralName
+ GeneralName ::= CHOICE {
+   otherName                  [0]  INSTANCE OF OTHER-NAME,
+   rfc822Name                 [1]  IA5String,
+   dNSName                    [2]  IA5String,
+   directoryName              [4]  Name,
+   uniformResourceIdentifier  [6]  IA5String,
+   iPAddress                  [7]  OCTET STRING,
+   registeredID               [8]  OBJECT IDENTIFIER }
 
-TSAPolicyId ::= OBJECT IDENTIFIER
-SignatureAlgorithmIdentifier ::= AlgorithmIdentifier
-KeyIdentifier ::= OCTET STRING
-SubjectKeyIdentifier ::= KeyIdentifier
-RevocationInfoChoices ::= SET OF CertificateList
-SignerInfos ::= SET OF SignerInfo
-CertificateSet ::= SET OF Certificate
-SignedData ::= SEQUENCE {
-  version CMSVersion,
-  digestAlgorithms DigestAlgorithmIdentifiers,
-  encapContentInfo EncapsulatedContentInfo,
-  certificates [0] IMPLICIT CertificateSet OPTIONAL,
-  crls [1] IMPLICIT RevocationInfoChoices OPTIONAL,
-  signerInfos SignerInfos }
+ TSAPolicyId ::= OBJECT IDENTIFIER
+ SignatureAlgorithmIdentifier ::= AlgorithmIdentifier
+ KeyIdentifier ::= OCTET STRING
+ SubjectKeyIdentifier ::= KeyIdentifier
+ RevocationInfoChoices ::= SET OF CertificateList
+ SignerInfos ::= SET OF SignerInfo
+ CertificateSet ::= SET OF Certificate
+ SignedData ::= SEQUENCE {
+   version CMSVersion,
+   digestAlgorithms DigestAlgorithmIdentifiers,
+   encapContentInfo EncapsulatedContentInfo,
+   certificates [0] IMPLICIT CertificateSet OPTIONAL,
+   crls [1] IMPLICIT RevocationInfoChoices OPTIONAL,
+   signerInfos SignerInfos }
 
-EncapsulatedContentInfo ::= SEQUENCE {
-  eContentType ContentType,
-  eContent [0] EXPLICIT OCTET STRING OPTIONAL }
+ EncapsulatedContentInfo ::= SEQUENCE {
+   eContentType ContentType,
+   eContent [0] EXPLICIT OCTET STRING OPTIONAL }
 
-SignerInfo ::= SEQUENCE {
-  version CMSVersion,
-  sid SignerIdentifier,
-  digestAlgorithm DigestAlgorithmIdentifier,
-  signedAttrs [0] IMPLICIT SignedAttributes OPTIONAL,
-  signatureAlgorithm SignatureAlgorithmIdentifier,
-  signature OCTET STRING,
-  unsignedAttrs [1] IMPLICIT UnsignedAttributes OPTIONAL }
+ SignerInfo ::= SEQUENCE {
+   version CMSVersion,
+   sid SignerIdentifier,
+   digestAlgorithm DigestAlgorithmIdentifier,
+   signedAttrs [0] IMPLICIT SignedAttributes OPTIONAL,
+   signatureAlgorithm SignatureAlgorithmIdentifier,
+   signature OCTET STRING,
+   unsignedAttrs [1] IMPLICIT UnsignedAttributes OPTIONAL }
 
-SignerIdentifier ::= CHOICE {
-  issuerAndSerialNumber IssuerAndSerialNumber,
-  subjectKeyIdentifier [0] SubjectKeyIdentifier }
+ SignerIdentifier ::= CHOICE {
+   issuerAndSerialNumber IssuerAndSerialNumber,
+   subjectKeyIdentifier [0] SubjectKeyIdentifier }
 
-IssuerAndSerialNumber ::= SEQUENCE {
-  issuer Name,
-  serialNumber INTEGER }
+ IssuerAndSerialNumber ::= SEQUENCE {
+   issuer Name,
+   serialNumber INTEGER }
 
-Hash ::= OCTET STRING
-  IssuerSerial ::= SEQUENCE {
-  issuer GeneralNames,
-  serialNumber CertificateSerialNumber}
+ Hash ::= OCTET STRING
+   IssuerSerial ::= SEQUENCE {
+   issuer GeneralNames,
+   serialNumber CertificateSerialNumber}
 
-ESSCertIDv2 ::= SEQUENCE {
-  hashAlgorithm AlgorithmIdentifier,
-  certHash Hash,
-  issuerSerial IssuerSerial}
+ ESSCertIDv2 ::= SEQUENCE {
+   hashAlgorithm AlgorithmIdentifier,
+   certHash Hash,
+   issuerSerial IssuerSerial}
 
-OtherHashValue ::= OCTET STRING
-OtherHashAlgAndValue ::= SEQUENCE {
-  hashAlgorithm AlgorithmIdentifier,
-  hashValue OtherHashValue }
+ OtherHashValue ::= OCTET STRING
+ OtherHashAlgAndValue ::= SEQUENCE {
+   hashAlgorithm AlgorithmIdentifier,
+   hashValue OtherHashValue }
 
-SPuri ::= IA5String
+ SPuri ::= IA5String
 
-SigPolicyId ::= OBJECT IDENTIFIER
-SigPolicyHash ::= OtherHashAlgAndValue
-SigPolicyQualifierId ::= OBJECT IDENTIFIER
+ SigPolicyId ::= OBJECT IDENTIFIER
+ SigPolicyHash ::= OtherHashAlgAndValue
+ SigPolicyQualifierId ::= OBJECT IDENTIFIER
 
-SignaturePolicyIdentifier ::= CHOICE {
-  signaturePolicy SignaturePolicyId }
+ SignaturePolicyIdentifier ::= CHOICE {
+   signaturePolicy SignaturePolicyId }
 
-SigPolicyQualifierInfo ::= SEQUENCE {
-  sigPolicyQualifierId SigPolicyQualifierId,
-  sigQualifier ANY DEFINED BY sigPolicyQualifierId }
+ SigPolicyQualifierInfo ::= SEQUENCE {
+   sigPolicyQualifierId SigPolicyQualifierId,
+   sigQualifier ANY DEFINED BY sigPolicyQualifierId }
 
-SignaturePolicyId ::= SEQUENCE {
-  sigPolicyId SigPolicyId,
-  sigPolicyHash SigPolicyHash OPTIONAL }
+ SignaturePolicyId ::= SEQUENCE {
+   sigPolicyId SigPolicyId,
+   sigPolicyHash SigPolicyHash OPTIONAL }
 
-DigestAlgorithmIdentifiers ::= SET OF DigestAlgorithmIdentifier
-DigestAlgorithmIdentifier ::= AlgorithmIdentifier
-CertificateSerialNumber ::= INTEGER
-SignedAttributes ::= SET SIZE (1..MAX) OF Attribute
-UnsignedAttributes ::= SET SIZE (1..MAX) OF Attribute
-Attribute ::= SEQUENCE {attrType OBJECT IDENTIFIER, attrValues SET OF AttributeValue }
-AttributeValue ::= ANY
-MessageDigest ::= OCTET STRING
+ DigestAlgorithmIdentifiers ::= SET OF DigestAlgorithmIdentifier
+ DigestAlgorithmIdentifier ::= AlgorithmIdentifier
+ CertificateSerialNumber ::= INTEGER
+ SignedAttributes ::= SET SIZE (1..MAX) OF Attribute
+ UnsignedAttributes ::= SET SIZE (1..MAX) OF Attribute
+ Attribute ::= SEQUENCE {attrType OBJECT IDENTIFIER, attrValues SET OF AttributeValue }
+ AttributeValue ::= ANY
+ MessageDigest ::= OCTET STRING
 
-SigningCertificateV2 ::= SEQUENCE {certs SEQUENCE OF ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL}
-SignaturePolicyImplied ::= NULL
+ SigningCertificateV2 ::= SEQUENCE {certs SEQUENCE OF ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL}
+ SignaturePolicyImplied ::= NULL
 
-DisplayText ::= CHOICE {
-  visibleString VisibleString (SIZE (1..200)),
-  bmpString BMPString (SIZE (1..200)),
-  utf8String UTF8String (SIZE (1..200))}
+ DisplayText ::= CHOICE {
+   visibleString VisibleString (SIZE (1..200)),
+   bmpString BMPString (SIZE (1..200)),
+   utf8String UTF8String (SIZE (1..200))}
 
-CrlOcspRef ::= SEQUENCE {
-  crlids     [0] CRLListID OPTIONAL,
-  ocspids    [1] OcspListID OPTIONAL,
-  otherRev   [2] OtherRevRefs OPTIONAL }
+ CrlOcspRef ::= SEQUENCE {
+   crlids     [0] CRLListID OPTIONAL,
+   ocspids    [1] OcspListID OPTIONAL,
+   otherRev   [2] OtherRevRefs OPTIONAL }
 
-CrlIdentifier ::= SEQUENCE {
-  crlissuer Name,
-  crlIssuedTime UTCTime,
-  crlNumber INTEGER OPTIONAL }
+ CrlIdentifier ::= SEQUENCE {
+   crlissuer Name,
+   crlIssuedTime UTCTime,
+   crlNumber INTEGER OPTIONAL }
 
-BasicOCSPResponse ::= SEQUENCE {
-  tbsResponseData ResponseData,
-  signatureAlgorithm AlgorithmIdentifier,
-  signature BIT STRING,
-  certs [0] EXPLICIT SEQUENCE OF Certificate OPTIONAL}
+ BasicOCSPResponse ::= SEQUENCE {
+   tbsResponseData ResponseData,
+   signatureAlgorithm AlgorithmIdentifier,
+   signature BIT STRING,
+   certs [0] EXPLICIT SEQUENCE OF Certificate OPTIONAL}
 
-ResponseData ::= SEQUENCE {
-  version [0] EXPLICIT Version DEFAULT v1,
-  responderID ResponderID,
-  producedAt GeneralizedTime,
-  responses SEQUENCE OF SingleResponse,
-  responseExtensions [1] EXPLICIT Extensions OPTIONAL} 
+ ResponseData ::= SEQUENCE {
+   version [0] EXPLICIT Version DEFAULT v1,
+   responderID ResponderID,
+   producedAt GeneralizedTime,
+   responses SEQUENCE OF SingleResponse,
+   responseExtensions [1] EXPLICIT Extensions OPTIONAL} 
 
-ResponderID ::= CHOICE {
-  byName [1] Name,
-  byKey [2] KeyHash}
+ ResponderID ::= CHOICE {
+   byName [1] Name,
+   byKey [2] KeyHash}
 
-KeyHash ::= OCTET STRING
+ KeyHash ::= OCTET STRING
 
-CertID ::= SEQUENCE {
-  hashAlgorithm AlgorithmIdentifier,
-  issuerNameHash OCTET STRING,
-  issuerKeyHash OCTET STRING,
-  serialNumber CertificateSerialNumber}
+ CertID ::= SEQUENCE {
+   hashAlgorithm AlgorithmIdentifier,
+   issuerNameHash OCTET STRING,
+   issuerKeyHash OCTET STRING,
+   serialNumber CertificateSerialNumber}
 
-CertStatus ::= CHOICE {
-  good [0] IMPLICIT NULL,
-  revoked [1] IMPLICIT RevokedInfo,
-  unknown [2] IMPLICIT UnknownInfo }
+ CertStatus ::= CHOICE {
+   good [0] IMPLICIT NULL,
+   revoked [1] IMPLICIT RevokedInfo,
+   unknown [2] IMPLICIT UnknownInfo }
 
-RevokedInfo ::= SEQUENCE {
-  revocationTime GeneralizedTime,
-  revocationReason [0] EXPLICIT CRLReason OPTIONAL }
+ RevokedInfo ::= SEQUENCE {
+   revocationTime GeneralizedTime,
+   revocationReason [0] EXPLICIT CRLReason OPTIONAL }
 
-SingleResponse ::= SEQUENCE {
-  certID CertID,
-  certStatus CertStatus,
-  thisUpdate GeneralizedTime,
-  nextUpdate [0] EXPLICIT GeneralizedTime OPTIONAL,
-  singleExtensions [1] EXPLICIT Extensions OPTIONAL }
+ SingleResponse ::= SEQUENCE {
+   certID CertID,
+   certStatus CertStatus,
+   thisUpdate GeneralizedTime,
+   nextUpdate [0] EXPLICIT GeneralizedTime OPTIONAL,
+   singleExtensions [1] EXPLICIT Extensions OPTIONAL }
 
-RevocationValues ::= SEQUENCE {
-  crlVals       [0] SEQUENCE OF CertificateList OPTIONAL,
-  ocspVals      [1] SEQUENCE OF BasicOCSPResponse OPTIONAL,
-  otherRevVals  [2] OtherRevVals OPTIONAL}
+ RevocationValues ::= SEQUENCE {
+   crlVals       [0] SEQUENCE OF CertificateList OPTIONAL,
+   ocspVals      [1] SEQUENCE OF BasicOCSPResponse OPTIONAL,
+   otherRevVals  [2] OtherRevVals OPTIONAL}
 
-OtherRevValType ::= OBJECT IDENTIFIER
-OtherRevVals ::= SEQUENCE { otherRevValType OtherRevValType }
-CRLListID ::= SEQUENCE { crls SEQUENCE OF CrlValidatedID}
+ OtherRevValType ::= OBJECT IDENTIFIER
+ OtherRevVals ::= SEQUENCE { otherRevValType OtherRevValType }
+ CRLListID ::= SEQUENCE { crls SEQUENCE OF CrlValidatedID}
 
-MessageImprint ::= SEQUENCE {
-  hashAlgorithm AlgorithmIdentifier,
-  hashedMessage OCTET STRING }
+ MessageImprint ::= SEQUENCE {
+   hashAlgorithm AlgorithmIdentifier,
+   hashedMessage OCTET STRING }
 
-TimeStampReq ::= SEQUENCE {
-  version           INTEGER { v1(1) },
-  messageImprint    MessageImprint,
-  reqPolicy         TSAPolicyId OPTIONAL,
-  nonce             INTEGER OPTIONAL,
-  certReq           BOOLEAN DEFAULT FALSE,
-  extensions    [0] IMPLICIT Extensions OPTIONAL}
+ TimeStampReq ::= SEQUENCE {
+   version           INTEGER { v1(1) },
+   messageImprint    MessageImprint,
+   reqPolicy         TSAPolicyId OPTIONAL,
+   nonce             INTEGER OPTIONAL,
+   certReq           BOOLEAN DEFAULT FALSE,
+   extensions    [0] IMPLICIT Extensions OPTIONAL}
 
-END    </code></figure>
+END
+    </code></figure>
     </section>
 </main><footer>
     2005—2019 © Synrc Research Center
