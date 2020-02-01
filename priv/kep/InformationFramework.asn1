@@ -1,6 +1,5 @@
 -- Module InformationFramework (X.501:08/1997)
-InformationFramework {joint-iso-itu-t ds(5) module(1) informationFramework(1) 
-  3} DEFINITIONS ::=
+InformationFramework {joint-iso-itu-t ds(5) module(1) informationFramework(1) 3} DEFINITIONS ::=
 BEGIN
 
 -- EXPORTS All -
@@ -9,10 +8,8 @@ BEGIN
 -- Directory services. Other applications may use them for their own purposes, but this will not constrain
 -- extensions and modifications needed to maintain or improve the Directory service.
 IMPORTS
-  id-oc, id-at, id-mr, id-oa, id-sc, id-ar, id-nf, selectedAttributeTypes,
-    directoryAbstractService, upperBounds
-    FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1)
-      usefulDefinitions(0) 3}
+  id-oc, id-at, id-mr, id-oa, id-sc, id-ar, id-nf, selectedAttributeTypes, directoryAbstractService, upperBounds
+    FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1) usefulDefinitions(0) 3}
   commonName, generalizedTimeMatch, generalizedTimeOrderingMatch, booleanMatch,
     integerMatch, integerOrderingMatch, objectIdentifierFirstComponentMatch,
     integerFirstComponentMatch, DirectoryString{}
@@ -35,7 +32,6 @@ Attribute ::= SEQUENCE {
 }
 
 AttributeType ::= ATTRIBUTE.&id
-
 AttributeValue ::= ATTRIBUTE.&Type
 
 Context ::= SEQUENCE {
@@ -80,15 +76,23 @@ SupportedContexts CONTEXT ::=
   {...}
 
 -- naming data types 
-Name ::= CHOICE { -- only one possibility for now --rdnSequence  RDNSequence
+Name ::= CHOICE { -- only one possibility for now 
+  rdnSequence  RDNSequence
 }
 
 RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
-
 DistinguishedName ::= RDNSequence
+RelativeDistinguishedName ::= SET OF AttributeTypeAndValue
 
-RelativeDistinguishedName ::=
-  SET SIZE (1..MAX) OF AttributeTypeAndDistinguishedValue
+AttributeTypeX ::= OBJECT IDENTIFIER
+AttributeValueX ::= CHOICE {
+  utf8 UTF8String,
+  printable PrintableString,
+  else ANY }
+
+AttributeTypeAndValue ::= SEQUENCE {
+  type AttributeTypeX,
+  value AttributeValueX }
 
 AttributeTypeAndDistinguishedValue ::= SEQUENCE {
   type                  ATTRIBUTE.&id({SupportedAttributes}),
@@ -574,8 +578,9 @@ SearchRule ::= SEQUENCE {
   entryLimit            [15]  EntryLimit OPTIONAL
 }
 
-SearchRuleId ::= SEQUENCE {id     INTEGER,
-                           dmdId  [0]  OBJECT IDENTIFIER
+SearchRuleId ::= SEQUENCE {
+  id     INTEGER,
+  dmdId  [0]  OBJECT IDENTIFIER
 }
 
 AllowedSubset ::= BIT STRING {baseObject(0), oneLevel(1), wholeSubtree(2)}
@@ -770,76 +775,47 @@ MATCHING-RESTRICTION ::= CLASS {
 
 -- object identifier assignments 
 -- object classes 
-id-oc-top OBJECT IDENTIFIER ::=
-  {id-oc 0}
 
+id-oc-top OBJECT IDENTIFIER ::=  {id-oc 0}
 id-oc-alias OBJECT IDENTIFIER ::= {id-oc 1}
-
 id-oc-parent OBJECT IDENTIFIER ::= {id-oc 28}
-
 id-oc-child OBJECT IDENTIFIER ::= {id-oc 29}
 
 -- attributes 
 id-at-objectClass OBJECT IDENTIFIER ::= {id-at 0}
-
 id-at-aliasedEntryName OBJECT IDENTIFIER ::= {id-at 1}
 
 -- matching rules 
 id-mr-objectIdentifierMatch OBJECT IDENTIFIER ::= {id-mr 0}
-
 id-mr-distinguishedNameMatch OBJECT IDENTIFIER ::= {id-mr 1}
 
 -- operational attributes 
-id-oa-excludeAllCollectiveAttributes OBJECT IDENTIFIER ::=
-  {id-oa 0}
-
+id-oa-excludeAllCollectiveAttributes OBJECT IDENTIFIER ::= {id-oa 0}
 id-oa-createTimestamp OBJECT IDENTIFIER ::= {id-oa 1}
-
 id-oa-modifyTimestamp OBJECT IDENTIFIER ::= {id-oa 2}
-
 id-oa-creatorsName OBJECT IDENTIFIER ::= {id-oa 3}
-
 id-oa-modifiersName OBJECT IDENTIFIER ::= {id-oa 4}
-
 id-oa-administrativeRole OBJECT IDENTIFIER ::= {id-oa 5}
-
 id-oa-subtreeSpecification OBJECT IDENTIFIER ::= {id-oa 6}
-
 id-oa-collectiveExclusions OBJECT IDENTIFIER ::= {id-oa 7}
-
 id-oa-subschemaTimestamp OBJECT IDENTIFIER ::= {id-oa 8}
-
 id-oa-hasSubordinates OBJECT IDENTIFIER ::= {id-oa 9}
-
 id-oa-subschemaSubentryList OBJECT IDENTIFIER ::= {id-oa 10}
-
 id-oa-accessControlSubentryList OBJECT IDENTIFIER ::= {id-oa 11}
-
 id-oa-collectiveAttributeSubentryList OBJECT IDENTIFIER ::= {id-oa 12}
-
 id-oa-contextDefaultSubentryList OBJECT IDENTIFIER ::= {id-oa 13}
-
 id-oa-contextAssertionDefault OBJECT IDENTIFIER ::= {id-oa 14}
-
 id-oa-serviceAdminSubentryList OBJECT IDENTIFIER ::= {id-oa 15}
-
 id-oa-searchRules OBJECT IDENTIFIER ::= {id-oa 16}
-
 id-oa-hierarchyLevel OBJECT IDENTIFIER ::= {id-oa 17}
-
 id-oa-hierarchyBelow OBJECT IDENTIFIER ::= {id-oa 18}
-
 id-oa-hierarchyParent OBJECT IDENTIFIER ::= {id-oa 19}
 
 -- subentry classes 
 id-sc-subentry OBJECT IDENTIFIER ::= {id-sc 0}
-
 id-sc-accessControlSubentry OBJECT IDENTIFIER ::= {id-sc 1}
-
 id-sc-collectiveAttributeSubentry OBJECT IDENTIFIER ::= {id-sc 2}
-
 id-sc-contextAssertionSubentry OBJECT IDENTIFIER ::= {id-sc 3}
-
 id-sc-serviceAdminSubentry OBJECT IDENTIFIER ::= {id-sc 4}
 
 --  Name forms 
@@ -847,22 +823,23 @@ id-nf-subentryNameForm OBJECT IDENTIFIER ::= {id-nf 16}
 
 -- administrative roles 
 id-ar-autonomousArea OBJECT IDENTIFIER ::= {id-ar 1}
-
 id-ar-accessControlSpecificArea OBJECT IDENTIFIER ::= {id-ar 2}
-
 id-ar-accessControlInnerArea OBJECT IDENTIFIER ::= {id-ar 3}
-
 id-ar-subschemaAdminSpecificArea OBJECT IDENTIFIER ::= {id-ar 4}
-
 id-ar-collectiveAttributeSpecificArea OBJECT IDENTIFIER ::= {id-ar 5}
-
 id-ar-collectiveAttributeInnerArea OBJECT IDENTIFIER ::= {id-ar 6}
-
 id-ar-contextDefaultSpecificArea OBJECT IDENTIFIER ::= {id-ar 7}
-
 id-ar-serviceSpecificArea OBJECT IDENTIFIER ::= {id-ar 8}
 
-END -- InformationFramework
+id-at OBJECT IDENTIFIER ::= {joint-iso-ccitt (2) ds (5) 4}
+id-at-countryName AttributeTypeX ::= {id-at 6}
+id-at-organizationName AttributeTypeX ::= {id-at 10}
+id-at-serialNumber AttributeTypeX ::= {id-at 5}
+id-at-stateOrProvinceName AttributeTypeX ::= {id-at 8}
+id-at-localityName AttributeTypeX ::= {id-at 7}
+id-at-commonName AttributeTypeX ::= {id-at 3}
+id-at-organizationalUnitName AttributeTypeX ::= {id-at 11}
 
--- Generated by Asnp, the ASN.1 pretty-printer of France Telecom R&D
+
+END -- InformationFramework
 
