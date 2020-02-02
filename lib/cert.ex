@@ -1,4 +1,4 @@
-defmodule KEP do
+defmodule CA.KEP do
   require Record
 
   Record.defrecord(:certAttrs, serial: "", cn: "", givenName: "", surname: "", o: "", title: "", ou: "", c: "", locality: "")

@@ -9,6 +9,7 @@ BEGIN
 -- within the Directory Specifications, and for the use of other applications which will use them to access 
 -- Directory services. Other applications may use them for their own purposes, but this will not constrain
 -- extensions and modifications needed to maintain or improve the Directory service.
+
 IMPORTS
   informationFramework, upperBounds, id-at, id-mr, id-avc,
     directoryAbstractService, id-pr, id-not, id-cat
@@ -937,524 +938,242 @@ LocaleContextSyntax ::= CHOICE {
 -- Attributes 
 -- id-at-objectClass						OBJECT IDENTIFIER	::=	{id-at 0}
 -- id-at-aliasedEntryName				OBJECT IDENTIFIER	::=	{id-at 1}
-id-at-encryptedAliasedEntryName OBJECT IDENTIFIER ::=
-  {id-at 1 2}
-
+id-at-encryptedAliasedEntryName OBJECT IDENTIFIER ::= {id-at 1 2}
 id-at-knowledgeInformation OBJECT IDENTIFIER ::= {id-at 2}
-
 id-at-commonName OBJECT IDENTIFIER ::= {id-at 3}
-
 id-at-encryptedCommonName OBJECT IDENTIFIER ::= {id-at 3 2}
-
 id-at-surname OBJECT IDENTIFIER ::= {id-at 4}
-
 id-at-encryptedSurname OBJECT IDENTIFIER ::= {id-at 4 2}
-
 id-at-serialNumber OBJECT IDENTIFIER ::= {id-at 5}
-
 id-at-encryptedSerialNumber OBJECT IDENTIFIER ::= {id-at 5 2}
-
 id-at-countryName OBJECT IDENTIFIER ::= {id-at 6}
-
 id-at-encryptedCountryName OBJECT IDENTIFIER ::= {id-at 6 2}
-
 id-at-localityName OBJECT IDENTIFIER ::= {id-at 7}
-
 id-at-encryptedLocalityName OBJECT IDENTIFIER ::= {id-at 7 2}
-
 id-at-collectiveLocalityName OBJECT IDENTIFIER ::= {id-at 7 1}
-
 id-at-encryptedCollectiveLocalityName OBJECT IDENTIFIER ::= {id-at 7 1 2}
-
 id-at-stateOrProvinceName OBJECT IDENTIFIER ::= {id-at 8}
-
 id-at-encryptedStateOrProvinceName OBJECT IDENTIFIER ::= {id-at 8 2}
-
 id-at-collectiveStateOrProvinceName OBJECT IDENTIFIER ::= {id-at 8 1}
-
-id-at-encryptedCollectiveStateOrProvinceName OBJECT IDENTIFIER ::=
-  {id-at 8 1 2}
-
+id-at-encryptedCollectiveStateOrProvinceName OBJECT IDENTIFIER ::= {id-at 8 1 2}
 id-at-streetAddress OBJECT IDENTIFIER ::= {id-at 9}
-
 id-at-encryptedStreetAddress OBJECT IDENTIFIER ::= {id-at 9 2}
-
 id-at-collectiveStreetAddress OBJECT IDENTIFIER ::= {id-at 9 1}
-
 id-at-encryptedCollectiveStreetAddress OBJECT IDENTIFIER ::= {id-at 9 1 2}
-
 id-at-organizationName OBJECT IDENTIFIER ::= {id-at 10}
-
 id-at-encryptedOrganizationName OBJECT IDENTIFIER ::= {id-at 10 2}
-
 id-at-collectiveOrganizationName OBJECT IDENTIFIER ::= {id-at 10 1}
-
 id-at-encryptedCollectiveOrganizationName OBJECT IDENTIFIER ::= {id-at 10 1 2}
-
 id-at-organizationalUnitName OBJECT IDENTIFIER ::= {id-at 11}
-
 id-at-encryptedOrganizationalUnitName OBJECT IDENTIFIER ::= {id-at 11 2}
-
 id-at-collectiveOrganizationalUnitName OBJECT IDENTIFIER ::= {id-at 11 1}
-
-id-at-encryptedCollectiveOrganizationalUnitName OBJECT IDENTIFIER ::=
-  {id-at 11 1 2}
-
+id-at-encryptedCollectiveOrganizationalUnitName OBJECT IDENTIFIER ::= {id-at 11 1 2}
 id-at-title OBJECT IDENTIFIER ::= {id-at 12}
-
 id-at-encryptedTitle OBJECT IDENTIFIER ::= {id-at 12 2}
-
 id-at-description OBJECT IDENTIFIER ::= {id-at 13}
-
 id-at-encryptedDescription OBJECT IDENTIFIER ::= {id-at 13 2}
-
 id-at-searchGuide OBJECT IDENTIFIER ::= {id-at 14}
-
 id-at-encryptedSearchGuide OBJECT IDENTIFIER ::= {id-at 14 2}
-
 id-at-businessCategory OBJECT IDENTIFIER ::= {id-at 15}
-
 id-at-encryptedBusinessCategory OBJECT IDENTIFIER ::= {id-at 15 2}
-
 id-at-postalAddress OBJECT IDENTIFIER ::= {id-at 16}
-
 id-at-encryptedPostalAddress OBJECT IDENTIFIER ::= {id-at 16 2}
-
 id-at-collectivePostalAddress OBJECT IDENTIFIER ::= {id-at 16 1}
-
 id-at-encryptedCollectivePostalAddress OBJECT IDENTIFIER ::= {id-at 16 1 2}
-
 id-at-postalCode OBJECT IDENTIFIER ::= {id-at 17}
-
 id-at-encryptedPostalCode OBJECT IDENTIFIER ::= {id-at 17 2}
-
 id-at-collectivePostalCode OBJECT IDENTIFIER ::= {id-at 17 1}
-
 id-at-encryptedCollectivePostalCode OBJECT IDENTIFIER ::= {id-at 17 1 2}
-
 id-at-postOfficeBox OBJECT IDENTIFIER ::= {id-at 18}
-
 id-at-encryptedPostOfficeBox OBJECT IDENTIFIER ::= {id-at 18 2}
-
 id-at-collectivePostOfficeBox OBJECT IDENTIFIER ::= {id-at 18 1}
-
 id-at-encryptedCollectivePostOfficeBox OBJECT IDENTIFIER ::= {id-at 18 1 2}
-
 id-at-physicalDeliveryOfficeName OBJECT IDENTIFIER ::= {id-at 19}
-
 id-at-encryptedPhysicalDeliveryOfficeName OBJECT IDENTIFIER ::= {id-at 19 2}
-
 id-at-collectivePhysicalDeliveryOfficeName OBJECT IDENTIFIER ::= {id-at 19 1}
-
-id-at-encryptedCollectivePhysicalDeliveryOfficeName OBJECT IDENTIFIER ::=
-  {id-at 19 1 2}
-
+id-at-encryptedCollectivePhysicalDeliveryOfficeName OBJECT IDENTIFIER ::= {id-at 19 1 2}
 id-at-telephoneNumber OBJECT IDENTIFIER ::= {id-at 20}
-
 id-at-encryptedTelephoneNumber OBJECT IDENTIFIER ::= {id-at 20 2}
-
 id-at-collectiveTelephoneNumber OBJECT IDENTIFIER ::= {id-at 20 1}
-
 id-at-encryptedCollectiveTelephoneNumber OBJECT IDENTIFIER ::= {id-at 20 1 2}
-
 id-at-telexNumber OBJECT IDENTIFIER ::= {id-at 21}
-
 id-at-encryptedTelexNumber OBJECT IDENTIFIER ::= {id-at 21 2}
-
 id-at-collectiveTelexNumber OBJECT IDENTIFIER ::= {id-at 21 1}
-
 id-at-encryptedCollectiveTelexNumber OBJECT IDENTIFIER ::= {id-at 21 1 2}
-
--- id-at-teletexTerminalIdentifier  			OBJECT IDENTIFIER	::=	{id-at 22}
--- id-at-encryptedTeletexTerminalIdentifier		OBJECT IDENTIFIER	::=	{id-at 22 2}
--- id-at-collectiveTeletexTerminalIdentifier		OBJECT IDENTIFIER	::=	{id-at 22 1}
--- id-at-encryptedCollectiveTeletexTerminalIdentifier
---								OBJECT IDENTIFIER	::=	{id-at 22 1 2}
-id-at-facsimileTelephoneNumber OBJECT IDENTIFIER ::=
-  {id-at 23}
-
+id-at-facsimileTelephoneNumber OBJECT IDENTIFIER ::= {id-at 23}
 id-at-encryptedFacsimileTelephoneNumber OBJECT IDENTIFIER ::= {id-at 23 2}
-
 id-at-collectiveFacsimileTelephoneNumber OBJECT IDENTIFIER ::= {id-at 23 1}
-
-id-at-encryptedCollectiveFacsimileTelephoneNumber OBJECT IDENTIFIER ::=
-  {id-at 23 1 2}
-
+id-at-encryptedCollectiveFacsimileTelephoneNumber OBJECT IDENTIFIER ::= {id-at 23 1 2}
 id-at-x121Address OBJECT IDENTIFIER ::= {id-at 24}
-
 id-at-encryptedX121Address OBJECT IDENTIFIER ::= {id-at 24 2}
-
 id-at-internationalISDNNumber OBJECT IDENTIFIER ::= {id-at 25}
-
 id-at-encryptedInternationalISDNNumber OBJECT IDENTIFIER ::= {id-at 25 2}
-
 id-at-collectiveInternationalISDNNumber OBJECT IDENTIFIER ::= {id-at 25 1}
-
-id-at-encryptedCollectiveInternationalISDNNumber OBJECT IDENTIFIER ::=
-  {id-at 25 1 2}
-
+id-at-encryptedCollectiveInternationalISDNNumber OBJECT IDENTIFIER ::= {id-at 25 1 2}
 id-at-registeredAddress OBJECT IDENTIFIER ::= {id-at 26}
-
 id-at-encryptedRegisteredAddress OBJECT IDENTIFIER ::= {id-at 26 2}
-
 id-at-destinationIndicator OBJECT IDENTIFIER ::= {id-at 27}
-
 id-at-encryptedDestinationIndicator OBJECT IDENTIFIER ::= {id-at 27 2}
-
 id-at-preferredDeliveryMethod OBJECT IDENTIFIER ::= {id-at 28}
-
 id-at-encryptedPreferredDeliveryMethod OBJECT IDENTIFIER ::= {id-at 28 2}
-
 id-at-presentationAddress OBJECT IDENTIFIER ::= {id-at 29}
-
 id-at-encryptedPresentationAddress OBJECT IDENTIFIER ::= {id-at 29 2}
-
 id-at-supportedApplicationContext OBJECT IDENTIFIER ::= {id-at 30}
-
 id-at-encryptedSupportedApplicationContext OBJECT IDENTIFIER ::= {id-at 30 2}
-
 id-at-member OBJECT IDENTIFIER ::= {id-at 31}
-
 id-at-encryptedMember OBJECT IDENTIFIER ::= {id-at 31 2}
-
 id-at-owner OBJECT IDENTIFIER ::= {id-at 32}
-
 id-at-encryptedOwner OBJECT IDENTIFIER ::= {id-at 32 2}
-
 id-at-roleOccupant OBJECT IDENTIFIER ::= {id-at 33}
-
 id-at-encryptedRoleOccupant OBJECT IDENTIFIER ::= {id-at 33 2}
-
 id-at-seeAlso OBJECT IDENTIFIER ::= {id-at 34}
-
 id-at-encryptedSeeAlso OBJECT IDENTIFIER ::= {id-at 34 2}
-
--- id-at-userPassword					OBJECT IDENTIFIER	::=	{id-at 35}
-id-at-encryptedUserPassword OBJECT IDENTIFIER ::=
-  {id-at 35 2}
-
--- id-at-userCertificate					OBJECT IDENTIFIER	::=	{id-at 36}
-id-at-encryptedUserCertificate OBJECT IDENTIFIER ::=
-  {id-at 36 2}
-
--- id-at-cACertificate					OBJECT IDENTIFIER	::=	{id-at 37}
-id-at-encryptedCACertificate OBJECT IDENTIFIER ::=
-  {id-at 37 2}
-
--- id-at-authorityRevocationList				OBJECT IDENTIFIER	::=	{id-at 38}
-id-at-encryptedAuthorityRevocationList OBJECT IDENTIFIER ::=
-  {id-at 38 2}
-
--- id-at-certificateRevocationList			OBJECT IDENTIFIER	::=	{id-at 39}
-id-at-encryptedCertificateRevocationList OBJECT IDENTIFIER ::=
-  {id-at 39 2}
-
--- id-at-crossCertificatePair				OBJECT IDENTIFIER	::=	{id-at 40}
-id-at-encryptedCrossCertificatePair OBJECT IDENTIFIER ::=
-  {id-at 40 2}
-
+id-at-encryptedUserPassword OBJECT IDENTIFIER ::= {id-at 35 2}
+id-at-encryptedUserCertificate OBJECT IDENTIFIER ::= {id-at 36 2}
+id-at-encryptedCACertificate OBJECT IDENTIFIER ::= {id-at 37 2}
+id-at-encryptedAuthorityRevocationList OBJECT IDENTIFIER ::= {id-at 38 2}
+id-at-encryptedCertificateRevocationList OBJECT IDENTIFIER ::= {id-at 39 2}
+id-at-encryptedCrossCertificatePair OBJECT IDENTIFIER ::= {id-at 40 2}
 id-at-name OBJECT IDENTIFIER ::= {id-at 41}
-
 id-at-givenName OBJECT IDENTIFIER ::= {id-at 42}
-
 id-at-encryptedGivenName OBJECT IDENTIFIER ::= {id-at 42 2}
-
 id-at-initials OBJECT IDENTIFIER ::= {id-at 43}
-
 id-at-encryptedInitials OBJECT IDENTIFIER ::= {id-at 43 2}
-
 id-at-generationQualifier OBJECT IDENTIFIER ::= {id-at 44}
-
 id-at-encryptedGenerationQualifier OBJECT IDENTIFIER ::= {id-at 44 2}
-
 id-at-uniqueIdentifier OBJECT IDENTIFIER ::= {id-at 45}
-
 id-at-encryptedUniqueIdentifier OBJECT IDENTIFIER ::= {id-at 45 2}
-
 id-at-dnQualifier OBJECT IDENTIFIER ::= {id-at 46}
-
 id-at-encryptedDnQualifier OBJECT IDENTIFIER ::= {id-at 46 2}
-
 id-at-enhancedSearchGuide OBJECT IDENTIFIER ::= {id-at 47}
-
 id-at-encryptedEnhancedSearchGuide OBJECT IDENTIFIER ::= {id-at 47 2}
-
 id-at-protocolInformation OBJECT IDENTIFIER ::= {id-at 48}
-
 id-at-encryptedProtocolInformation OBJECT IDENTIFIER ::= {id-at 48 2}
-
 id-at-distinguishedName OBJECT IDENTIFIER ::= {id-at 49}
-
 id-at-encryptedDistinguishedName OBJECT IDENTIFIER ::= {id-at 49 2}
-
 id-at-uniqueMember OBJECT IDENTIFIER ::= {id-at 50}
-
 id-at-encryptedUniqueMember OBJECT IDENTIFIER ::= {id-at 50 2}
-
 id-at-houseIdentifier OBJECT IDENTIFIER ::= {id-at 51}
-
 id-at-encryptedHouseIdentifier OBJECT IDENTIFIER ::= {id-at 51 2}
-
---id-at-supportedAlgorithms				OBJECT IDENTIFIER	::=	{id-at 52}
-id-at-encryptedSupportedAlgorithms OBJECT IDENTIFIER ::=
-  {id-at 52 2}
-
---id-at-deltaRevocationList				OBJECT IDENTIFIER	::=	{id-at 53}
-id-at-encryptedDeltaRevocationList OBJECT IDENTIFIER ::=
-  {id-at 53 2}
-
+id-at-encryptedSupportedAlgorithms OBJECT IDENTIFIER ::= {id-at 52 2}
+id-at-encryptedDeltaRevocationList OBJECT IDENTIFIER ::= {id-at 53 2}
 id-at-dmdName OBJECT IDENTIFIER ::= {id-at 54}
-
 id-at-encryptedDmdName OBJECT IDENTIFIER ::= {id-at 54 2}
-
--- id-at-clearance   						OBJECT IDENTIFIER	::=	{id-at 55}
-id-at-encryptedClearance OBJECT IDENTIFIER ::=
-  {id-at 55 2}
-
--- id-at-defaultDirQop					OBJECT IDENTIFIER	::=	{id-at 56}
-id-at-encryptedDefaultDirQop OBJECT IDENTIFIER ::=
-  {id-at 56 2}
-
--- id-at-attributeIntegrityInfo				OBJECT IDENTIFIER	::=	{id-at 57}
-id-at-encryptedAttributeIntegrityInfo OBJECT IDENTIFIER ::=
-  {id-at 57 2}
-
---id-at-attributeCertificate					OBJECT IDENTIFIER	::=	{id-at 58} 
-id-at-encryptedAttributeCertificate OBJECT IDENTIFIER ::=
-  {id-at 58 2}
-
--- id-at-attributeCertificateRevocationList		OBJECT IDENTIFIER	::=	{id-at 59}
-id-at-encryptedAttributeCertificateRevocationList OBJECT IDENTIFIER ::=
-  {id-at 59 2}
-
--- id-at-confKeyInfo					OBJECT IDENTIFIER	::=	{id-at 60}
-id-at-encryptedConfKeyInfo OBJECT IDENTIFIER ::=
-  {id-at 60 2}
-
--- id-at-family-information			        OBJECT IDENTIFIER		{id-at 64}
-id-at-pseudonym OBJECT IDENTIFIER ::=
-  {id-at 65}
-
+id-at-encryptedClearance OBJECT IDENTIFIER ::= {id-at 55 2}
+id-at-encryptedDefaultDirQop OBJECT IDENTIFIER ::= {id-at 56 2}
+id-at-encryptedAttributeIntegrityInfo OBJECT IDENTIFIER ::= {id-at 57 2}
+id-at-encryptedAttributeCertificate OBJECT IDENTIFIER ::= {id-at 58 2}
+id-at-encryptedAttributeCertificateRevocationList OBJECT IDENTIFIER ::= {id-at 59 2}
+id-at-encryptedConfKeyInfo OBJECT IDENTIFIER ::= {id-at 60 2}
+id-at-pseudonym OBJECT IDENTIFIER ::= {id-at 65}
 id-at-communicationsService OBJECT IDENTIFIER ::= {id-at 66}
-
 id-at-communicationsNetwork OBJECT IDENTIFIER ::= {id-at 67}
 
 -- Matching rules 
--- id-mr-objectIdentifierMatch 				OBJECT IDENTIFIER	::=	{id-mr 0}
--- id-mr-distinguishedNameMatch			OBJECT IDENTIFIER	::=	{id-mr 1}
-id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::=
-  {id-mr 2}
-
+id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::= {id-mr 2}
 id-mr-caseIgnoreOrderingMatch OBJECT IDENTIFIER ::= {id-mr 3}
-
 id-mr-caseIgnoreSubstringsMatch OBJECT IDENTIFIER ::= {id-mr 4}
-
 id-mr-caseExactMatch OBJECT IDENTIFIER ::= {id-mr 5}
-
 id-mr-caseExactOrderingMatch OBJECT IDENTIFIER ::= {id-mr 6}
-
 id-mr-caseExactSubstringsMatch OBJECT IDENTIFIER ::= {id-mr 7}
-
 id-mr-numericStringMatch OBJECT IDENTIFIER ::= {id-mr 8}
-
 id-mr-numericStringOrderingMatch OBJECT IDENTIFIER ::= {id-mr 9}
-
 id-mr-numericStringSubstringsMatch OBJECT IDENTIFIER ::= {id-mr 10}
-
 id-mr-caseIgnoreListMatch OBJECT IDENTIFIER ::= {id-mr 11}
-
 id-mr-caseIgnoreListSubstringsMatch OBJECT IDENTIFIER ::= {id-mr 12}
-
 id-mr-booleanMatch OBJECT IDENTIFIER ::= {id-mr 13}
-
 id-mr-integerMatch OBJECT IDENTIFIER ::= {id-mr 14}
-
 id-mr-integerOrderingMatch OBJECT IDENTIFIER ::= {id-mr 15}
-
 id-mr-bitStringMatch OBJECT IDENTIFIER ::= {id-mr 16}
-
 id-mr-octetStringMatch OBJECT IDENTIFIER ::= {id-mr 17}
-
 id-mr-octetStringOrderingMatch OBJECT IDENTIFIER ::= {id-mr 18}
-
 id-mr-octetStringSubstringsMatch OBJECT IDENTIFIER ::= {id-mr 19}
-
 id-mr-telephoneNumberMatch OBJECT IDENTIFIER ::= {id-mr 20}
-
 id-mr-telephoneNumberSubstringsMatch OBJECT IDENTIFIER ::= {id-mr 21}
-
 id-mr-presentationAddressMatch OBJECT IDENTIFIER ::= {id-mr 22}
-
 id-mr-uniqueMemberMatch OBJECT IDENTIFIER ::= {id-mr 23}
-
 id-mr-protocolInformationMatch OBJECT IDENTIFIER ::= {id-mr 24}
-
 id-mr-uTCTimeMatch OBJECT IDENTIFIER ::= {id-mr 25}
-
 id-mr-uTCTimeOrderingMatch OBJECT IDENTIFIER ::= {id-mr 26}
-
 id-mr-generalizedTimeMatch OBJECT IDENTIFIER ::= {id-mr 27}
-
 id-mr-generalizedTimeOrderingMatch OBJECT IDENTIFIER ::= {id-mr 28}
-
 id-mr-integerFirstComponentMatch OBJECT IDENTIFIER ::= {id-mr 29}
-
 id-mr-objectIdentifierFirstComponentMatch OBJECT IDENTIFIER ::= {id-mr 30}
-
 id-mr-directoryStringFirstComponentMatch OBJECT IDENTIFIER ::= {id-mr 31}
-
 id-mr-wordMatch OBJECT IDENTIFIER ::= {id-mr 32}
-
 id-mr-keywordMatch OBJECT IDENTIFIER ::= {id-mr 33}
-
--- id-mr-certificateExactMatch				OBJECT IDENTIFIER	::=	{id-mr 34}
--- id-mr-certificateMatch					OBJECT IDENTIFIER	::=	{id-mr 35}
--- id-mr-certificatePairExactMatch			OBJECT IDENTIFIER	::=	{id-mr 36}
--- id-mr-certificatePairMatch				OBJECT IDENTIFIER	::=	{id-mr 37}
--- id-mr-certificateListExactMatch			OBJECT IDENTIFIER	::=	{id-mr 38}
--- id-mr-certificateListMatch				OBJECT IDENTIFIER	::=	{id-mr 39}
--- id-mr-algorithmIdentifierMatch			OBJECT IDENTIFIER	::=	{id-mr 40}
-id-mr-storedPrefixMatch OBJECT IDENTIFIER ::=
-  {id-mr 41}
-
--- id-mr-attributeCertificateMatch			OBJECT IDENTIFIER 	::=	{id-mr 42}
--- id-mr-readerAndKeyIDMatch				OBJECT IDENTIFIER	::=	{id-mr 43}
---id-mr-attributeIntegrityMatch				OBJECT IDENTIFIER 	::=	{id-mr 44}
-id-mr-systemProposedMatch OBJECT IDENTIFIER ::=
-  {id-mr 47}
-
+id-mr-storedPrefixMatch OBJECT IDENTIFIER ::= {id-mr 41}
+id-mr-systemProposedMatch OBJECT IDENTIFIER ::= {id-mr 47}
 id-mr-generalWordMatch OBJECT IDENTIFIER ::= {id-mr 48}
-
 id-mr-approximateStringMatch OBJECT IDENTIFIER ::= {id-mr 49}
-
 id-mr-ignoreIfAbsentMatch OBJECT IDENTIFIER ::= {id-mr 50}
-
 id-mr-nullMatch OBJECT IDENTIFIER ::= {id-mr 51}
-
 id-mr-zonalMatch OBJECT IDENTIFIER ::= {id-mr 52}
-
 id-mr-facsimileNumberMatch OBJECT IDENTIFIER ::= {id-mr 63}
-
 id-mr-facsimileNumberSubstringsMatch OBJECT IDENTIFIER ::= {id-mr 64}
 
 -- contexts 
 id-avc-language OBJECT IDENTIFIER ::= {id-avc 0}
-
 id-avc-temporal OBJECT IDENTIFIER ::= {id-avc 1}
-
 id-avc-locale OBJECT IDENTIFIER ::= {id-avc 2}
 
---id-avc-attributeValueSecurityLabelContext  	OBJECT IDENTIFIER	::=	{id-avc 3}
---id-avc-attributeValueIntegrityInfoContext		OBJECT IDENTIFIER	::=	{id-avc 4}
 -- Problem definitions 
-id-pr-targetDsaUnavailable OBJECT IDENTIFIER ::=
-  {id-pr 1}
-
+id-pr-targetDsaUnavailable OBJECT IDENTIFIER ::= {id-pr 1}
 id-pr-dataSourceUnavailable OBJECT IDENTIFIER ::= {id-pr 2}
-
 id-pr-unidentifiedOperation OBJECT IDENTIFIER ::= {id-pr 3}
-
 id-pr-unavailableOperation OBJECT IDENTIFIER ::= {id-pr 4}
-
 id-pr-searchAttributeViolation OBJECT IDENTIFIER ::= {id-pr 5}
-
 id-pr-searchAttributeCombinationViolation OBJECT IDENTIFIER ::= {id-pr 6}
-
 id-pr-searchValueNotAllowed OBJECT IDENTIFIER ::= {id-pr 7}
-
 id-pr-missingSearchAttribute OBJECT IDENTIFIER ::= {id-pr 8}
-
 id-pr-searchValueViolation OBJECT IDENTIFIER ::= {id-pr 9}
-
 id-pr-attributeNegationViolation OBJECT IDENTIFIER ::= {id-pr 10}
-
 id-pr-searchValueRequired OBJECT IDENTIFIER ::= {id-pr 11}
-
 id-pr-invalidSearchValue OBJECT IDENTIFIER ::= {id-pr 12}
-
 id-pr-searchContextViolation OBJECT IDENTIFIER ::= {id-pr 13}
-
 id-pr-searchContextCombinationViolation OBJECT IDENTIFIER ::= {id-pr 14}
-
 id-pr-missingSearchContext OBJECT IDENTIFIER ::= {id-pr 15}
-
 id-pr-searchContextValueViolation OBJECT IDENTIFIER ::= {id-pr 16}
-
 id-pr-searchContextValueRequired OBJECT IDENTIFIER ::= {id-pr 17}
-
 id-pr-invalidContextSearchValue OBJECT IDENTIFIER ::= {id-pr 18}
-
 id-pr-unsupportedMatchingRule OBJECT IDENTIFIER ::= {id-pr 19}
-
 id-pr-attributeMatchingViolation OBJECT IDENTIFIER ::= {id-pr 20}
-
 id-pr-unsupportedMatchingUse OBJECT IDENTIFIER ::= {id-pr 21}
-
 id-pr-matchingUseViolation OBJECT IDENTIFIER ::= {id-pr 22}
-
 id-pr-hierarchySelectForbidden OBJECT IDENTIFIER ::= {id-pr 23}
-
 id-pr-invalidHierarchySelect OBJECT IDENTIFIER ::= {id-pr 24}
-
 id-pr-unavailableHierarchySelect OBJECT IDENTIFIER ::= {id-pr 25}
-
 id-pr-invalidSearchOptions OBJECT IDENTIFIER ::= {id-pr 26}
-
 id-pr-missingSearchOptions OBJECT IDENTIFIER ::= {id-pr 27}
-
 id-pr-invalidServiceControlOptions OBJECT IDENTIFIER ::= {id-pr 28}
-
 id-pr-missingServiceControlOptions OBJECT IDENTIFIER ::= {id-pr 29}
-
 id-pr-searchSubsetViolation OBJECT IDENTIFIER ::= {id-pr 30}
-
 id-pr-unmatchedKeyAttributes OBJECT IDENTIFIER ::= {id-pr 31}
-
 id-pr-ambiguousKeyAttributes OBJECT IDENTIFIER ::= {id-pr 32}
 
 -- Notification attributes 
 id-not-dSAProblem OBJECT IDENTIFIER ::= {id-not 0}
-
 id-not-searchServiceProblem OBJECT IDENTIFIER ::= {id-not 1}
-
 id-not-serviceType OBJECT IDENTIFIER ::= {id-not 2}
-
 id-not-attributeTypeList OBJECT IDENTIFIER ::= {id-not 3}
-
 id-not-matchingRuleList OBJECT IDENTIFIER ::= {id-not 4}
-
 id-not-filterItem OBJECT IDENTIFIER ::= {id-not 5}
-
 id-not-attributeCombinations OBJECT IDENTIFIER ::= {id-not 6}
-
 id-not-contextTypeList OBJECT IDENTIFIER ::= {id-not 7}
-
 id-not-contextList OBJECT IDENTIFIER ::= {id-not 8}
-
 id-not-contextCombinations OBJECT IDENTIFIER ::= {id-not 9}
-
 id-not-hierarchySelectList OBJECT IDENTIFIER ::= {id-not 10}
-
 id-not-searchOptionsList OBJECT IDENTIFIER ::= {id-not 11}
-
 id-not-serviceControlOptionsList OBJECT IDENTIFIER ::= {id-not 12}
-
 id-not-multipleMatchingLocalities OBJECT IDENTIFIER ::= {id-not 13}
-
 id-not-proposedRelaxation OBJECT IDENTIFIER ::= {id-not 14}
-
 id-not-appliedRelaxation OBJECT IDENTIFIER ::= {id-not 15}
-
 id-not-substringRequirements OBJECT IDENTIFIER ::= {id-not 16}
 
 -- Control  attributes 
-id-cat-sequenceMatchType OBJECT IDENTIFIER ::=
-  {id-cat 1}
-
+id-cat-sequenceMatchType OBJECT IDENTIFIER ::= {id-cat 1}
 id-cat-wordMatchType OBJECT IDENTIFIER ::= {id-cat 2}
-
 id-cat-characterMatchTypes OBJECT IDENTIFIER ::= {id-cat 3}
-
 id-cat-selectedContexts OBJECT IDENTIFIER ::= {id-cat 4}
 
 G3FacsimileNonBasicParameters ::= BIT STRING {
@@ -1476,5 +1195,4 @@ G3FacsimileNonBasicParameters ::= BIT STRING {
 
 END -- SelectedAttributeTypes
 
--- Generated by Asnp, the ASN.1 pretty-printer of France Telecom R&D
 

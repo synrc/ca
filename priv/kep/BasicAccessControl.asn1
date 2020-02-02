@@ -8,6 +8,7 @@ BEGIN
 -- within the Directory Specifications, and for the use of other applications which will use them to access 
 -- Directory services. Other applications may use them for their own purposes, but this will not constrain
 -- extensions and modifications needed to maintain or improve the Directory service.
+
 IMPORTS
   id-aca, id-acScheme, informationFramework, upperBounds,
     selectedAttributeTypes, directoryAbstractService
@@ -157,25 +158,16 @@ subentryACI ATTRIBUTE ::= {
 
 -- object identifier assignments 
 -- attributes 
-id-aca-accessControlScheme OBJECT IDENTIFIER ::=
-  {id-aca 1}
-
+id-aca-accessControlScheme OBJECT IDENTIFIER ::= {id-aca 1}
 id-aca-prescriptiveACI OBJECT IDENTIFIER ::= {id-aca 4}
-
 id-aca-entryACI OBJECT IDENTIFIER ::= {id-aca 5}
-
 id-aca-subentryACI OBJECT IDENTIFIER ::= {id-aca 6}
 
 -- access control schemes -
-basicAccessControlScheme OBJECT IDENTIFIER ::=
-  {id-acScheme 1}
-
+basicAccessControlScheme OBJECT IDENTIFIER ::= {id-acScheme 1}
 simplifiedAccessControlScheme OBJECT IDENTIFIER ::= {id-acScheme 2}
-
 rule-based-access-control OBJECT IDENTIFIER ::= {id-acScheme 3}
-
 rule-and-basic-access-control OBJECT IDENTIFIER ::= {id-acScheme 4}
-
 rule-and-simple-access-control OBJECT IDENTIFIER ::= {id-acScheme 5}
 
 END -- BasicAccessControl

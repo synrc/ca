@@ -1,4 +1,5 @@
 -- Module InformationFramework (X.501:08/1997)
+
 InformationFramework {joint-iso-itu-t ds(5) module(1) informationFramework(1) 3} DEFINITIONS ::=
 BEGIN
 
@@ -7,6 +8,7 @@ BEGIN
 -- within the Directory Specifications, and for the use of other applications which will use them to access 
 -- Directory services. Other applications may use them for their own purposes, but this will not constrain
 -- extensions and modifications needed to maintain or improve the Directory service.
+
 IMPORTS
   id-oc, id-at, id-mr, id-oa, id-sc, id-ar, id-nf, selectedAttributeTypes, directoryAbstractService, upperBounds
     FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1) usefulDefinitions(0) 3}

@@ -9,6 +9,7 @@ BEGIN
 --  within the Directory Specifications, and for the use of other applications which will use them to access
 --  Directory services. Other applications may use them for their own purposes, but this will not constrain
 --  extensions and modifications needed to maintain or improve the Directory service.
+
 IMPORTS
   id-at, id-mr, informationFramework, upperBounds, selectedAttributeTypes,
     basicAccessControl, certificateExtensions
@@ -265,23 +266,14 @@ SIGNED{ToBeSigned} ::= SEQUENCE {
 }
 
 --  object identifier assignments 
-id-at-userPassword OBJECT IDENTIFIER ::=
-  {id-at 35}
-
+id-at-userPassword OBJECT IDENTIFIER ::= {id-at 35}
 id-at-userCertificate OBJECT IDENTIFIER ::= {id-at 36}
-
 id-at-cAcertificate OBJECT IDENTIFIER ::= {id-at 37}
-
 id-at-authorityRevocationList OBJECT IDENTIFIER ::= {id-at 38}
-
 id-at-certificateRevocationList OBJECT IDENTIFIER ::= {id-at 39}
-
 id-at-crossCertificatePair OBJECT IDENTIFIER ::= {id-at 40}
-
 id-at-attributeCertificate OBJECT IDENTIFIER ::= {id-at 58}
-
 id-at-attributeCertificateRevocationList OBJECT IDENTIFIER ::= {id-at 59}
-
 id-mr-attributeCertificateMatch OBJECT IDENTIFIER ::= {id-mr 42}
 
 END
