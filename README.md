@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.com/synrc/ca.svg?branch=master)](https://travis-ci.com/synrc/ca)
 [![Hex pm](http://img.shields.io/hexpm/v/ca.svg?style=flat)](https://hex.pm/packages/ca)
 
-## KEP decode SignData
+## X.509 decode SignData
 
 ```elixir
 > {:ok,bin} = :file.read_file("priv/5HT.p7s")
@@ -19,7 +19,7 @@
   "", "АЦСК", 'UA', "Київ"}}
 ```
 
-## KEP decode Cert
+## X.509 decode Cert
 
 ```elixir
 > {:ok,bin} = :file.read_file("priv/5HT.cer")
