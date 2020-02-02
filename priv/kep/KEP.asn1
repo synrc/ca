@@ -5,6 +5,8 @@
 -- https://zakon.rada.gov.ua/laws/show/z2230-13
 -- https://zakon.rada.gov.ua/laws/show/z1398-12
 
+-- PKCS + OCSP + Authentication + Information (X.501:08, X.509:08, X.511:08, X.520:08).
+
 -- from: Наказ Міністерства юстиції України, 
 --   to: Адміністрації Державної служби спеціального зв’язку та захисту інформації України
 -- date: 20.08.2012 #1236/5/453
