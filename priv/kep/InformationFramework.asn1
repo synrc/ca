@@ -10,26 +10,24 @@ BEGIN
 -- extensions and modifications needed to maintain or improve the Directory service.
 
 IMPORTS
-  id-oc, id-at, id-mr, id-oa, id-sc, id-ar, id-nf, selectedAttributeTypes, directoryAbstractService, upperBounds
-    FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1) usefulDefinitions(0) 3}
-  commonName, generalizedTimeMatch, generalizedTimeOrderingMatch, booleanMatch,
-    integerMatch, integerOrderingMatch, objectIdentifierFirstComponentMatch,
-    integerFirstComponentMatch, DirectoryString{}
-    FROM SelectedAttributeTypes selectedAttributeTypes
-  TypeAndContextAssertion, ServiceControlOptions, SearchControlOptions,
-    HierarchySelections, FamilyGrouping, FamilyReturn
-    FROM DirectoryAbstractService directoryAbstractService ub-search
-    FROM UpperBounds upperBounds;
+       id-oc, id-at, id-mr, id-oa, id-sc, id-ar, id-nf, selectedAttributeTypes, directoryAbstractService, upperBounds
+  FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1) usefulDefinitions(0) 3}
+       commonName, generalizedTimeMatch, generalizedTimeOrderingMatch, booleanMatch,
+       integerMatch, integerOrderingMatch, objectIdentifierFirstComponentMatch,
+       integerFirstComponentMatch, DirectoryString{}
+  FROM SelectedAttributeTypes selectedAttributeTypes
+       TypeAndContextAssertion, ServiceControlOptions, SearchControlOptions,
+       HierarchySelections, FamilyGrouping, FamilyReturn
+  FROM DirectoryAbstractService directoryAbstractService
+       ub-search
+  FROM UpperBounds upperBounds;
 
--- attribute data types 
 Attribute ::= SEQUENCE {
-  type               ATTRIBUTE.&id({SupportedAttributes}),
-  values
-    SET SIZE (0..MAX) OF ATTRIBUTE.&Type({SupportedAttributes}{@type}),
-  valuesWithContext
-    SET SIZE (1..MAX) OF
-      SEQUENCE {value        ATTRIBUTE.&Type({SupportedAttributes}{@type}),
-                contextList  SET SIZE (1..MAX) OF Context} OPTIONAL
+  type ATTRIBUTE.&id({SupportedAttributes}),
+  values SET SIZE (0..MAX) OF ATTRIBUTE.&Type({SupportedAttributes}{@type}),
+  valuesWithContext SET SIZE (1..MAX) OF SEQUENCE {
+    value ATTRIBUTE.&Type({SupportedAttributes}{@type}),
+    contextList  SET SIZE (1..MAX) OF Context } OPTIONAL
 }
 
 AttributeType ::= ATTRIBUTE.&id
@@ -37,25 +35,22 @@ AttributeValue ::= ATTRIBUTE.&Type
 
 Context ::= SEQUENCE {
   contextType    CONTEXT.&id({SupportedContexts}),
-  contextValues
-    SET SIZE (1..MAX) OF CONTEXT.&Type({SupportedContexts}{@contextType}),
+  contextValues  SET SIZE (1..MAX) OF CONTEXT.&Type({SupportedContexts}{@contextType}),
   fallback       BOOLEAN DEFAULT FALSE
 }
 
 AttributeValueAssertion ::= SEQUENCE {
-  type              ATTRIBUTE.&id({SupportedAttributes}),
-  assertion
-    ATTRIBUTE.&equality-match.&AssertionType({SupportedAttributes}{@type}),
-  assertedContexts
-    CHOICE {allContexts       [0]  NULL,
-            selectedContexts  [1]  SET SIZE (1..MAX) OF ContextAssertion
+  type      ATTRIBUTE.&id({SupportedAttributes}),
+  assertion ATTRIBUTE.&equality-match.&AssertionType({SupportedAttributes}{@type}),
+  assertedContexts CHOICE {
+    allContexts       [0]  NULL,
+    selectedContexts  [1]  SET SIZE (1..MAX) OF ContextAssertion
   } OPTIONAL
 }
 
 ContextAssertion ::= SEQUENCE {
   contextType    CONTEXT.&id({SupportedContexts}),
-  contextValues
-    SET SIZE (1..MAX) OF CONTEXT.&Assertion({SupportedContexts}{@contextType})
+  contextValues  SET SIZE (1..MAX) OF CONTEXT.&Assertion({SupportedContexts}{@contextType})
 }
 
 AttributeTypeAssertion ::= SEQUENCE {
@@ -67,20 +62,16 @@ AttributeTypeAssertion ::= SEQUENCE {
 -- profiles or to protocol implementation conformance statements. The set is required to
 -- specify a table constraint on the values component of Attribute, the value component 
 -- of AttributeTypeAndValue, and the assertion component of AttributeValueAssertion.
-SupportedAttributes ATTRIBUTE ::=
-  {objectClass | aliasedEntryName, ...}
+
+SupportedAttributes ATTRIBUTE ::= {objectClass | aliasedEntryName, ...}
 
 -- Definition of the following information object set is deferred, perhaps to standardized
 -- profiles or to protocol implementation conformance statements. The set is required to
 -- specify a table constraint on the context specifications
-SupportedContexts CONTEXT ::=
-  {...}
 
--- naming data types 
-Name ::= CHOICE { -- only one possibility for now 
-  rdnSequence  RDNSequence
-}
+SupportedContexts CONTEXT ::= {...}
 
+Name ::= CHOICE { rdnSequence  RDNSequence }
 RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
 DistinguishedName ::= RDNSequence
 RelativeDistinguishedName ::= SET OF AttributeTypeAndValue
@@ -840,7 +831,6 @@ id-at-stateOrProvinceName AttributeTypeX ::= {id-at 8}
 id-at-localityName AttributeTypeX ::= {id-at 7}
 id-at-commonName AttributeTypeX ::= {id-at 3}
 id-at-organizationalUnitName AttributeTypeX ::= {id-at 11}
-
 
 END -- InformationFramework
 

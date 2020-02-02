@@ -11,28 +11,26 @@ BEGIN
 -- extensions and modifications needed to maintain or improve the Directory service.
 
 IMPORTS
-  informationFramework, upperBounds, id-at, id-mr, id-avc,
-    directoryAbstractService, id-pr, id-not, id-cat
-    FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1)
-      usefulDefinitions(0) 3}
-  Attribute, ATTRIBUTE, MATCHING-RULE, AttributeType, OBJECT-CLASS,
-    DistinguishedName, objectIdentifierMatch, distinguishedNameMatch, 
-    CONTEXT, ContextAssertion, AttributeCombination, ContextCombination,
-    MAPPING-BASED-MATCHING, MRMapping, AttributeValueAssertion
-    FROM InformationFramework informationFramework
-    ub-answerback, ub-name, ub-common-name, ub-surname, ub-serial-number,
-    ub-locality-name, ub-state-name, ub-street-address, ub-organization-name,
-    ub-organizational-unit-name, ub-title, ub-description,
-    ub-business-category, ub-postal-line, ub-postal-string, ub-postal-code,
-    ub-post-office-box, ub-physical-office-name, ub-telex-number,
-    ub-country-code, ub-teletex-terminal-id, ub-telephone-number,
-    ub-x121-address, ub-international-isdn-number, ub-destination-indicator,
-    ub-user-password, ub-match, ub-knowledge-information,
-    ub-directory-string-first-component-match, ub-localeContextSyntax,
-    ub-pseudonym
-    FROM UpperBounds upperBounds
-  FilterItem, HierarchySelections, SearchControlOptions, ServiceControlOptions
-    FROM DirectoryAbstractService directoryAbstractService;
+       informationFramework, upperBounds, id-at, id-mr, id-avc,
+       directoryAbstractService, id-pr, id-not, id-cat
+  FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1) usefulDefinitions(0) 3}
+       Attribute, ATTRIBUTE, MATCHING-RULE, AttributeType, OBJECT-CLASS,
+       DistinguishedName, objectIdentifierMatch, distinguishedNameMatch, 
+       CONTEXT, ContextAssertion, AttributeCombination, ContextCombination,
+       MAPPING-BASED-MATCHING, MRMapping, AttributeValueAssertion
+  FROM InformationFramework informationFramework
+       ub-answerback, ub-name, ub-common-name, ub-surname, ub-serial-number,
+       ub-locality-name, ub-state-name, ub-street-address, ub-organization-name,
+       ub-organizational-unit-name, ub-title, ub-description,
+       ub-business-category, ub-postal-line, ub-postal-string, ub-postal-code,
+       ub-post-office-box, ub-physical-office-name, ub-telex-number,
+       ub-country-code, ub-teletex-terminal-id, ub-telephone-number,
+       ub-x121-address, ub-international-isdn-number, ub-destination-indicator,
+       ub-user-password, ub-match, ub-knowledge-information,
+       ub-directory-string-first-component-match, ub-localeContextSyntax, ub-pseudonym
+  FROM UpperBounds upperBounds
+       FilterItem, HierarchySelections, SearchControlOptions, ServiceControlOptions
+  FROM DirectoryAbstractService directoryAbstractService;
 
 -- Directory string type 
 DirectoryString{INTEGER:maxSize} ::= CHOICE {

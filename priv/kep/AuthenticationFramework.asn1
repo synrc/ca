@@ -1,7 +1,6 @@
 -- Module AuthenticationFramework (X.509:08/1997)
 
-AuthenticationFramework {joint-iso-itu-t ds(5) module(1)
-  authenticationFramework(7) 3} DEFINITIONS ::=
+AuthenticationFramework {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 3} DEFINITIONS ::=
 BEGIN
 
 --  EXPORTS All 
@@ -11,21 +10,19 @@ BEGIN
 --  extensions and modifications needed to maintain or improve the Directory service.
 
 IMPORTS
-  id-at, id-mr, informationFramework, upperBounds, selectedAttributeTypes,
-    basicAccessControl, certificateExtensions
-    FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1)
-      usefulDefinitions(0) 3}
-  Name, ATTRIBUTE, AttributeType, MATCHING-RULE, Attribute
-    FROM InformationFramework informationFramework
-  ub-user-password
-    FROM UpperBounds upperBounds
-  AuthenticationLevel
-    FROM BasicAccessControl basicAccessControl
-  UniqueIdentifier, octetStringMatch
-    FROM SelectedAttributeTypes selectedAttributeTypes
-  certificateExactMatch, certificatePairExactMatch, certificateListExactMatch,
-    GeneralNames
-    FROM CertificateExtensions certificateExtensions;
+      id-at, id-mr, informationFramework, upperBounds,
+      selectedAttributeTypes, basicAccessControl,
+      certificateExtensions
+ FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1) usefulDefinitions(0) 3}
+      Name, ATTRIBUTE, AttributeType, MATCHING-RULE, Attribute
+ FROM InformationFramework informationFramework
+      ub-user-password
+ FROM UpperBounds upperBounds
+      AuthenticationLevel
+ FROM BasicAccessControl basicAccessControl
+      UniqueIdentifier, octetStringMatch FROM SelectedAttributeTypes selectedAttributeTypes
+      certificateExactMatch, certificatePairExactMatch, certificateListExactMatch, GeneralNames
+ FROM CertificateExtensions certificateExtensions;
 
 --  basic certificate definition
 Certificate ::=
@@ -37,15 +34,12 @@ Certificate ::=
                validity                 Validity,
                subject                  Name,
                subjectPublicKeyInfo     SubjectPublicKeyInfo,
-               issuerUniqueIdentifier   [1] IMPLICIT UniqueIdentifier OPTIONAL,
-               --  if present, version must be v2 or v3
-               subjectUniqueIdentifier  [2] IMPLICIT UniqueIdentifier OPTIONAL,
-               --  if present, version must be v2 or v3
-               extensions               [3]  Extensions OPTIONAL
-               --  If present, version must be v3 -- }}
+               issuerUniqueIdentifier   [1] IMPLICIT UniqueIdentifier OPTIONAL, -- v2/v3
+               subjectUniqueIdentifier  [2] IMPLICIT UniqueIdentifier OPTIONAL, -- v2/v3
+               extensions               [3] Extensions OPTIONAL                 -- v3
+    }}
 
 Version ::= INTEGER {v1(0), v2(1), v3(2)}
-
 CertificateSerialNumber ::= INTEGER
 
 AlgorithmIdentifier ::= SEQUENCE {
@@ -53,53 +47,44 @@ AlgorithmIdentifier ::= SEQUENCE {
   parameters  ALGORITHM.&Type({SupportedAlgorithms}{@algorithm}) OPTIONAL
 }
 
---	Definition of the following information object set is deferred, perhaps to standardized
---	profiles or to protocol implementation conformance statements. The set is required to
---	specify a table constraint on the parameters component of AlgorithmIdentifier.
-SupportedAlgorithms ALGORITHM ::=
-{...}
+-- Definition of the following information object set is deferred, perhaps to standardized
+-- profiles or to protocol implementation conformance statements. The set is required to
+-- specify a table constraint on the parameters component of AlgorithmIdentifier.
 
-Validity ::= SEQUENCE {notBefore  Time,
-                       notAfter   Time
-}
+SupportedAlgorithms ALGORITHM ::= {...}
+Validity ::= SEQUENCE { notBefore Time, notAfter Time }
 
 SubjectPublicKeyInfo ::= SEQUENCE {
   algorithm         AlgorithmIdentifier,
-  subjectPublicKey  BIT STRING
-}
+  subjectPublicKey  BIT STRING }
 
-Time ::= CHOICE {utcTime          UTCTime,
-                 generalizedTime  GeneralizedTime
-}
+Time ::= CHOICE {
+  utcTime UTCTime,
+  generalizedTime  GeneralizedTime }
 
 Extensions ::= SEQUENCE OF Extension
 
---  For those extensions where ordering of individual extensions within the SEQUENCE is significant, the
---  specification of those individual extensions shall include the rules for the significance of the order therein
+-- For those extensions where ordering of individual extensions within the SEQUENCE is significant, the
+-- specification of those individual extensions shall include the rules for the significance of the order therein
+
 Extension ::= SEQUENCE {
   extnId     EXTENSION.&id({ExtensionSet}),
   critical   BOOLEAN DEFAULT FALSE,
-  extnValue  OCTET STRING--  contains a DER encoding of a value of type &ExtnType
---  for the extension object identified by extnId 
-}
+  extnValue  OCTET STRING }
 
-ExtensionSet EXTENSION ::=
-  {...}
+ExtensionSet EXTENSION ::= {...}
 
-EXTENSION ::= CLASS {&id        OBJECT IDENTIFIER UNIQUE,
-                     &ExtnType  
-}WITH SYNTAX {SYNTAX &ExtnType
-              IDENTIFIED BY &id
-}
+EXTENSION ::= CLASS {
+  &id OBJECT IDENTIFIER UNIQUE,
+  &ExtnType } WITH SYNTAX {
+  SYNTAX &ExtnType IDENTIFIED BY &id }
 
---  other certificate constructs
 Certificates ::= SEQUENCE {
-  userCertificate    Certificate,
+  userCertificate Certificate,
   certificationPath  ForwardCertificationPath OPTIONAL
 }
 
 ForwardCertificationPath ::= SEQUENCE OF CrossCertificates
-
 CrossCertificates ::= SET OF Certificate
 
 CertificationPath ::= SEQUENCE {
@@ -110,14 +95,11 @@ CertificationPath ::= SEQUENCE {
 CertificatePair ::= SEQUENCE {
   issuedByThisCA  [0]  Certificate OPTIONAL,
   issuedToThisCA  [1]  Certificate OPTIONAL
-  --  at least one of the pair shall be present 
 }
 
---  Certificate Revocation List (CRL)
 CertificateList ::=
   SIGNED
-    {SEQUENCE {version              Version OPTIONAL,
-               --  if present, version must be v2
+    {SEQUENCE {version              Version OPTIONAL, -- v2
                signature            AlgorithmIdentifier,
                issuer               Name,
                thisUpdate           Time,
@@ -129,7 +111,6 @@ CertificateList ::=
                              crlEntryExtensions  Extensions OPTIONAL} OPTIONAL,
                crlExtensions        [0]  Extensions OPTIONAL}}
 
---  attribute certificate
 AttributeCertificationPath ::= SEQUENCE {
   attributeCertificate  AttributeCertificate,
   acPath                SEQUENCE OF ACPathData OPTIONAL
@@ -265,7 +246,6 @@ SIGNED{ToBeSigned} ::= SEQUENCE {
   COMPONENTS OF SIGNATURE{ToBeSigned}
 }
 
---  object identifier assignments 
 id-at-userPassword OBJECT IDENTIFIER ::= {id-at 35}
 id-at-userCertificate OBJECT IDENTIFIER ::= {id-at 36}
 id-at-cAcertificate OBJECT IDENTIFIER ::= {id-at 37}
@@ -278,5 +258,4 @@ id-mr-attributeCertificateMatch OBJECT IDENTIFIER ::= {id-mr 42}
 
 END
 
--- Generated by Asnp, the ASN.1 pretty-printer of France Telecom R&D
 
