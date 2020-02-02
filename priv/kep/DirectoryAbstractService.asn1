@@ -24,24 +24,22 @@ IMPORTS
 -- Common data types 
 -- Parameterized type for representing optional signing 
 
-OPTIONALLY-SIGNED{Type} ::= CHOICE {unsigned  Type,
-                                    signed    SIGNED{Type}
+OPTIONALLY-SIGNED {Type} ::= CHOICE {
+  unsigned  Type,
+  signed    SIGNED {Type}
 }
 
 AgreementID ::= SEQUENCE {
   identifier  INTEGER,
-  version     INTEGER
-}
+  version     INTEGER }
 
 Code ::= CHOICE {
   local   INTEGER,
-  global  OBJECT IDENTIFIER
-}
+  global  OBJECT IDENTIFIER }
 
 OperationProgress ::= SET {
   nameResolutionPhase  [0]  ENUMERATED {notStarted(1), proceeding(2), completed(3)},
-  nextRDNToBeResolved  [1]  INTEGER OPTIONAL
-}
+  nextRDNToBeResolved  [1]  INTEGER OPTIONAL }
 
 ReferenceType ::= ENUMERATED {
   superior(1), subordinate(2), cross(3), nonSpecificSubordinate(4),
@@ -51,8 +49,8 @@ CommonArguments ::= SET {
   serviceControls     [30]  ServiceControls DEFAULT {},
   securityParameters  [29]  SecurityParameters OPTIONAL,
   requestor           [28]  DistinguishedName OPTIONAL,
-  operationProgress
-    [27]  OperationProgress DEFAULT {nameResolutionPhase notStarted},
+  operationProgress   [27]  OperationProgress DEFAULT {
+    nameResolutionPhase notStarted },
   aliasedRDNs         [26]  INTEGER OPTIONAL,
   criticalExtensions  [25]  BIT STRING OPTIONAL,
   referenceType       [24]  ReferenceType OPTIONAL,
@@ -85,9 +83,9 @@ ServiceControls ::= SET {
   sizeLimit            [3]  INTEGER OPTIONAL,
   scopeOfReferral      [4]  INTEGER {dmd(0), country(1)} OPTIONAL,
   attributeSizeLimit   [5]  INTEGER OPTIONAL,
-  manageDSAITPlaneRef
-    [6]  SEQUENCE {dsaName      Name,
-                   agreementID  AgreementID} OPTIONAL,
+  manageDSAITPlaneRef  [6]  SEQUENCE {
+    dsaName      Name,
+    agreementID  AgreementID } OPTIONAL,
   serviceType          [7]  OBJECT IDENTIFIER OPTIONAL,
   userClass            [8]  INTEGER OPTIONAL
 }
@@ -99,17 +97,16 @@ ServiceControlOptions ::= BIT STRING {
   noSubtypeSelection(10), countFamily(11)}
 
 EntryInformationSelection ::= SET {
-  attributes
-    CHOICE {allUserAttributes  [0]  NULL,
-            select             [1]  SET OF AttributeType
-            --  empty set implies no attributes are requested 
+  attributes CHOICE {
+    allUserAttributes  [0]  NULL,
+    select             [1]  SET OF AttributeType
   } DEFAULT allUserAttributes:NULL,
-  infoTypes
-    [2]  INTEGER {attributeTypesOnly(0), attributeTypesAndValues(1)}
-      DEFAULT attributeTypesAndValues,
-  extraAttributes
-    CHOICE {allOperationalAttributes  [3]  NULL,
-            select                    [4]  SET OF AttributeType} OPTIONAL,
+  infoTypes [2]  INTEGER {
+    attributeTypesOnly(0),
+    attributeTypesAndValues(1) } DEFAULT attributeTypesAndValues,
+  extraAttributes CHOICE {
+    allOperationalAttributes  [3]  NULL,
+    select                    [4]  SET OF AttributeType} OPTIONAL,
   contextSelection  ContextSelection OPTIONAL,
   returnContexts    BOOLEAN DEFAULT FALSE,
   familyReturn      FamilyReturn DEFAULT {memberSelect contributingEntriesOnly}
@@ -122,9 +119,10 @@ ContextSelection ::= CHOICE {
 
 TypeAndContextAssertion ::= SEQUENCE {
   type               AttributeType,
-  contextAssertions
-    CHOICE {preference  SEQUENCE OF ContextAssertion,
-            all         SET OF ContextAssertion}
+  contextAssertions  CHOICE {
+    preference  SEQUENCE OF ContextAssertion,
+    all         SET OF ContextAssertion
+  }
 }
 
 FamilyReturn ::= SEQUENCE {
@@ -132,64 +130,40 @@ FamilyReturn ::= SEQUENCE {
   familySelect  SEQUENCE SIZE (1..MAX) OF OBJECT-CLASS.&id OPTIONAL
 }
 
---family-information ATTRIBUTE ::= {
---  WITH SYNTAX  FamilyEntries
---  USAGE        directoryOperation
---  ID           id-at-family-information
---}
-
 FamilyEntries ::= SEQUENCE {
   family-class   OBJECT-CLASS.&id, -- structural object class value
-  familyEntries  SEQUENCE OF FamilyEntry
-}
+  familyEntries  SEQUENCE OF FamilyEntry }
 
 FamilyEntry ::= SEQUENCE {
   rdn          RelativeDistinguishedName,
-  information
-    SEQUENCE OF CHOICE {attributeType  AttributeType,
-                        attribute      Attribute},
-  family-info  SEQUENCE SIZE (1..MAX) OF FamilyEntries OPTIONAL
-}
+  information  SEQUENCE OF CHOICE {attributeType AttributeType,attribute Attribute},
+  family-info  SEQUENCE SIZE (1..MAX) OF FamilyEntries OPTIONAL }
 
 EntryInformation ::= SEQUENCE {
   name                   Name,
   fromEntry              BOOLEAN DEFAULT TRUE,
-  information
-    SET SIZE (1..MAX) OF
-      CHOICE {attributeType  AttributeType,
-              attribute      Attribute} OPTIONAL,
-  incompleteEntry        [3]  BOOLEAN DEFAULT FALSE, -- not in 1988-edition systems
-  partialNameResolution
-    [4]  BOOLEAN DEFAULT FALSE -- not in 1988 or 1993 edition systems --
+  information SET SIZE (1..MAX) OF CHOICE {
+    attributeType  AttributeType,
+    attribute      Attribute} OPTIONAL,
+  incompleteEntry        [3] BOOLEAN DEFAULT FALSE, -- not in 1988-edition systems
+  partialNameResolution  [4] BOOLEAN DEFAULT FALSE -- not in 1988 or 1993 edition systems --
 }
 
 Filter ::= CHOICE {
   item  [0]  FilterItem,
   and   [1]  SET OF Filter,
   or    [2]  SET OF Filter,
-  not   [3]  Filter
-}
+  not   [3]  Filter }
 
 FilterItem ::= CHOICE {
   equality          [0]  AttributeValueAssertion,
-  substrings
-    [1]  SEQUENCE {type     ATTRIBUTE.&id({SupportedAttributes}),
-                   strings
-                     SEQUENCE OF
-                       CHOICE {initial
-                                 [0]  ATTRIBUTE.&Type
-                                        ({SupportedAttributes}
-                                           {@substrings.type}),
-                               any
-                                 [1]  ATTRIBUTE.&Type
-                                        ({SupportedAttributes}
-                                           {@substrings.type}),
-                               final
-                                 [2]  ATTRIBUTE.&Type
-                                        ({SupportedAttributes}
-                                           {@substrings.type}),
-                               control  Attribute -- Used to specify interpretation of following items
-                       }},
+  substrings        [1]  SEQUENCE {
+    type     ATTRIBUTE.&id({SupportedAttributes}),
+    strings  SEQUENCE OF CHOICE {
+      initial [0] ATTRIBUTE.&Type ({SupportedAttributes}{@substrings.type}),
+      any     [1] ATTRIBUTE.&Type ({SupportedAttributes}{@substrings.type}),
+      final   [2] ATTRIBUTE.&Type ({SupportedAttributes}{@substrings.type}),
+      control  Attribute}},
   greaterOrEqual    [2]  AttributeValueAssertion,
   lessOrEqual       [3]  AttributeValueAssertion,
   present           [4]  AttributeType,
@@ -201,27 +175,21 @@ FilterItem ::= CHOICE {
 MatchingRuleAssertion ::= SEQUENCE {
   matchingRule  [1]  SET SIZE (1..MAX) OF MATCHING-RULE.&id,
   type          [2]  AttributeType OPTIONAL,
-  matchValue
-    [3]  MATCHING-RULE.&AssertionType
-           (CONSTRAINED BY {
-              -- matchValue must be a value of  type specified by the &AssertionType field of 
-              -- one of the MATCHING-RULE information objects identified by matchingRule -- }),
+  matchValue    [3]  MATCHING-RULE.&AssertionType (CONSTRAINED BY {}),
   dnAttributes  [4]  BOOLEAN DEFAULT FALSE
 }
 
 PagedResultsRequest ::= CHOICE {
-  newRequest
-    SEQUENCE {pageSize  INTEGER,
-              sortKeys  SEQUENCE SIZE (1..MAX) OF SortKey OPTIONAL,
-              reverse   [1]  BOOLEAN DEFAULT FALSE,
-              unmerged  [2]  BOOLEAN DEFAULT FALSE},
-  queryReference  OCTET STRING
-}
+  newRequest SEQUENCE {
+    pageSize  INTEGER,
+    sortKeys  SEQUENCE SIZE (1..MAX) OF SortKey OPTIONAL,
+    reverse   [1]  BOOLEAN DEFAULT FALSE,
+    unmerged  [2]  BOOLEAN DEFAULT FALSE},
+  queryReference  OCTET STRING }
 
 SortKey ::= SEQUENCE {
   type          AttributeType,
-  orderingRule  MATCHING-RULE.&id OPTIONAL
-}
+  orderingRule  MATCHING-RULE.&id OPTIONAL }
 
 SecurityParameters ::= SET {
   certification-path          [0]  CertificationPath OPTIONAL,
@@ -233,8 +201,7 @@ SecurityParameters ::= SET {
   operationCode               [6]  Code OPTIONAL,
   attributeCertificationPath  [7]  AttributeCertificationPath OPTIONAL,
   errorProtection             [8]  ErrorProtectionRequest OPTIONAL,
-  errorCode                   [9]  Code OPTIONAL
-}
+  errorCode                   [9]  Code OPTIONAL }
 
 HierarchySelections ::= BIT STRING {
   self(0), children(1), parent(2), hierarchy(3), top(4), subtree(5),
@@ -249,14 +216,12 @@ SearchControlOptions ::= BIT STRING {
 ProtectionRequest ::= INTEGER {
   none(0), signed(1), encrypted(2), signed-encrypted(3)}
 
-Time ::= CHOICE {utcTime          UTCTime,
-                 generalizedTime  GeneralizedTime
-}
+Time ::= CHOICE {
+  utcTime          UTCTime,
+  generalizedTime  GeneralizedTime }
 
 ErrorProtectionRequest ::= INTEGER {
   none(0), signed(1), encrypted(2), signed-encrypted(3)}
 
 END -- DirectoryAbstractService
-
--- Generated by Asnp, the ASN.1 pretty-printer of France Telecom R&D
 

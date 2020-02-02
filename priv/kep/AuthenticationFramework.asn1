@@ -20,7 +20,8 @@ IMPORTS
  FROM UpperBounds upperBounds
       AuthenticationLevel
  FROM BasicAccessControl basicAccessControl
-      UniqueIdentifier, octetStringMatch FROM SelectedAttributeTypes selectedAttributeTypes
+      UniqueIdentifier, octetStringMatch
+ FROM SelectedAttributeTypes selectedAttributeTypes
       certificateExactMatch, certificatePairExactMatch, certificateListExactMatch, GeneralNames
  FROM CertificateExtensions certificateExtensions;
 

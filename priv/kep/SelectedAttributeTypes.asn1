@@ -1,7 +1,7 @@
 -- Module SelectedAttributeTypes (X.520:08/1997)
 
-SelectedAttributeTypes {joint-iso-itu-t ds(5) module(1)
-  selectedAttributeTypes(5) 3} DEFINITIONS ::=
+SelectedAttributeTypes {joint-iso-itu-t ds(5) module(1) selectedAttributeTypes(5) 3}
+DEFINITIONS ::=
 BEGIN
 
 -- EXPORTS All 

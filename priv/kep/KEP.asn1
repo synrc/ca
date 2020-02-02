@@ -10,7 +10,6 @@
 -- date: 20.08.2012 #1236/5/453
 
 KEP DEFINITIONS IMPLICIT TAGS ::=
-
 BEGIN
 
 IMPORTS Attribute, Name

@@ -1,6 +1,7 @@
 -- Module UpperBounds (X.520:08/1997)
 
-UpperBounds {joint-iso-itu-t ds(5) module(1) upperBounds(10) 3} DEFINITIONS ::=
+UpperBounds {joint-iso-itu-t ds(5) module(1) upperBounds(10) 3}
+DEFINITIONS ::=
 BEGIN
 
 -- EXPORTS All 
