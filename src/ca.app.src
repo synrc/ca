@@ -1,9 +1,9 @@
 {application, ca,
  [
   {description, "CA Certificate Authority"},
-  {vsn, "0.10.0"},
+  {vsn, "1.1.0"},
   {registered, []},
   {applications, [kernel,stdlib,ranch,cowboy]},
-  {mod, { ca, []}},
+  {mod, { 'Elixir.CA', []}},
   {env, []}
  ]}.

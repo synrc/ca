@@ -1,0 +1,10 @@
+src/AuthenticationFramework.*
+src/BasicAccessControl.*
+src/CertificateExtensions.*
+src/DirectoryAbstractService.*
+src/InformationFramework.*
+src/KEP.*
+src/MTSUpperBounds.*
+src/SelectedAttributeTypes.*
+src/UpperBounds.*
+src/UsefulDefinitions.*

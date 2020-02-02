@@ -16,8 +16,7 @@ IMPORTS
     FROM SelectedAttributeTypes selectedAttributeTypes
   TypeAndContextAssertion, ServiceControlOptions, SearchControlOptions,
     HierarchySelections, FamilyGrouping, FamilyReturn
-    FROM DirectoryAbstractService directoryAbstractService
-  ub-search
+    FROM DirectoryAbstractService directoryAbstractService ub-search
     FROM UpperBounds upperBounds;
 
 -- attribute data types 

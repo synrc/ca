@@ -5,23 +5,21 @@ CertificateExtensions {joint-iso-itu-t ds(5) module(1)
 BEGIN
 
 --  EXPORTS ALL 
-IMPORTS
-  id-at, id-ce, id-mr, informationFramework, authenticationFramework,
-    selectedAttributeTypes, upperBounds
-    FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1)
-      usefulDefinitions(0) 3}
-  Name, RelativeDistinguishedName, ATTRIBUTE, Attribute, MATCHING-RULE
-    FROM InformationFramework informationFramework
-  CertificateSerialNumber, CertificateList, AlgorithmIdentifier, EXTENSION,
-    Time
-    FROM AuthenticationFramework authenticationFramework
-  DirectoryString{}
-    FROM SelectedAttributeTypes selectedAttributeTypes
-  ub-name
-    FROM UpperBounds upperBounds
-  ORAddress
-    FROM MTSAbstractService {joint-iso-itu-t mhs(6) mts(3) modules(0)
-      mts-abstract-service(1) version-1999(1)};
+IMPORTS id-at, id-ce, id-mr, informationFramework, authenticationFramework,
+        selectedAttributeTypes, upperBounds
+   FROM UsefulDefinitions {joint-iso-itu-t ds(5) module(1) usefulDefinitions(0) 3}
+
+        Name, RelativeDistinguishedName, ATTRIBUTE, Attribute, MATCHING-RULE
+   FROM InformationFramework informationFramework
+
+        CertificateSerialNumber, CertificateList, AlgorithmIdentifier, EXTENSION, Time
+   FROM AuthenticationFramework authenticationFramework
+
+        DirectoryString{}
+   FROM SelectedAttributeTypes selectedAttributeTypes
+
+        ub-name
+   FROM UpperBounds upperBounds;
 
 --  Unless explicitly noted otherwise, there is no significance to the ordering
 --  of components of a SEQUENCE OF construct in this Specification.
@@ -154,7 +152,6 @@ GeneralName ::= CHOICE {
   otherName                  [0]  INSTANCE OF OTHER-NAME,
   rfc822Name                 [1]  IA5String,
   dNSName                    [2]  IA5String,
-  x400Address                [3]  ORAddress,
   directoryName              [4]  Name,
   ediPartyName               [5]  EDIPartyName,
   uniformResourceIdentifier  [6]  IA5String,

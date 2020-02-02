@@ -10,6 +10,13 @@ init(Req,Opts) ->
     Request = maybe_service(Method, HasBody, Req),
     {ok, Request, Opts}.
 
+boot() ->
+  [ ca_enroll:boot(Crypto) || Crypto <- [ "rsa", "ecc" ] ],
+  R = cowboy_router:compile([{'_', [
+      {"/up/:crypto", ca_up, []},
+      {"/enroll/:crypto/:nsCertType", ca_enroll, []}
+  ]}]).
+
 cwd() -> {ok, Cwd} = file:get_cwd(), Cwd.
 cat(X)          -> lists:concat(X).
 run(X)          -> sh:sh(sh:run(X)).
