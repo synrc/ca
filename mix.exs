@@ -4,7 +4,7 @@ defmodule CA.Mixfile do
   def project() do
     [
       app: :ca,
-      version: "0.10.0",
+      version: "1.1.0",
       elixir: "~> 1.7",
       description: "CA Certificate Authority",
       package: package(),
@@ -28,7 +28,7 @@ defmodule CA.Mixfile do
 
   def deps() do
     [
-      {:cowboy, "~> 2.5.0"},
+      {:cowboy, "~> 2.7.0"},
       {:ex_doc, "~> 0.11", only: :dev}
     ]
   end

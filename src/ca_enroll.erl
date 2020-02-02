@@ -10,6 +10,7 @@ init(Req,Opts) ->
     Request = maybe_service(Method, HasBody, Req),
     {ok, Request, Opts}.
 
+cwd() -> {ok, Cwd} = file:get_cwd(), Cwd.
 cat(X)          -> lists:concat(X).
 run(X)          -> sh:sh(sh:run(X)).
 reply(X,Y,Z,R)  -> cowboy_req:reply(X,Y,Z,R).
@@ -27,7 +28,7 @@ boot(Crypto) ->
         {ok,_} -> skip end, {ok,Crypto}.
 
 do_boot(Crypto) ->
-   {Num,Bin} = {<<"1000">>,replace(replace(cnf(),"PATH",mad_utils:cwd()),"CRYPTO",Crypto)},
+   {Num,Bin} = {<<"1000">>,replace(replace(cnf(),"PATH",cwd()),"CRYPTO",Crypto)},
    {Dir,CNF} = root(Crypto), filelib:ensure_dir(Dir),
    Files     = [{"index.txt",<<>>},{"crlnumber",Num},{"serial",Num},{CNF,Bin}],
    lists:map(fun({A,B}) -> file:write_file(Dir++A,B) end, Files), ca(Crypto).
