@@ -4,13 +4,13 @@ defmodule CA.Mixfile do
   def project() do
     [
       app: :ca,
-      version: "1.1.1",
+      version: "1.2.0",
       elixir: "~> 1.7",
-      compilers: [:asn1] ++ Mix.compilers,
+#      compilers: [:asn1] ++ Mix.compilers,
       description: "CA Certificate Authority",
       package: package(),
-      asn1_paths: ["priv/kep"],
-      erlc_paths: ["src"],
+#      asn1_paths: ["priv/kep"],
+#      erlc_paths: ["src"],
       deps: deps()
     ]
   end
@@ -30,7 +30,7 @@ defmodule CA.Mixfile do
   def deps() do
     [
       {:cowboy, "~> 2.7.0"},
-      {:asn1ex, github: "vicentfg/asn1ex", only: :dev},
+#      {:asn1ex, "~> 0.0.1", only: :dev},
       {:ex_doc, "~> 0.11", only: :dev}
     ]
   end
