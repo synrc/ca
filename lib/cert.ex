@@ -34,11 +34,18 @@ defmodule CA.KEP do
     )
   end
 
+  def flat(code,{k,v},acc) when is_integer(k), do: [flat(code,v,acc)|acc]
+  def flat(code,{k,v},acc), do: [flat(code,k,acc)|acc]
+  def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
+  def flat(code,k,acc) when is_binary(k), do: [k|acc]
+
   def parseCert(cert) do
     {:Certificate, a, _, _} = cert
-    {:Certificate_toBeSigned, _ver, _sel, _alg, issuer, _val, issuee, _, _, _, _} = a
+    {:Certificate_toBeSigned, _ver, _sel, _alg, issuer, _val, issuee, _, _, _, exts} = a
+    extensions = :lists.map(fn {:Extension,code,_,b} ->
+         {code, :lists.flatten flat(code,:asn1rt_nif.decode_ber_tlv(b),[])} end, exts)
     person = :lists.flatten(:erlang.element(2, issuee))
     ca = :lists.flatten(:erlang.element(2, issuer))
-    {parseAttrs(person),parseAttrs(ca)}
+    {parseAttrs(person),parseAttrs(ca),extensions}
   end
 end
