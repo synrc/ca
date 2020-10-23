@@ -18,6 +18,7 @@
          legacy_erlang_types/0]).
 -export(['dialyzer-suppressions'/1]).
 -export([
+decode_object_identifier/2,
 enc_ContentInfo/2,
 enc_UnknownInfo/2,
 enc_CrlValidatedID/2,

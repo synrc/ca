@@ -34,6 +34,26 @@ defmodule CA.KEP do
     )
   end
 
+  def pair([],acc), do: acc
+  def pair([x],acc), do: [x|acc]
+  def pair([a,b|t],acc), do: pair(t,[{:oid.decode(a),b}|acc])
+
+  def oid({1,3,6,1,5,5,7,1,1}, v), do: {:authorityInfoAccess, pair(v,[])}
+  def oid({1,3,6,1,5,5,7,1,3}, [v]), do: {:qcStatements, :oid.decode v}
+  def oid({1,3,6,1,5,5,7,1,11},v), do: {:subjectInfoAccess, pair(v,[])}
+  def oid({2,5,29,9},v),  do: {:subjectDirectoryAttributes, pair(v,[])}
+  def oid({2,5,29,14},v), do: {:subjectKeyIdentifier, pair(v,[])}
+  def oid({2,5,29,15},v), do: {:keyUsage, pair(v,[])}
+  def oid({2,5,29,16},v), do: {:privateKeyUsagePeriod, v}
+  def oid({2,5,29,17},v), do: {:subjectAltName, pair(v,[])}
+  def oid({2,5,29,19},v), do: {:basicConstraints, pair(v,[])}
+  def oid({2,5,29,31},v), do: {:cRLDistributionPoints, pair(v,[])}
+  def oid({2,5,29,32},[v]), do: {:certificatePolicies, :oid.decode v}
+  def oid({2,5,29,35},v), do: {:authorityKeyIdentifier, pair(v,[])}
+  def oid({2,5,29,46},v), do: {:freshestCRL, pair(v,[])}
+  def oid(x,v) when is_binary(x), do: {:oid.decode(x),pair(v,[])}
+  def oid(x,v), do: {x,v}
+
   def flat(code,{k,v},acc) when is_integer(k), do: [flat(code,v,acc)|acc]
   def flat(code,{k,v},acc), do: [flat(code,k,acc)|acc]
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
@@ -43,7 +63,8 @@ defmodule CA.KEP do
     {:Certificate, a, _, _} = cert
     {:Certificate_toBeSigned, _ver, _sel, _alg, issuer, _val, issuee, _, _, _, exts} = a
     extensions = :lists.map(fn {:Extension,code,_,b} ->
-         {code, :lists.flatten flat(code,:asn1rt_nif.decode_ber_tlv(b),[])} end, exts)
+         oid(code, :lists.flatten(flat(code,:asn1rt_nif.decode_ber_tlv(b),[])))
+      end, exts)
     person = :lists.flatten(:erlang.element(2, issuee))
     ca = :lists.flatten(:erlang.element(2, issuer))
     {parseAttrs(person),parseAttrs(ca),extensions}
