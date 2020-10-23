@@ -22,7 +22,7 @@ IMPORTS
  FROM BasicAccessControl basicAccessControl
       UniqueIdentifier, octetStringMatch
  FROM SelectedAttributeTypes selectedAttributeTypes
-      certificateExactMatch, certificatePairExactMatch, certificateListExactMatch, GeneralNames
+      certificateExactMatch, certificatePairExactMatch, certificateListExactMatch, GeneralNames, subjectDirectoryAttributes
  FROM CertificateExtensions certificateExtensions;
 
 --  basic certificate definition
@@ -71,7 +71,10 @@ Extensions ::= SEQUENCE OF Extension
 Extension ::= SEQUENCE {
   extnId     EXTENSION.&id({ExtensionSet}),
   critical   BOOLEAN DEFAULT FALSE,
-  extnValue  OCTET STRING }
+  extnValue  OCTET STRING (CONTAINING EXTENSION.&ExtnType({ExtensionSet}{@extnID}) ENCODED BY der) }
+
+der OBJECT IDENTIFIER ::=
+  {joint-iso-itu-t asn1(1) ber-derived(2) distinguished-encoding(1)}
 
 ExtensionSet EXTENSION ::= {...}
 
