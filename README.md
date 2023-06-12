@@ -1,4 +1,4 @@
-# CA: Certificate Authority
+# SYNRC 🛡️ CA
 
 [![Actions Status](https://github.com/synrc/ca/workflows/mix/badge.svg)](https://github.com/synrc/ca/actions)
 [![Build Status](https://travis-ci.com/synrc/ca.svg?branch=master)](https://travis-ci.com/synrc/ca)
