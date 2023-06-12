@@ -4,6 +4,8 @@
 [![Build Status](https://travis-ci.com/synrc/ca.svg?branch=master)](https://travis-ci.com/synrc/ca)
 [![Hex pm](http://img.shields.io/hexpm/v/ca.svg?style=flat)](https://hex.pm/packages/ca)
 
+![ca-shaders](https://github.com/synrc/ca/assets/144776/f8f9c280-9442-443e-a2be-7d610a1a7815)
+
 ## X.509 decode SignData
 
 ```elixir
