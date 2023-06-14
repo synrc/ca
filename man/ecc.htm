@@ -18,74 +18,75 @@
 <main>
     <section>
     <h3>ECC X.509</h3>
-    <figure><code> mkdir -p cert/ecc</code></figure>
+    <figure><code> $ mkdir -p cert/ecc
+ $ echo 00 > cert/ecc/serial
+ $ echo "" > cert/ecc/index.txt
+ $ echo 10 > cert/ecc/crlnumber</code></figure>
     </section>
     <section>
     <h4>CA KEY</h4>
-    <figure><code> openssl ecparam -genkey -name secp384r1 | \
- openssl ec -aes256 -passout pass:0000 -out cert/ecc/caroot.key</code>
-    <code> openssl req -config cert/ecc/synrc.cnf -days 3650 \
-         -new -x509 \
-         -key cert/ecc/caroot.key \
-         -out cert/ecc/caroot.pem \
-         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=CA"</code>
+    <figure><code> $ openssl ecparam -genkey -name secp384r1 |
+   openssl ec -aes256 -passout pass:0 \
+              -out cert/ecc/caroot.key</code>
+    <code> $ openssl req -config cert/ecc/synrc.cnf -days 3650 -batch \
+               -new -x509 -passin pass:0 -passout pass:0 \
+               -key cert/ecc/caroot.key -out cert/ecc/caroot.pem \
+               -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=CA"</code>
     </figure>
     </section>
     <section>
     <h4>CA CRL</h4>
-    <figure><code> openssl ca -config cert/ecc/synrc.cnf \
-         -gencrl -out cert/ecc/eccroot.crl</code></figure>
+    <figure><code> $ openssl ca -config cert/ecc/synrc.cnf \
+              -passin pass:0 -gencrl -out cert/ecc/eccroot.crl</code></figure>
     </section>
     <section>
     <h4>SERVER KEY</h4>
-    <figure><code> openssl req -config cert/ecc/synrc.cnf \
-         -new -newkey ec:&#60;(openssl ecparam -name secp384r1) \
-         -keyout cert/ecc/server.key.enc \
-         -out cert/ecc/server.csr \
-         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=SERVER"</code>
-    <code> openssl ec -in cert/ecc/server.key.enc \
-         -out cert/ecc/server.key</code>
+    <figure><code> $ export SERVER=server</code>
+    <code> $ openssl req -config cert/ecc/synrc.cnf \
+               -passin pass:0 -passout pass:0 \
+               -new -newkey ec:&lt;(openssl ecparam -name secp384r1) \
+               -keyout cert/ecc/$SERVER.key.enc \
+               -out cert/ecc/$SERVER.csr \
+               -subj "/C=UA/ST=Kyiv/O=SYNRC/CN="$SERVER</code>
+    <code> $ openssl ec -in cert/ecc/$SERVER.key.enc \
+              -out cert/ecc/$SERVER.key -passin pass:0 -passout pass:0</code>
     </figure>
     </section>
     <section>
     <h4>SERVER CERT</h4>
     <figure>
-    <code> openssl ca -config cert/ecc/synrc.cnf \
-         -extensions server_cert \
-         -days 730 \
-         -in cert/ecc/server.csr \
-         -out cert/ecc/server.pem \
-         -cert cert/ecc/caroot.pem \
-         -keyfile cert/ecc/caroot.key</code></figure>
+    <code> $ openssl ca -config cert/ecc/synrc.cnf -days 730 -batch \
+              -in cert/ecc/$SERVER.csr -out cert/ecc/$SERVER.pem \
+              -keyfile cert/ecc/caroot.key -cert cert/ecc/caroot.pem \
+              -passin pass:0 -extensions server_cert
+</code></figure>
     </section>
     <section>
     <h4>CLIENT KEY</h4>
     <figure>
-    <code> openssl req -config cert/ecc/synrc.cnf -passout pass:0 \
-         -new -newkey ec:&#60;(openssl ecparam -name secp384r1) \
-         -keyout cert/ecc/client.key \
-         -out cert/ecc/client.csr \
-         -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=Maxim"</code>
+    <code> $ export CLIENT=client</code>
+    <code> $ openssl req -config cert/ecc/synrc.cnf -batch \
+               -passin pass:0 -passout pass:0 \
+               -new -newkey ec:&lt;(openssl ecparam -name secp384r1) \
+               -keyout cert/ecc/$CLIENT.key \
+               -out cert/ecc/$CLIENT.csr \
+               -subj "/C=UA/ST=Kyiv/O=SYNRC/CN="$CLIENT</code>
     </figure>
     </section>
     <section>
     <h4>CLIENT CERT</h4>
     <figure>
-    <code> openssl ca -config cert/ecc/synrc.cnf \
-         -extensions usr_cert \
-         -days 365 \
-         -in cert/ecc/client.csr \
-         -out cert/ecc/client.pem \
-         -cert cert/ecc/caroot.pem \
-         -keyfile cert/ecc/caroot.key</code></figure>
+    <code> $ openssl ca -config cert/ecc/synrc.cnf \
+              -extensions usr_cert -batch -days 365 -passin pass:0 \
+              -in cert/ecc/$CLIENT.csr -out cert/ecc/$CLIENT.pem \
+              -cert cert/ecc/caroot.pem -keyfile cert/ecc/caroot.key</code></figure>
     </section>
     <section>
     <h4>CLIENT PFX</h4>
     <figure>
-    <code> openssl pkcs12 -export \
-         -inkey cert/ecc/client.key \
-         -in cert/ecc/client.pem \
-         -out cert/ecc/client.p12</code></figure>
+    <code> $ openssl pkcs12 -export -passin pass:0 -passout pass:0 \
+                  -inkey cert/ecc/$CLIENT.key -in cert/ecc/$CLIENT.pem \
+                  -out cert/ecc/$CLIENT.p12</code></figure>
     </section>
     <section>
     <h3>ECC CNF</h3>
@@ -93,17 +94,17 @@
  default_ca = CA_default
 
  [ CA_default ]
- dir               = /home/ubuntu/depot/synrc
- certs             = $dir/cert/ecc
- crl_dir           = $dir/cert/ecc
- new_certs_dir     = $dir/cert/ecc
- database          = $dir/cert/ecc/index.txt
- serial            = $dir/cert/ecc/serial
- RANDFILE          = $dir/cert/ecc/.rand
- private_key       = $dir/cert/ecc/caroot.key
- certificate       = $dir/cert/ecc/caroot.pem
- crlnumber         = $dir/cert/ecc/crlnumber
- crl               = $dir/cert/ecc/eccroot.crl
+ dir               = /Users/maxim/depot/synrc/ca/cert/ecc
+ certs             = $dir
+ crl_dir           = $dir
+ new_certs_dir     = $dir
+ database          = $dir/index.txt
+ serial            = $dir/serial
+ RANDFILE          = $dir/.rand
+ private_key       = $dir/caroot.key
+ certificate       = $dir/caroot.pem
+ crlnumber         = $dir/crlnumber
+ crl               = $dir/eccroot.crl
  crl_extensions    = crl_ext
  default_crl_days  = 3650
  default_md        = sha384
@@ -128,17 +129,17 @@
  x509_extensions     = v3_ca
 
  [ req_distinguished_name ]
- countryName                     = Country Name (2 letter code)
- stateOrProvinceName             = State or Province Name
- localityName                    = Locality Name
- 0.organizationName              = Organization Name
- organizationalUnitName          = Organizational Unit Name
- commonName                      = Common Name
- commonName_default              = CA
+ countryName                     = UA
  countryName_default             = UA
- stateOrProvinceName_default     = Kyiv
- localityName_default            = Kyiv
+ 0.organizationName              = SYNRC
  0.organizationName_default      = SYNRC
+ commonName                      = CA
+ commonName_default              = CA
+ stateOrProvinceName             = Kyiv
+ stateOrProvinceName_default     = Kyiv
+ localityName                    = Kyiv
+ localityName_default            = Kyiv
+ organizationalUnitName          = HQ
  organizationalUnitName_default  = HQ
 
  [ v3_ca ]
@@ -158,7 +159,7 @@
  [ usr_cert ]
  basicConstraints = CA:FALSE
  nsCertType = client, email
- nsComment = "Synrc Client Certificate"
+ nsComment = "SYNRC CLIENT"
  subjectKeyIdentifier = hash
  authorityKeyIdentifier = keyid,issuer
  keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
@@ -168,7 +169,7 @@
  [ server_cert ]
  basicConstraints = CA:FALSE
  nsCertType = server
- nsComment = "Synrc Server Certificate"
+ nsComment = "SYNRC SERVER"
  subjectKeyIdentifier = hash
  authorityKeyIdentifier = keyid,issuer:always
  keyUsage = critical, digitalSignature, keyEncipherment
@@ -195,7 +196,8 @@
 
  [ocsp_info]
  caIssuers;URI.0 = http://crl.n2o.dev:8081/eccroot.crt
- OCSP;URI.0 = http://ocsp.n2o.dev:8081/</code></figure>
+ OCSP;URI.0 = http://ocsp.n2o.dev:8081/
+</code></figure>
     </section>
     <section>
     <h3>LibreSSL</h3>
