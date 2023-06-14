@@ -144,6 +144,9 @@
        {port, 8883},
        {ssl_opts, [
            {verify,verify_peer},
+           {customize_hostname_check,
+               [{match_fun, fun ({ip,{127,0,0,1}},{dNSName,"localhost"}) -> true;
+                                (_,_) -> false end}]},
            {certfile,"cert/ecc/Max Socha.pem"},
            {keyfile,"cert/ecc/Max Socha.key"},
            {cacertfile,"cert/ecc/caroot.pem"}]}]).
