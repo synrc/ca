@@ -12,7 +12,7 @@ init(Req,Opts) ->
 
 boot() ->
   [ ca_enroll:boot(Crypto) || Crypto <- [ "rsa", "ecc" ] ],
-  R = cowboy_router:compile([{'_', [
+  cowboy_router:compile([{'_', [
       {"/up/:crypto", ca_up, []},
       {"/enroll/:crypto/:nsCertType", ca_enroll, []}
   ]}]).

@@ -2,7 +2,7 @@
 default_ca = CA_default
 
 [ CA_default ]
-dir               = PATH/cert/CRYPTO
+dir               = /Users/maxim/depot/synrc/ca/cert/ecc
 certs             = $dir
 crl_dir           = $dir
 new_certs_dir     = $dir
@@ -12,7 +12,7 @@ RANDFILE          = $dir/.rand
 private_key       = $dir/caroot.key
 certificate       = $dir/caroot.pem
 crlnumber         = $dir/crlnumber
-crl               = $dir/CRYPTOroot.crl
+crl               = $dir/eccroot.crl
 crl_extensions    = crl_ext
 default_crl_days  = 3650
 default_md        = sha384
@@ -37,17 +37,17 @@ default_md          = sha384
 x509_extensions     = v3_ca
 
 [ req_distinguished_name ]
-countryName                     = Country Name (2 letter code)
-stateOrProvinceName             = State or Province Name
-localityName                    = Locality Name
-0.organizationName              = Organization Name
-organizationalUnitName          = Organizational Unit Name
-commonName                      = Common Name
-commonName_default              = CA
+countryName                     = UA
 countryName_default             = UA
-stateOrProvinceName_default     = Kyiv
-localityName_default            = Kyiv
+0.organizationName              = SYNRC
 0.organizationName_default      = SYNRC
+commonName                      = CA
+commonName_default              = CA
+stateOrProvinceName             = Kyiv
+stateOrProvinceName_default     = Kyiv
+localityName                    = Kyiv
+localityName_default            = Kyiv
+organizationalUnitName          = HQ
 organizationalUnitName_default  = HQ
 
 [ v3_ca ]
@@ -67,7 +67,7 @@ authorityInfoAccess = @ocsp_info
 [ usr_cert ]
 basicConstraints = CA:FALSE
 nsCertType = client, email
-nsComment = "Synrc Client Certificate"
+nsComment = "SYNRC CLIENT"
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer
 keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
@@ -77,7 +77,7 @@ subjectAltName = @alt_names
 [ server_cert ]
 basicConstraints = CA:FALSE
 nsCertType = server
-nsComment = "Synrc Server Certificate"
+nsComment = "SYNRC SERVER"
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
@@ -100,8 +100,8 @@ keyUsage = critical, digitalSignature
 extendedKeyUsage = critical, OCSPSigning
 
 [crl_info]
-URI.0 = http://crl.n2o.dev:8081/CRYPTOroot.crl
+URI.0 = http://crl.n2o.dev:8081/eccroot.crl
 
 [ocsp_info]
-caIssuers;URI.0 = http://crl.n2o.dev:8081/CRYPTOroot.crt
+caIssuers;URI.0 = http://crl.n2o.dev:8081/eccroot.crt
 OCSP;URI.0 = http://ocsp.n2o.dev:8081/

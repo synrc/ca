@@ -50,17 +50,17 @@
               and client certificates (for securing device connections).
               </p>
             <h3>SYNRC CA</h3>
-
             <figure><img src="https://ca.erp.uno/priv/design/ca-shaders.png" width=900></figure>
         </section>
         <section>
            <h3>SETUP CA</h3>
-           <p>SYNRC CA supports all Erlang package managers: mix, mad, rebar3, rebar, erlang.mk.</p>
+           <p>SYNRC CA supports Elixir package manager MIX:.</p>
            <figure><code>
- $ mad get ca
- $ cd deps/ca
- $ mad deps compile plan start
- OK
+ $ git clone git@github.com:synrc/ca && cd ca
+ $ mix deps.get
+ $ mix release
+ $ _build/dev/rel/ca/bin/ca daemon
+ $ _build/dev/rel/ca/bin/ca remote
            </code></figure>
            <p>You can either use you own instance or SYNRC CA instance.
               Here is how to obtain the SYNRC root certificate:</p>
