@@ -66,12 +66,12 @@
     <h4>CLIENT KEY</h4>
     <figure>
     <code> $ export CLIENT=client</code>
-    <code> $ openssl req -config cert/ecc/synrc.cnf -batch \
-               -passin pass:0 -passout pass:0 \
+    <code> $ openssl req -config cert/ecc/synrc.cnf -batch -passout pass:0 \
                -new -newkey ec:&lt;(openssl ecparam -name secp384r1) \
                -keyout cert/ecc/$CLIENT.key \
                -out cert/ecc/$CLIENT.csr \
                -subj "/C=UA/ST=Kyiv/O=SYNRC/CN="$CLIENT</code>
+    <code> $ openssl ec -in cert/ecc/$CLIENT.key.enc -out cert/ecc/$CLIENT.key -passin pass:0</code>
     </figure>
     </section>
     <section>
