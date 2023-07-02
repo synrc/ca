@@ -65,7 +65,7 @@ crlDistributionPoints = @crl_info
 authorityInfoAccess = @ocsp_info
 
 [ usr_cert ]
-basicConstraints = CA:FALSE
+basicConstraints = CA:TRUE
 nsCertType = client, email
 nsComment = "SYNRC CLIENT"
 subjectKeyIdentifier = hash
@@ -75,7 +75,7 @@ extendedKeyUsage = clientAuth, emailProtection
 subjectAltName = @alt_names
 
 [ server_cert ]
-basicConstraints = CA:FALSE
+basicConstraints = CA:TRUE
 nsCertType = server
 nsComment = "SYNRC SERVER"
 subjectKeyIdentifier = hash
@@ -93,7 +93,7 @@ DNS.0 = localhost
 authorityKeyIdentifier=keyid:always
 
 [ ocsp ]
-basicConstraints = CA:FALSE
+basicConstraints = CA:TRUE
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer
 keyUsage = critical, digitalSignature
