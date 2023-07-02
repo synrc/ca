@@ -1,7 +1,6 @@
 -module(ca_up).
 -include_lib("public_key/include/public_key.hrl").
--compile(export_all).
--export([init/2]).
+-export([init/2, reply/4, bind/2, echo/2, service/2, maybe_service/3]).
 
 init(Req,Opts) ->
     Method  = cowboy_req:method(Req),

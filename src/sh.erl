@@ -1,5 +1,5 @@
 -module(sh).
--compile(export_all).
+-export([reduce/0, run/1, sh/1]).
 
 reduce() -> fun({_, Chunk}, Acc) -> [Chunk|Acc] end.
 

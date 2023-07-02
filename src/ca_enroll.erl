@@ -1,8 +1,7 @@
 -module(ca_enroll).
 -copyright('Namdak Tonpa').
 -include_lib("public_key/include/public_key.hrl").
--compile(export_all).
--export([init/2]).
+-export([init/2, boot/0, boot/1, cwd/0, ca/1, enroll/3, service/3, maybe_service/3, echo/2]).
 
 init(Req,Opts) ->
     Method  = cowboy_req:method(Req),

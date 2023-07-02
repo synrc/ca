@@ -55,9 +55,9 @@ defmodule CA.KEP do
   def oid(x,v), do: {x,v}
 
   def flat(code,{k,v},acc) when is_integer(k), do: [flat(code,v,acc)|acc]
-  def flat(code,{k,v},acc), do: [flat(code,k,acc)|acc]
+  def flat(code,{k,_v},acc), do: [flat(code,k,acc)|acc]
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
-  def flat(code,k,acc) when is_binary(k), do: [k|acc]
+  def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
   def parseCert(cert) do
     {:Certificate, a, _, _} = cert
