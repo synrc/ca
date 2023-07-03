@@ -4,9 +4,9 @@ defmodule CA.Mixfile do
   def project() do
     [
       app: :ca,
-      version: "1.10.0",
+      version: "4.6.0",
       elixir: "~> 1.7",
-      description: "CA Certificate Authority",
+      description: "CA  CXC 138 21 Certificate Authority",
       package: package(),
       deps: deps()
     ]
@@ -14,7 +14,7 @@ defmodule CA.Mixfile do
 
   def package do
     [
-      files: ~w(src lib mix.exs LICENSE),
+      files: ~w(src priv lib mix.exs LICENSE),
       licenses: ["ISC"],
       maintainers: ["Namdak Tonpa"],
       name: :ca,
@@ -26,7 +26,8 @@ defmodule CA.Mixfile do
 
   def deps() do
     [
-      {:cowboy, "~> 2.7.0"},
+      {:cowboy, "~> 2.5.0"},
+      {:cowlib, "~> 2.6.0"},
       {:ex_doc, "~> 0.11", only: :dev}
     ]
   end

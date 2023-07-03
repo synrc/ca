@@ -21,7 +21,7 @@ cat(X)          -> lists:concat(X).
 run(X)          -> sh:sh(sh:run(X)).
 reply(X,Y,Z,R)  -> cowboy_req:reply(X,Y,Z,R).
 bind(X,Y)       -> binary_to_list(cowboy_req:binding(X,Y)).
-cnf()           -> {ok,Bin} = file:read_file("priv/cnf/synrc.cnf"), Bin.
+cnf()           -> {ok,Bin} = file:read_file(code:priv_dir(ca) ++ "/cnf/synrc.cnf"), Bin.
 replace(S,A,B)  -> re:replace(S,A,B,[global,{return,binary}]).
 echo(<<>>, Req) -> reply(400,#{},<<"General Enrolment Error">>,Req);
 echo(Echo, Req) -> reply(200,#{<<"content-type">> => <<"text/plain;charset=utf-8">>},Echo,Req).
