@@ -9,15 +9,20 @@ defmodule CA.CRYPTO do
 
     def privat(name) do
         prefix = "priv/certs/"
-        key = :public_key.pem_entry_decode(:erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(prefix <> name <> ".key")))))
+        bin = :erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(prefix <> name <> ".key"))))
+        key = :public_key.pem_entry_decode(bin)
         {_,_,keyBin,_,_,_} = key
-        keyBin
+        :io.format '~p~n', [key]
+        {keyBin,bin}
     end
 
     def public(name) do
         prefix = "priv/certs/"
-        pub  = :public_key.pem_entry_decode(:erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(prefix <> name <> ".pem")))))
-        :erlang.element(3,:erlang.element(8, :erlang.element(2, pub)))
+        bin = :erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(prefix <> name <> ".pem"))))
+        pub = :public_key.pem_entry_decode(bin)
+        :io.format '~p~n', [pub]
+        keyBin = :erlang.element(3,:erlang.element(8, :erlang.element(2, pub)))
+        {keyBin,bin}
     end
 
     for fun <- ~w(md5 sha sha224 sha256 sha384 sha512)a do
@@ -47,27 +52,26 @@ defmodule CA.CRYPTO do
 
     def test() do
         scheme = :secp384r1
-        aliceK = privat "client"
-        aliceP = public "client"
-        maximK = privat "server"
-        maximP = public "server"
+        {maximK,key} = privat "maxim"
+        {maximP,pub} = public "maxim"
         cms = testCMSX509
+        :io.format '~p~n', [cms]
         {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,{_,_,{_,iv}},msg},_}}} = cms
         [{:kari,{_,:v3,{_,{_,_,publicKey}},_,_,[{_,_,encryptedKey}]}}|y] = x
         encryptedKey2 = :binary.part(encryptedKey, 2, 16)
-        maximS = shared(aliceP,maximK,scheme)
-        aliceS = shared(maximP,aliceK,scheme)
-        aliceS == maximS
-        derived = kdf(:sha512, aliceS, 8*:erlang.size(aliceS))
-#        unwrap = :aes_kw.unwrap(encryptedKey2, derived)
-        :io.format('~p~n',
-           [{cms,[ publicKey: aliceP,
-                   senderPublic: publicKey,
-                   encryptedKey: encryptedKey,
-                   kdf: derived,
-#                   unwrapped: unwrap,
-                   encryptedMessage: msg,
-                   iv: iv]}])
+#        maximS = shared(maximP,maximK,scheme)
+        maximS = shared(publicKey,maximK,scheme)
+        derived = kdf(:sha256, maximS, 256)
+#        unwrap = :aes_kw.unwrap(derived, encryptedKey)
+        [ cert: pub,
+          priv: key,
+          publicKey: maximP,
+          privateKey: maximK,
+          sharedKey: maximS,
+          senderPublic: publicKey,
+          encryptedKey: encryptedKey,
+          encryptedMessage: msg,
+          iv: iv]
 #        decryptCBC(msg, unwrap, iv)
     end
 
