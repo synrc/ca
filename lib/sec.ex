@@ -1,14 +1,4 @@
 defmodule CA.CRYPTO do
-    @aad "AES256CBC"
-
-    def unwrap() do
-        y = "0004290728E36FA052424AB5649D08B62893E1037A96F3A55542A602A3ADC498B6C79962237F3A06B0165B"
-            "474E8700F08E5050298E49CE3B2CC55E2FA3752FFCDFEE8A59E76FA2CEFC841A50086D8F47018E5E26BE4D"
-            "68B2CD926583A9A41257113C"
-        z = "884B58ACC3A022028967505E052BEF8E"
-        w = "D434906245409BD25A7EBA7827F42F64"
-        x = :oid.unhex "4C5A459B4A305BC8B356571308AEAF7B269BBBE7CB17D09AAC9DCF6868685214D20F40478B0B186B"
-    end
 
     def testCMSX509() do
         {_,bin} = :file.read_file "priv/encrypted.bin"
@@ -30,6 +20,35 @@ defmodule CA.CRYPTO do
 
     def shared(pub, key, scheme), do: :crypto.compute_key(:ecdh, pub, key, scheme)
 
+    def expand(hash_fun, prk, len, info \\ "") do
+        hash_len = hash_length(hash_fun)
+        n = Float.ceil(len/hash_len) |> round()
+        full = Enum.scan(1..n, "", fn index, prev ->
+             data = prev <> info <> <<index>>
+            :crypto.mac(:hmac, hash_fun, prk, data)
+         end) |> Enum.reduce("", &Kernel.<>(&2, &1))
+        <<output :: unit(8)-size(len), _ :: binary>> = full
+        <<output :: unit(8)-size(len)>>
+    end
+
+    for fun <- ~w(md5 sha sha224 sha256 sha384 sha512)a do
+      len = fun |> :crypto.hash("") |> byte_size()
+      defp hash_length(unquote(fun)) do
+        unquote(len)
+      end
+    end
+
+    def extract(hash_fun, ikm, salt \\ ""), do: :crypto.mac(:hmac, hash_fun, salt, ikm)
+
+    def decryptCBC(cipher, secret, iv) do
+        secret = :binary.part(secret, 0, 16)
+        :crypto.crypto_one_time(:aes_256_cbc,secret,iv,cipher,[{:encrypt,false}]) end
+
+    def kdf(hash_fun, ikm, len, salt \\ "", info \\ "") do
+        prk = extract(hash_fun, ikm, salt)
+        expand(hash_fun, prk, len, info)
+    end
+
     def test() do
         scheme = :secp384r1
         aliceK = privat "client"
@@ -39,13 +58,19 @@ defmodule CA.CRYPTO do
         cms = testCMSX509
         {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,{_,_,{_,iv}},msg},_}}} = cms
         [{:kari,{_,:v3,{_,{_,_,publicKey}},_,_,[{_,_,encryptedKey}]}}|y] = x
+        encryptedKey2 = :binary.part(encryptedKey,2,16)
         maximS = shared(aliceP,maximK,scheme)
         aliceS = shared(maximP,aliceK,scheme)
-        :io.format('IV: ~tp~n',[iv])
-        {cms,[publicKey: {8*:erlang.size(publicKey),publicKey},
-             encryptedKey: {:erlang.size(encryptedKey),encryptedKey},
-             iv: iv, msg: {:erlang.size(msg),msg}]}
+        aliceS == maximS
+        derived = kdf(:sha256, aliceS, :erlang.size(aliceS))
+        unwrap = :aes_kw.unwrap(encryptedKey, derived)
+        :io.format('~p~n',
+           [{cms,[ publicKey: publicKey,
+                   encryptedKey: encryptedKey,
+                   kdf: derived,
+                   unwrapped: unwrap,
+                   iv: iv]}])
+#        decryptCBC(msg, unwrap, iv)
     end
-
 
 end
