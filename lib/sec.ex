@@ -1,19 +1,21 @@
 defmodule CA.CRYPTO do
 
     def testCMSX509() do
-        {_,bin} = :file.read_file "priv/encrypted.bin"
+        {_,base} = :file.read_file "priv/encrypted.txt"
+        [_,s] = :string.split base, "\n\n" # S/MIME
+        bin = :base64.decode s
         :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, bin)
     end
 
     def privat(name) do
-        prefix = "priv/cert/"
+        prefix = "priv/certs/"
         key = :public_key.pem_entry_decode(:erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(prefix <> name <> ".key")))))
         {_,_,keyBin,_,_,_} = key
         keyBin
     end
 
     def public(name) do
-        prefix = "priv/cert/"
+        prefix = "priv/certs/"
         pub  = :public_key.pem_entry_decode(:erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(prefix <> name <> ".pem")))))
         :erlang.element(3,:erlang.element(8, :erlang.element(2, pub)))
     end
@@ -56,8 +58,8 @@ defmodule CA.CRYPTO do
         maximS = shared(aliceP,maximK,scheme)
         aliceS = shared(maximP,aliceK,scheme)
         aliceS == maximS
-        derived = kdf(:sha256, aliceS, :erlang.size(aliceS))
-        unwrap = :aes_kw.unwrap(encryptedKey2, derived, iv)
+        derived = kdf(:sha512, aliceS, 8*:erlang.size(aliceS))
+#        unwrap = :aes_kw.unwrap(encryptedKey2, derived)
         :io.format('~p~n',
            [{cms,[ publicKey: aliceP,
                    senderPublic: publicKey,
