@@ -52,7 +52,6 @@ defmodule CA.CRYPTO do
         cms = testCMSX509
         {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,{_,_,{_,iv}},msg},_}}} = cms
         [{:kari,{_,:v3,{_,{_,_,publicKey}},_,_,[{_,_,encryptedKey}]}}|y] = x
-        encryptedKey2 = :binary.part(encryptedKey,2,16)
         maximS = shared(aliceP,maximK,scheme)
         aliceS = shared(maximP,aliceK,scheme)
         aliceS == maximS
