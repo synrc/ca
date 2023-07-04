@@ -59,7 +59,9 @@
    --  5.  Content Encryption Algorithms
 
    ContentEncryptionAlgs CONTENT-ENCRYPTION ::=
-       { cea-3DES-cbc | cea-RC2-cbc, ... }
+       { cea-3DES-cbc |
+         cea-RC2-cbc,
+         ... }
 
    --  6.  Message Authentication Code Algorithms
 
@@ -110,6 +112,28 @@
 
    id-PBKDF2 OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840)
       rsadsi(113549) pkcs(1) pkcs-5(5) 12 }
+
+   id-gost28147-wrap OBJECT IDENTIFIER ::= { iso(1) member-body(2) ukraine(804) root(2)
+      security(1) cryptography(1) pki(1) pki-alg(1) pki-alg-sym(1) gost24147(1) wrap(5) }
+
+   id-gost28147-ofb OBJECT IDENTIFIER ::= { iso(1) member-body(2) ukraine(804) root(2)
+      security(1) cryptography(1) pki(1) pki-alg(1) pki-alg-sym(1) gost24147(1) ofb(2) }
+
+   id-gost28147-cfb OBJECT IDENTIFIER ::= { iso(1) member-body(2) ukraine(804) root(2)
+      security(1) cryptography(1) pki(1)  pki-alg(1) pki-alg-sym(1) gost24147(1) cfb(3) }
+
+   id-Dstu7624ofb-x256 OBJECT IDENTIFIER ::= { iso(1) member-body(2) ukraine(804) root(2)
+      security(1) cryptography(1) ua-pki(1) alg(1) sym(1) dstu7624(3) ofb(6) x256(2) }
+
+   id-Dstu7624cfb-x256 OBJECT IDENTIFIER ::= { iso(1) member-body(2) ukraine(804) root(2)
+      security(1) cryptography(1) ua-pki(1) alg(1) sym(1) dstu7624(3) cfb(3) x256(2) }
+
+   GOST28147Parameters ::= SEQUENCE {
+     iv    OCTET STRING (SIZE (8)),
+     dke   OCTET STRING (SIZE (64)) }
+
+   Dstu7624Parameters ::= SEQUENCE {
+     iv OCTET STRING (SIZE (32)) }
 
    -- Algorithm Identifier Parameter Types
 

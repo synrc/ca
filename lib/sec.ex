@@ -16,14 +16,14 @@ defmodule CA.CRYPTO do
     end
 
     def privat(name) do
-        prefix = "priv/"
+        prefix = "priv/cert/"
         key = :public_key.pem_entry_decode(:erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(prefix <> name <> ".key")))))
         {_,_,keyBin,_,_,_} = key
         keyBin
     end
 
     def public(name) do
-        prefix = "priv/"
+        prefix = "priv/cert/"
         pub  = :public_key.pem_entry_decode(:erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(prefix <> name <> ".pem")))))
         :erlang.element(3,:erlang.element(8, :erlang.element(2, pub)))
     end
@@ -31,12 +31,18 @@ defmodule CA.CRYPTO do
     def shared(pub, key, scheme), do: :crypto.compute_key(:ecdh, pub, key, scheme)
 
     def test() do
-        key = privat "client"
-        public = public "client"
-        {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,_,cipher},_}}} = CA.CRYPTO.testCMSX509
-        [kari: {_,:v3,{_,{_,_,pub}},_,_,[{_,_,data}]}] = x
-        {pub,public,data,key,cipher}
-
+        scheme = :secp384r1
+        aliceK = privat "client"
+        aliceP = public "client"
+        maximK = privat "server"
+        maximP = public "server"
+        cms = testCMSX509
+        {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,{_,_,{_,iv}},msg},_}}} = cms
+        [{:kari,{_,:v3,{_,{_,_,publicKey}},_,_,[{_,_,encryptedKey}]}}|y] = x
+        maximS = shared(aliceP,maximK,scheme)
+        aliceS = shared(maximP,aliceK,scheme)
+        :io.format('IV: ~tp~n',[iv])
+        {cms,[publicKey: publicKey,encryptedKey: encryptedKey, iv: iv, msg: msg]}
     end
 
 
