@@ -12,7 +12,7 @@ defmodule CA.CRYPTO do
 
     def testCMSX509() do
         {_,bin} = :file.read_file "priv/encrypted.bin"
-        :'CryptographicMessageSyntax-2009'.decode(:ContentInfo, bin)
+        :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, bin)
     end
 
     def privat(name) do
@@ -42,7 +42,9 @@ defmodule CA.CRYPTO do
         maximS = shared(aliceP,maximK,scheme)
         aliceS = shared(maximP,aliceK,scheme)
         :io.format('IV: ~tp~n',[iv])
-        {cms,[publicKey: publicKey,encryptedKey: encryptedKey, iv: iv, msg: msg]}
+        {cms,[publicKey: {8*:erlang.size(publicKey),publicKey},
+             encryptedKey: {:erlang.size(encryptedKey),encryptedKey},
+             iv: iv, msg: {:erlang.size(msg),msg}]}
     end
 
 

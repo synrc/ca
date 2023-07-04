@@ -5,6 +5,10 @@
    BEGIN
    IMPORTS
 
+       cea-aes128-cbc, cea-aes256-cbc
+   FROM CMSAesRsaesOaep-2009 {iso(1) member-body(2) us(840) rsadsi(113549)
+       pkcs(1) pkcs-9(9) smime(16) modules(0) id-mod-cms-aes-02(38)}
+
    ParamOptions, DIGEST-ALGORITHM, SIGNATURE-ALGORITHM,
       PUBLIC-KEY, KEY-DERIVATION, KEY-WRAP, MAC-ALGORITHM,
       KEY-AGREE, KEY-TRANSPORT, CONTENT-ENCRYPTION, ALGORITHM,
@@ -60,7 +64,9 @@
 
    ContentEncryptionAlgs CONTENT-ENCRYPTION ::=
        { cea-3DES-cbc |
-         cea-RC2-cbc,
+         cea-RC2-cbc |
+         cea-aes128-cbc |
+         cea-aes256-cbc,
          ... }
 
    --  6.  Message Authentication Code Algorithms

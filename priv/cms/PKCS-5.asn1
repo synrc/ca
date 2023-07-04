@@ -1,6 +1,4 @@
-PKCS-5 {
-    iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-5(5) modules(16)
-	pkcs5v2-1(2)}
+PKCS-5 { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-5(5) modules(16) pkcs5v2-1(2) }
 
 DEFINITIONS EXPLICIT TAGS ::=
 

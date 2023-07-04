@@ -4,6 +4,7 @@
        pkcs(1) pkcs-9(9) smime(16) modules(0) id-mod-cms-aes-02(38)}
    DEFINITIONS IMPLICIT TAGS ::=
    BEGIN
+   EXPORTS ALL;
    IMPORTS
 
    CONTENT-ENCRYPTION, KEY-WRAP, SMIME-CAPS
@@ -56,6 +57,7 @@
        PARAMS TYPE AES-IV ARE required
        SMIME-CAPS { IDENTIFIED BY id-aes256-CBC }
    }
+
    id-aes256-CBC OBJECT IDENTIFIER ::= { aes 42 }
 
    -- AES-IV is the parameter for all the above object identifiers.

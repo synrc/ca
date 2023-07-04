@@ -236,21 +236,17 @@ RecipientInfos ::= CHOICE {
 
 EncryptedContentInfo ::= SEQUENCE {
   contentType     ContentType,
-  contentEncryptionAlgorithm
-                  ContentEncryptionAlgorithmIdentifier,
-  encryptedContent
-                  [0] IMPLICIT EncryptedContent OPTIONAL
+  contentEncryptionAlgorithm ContentEncryptionAlgorithmIdentifier,
+  encryptedContent [0] IMPLICIT EncryptedContent OPTIONAL
 }
 
 EncryptedContent ::= OCTET STRING
 
 RecipientInfo ::= SEQUENCE {
-  version         INTEGER {riVer0(0)} (riVer0),
-  issuerAndSerialNumber
-                  IssuerAndSerialNumber,
-  keyEncryptionAlgorithm
-                  KeyEncryptionAlgorithmIdentifier,
-  encryptedKey    EncryptedKey
+  version INTEGER {riVer0(0)} (riVer0),
+  issuerAndSerialNumber IssuerAndSerialNumber,
+  keyEncryptionAlgorithm KeyEncryptionAlgorithmIdentifier,
+  encryptedKey EncryptedKey
 }
 
 EncryptedKey ::= OCTET STRING
@@ -314,8 +310,7 @@ EncryptedData ::= SEQUENCE {
 -- 14. Object Identifiers
 --
 
-pkcs-7                  OBJECT IDENTIFIER ::=
-  { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 7 }
+pkcs-7                  OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 7 }
 data                    OBJECT IDENTIFIER ::= { pkcs-7 1 }
 signedData              OBJECT IDENTIFIER ::= { pkcs-7 2 }
 envelopedData           OBJECT IDENTIFIER ::= { pkcs-7 3 }
