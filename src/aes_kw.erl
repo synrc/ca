@@ -1,23 +1,14 @@
 -module(aes_kw).
-
-%% API
 -export([wrap/2]).
 -export([wrap/3]).
 -export([unwrap/2]).
 -export([unwrap/3]).
 -export([test/0]).
 
-
 -define(MSB64,      1/unsigned-big-integer-unit:64).
 -define(DEFAULT_IV, << 16#A6A6A6A6A6A6A6A6:?MSB64 >>).
 
-%%====================================================================
-%% API functions
-%%====================================================================
-
-wrap(PlainText, KEK) ->
-    wrap(PlainText, KEK, ?DEFAULT_IV).
-
+wrap(PlainText, KEK) -> wrap(PlainText, KEK, ?DEFAULT_IV).
 wrap(PlainText, KEK, IV)
         when (byte_size(PlainText) rem 8) =:= 0
         andalso (bit_size(KEK) =:= 128
@@ -27,9 +18,7 @@ wrap(PlainText, KEK, IV)
     BlockCount = (byte_size(Buffer) div 8) - 1,
     do_wrap(Buffer, 0, BlockCount, KEK).
 
-unwrap(CipherText, KEK) ->
-    unwrap(CipherText, KEK, ?DEFAULT_IV).
-
+unwrap(CipherText, KEK) -> unwrap(CipherText, KEK, ?DEFAULT_IV).
 unwrap(CipherText, KEK, IV)
         when (byte_size(CipherText) rem 8) =:= 0
         andalso (bit_size(KEK) =:= 128
@@ -44,23 +33,14 @@ unwrap(CipherText, KEK, IV)
             erlang:error({badarg, [CipherText, KEK, IV]})
     end.
 
-%%%-------------------------------------------------------------------
-%%% Internal functions
-%%%-------------------------------------------------------------------
-
-%% @private
-do_wrap(Buffer, 6, _BlockCount, _KEK) ->
-    Buffer;
-do_wrap(Buffer, J, BlockCount, KEK) ->
-    do_wrap(do_wrap(Buffer, J, 1, BlockCount, KEK), J + 1, BlockCount, KEK).
+do_wrap(Buffer, 6, _BlockCount, _KEK) -> Buffer;
+do_wrap(Buffer, J, BlockCount, KEK) -> do_wrap(do_wrap(Buffer, J, 1, BlockCount, KEK), J + 1, BlockCount, KEK).
 
 codec(128) -> aes_128_ecb;
 codec(192) -> aes_192_ecb;
 codec(256) -> aes_256_ecb.
 
-%% @private
-do_wrap(Buffer, _J, I, BlockCount, _KEK) when I > BlockCount ->
-    Buffer;
+do_wrap(Buffer, _J, I, BlockCount, _KEK) when I > BlockCount -> Buffer;
 do_wrap(<< A0:8/binary, Rest/binary >>, J, I, BlockCount, KEK) ->
     HeadSize = (I - 1) * 8,
     << Head:HeadSize/binary, B0:8/binary, Tail/binary >> = Rest,
@@ -70,15 +50,10 @@ do_wrap(<< A0:8/binary, Rest/binary >>, J, I, BlockCount, KEK) ->
     A2 = A1 bxor Round,
     do_wrap(<< A2:?MSB64, Head/binary, B1/binary, Tail/binary >>, J, I + 1, BlockCount, KEK).
 
-%% @private
-do_unwrap(Buffer, J, _BlockCount, _KEK) when J < 0 ->
-    Buffer;
-do_unwrap(Buffer, J, BlockCount, KEK) ->
-    do_unwrap(do_unwrap(Buffer, J, BlockCount, BlockCount, KEK), J - 1, BlockCount, KEK).
+do_unwrap(Buffer, J, _BlockCount, _KEK) when J < 0 -> Buffer;
+do_unwrap(Buffer, J, BlockCount, KEK) -> do_unwrap(do_unwrap(Buffer, J, BlockCount, BlockCount, KEK), J - 1, BlockCount, KEK).
 
-%% @private
-do_unwrap(Buffer, _J, I, _BlockCount, _KEK) when I < 1 ->
-    Buffer;
+do_unwrap(Buffer, _J, I, _BlockCount, _KEK) when I < 1 -> Buffer;
 do_unwrap(<< A0:?MSB64, Rest/binary >>, J, I, BlockCount, KEK) ->
     HeadSize = (I - 1) * 8,
     << Head:HeadSize/binary, B0:8/binary, Tail/binary >> = Rest,
