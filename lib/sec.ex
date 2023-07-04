@@ -18,8 +18,15 @@ defmodule CA.CRYPTO do
         :erlang.element(3,:erlang.element(8, :erlang.element(2, pub)))
     end
 
-    def shared(pub, key, scheme), do: :crypto.compute_key(:ecdh, pub, key, scheme)
+    for fun <- ~w(md5 sha sha224 sha256 sha384 sha512)a do
+      len = fun |> :crypto.hash("") |> byte_size()
+      defp hash_length(unquote(fun)) do
+        unquote(len)
+      end
+    end
 
+    def kdf(hash_fun, ikm, len, salt \\ "", info \\ ""), do: expand(hash_fun, extract(hash_fun, ikm, salt), len, info)
+    def extract(hash_fun, ikm, salt \\ ""), do: :crypto.mac(:hmac, hash_fun, salt, ikm)
     def expand(hash_fun, prk, len, info \\ "") do
         hash_len = hash_length(hash_fun)
         n = Float.ceil(len/hash_len) |> round()
@@ -28,26 +35,13 @@ defmodule CA.CRYPTO do
             :crypto.mac(:hmac, hash_fun, prk, data)
          end) |> Enum.reduce("", &Kernel.<>(&2, &1))
         <<output :: unit(8)-size(len), _ :: binary>> = full
-        <<output :: unit(8)-size(len)>>
-    end
-
-    for fun <- ~w(md5 sha sha224 sha256 sha384 sha512)a do
-      len = fun |> :crypto.hash("") |> byte_size()
-      defp hash_length(unquote(fun)) do
-        unquote(len)
-      end
-    end
-
-    def extract(hash_fun, ikm, salt \\ ""), do: :crypto.mac(:hmac, hash_fun, salt, ikm)
+        <<output :: unit(8)-size(len)>> end
 
     def decryptCBC(cipher, secret, iv) do
         secret = :binary.part(secret, 0, 16)
         :crypto.crypto_one_time(:aes_256_cbc,secret,iv,cipher,[{:encrypt,false}]) end
 
-    def kdf(hash_fun, ikm, len, salt \\ "", info \\ "") do
-        prk = extract(hash_fun, ikm, salt)
-        expand(hash_fun, prk, len, info)
-    end
+    def shared(pub, key, scheme), do: :crypto.compute_key(:ecdh, pub, key, scheme)
 
     def test() do
         scheme = :secp384r1
@@ -63,12 +57,12 @@ defmodule CA.CRYPTO do
         aliceS = shared(maximP,aliceK,scheme)
         aliceS == maximS
         derived = kdf(:sha256, aliceS, :erlang.size(aliceS))
-        unwrap = :aes_kw.unwrap(encryptedKey, derived)
+#        unwrap = :aes_kw.unwrap(derived, encryptedKey)
         :io.format('~p~n',
            [{cms,[ publicKey: publicKey,
                    encryptedKey: encryptedKey,
                    kdf: derived,
-                   unwrapped: unwrap,
+#                   unwrapped: unwrap,
                    iv: iv]}])
 #        decryptCBC(msg, unwrap, iv)
     end
