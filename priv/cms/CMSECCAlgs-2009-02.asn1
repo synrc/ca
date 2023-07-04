@@ -1,0 +1,599 @@
+CMSECCAlgs-2009-02
+  { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
+    smime(16) modules(0) id-mod-cms-ecc-alg-2009-02(46) }
+
+DEFINITIONS IMPLICIT TAGS ::=
+
+BEGIN
+
+-- EXPORTS ALL
+
+IMPORTS
+
+-- From [PKI-ASN]
+
+mda-sha1, sa-ecdsaWithSHA1, sa-ecdsaWithSHA224, sa-ecdsaWithSHA256,
+sa-ecdsaWithSHA384, sa-ecdsaWithSHA512, id-ecPublicKey,
+ECDSA-Sig-Value, ECPoint, ECParameters
+  FROM PKIXAlgs-2009
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-pkix1-algorithms2008-02(56) }
+
+-- From [PKI-ASN]
+
+mda-sha224, mda-sha256, mda-sha384, mda-sha512
+  FROM PKIX1-PSS-OAEP-Algorithms-2009
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-pkix1-rsa-pkalgs-02(54) }
+
+-- FROM [CMS-ASN]
+
+KEY-WRAP, SIGNATURE-ALGORITHM, DIGEST-ALGORITHM, ALGORITHM,
+PUBLIC-KEY, MAC-ALGORITHM, CONTENT-ENCRYPTION, KEY-AGREE, SMIME-CAPS,
+AlgorithmIdentifier{}
+  FROM AlgorithmInformation-2009
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-algorithmInformation-02(58) }
+
+-- From [CMS-ASN]
+
+OriginatorPublicKey, UserKeyingMaterial
+  FROM CryptographicMessageSyntax-2009
+    { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
+      smime(16) modules(0) id-mod-cms-2004-02(41) }
+
+-- From [CMS-ASN]
+
+maca-hMAC-SHA1, cea-3DES-cbc, kwa-3DESWrap, CBCParameter
+  FROM CryptographicMessageSyntaxAlgorithms-2009
+    { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
+      smime(16) modules(0) id-mod-cmsalg-2001-02(37) }
+
+-- From [CMS-ASN]
+
+cea-aes128-cbc, cea-aes192-cbc, cea-aes256-cbc, kwa-aes128-wrap,
+kwa-aes192-wrap, kwa-aes256-wrap
+  FROM CMSAesRsaesOaep-2009
+    { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
+      smime(16) modules(0) id-mod-cms-aes-02(38) }
+
+-- From [CMS-ASN]
+
+cea-aes128-CCM, cea-aes192-CCM, cea-aes256-CCM, cea-aes128-GCM,
+cea-aes192-GCM, cea-aes256-GCM
+  FROM CMS-AES-CCM-and-AES-GCM-2009
+    { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
+      smime(16) modules(0) id-mod-cms-aes-ccm-gcm-02(44) }
+
+;
+
+-- Constrains the SignedData digestAlgorithms field
+-- Constrains the SignedData SignerInfo digestAlgorithm field
+-- Constrains the AuthenticatedData digestAlgorithm field
+
+-- Message Digest Algorithms: Imported from [PKI-ASN]
+
+-- MessageDigestAlgs DIGEST-ALGORITHM ::= {
+--  mda-sha1   |
+--  mda-sha224 |
+--  mda-sha256 |
+--  mda-sha384 |
+--  mda-sha512,
+--  ...
+-- }
+
+-- Constrains the SignedData SignerInfo signatureAlgorithm field
+
+-- Signature Algorithms: Imported from [PKI-ASN]
+
+-- SignatureAlgs SIGNATURE-ALGORITHM ::= {
+--  sa-ecdsaWithSHA1   |
+--  sa-ecdsaWithSHA224 |
+--  sa-ecdsaWithSHA256 |
+--  sa-ecdsaWithSHA384 |
+--  sa-ecdsaWithSHA512,
+--  ...
+-- }
+
+-- ECDSA Signature Value: Imported from [PKI-ALG]
+-- Contents of SignatureValue OCTET STRING
+
+-- ECDSA-Sig-Value ::= SEQUENCE {
+--   r  INTEGER,
+--   s  INTEGER
+-- }
+
+--
+-- Key Agreement Algorithms
+--
+
+-- Constrains the EnvelopedData RecipientInfo KeyAgreeRecipientInfo
+--   keyEncryption Algorithm field
+-- Constrains the AuthenticatedData RecipientInfo
+--   KeyAgreeRecipientInfo keyEncryption Algorithm field
+-- Constrains the AuthEnvelopedData RecipientInfo
+--   KeyAgreeRecipientInfo keyEncryption Algorithm field
+
+-- DH variants are not used with AuthenticatedData or
+-- AuthEnvelopedData
+
+KeyAgreementAlgs KEY-AGREE ::= {
+  kaa-dhSinglePass-stdDH-sha1kdf-scheme        |
+  kaa-dhSinglePass-stdDH-sha224kdf-scheme      |
+  kaa-dhSinglePass-stdDH-sha256kdf-scheme      |
+  kaa-dhSinglePass-stdDH-sha384kdf-scheme      |
+  kaa-dhSinglePass-stdDH-sha512kdf-scheme      |
+  kaa-dhSinglePass-cofactorDH-sha1kdf-scheme   |
+  kaa-dhSinglePass-cofactorDH-sha224kdf-scheme |
+  kaa-dhSinglePass-cofactorDH-sha256kdf-scheme |
+  kaa-dhSinglePass-cofactorDH-sha384kdf-scheme |
+  kaa-dhSinglePass-cofactorDH-sha512kdf-scheme |
+  kaa-mqvSinglePass-sha1kdf-scheme             |
+  kaa-mqvSinglePass-sha224kdf-scheme           |
+  kaa-mqvSinglePass-sha256kdf-scheme           |
+  kaa-mqvSinglePass-sha384kdf-scheme           |
+  kaa-mqvSinglePass-sha512kdf-scheme,
+  ...
+}
+
+x9-63-scheme OBJECT IDENTIFIER ::= {
+  iso(1) identified-organization(3) tc68(133) country(16) x9(840)
+  x9-63(63) schemes(0) }
+
+secg-scheme OBJECT IDENTIFIER ::= {
+  iso(1) identified-organization(3) certicom(132) schemes(1) }
+
+--
+-- Diffie-Hellman Single Pass, Standard, with KDFs
+--
+
+-- Parameters are always present and indicate the Key Wrap Algorithm
+
+kaa-dhSinglePass-stdDH-sha1kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER dhSinglePass-stdDH-sha1kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-dhSinglePass-stdDH-sha1kdf-scheme
+}
+
+dhSinglePass-stdDH-sha1kdf-scheme OBJECT IDENTIFIER ::= {
+  x9-63-scheme 2 }
+
+kaa-dhSinglePass-stdDH-sha224kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER dhSinglePass-stdDH-sha224kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-dhSinglePass-stdDH-sha224kdf-scheme
+}
+
+dhSinglePass-stdDH-sha224kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 11 0 }
+
+kaa-dhSinglePass-stdDH-sha256kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER dhSinglePass-stdDH-sha256kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-dhSinglePass-stdDH-sha256kdf-scheme
+}
+
+dhSinglePass-stdDH-sha256kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 11 1 }
+
+kaa-dhSinglePass-stdDH-sha384kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER dhSinglePass-stdDH-sha384kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-dhSinglePass-stdDH-sha384kdf-scheme
+}
+
+dhSinglePass-stdDH-sha384kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 11 2 }
+
+kaa-dhSinglePass-stdDH-sha512kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER dhSinglePass-stdDH-sha512kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-dhSinglePass-stdDH-sha512kdf-scheme
+}
+
+dhSinglePass-stdDH-sha512kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 11 3 }
+
+--
+-- Diffie-Hellman Single Pass, Cofactor, with KDFs
+--
+
+kaa-dhSinglePass-cofactorDH-sha1kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER dhSinglePass-cofactorDH-sha1kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-dhSinglePass-cofactorDH-sha1kdf-scheme
+}
+
+dhSinglePass-cofactorDH-sha1kdf-scheme OBJECT IDENTIFIER ::= {
+  x9-63-scheme 3 }
+
+kaa-dhSinglePass-cofactorDH-sha224kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER dhSinglePass-cofactorDH-sha224kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-dhSinglePass-cofactorDH-sha224kdf-scheme
+}
+
+dhSinglePass-cofactorDH-sha224kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 14 0 }
+
+kaa-dhSinglePass-cofactorDH-sha256kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER dhSinglePass-cofactorDH-sha256kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-dhSinglePass-cofactorDH-sha256kdf-scheme
+}
+
+dhSinglePass-cofactorDH-sha256kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 14 1 }
+
+kaa-dhSinglePass-cofactorDH-sha384kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER dhSinglePass-cofactorDH-sha384kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-dhSinglePass-cofactorDH-sha384kdf-scheme
+}
+
+dhSinglePass-cofactorDH-sha384kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 14 2 }
+
+kaa-dhSinglePass-cofactorDH-sha512kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER dhSinglePass-cofactorDH-sha512kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-dhSinglePass-cofactorDH-sha512kdf-scheme
+}
+
+dhSinglePass-cofactorDH-sha512kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 14 3 }
+
+--
+-- MQV Single Pass, Cofactor, with KDFs
+--
+
+kaa-mqvSinglePass-sha1kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER mqvSinglePass-sha1kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-mqvSinglePass-sha1kdf-scheme
+}
+
+mqvSinglePass-sha1kdf-scheme OBJECT IDENTIFIER ::= {
+  x9-63-scheme 16 }
+
+kaa-mqvSinglePass-sha224kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER mqvSinglePass-sha224kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-mqvSinglePass-sha224kdf-scheme
+}
+
+mqvSinglePass-sha224kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 15 0 }
+
+kaa-mqvSinglePass-sha256kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER mqvSinglePass-sha256kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-mqvSinglePass-sha256kdf-scheme
+}
+
+mqvSinglePass-sha256kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 15 1 }
+
+kaa-mqvSinglePass-sha384kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER mqvSinglePass-sha384kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-mqvSinglePass-sha384kdf-scheme
+}
+
+mqvSinglePass-sha384kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 15 2 }
+
+kaa-mqvSinglePass-sha512kdf-scheme KEY-AGREE ::= {
+  IDENTIFIER mqvSinglePass-sha512kdf-scheme
+  PARAMS TYPE KeyWrapAlgorithm ARE required
+  UKM -- TYPE unencoded data -- ARE preferredPresent
+  SMIME-CAPS cap-kaa-mqvSinglePass-sha512kdf-scheme
+}
+
+mqvSinglePass-sha512kdf-scheme OBJECT IDENTIFIER ::= {
+  secg-scheme 15 3 }
+
+--
+-- Key Wrap Algorithms: Imported from [CMS-ASN]
+--
+
+KeyWrapAlgorithm ::= AlgorithmIdentifier { KEY-WRAP, { KeyWrapAlgs } }
+
+KeyWrapAlgs KEY-WRAP ::= {
+  kwa-3DESWrap    |
+  kwa-aes128-wrap |
+  kwa-aes192-wrap |
+  kwa-aes256-wrap,
+  ...
+}
+
+--
+-- Content Encryption Algorithms: Imported from [CMS-ASN]
+--
+
+-- Constrains the EnvelopedData EncryptedContentInfo encryptedContent
+-- field and the AuthEnvelopedData EncryptedContentInfo
+-- contentEncryptionAlgorithm field
+
+-- ContentEncryptionAlgs CONTENT-ENCRYPTION ::= {
+--   cea-3DES-cbc |
+--   cea-aes128-cbc   |
+--   cea-aes192-cbc   |
+--   cea-aes256-cbc   |
+--   cea-aes128-ccm   |
+--   cea-aes192-ccm   |
+--   cea-aes256-ccm   |
+--   cea-aes128-gcm   |
+--   cea-aes192-gcm   |
+--   cea-aes256-gcm,
+--   ...
+--   }
+
+-- des-ede3-cbc and aes*-cbc are used with EnvelopedData and
+-- EncryptedData
+-- aes*-ccm are used with AuthEnvelopedData
+-- aes*-gcm are used with AuthEnvelopedData
+-- (where * is 128, 192, and 256)
+
+--
+-- Message Authentication Code Algorithms
+--
+
+-- Constrains the AuthenticatedData
+-- MessageAuthenticationCodeAlgorithm field
+--
+
+MessageAuthAlgs MAC-ALGORITHM ::= {
+--  maca-hMAC-SHA1 |
+  maca-hMAC-SHA224 |
+  maca-hMAC-SHA256 |
+  maca-hMAC-SHA384 |
+  maca-hMAC-SHA512,
+  ...
+}
+
+maca-hMAC-SHA224 MAC-ALGORITHM ::= {
+  IDENTIFIER id-hmacWithSHA224
+  PARAMS ARE absent
+  IS-KEYED-MAC TRUE
+  SMIME-CAPS cap-hMAC-SHA224
+}
+
+id-hmacWithSHA224 OBJECT IDENTIFIER ::= {
+  iso(1) member-body(2) us(840) rsadsi(113549)
+  digestAlgorithm(2) 8 }
+
+maca-hMAC-SHA256 MAC-ALGORITHM ::= {
+  IDENTIFIER id-hmacWithSHA256
+  PARAMS ARE absent
+  IS-KEYED-MAC TRUE
+  SMIME-CAPS cap-hMAC-SHA256
+}
+
+id-hmacWithSHA256 OBJECT IDENTIFIER ::= {
+  iso(1) member-body(2) us(840) rsadsi(113549)
+  digestAlgorithm(2) 9 }
+
+maca-hMAC-SHA384 MAC-ALGORITHM ::= {
+  IDENTIFIER id-hmacWithSHA384
+  PARAMS ARE absent
+  IS-KEYED-MAC TRUE
+  SMIME-CAPS cap-hMAC-SHA384
+}
+
+id-hmacWithSHA384 OBJECT IDENTIFIER ::= {
+  iso(1) member-body(2) us(840) rsadsi(113549)
+  digestAlgorithm(2) 10 }
+
+maca-hMAC-SHA512 MAC-ALGORITHM ::= {
+  IDENTIFIER id-hmacWithSHA512
+  PARAMS ARE absent
+  IS-KEYED-MAC TRUE
+  SMIME-CAPS cap-hMAC-SHA512
+}
+
+id-hmacWithSHA512 OBJECT IDENTIFIER ::= {
+  iso(1) member-body(2) us(840) rsadsi(113549)
+  digestAlgorithm(2) 11 }
+
+--
+-- Originator Public Key Algorithms
+--
+
+-- Constraints on KeyAgreeRecipientInfo OriginatorIdentifierOrKey
+-- OriginatorPublicKey algorithm field
+
+OriginatorPKAlgorithms PUBLIC-KEY ::= {
+  opka-ec,
+  ...
+}
+
+opka-ec PUBLIC-KEY ::={
+  IDENTIFIER id-ecPublicKey
+  KEY ECPoint
+  PARAMS TYPE CHOICE { n NULL, p ECParameters } ARE preferredAbsent
+}
+
+-- Format for both ephemeral and static public keys: Imported from
+-- [PKI-ALG]
+
+-- ECPoint ::= OCTET STRING
+
+-- ECParameters ::= CHOICE {
+--   namedCurve      CURVE.&id({NamedCurve})
+--   commented out in [PKI-ALG] implicitCurve   NULL
+--   commented out in [PKI-ALG] specifiedCurve  SpecifiedECDomain
+--   commented out in [PKI-ALG] ...
+-- }
+  -- implicitCurve and specifiedCurve MUST NOT be used in PKIX.
+  -- Details for SpecifiedECDomain can be found in [X9.62].
+  -- Any future additions to this CHOICE should be coordinated
+  -- with ANSI X.9.
+
+-- Format of KeyAgreeRecipientInfo ukm field when used with
+-- ECMQV
+
+MQVuserKeyingMaterial ::= SEQUENCE {
+  ephemeralPublicKey       OriginatorPublicKey,
+  addedukm             [0] EXPLICIT UserKeyingMaterial OPTIONAL
+}
+
+-- 'SharedInfo' for input to KDF when using ECDH and ECMQV with
+-- EnvelopedData, AuthenticatedData, or AuthEnvelopedData
+
+ECC-CMS-SharedInfo ::= SEQUENCE {
+  keyInfo         KeyWrapAlgorithm,
+  entityUInfo [0] EXPLICIT OCTET STRING OPTIONAL,
+  suppPubInfo [2] EXPLICIT OCTET STRING
+}
+
+--
+-- S/MIME CAPS for algorithms in this document
+--
+
+SMimeCAPS SMIME-CAPS ::= {
+--  mda-sha1.&smimeCaps                                   |
+--  mda-sha224.&smimeCaps                                 |
+--  mda-sha256.&smimeCaps                                 |
+--  mda-sha384.&smimeCaps                                 |
+--  mda-sha512.&smimeCaps                                 |
+--  sa-ecdsaWithSHA1.&smimeCaps                           |
+--  sa-ecdsaWithSHA224.&smimeCaps                         |
+--  sa-ecdsaWithSHA256.&smimeCaps                         |
+--  sa-ecdsaWithSHA384.&smimeCaps                         |
+--  sa-ecdsaWithSHA512.&smimeCaps                         |
+  kaa-dhSinglePass-stdDH-sha1kdf-scheme.&smimeCaps        |
+  kaa-dhSinglePass-stdDH-sha224kdf-scheme.&smimeCaps      |
+  kaa-dhSinglePass-stdDH-sha256kdf-scheme.&smimeCaps      |
+  kaa-dhSinglePass-stdDH-sha384kdf-scheme.&smimeCaps      |
+  kaa-dhSinglePass-stdDH-sha512kdf-scheme.&smimeCaps      |
+  kaa-dhSinglePass-cofactorDH-sha1kdf-scheme.&smimeCaps   |
+  kaa-dhSinglePass-cofactorDH-sha224kdf-scheme.&smimeCaps |
+  kaa-dhSinglePass-cofactorDH-sha256kdf-scheme.&smimeCaps |
+  kaa-dhSinglePass-cofactorDH-sha384kdf-scheme.&smimeCaps |
+  kaa-dhSinglePass-cofactorDH-sha512kdf-scheme.&smimeCaps |
+  kaa-mqvSinglePass-sha1kdf-scheme.&smimeCaps             |
+  kaa-mqvSinglePass-sha224kdf-scheme.&smimeCaps           |
+  kaa-mqvSinglePass-sha256kdf-scheme.&smimeCaps           |
+  kaa-mqvSinglePass-sha384kdf-scheme.&smimeCaps           |
+  kaa-mqvSinglePass-sha512kdf-scheme.&smimeCaps           |
+--  kwa-3des.&smimeCaps                                   |
+--  kwa-aes128.&smimeCaps                                 |
+--  kwa-aes192.&smimeCaps                                 |
+--  kwa-aes256.&smimeCaps                                 |
+--  cea-3DES-cbc.&smimeCaps                               |
+--  cea-aes128-cbc.&smimeCaps                             |
+--  cea-aes192-cbc.&smimeCaps                             |
+--  cea-aes256-cbc.&smimeCaps                             |
+--  cea-aes128-ccm.&smimeCaps                             |
+--  cea-aes192-ccm.&smimeCaps                             |
+--  cea-aes256-ccm.&smimeCaps                             |
+--  cea-aes128-gcm.&smimeCaps                             |
+--  cea-aes192-gcm.&smimeCaps                             |
+--  cea-aes256-gcm.&smimeCaps                             |
+--  maca-hMAC-SHA1.&smimeCaps                             |
+  maca-hMAC-SHA224.&smimeCaps                             |
+  maca-hMAC-SHA256.&smimeCaps                             |
+  maca-hMAC-SHA384.&smimeCaps                             |
+  maca-hMAC-SHA512.&smimeCaps,
+  ...
+}
+
+cap-kaa-dhSinglePass-stdDH-sha1kdf-scheme SMIME-CAPS ::= {
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY dhSinglePass-stdDH-sha1kdf-scheme
+}
+
+cap-kaa-dhSinglePass-stdDH-sha224kdf-scheme SMIME-CAPS ::= {
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY dhSinglePass-stdDH-sha224kdf-scheme
+}
+
+cap-kaa-dhSinglePass-stdDH-sha256kdf-scheme SMIME-CAPS ::= {
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY dhSinglePass-stdDH-sha256kdf-scheme
+}
+
+cap-kaa-dhSinglePass-stdDH-sha384kdf-scheme SMIME-CAPS ::= {
+   TYPE KeyWrapAlgorithm
+   IDENTIFIED BY dhSinglePass-stdDH-sha384kdf-scheme
+}
+
+cap-kaa-dhSinglePass-stdDH-sha512kdf-scheme SMIME-CAPS ::= {
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY dhSinglePass-stdDH-sha512kdf-scheme
+}
+
+cap-kaa-dhSinglePass-cofactorDH-sha1kdf-scheme SMIME-CAPS ::={
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY dhSinglePass-cofactorDH-sha1kdf-scheme
+}
+
+cap-kaa-dhSinglePass-cofactorDH-sha224kdf-scheme SMIME-CAPS ::={
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY dhSinglePass-cofactorDH-sha224kdf-scheme
+}
+
+cap-kaa-dhSinglePass-cofactorDH-sha256kdf-scheme SMIME-CAPS ::={
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY dhSinglePass-cofactorDH-sha256kdf-scheme
+}
+
+cap-kaa-dhSinglePass-cofactorDH-sha384kdf-scheme SMIME-CAPS ::={
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY dhSinglePass-cofactorDH-sha384kdf-scheme
+}
+
+cap-kaa-dhSinglePass-cofactorDH-sha512kdf-scheme SMIME-CAPS ::={
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY dhSinglePass-cofactorDH-sha512kdf-scheme
+}
+
+cap-kaa-mqvSinglePass-sha1kdf-scheme SMIME-CAPS ::={
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY mqvSinglePass-sha1kdf-scheme
+}
+
+cap-kaa-mqvSinglePass-sha224kdf-scheme SMIME-CAPS ::={
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY mqvSinglePass-sha224kdf-scheme
+}
+
+cap-kaa-mqvSinglePass-sha256kdf-scheme SMIME-CAPS ::={
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY mqvSinglePass-sha256kdf-scheme
+}
+
+cap-kaa-mqvSinglePass-sha384kdf-scheme SMIME-CAPS ::={
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY mqvSinglePass-sha384kdf-scheme
+}
+
+cap-kaa-mqvSinglePass-sha512kdf-scheme SMIME-CAPS ::={
+  TYPE KeyWrapAlgorithm
+  IDENTIFIED BY mqvSinglePass-sha512kdf-scheme
+}
+
+cap-hMAC-SHA224 SMIME-CAPS ::={ IDENTIFIED BY id-hmacWithSHA224 }
+cap-hMAC-SHA256 SMIME-CAPS ::={ IDENTIFIED BY id-hmacWithSHA256 }
+cap-hMAC-SHA384 SMIME-CAPS ::={ IDENTIFIED BY id-hmacWithSHA384 }
+cap-hMAC-SHA512 SMIME-CAPS ::={ IDENTIFIED BY id-hmacWithSHA512 }
+
+END

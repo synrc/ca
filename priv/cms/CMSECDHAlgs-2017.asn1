@@ -1,0 +1,109 @@
+ CMSECDHAlgs-2017
+     { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
+       smime(16) modules(0) id-mod-cms-ecdh-alg-2017(67) }
+
+   DEFINITIONS IMPLICIT TAGS ::=
+   BEGIN
+
+   -- EXPORTS ALL
+
+   IMPORTS
+
+     KeyWrapAlgorithm
+       FROM CryptographicMessageSyntaxAlgorithms-2009  -- in [CMSASN1]
+         { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+           pkcs-9(9) smime(16) modules(0) id-mod-cmsalg-2001-02(37) }
+
+     KEY-AGREE, SMIME-CAPS
+       FROM AlgorithmInformation-2009  -- in [CMSASN1]
+         { iso(1) identified-organization(3) dod(6) internet(1)
+           security(5) mechanisms(5) pkix(7) id-mod(0)
+           id-mod-algorithmInformation-02(58) }
+
+     dhSinglePass-stdDH-sha256kdf-scheme,
+     dhSinglePass-stdDH-sha384kdf-scheme,
+     dhSinglePass-stdDH-sha512kdf-scheme,
+     kaa-dhSinglePass-stdDH-sha256kdf-scheme,
+     kaa-dhSinglePass-stdDH-sha384kdf-scheme,
+     kaa-dhSinglePass-stdDH-sha512kdf-scheme,
+     cap-kaa-dhSinglePass-stdDH-sha256kdf-scheme,
+     cap-kaa-dhSinglePass-stdDH-sha384kdf-scheme,
+     cap-kaa-dhSinglePass-stdDH-sha512kdf-scheme
+       FROM CMSECCAlgs-2009-02  -- in [CMSECC]
+         { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+           pkcs-9(9) smime(16) modules(0)
+           id-mod-cms-ecc-alg-2009-02(46) }
+     ;
+
+   --
+   -- Object Identifiers
+   --
+
+   smime-alg OBJECT IDENTIFIER ::= {
+      iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+      pkcs-9(9) smime(16) alg(3) }
+
+   dhSinglePass-stdDH-hkdf-sha256-scheme OBJECT IDENTIFIER ::= {
+      smime-alg 19 }
+
+   dhSinglePass-stdDH-hkdf-sha384-scheme OBJECT IDENTIFIER ::= {
+      smime-alg 20 }
+
+   dhSinglePass-stdDH-hkdf-sha512-scheme OBJECT IDENTIFIER ::= {
+      smime-alg 21 }
+
+   --
+   -- Extend the Key Agreement Algorithms in [CMSECC]
+   --
+
+   KeyAgreementAlgs KEY-AGREE ::= { ...,
+     kaa-dhSinglePass-stdDH-sha256kdf-scheme   |
+     kaa-dhSinglePass-stdDH-sha384kdf-scheme   |
+     kaa-dhSinglePass-stdDH-sha512kdf-scheme   |
+     kaa-dhSinglePass-stdDH-hkdf-sha256-scheme |
+     kaa-dhSinglePass-stdDH-hkdf-sha384-scheme |
+     kaa-dhSinglePass-stdDH-hkdf-sha512-scheme }
+
+   kaa-dhSinglePass-stdDH-hkdf-sha256-scheme KEY-AGREE ::= {
+     IDENTIFIER dhSinglePass-stdDH-hkdf-sha256-scheme
+     PARAMS TYPE KeyWrapAlgorithm ARE required
+     UKM -- TYPE unencoded data -- ARE preferredPresent
+     SMIME-CAPS cap-kaa-dhSinglePass-stdDH-hkdf-sha256-scheme }
+
+   kaa-dhSinglePass-stdDH-hkdf-sha384-scheme KEY-AGREE ::= {
+     IDENTIFIER dhSinglePass-stdDH-hkdf-sha384-scheme
+     PARAMS TYPE KeyWrapAlgorithm ARE required
+     UKM -- TYPE unencoded data -- ARE preferredPresent
+     SMIME-CAPS cap-kaa-dhSinglePass-stdDH-hkdf-sha384-scheme }
+
+   kaa-dhSinglePass-stdDH-hkdf-sha512-scheme KEY-AGREE ::= {
+     IDENTIFIER dhSinglePass-stdDH-hkdf-sha512-scheme
+     PARAMS TYPE KeyWrapAlgorithm ARE required
+     UKM -- TYPE unencoded data -- ARE preferredPresent
+     SMIME-CAPS cap-kaa-dhSinglePass-stdDH-hkdf-sha512-scheme }
+
+   --
+   -- Extend the S/MIME CAPS in [CMSECC]
+   --
+
+   SMimeCAPS SMIME-CAPS ::= { ...,
+     kaa-dhSinglePass-stdDH-sha256kdf-scheme.&smimeCaps   |
+     kaa-dhSinglePass-stdDH-sha384kdf-scheme.&smimeCaps   |
+     kaa-dhSinglePass-stdDH-sha512kdf-scheme.&smimeCaps   |
+     kaa-dhSinglePass-stdDH-hkdf-sha256-scheme.&smimeCaps |
+     kaa-dhSinglePass-stdDH-hkdf-sha384-scheme.&smimeCaps |
+     kaa-dhSinglePass-stdDH-hkdf-sha512-scheme.&smimeCaps }
+
+   cap-kaa-dhSinglePass-stdDH-hkdf-sha256-scheme SMIME-CAPS ::= {
+     TYPE KeyWrapAlgorithm
+     IDENTIFIED BY dhSinglePass-stdDH-hkdf-sha256-scheme }
+
+   cap-kaa-dhSinglePass-stdDH-hkdf-sha384-scheme SMIME-CAPS ::= {
+     TYPE KeyWrapAlgorithm
+     IDENTIFIED BY dhSinglePass-stdDH-hkdf-sha384-scheme}
+
+   cap-kaa-dhSinglePass-stdDH-hkdf-sha512-scheme SMIME-CAPS ::= {
+     TYPE KeyWrapAlgorithm
+     IDENTIFIED BY dhSinglePass-stdDH-hkdf-sha512-scheme }
+
+   END
