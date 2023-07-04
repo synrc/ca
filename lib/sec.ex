@@ -1,9 +1,17 @@
 defmodule CA.CRYPTO do
     @aad "AES256CBC"
 
+    def unwrap() do
+        y = "0004290728E36FA052424AB5649D08B62893E1037A96F3A55542A602A3ADC498B6C79962237F3A06B0165B"
+            "474E8700F08E5050298E49CE3B2CC55E2FA3752FFCDFEE8A59E76FA2CEFC841A50086D8F47018E5E26BE4D"
+            "68B2CD926583A9A41257113C"
+        z = "884B58ACC3A022028967505E052BEF8E"
+        w = "D434906245409BD25A7EBA7827F42F64"
+        x = :oid.unhex "4C5A459B4A305BC8B356571308AEAF7B269BBBE7CB17D09AAC9DCF6868685214D20F40478B0B186B"
+    end
+
     def testCMSX509() do
-        {_,base} = :file.read_file "priv/encrypted.txt"
-        bin = :base64.decode base
+        {_,bin} = :file.read_file "priv/encrypted.bin"
         :'CryptographicMessageSyntax-2009'.decode(:ContentInfo, bin)
     end
 
@@ -25,7 +33,7 @@ defmodule CA.CRYPTO do
     def test() do
         key = privat "client"
         public = public "client"
-         {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,_,cipher},_}}} = CA.CRYPTO.testCMSX509
+        {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,_,cipher},_}}} = CA.CRYPTO.testCMSX509
         [kari: {_,:v3,{_,{_,_,pub}},_,_,[{_,_,data}]}] = x
         {pub,public,data,key,cipher}
 

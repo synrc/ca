@@ -1,5 +1,10 @@
 -module(oid).
--export([decode/1]).
+-export([decode/1, hex/1, unhex/1]).
+
+digit(X) when X >= 0 andalso X =< 9 -> X + 48;
+digit(X) when X >= 10 andalso X =< 15 -> X + 87.
+hex(Bin) -> << << (digit(A1)),(digit(A2)) >> || <<A1:4,A2:4>> <= Bin >>.
+unhex(Hex) -> << << (erlang:list_to_integer([H1,H2], 16)) >> || <<H1,H2>> <= Hex >>.
 
 match_tags({T, V}, [T]) -> V;
 match_tags({T, V}, [T | Tt]) -> match_tags(V, Tt);

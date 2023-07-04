@@ -1,0 +1,84 @@
+AESKeyWrapWithPad-02 { iso(1) member-body(2) us(840) rsadsi(113549)
+     pkcs(1) pkcs-9(9) smime(16) modules(0) 48 }
+
+   DEFINITIONS IMPLICIT TAGS ::=
+
+   BEGIN
+
+   -- EXPORTS ALL --
+
+   IMPORTS
+     AlgorithmIdentifier{}, CONTENT-ENCRYPTION, KEY-WRAP, SMIME-CAPS
+     FROM AlgorithmInformation-2009  -- [CMS-ASN]
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) id-mod(0)
+         id-mod-algorithmInformation-02(58) };
+
+   AES-ContentEncryption CONTENT-ENCRYPTION ::= {
+     cea-aes128-wrap-pad |
+     cea-aes192-wrap-pad |
+     cea-aes256-wrap-pad,
+     ... }
+
+   AES-KeyWrap KEY-WRAP ::= {
+     kwa-aes128-wrap-pad |
+     kwa-aes192-wrap-pad |
+     kwa-aes256-wrap-pad,
+     ... }
+
+   SMimeCaps SMIME-CAPS ::= {
+     cea-aes128-wrap-pad.&smimeCaps |
+     cea-aes192-wrap-pad.&smimeCaps |
+     cea-aes256-wrap-pad.&smimeCaps |
+     kwa-aes128-wrap-pad.&smimeCaps |
+     kwa-aes192-wrap-pad.&smimeCaps |
+     kwa-aes256-wrap-pad.&smimeCaps,
+     ... }
+
+   -- AES object identifier
+
+   aes OBJECT IDENTIFIER ::= {
+     joint-iso-itu-t(2) country(16) us(840) organization(1)
+     gov(101) csor(3) nistAlgorithms(4) 1 }
+
+   -- Content Encryption Algorithms
+
+   cea-aes128-wrap-pad CONTENT-ENCRYPTION ::= {
+     IDENTIFIER id-aes128-wrap-pad
+     PARAMS ARE absent
+     SMIME-CAPS { IDENTIFIED BY id-aes128-wrap-pad } }
+
+   cea-aes192-wrap-pad CONTENT-ENCRYPTION ::= {
+     IDENTIFIER id-aes192-wrap-pad
+     PARAMS ARE absent
+     SMIME-CAPS { IDENTIFIED BY id-aes192-wrap-pad } }
+
+   cea-aes256-wrap-pad CONTENT-ENCRYPTION ::= {
+     IDENTIFIER id-aes256-wrap-pad
+     PARAMS ARE absent
+     SMIME-CAPS { IDENTIFIED BY id-aes256-wrap-pad } }
+
+   -- Key Wrap Algorithms
+
+   kwa-aes128-wrap-pad KEY-WRAP ::= {
+     IDENTIFIER id-aes128-wrap-pad
+     PARAMS ARE absent
+     SMIME-CAPS { IDENTIFIED BY id-aes128-wrap-pad } }
+
+   id-aes128-wrap-pad OBJECT IDENTIFIER ::= { aes 8 }
+
+   kwa-aes192-wrap-pad KEY-WRAP ::= {
+     IDENTIFIER id-aes192-wrap-pad
+     PARAMS ARE absent
+     SMIME-CAPS { IDENTIFIED BY id-aes192-wrap-pad } }
+
+   id-aes192-wrap-pad OBJECT IDENTIFIER ::= { aes 28 }
+
+   kwa-aes256-wrap-pad KEY-WRAP ::= {
+     IDENTIFIER id-aes256-wrap-pad
+     PARAMS ARE absent
+     SMIME-CAPS { IDENTIFIED BY id-aes256-wrap-pad } }
+
+   id-aes256-wrap-pad OBJECT IDENTIFIER ::= { aes 48 }
+
+   END

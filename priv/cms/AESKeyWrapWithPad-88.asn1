@@ -1,0 +1,25 @@
+ AESKeyWrapWithPad-88 { iso(1) member-body(2) us(840) rsadsi(113549)
+     pkcs(1) pkcs-9(9) smime(16) modules(0) 47 }
+
+   DEFINITIONS IMPLICIT TAGS ::=
+
+   BEGIN
+
+   -- EXPORTS ALL --
+
+   -- IMPORTS NONE --
+
+   -- AES information object identifiers --
+
+   aes OBJECT IDENTIFIER ::= {
+     joint-iso-itu-t(2) country(16) us(840) organization(1) gov(101)
+     csor(3) nistAlgorithms(4) 1 }
+
+   -- AES Key Wrap With Padding Algorithm Identifiers are to be used
+   -- with the Parameter field absent
+
+   id-aes128-wrap-pad OBJECT IDENTIFIER ::= { aes 8 }
+   id-aes192-wrap-pad OBJECT IDENTIFIER ::= { aes 28 }
+   id-aes256-wrap-pad OBJECT IDENTIFIER ::= { aes 48 }
+
+   END
