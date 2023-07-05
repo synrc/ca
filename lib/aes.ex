@@ -85,6 +85,54 @@ defmodule CA.AES do
         :ok
     end
 
+    def check_C2PNB368w1_GCM256() do # C2PNB368w1
+        scheme = :c2pnb368w1
+        {aliceP,aliceK} = :crypto.generate_key(:ecdh, scheme)
+        {maximP,maximK} = :crypto.generate_key(:ecdh, scheme)
+        maximS = :binary.part(shared(aliceP,maximK,scheme),0,32)
+        aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
+        iv = :crypto.strong_rand_bytes(16)
+        x = encrypt(:aes_256_gcm, "Success!", maximS, iv)
+        "Success!" == decrypt(:aes_256_gcm, x, aliceS, iv)
+        :ok
+    end
+
+    def check_BrainPoolP512t1_GCM256() do # BrainPoolP512t1
+        scheme = :brainpoolP512t1
+        {aliceP,aliceK} = :crypto.generate_key(:ecdh, scheme)
+        {maximP,maximK} = :crypto.generate_key(:ecdh, scheme)
+        maximS = :binary.part(shared(aliceP,maximK,scheme),0,32)
+        aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
+        iv = :crypto.strong_rand_bytes(16)
+        x = encrypt(:aes_256_gcm, "Success!", maximS, iv)
+        "Success!" == decrypt(:aes_256_gcm, x, aliceS, iv)
+        :ok
+    end
+
+    def check_BrainPoolP512t1_GCM256() do # BrainPoolP512t1
+        scheme = :brainpoolP512t1
+        {aliceP,aliceK} = :crypto.generate_key(:ecdh, scheme)
+        {maximP,maximK} = :crypto.generate_key(:ecdh, scheme)
+        maximS = :binary.part(shared(aliceP,maximK,scheme),0,32)
+        aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
+        iv = :crypto.strong_rand_bytes(16)
+        x = encrypt(:aes_256_gcm, "Success!", maximS, iv)
+        "Success!" == decrypt(:aes_256_gcm, x, aliceS, iv)
+        :ok
+    end
+
+    def check_SECT571_GCM256() do # SECT571r1
+        scheme = :sect571r1
+        {aliceP,aliceK} = :crypto.generate_key(:ecdh, scheme)
+        {maximP,maximK} = :crypto.generate_key(:ecdh, scheme)
+        maximS = :binary.part(shared(aliceP,maximK,scheme),0,32)
+        aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
+        iv = :crypto.strong_rand_bytes(16)
+        x = encrypt(:aes_256_gcm, "Success!", maximS, iv)
+        "Success!" == decrypt(:aes_256_gcm, x, aliceS, iv)
+        :ok
+    end
+
     def check_X448_GCM256() do # X488
         scheme = :x448
         {aliceP,aliceK} = :crypto.generate_key(:ecdh, scheme)
