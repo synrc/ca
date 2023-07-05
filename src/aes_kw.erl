@@ -60,7 +60,7 @@ do_unwrap(<< A0:?MSB64, Rest/binary >>, J, I, BlockCount, KEK) ->
     Round = (BlockCount * J) + I,
     A1 = A0 bxor Round,
     Data = << A1:?MSB64, B0/binary >>,
-    << A2:8/binary, B1/binary >> = crypto:crypto_one_time(codec(bit_size(KEK)), KEK, <<>>, Data, [{encrypt,false}]),
+    << A2:8/binary, B1/binary >> = crypto:crypto_one_time(codec(bit_size(KEK)), KEK, ?DEFAULT_IV, Data, [{encrypt,false}]),
     do_unwrap(<< A2/binary, Head/binary, B1/binary, Tail/binary >>, J, I - 1, BlockCount, KEK).
 
 test() ->
