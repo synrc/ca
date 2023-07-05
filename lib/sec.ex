@@ -51,23 +51,23 @@ defmodule CA.CRYPTO do
     def shared(pub, key, scheme), do: :crypto.compute_key(:ecdh, pub, key, scheme)
 
     def test() do
-        scheme = :secp384r1
+        scheme = :prime256v1
         {maximK,key} = privat "maxim"
         {maximP,pub} = public "maxim"
         cms = testCMSX509
         :io.format '~p~n', [cms]
         {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,{_,_,{_,iv}},msg},_}}} = cms
-        [{:kari,{_,:v3,{_,{_,_,publicKey}},_,_,[{_,_,encryptedKey}]}}|y] = x
+        [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,_,[{_,_,encryptedKey}]}}|y] = x
         encryptedKey2 = :binary.part(encryptedKey, 2, 16)
-#        maximS = shared(maximP,maximK,scheme)
-        maximS = shared(publicKey,maximK,scheme)
-        derived = kdf(:sha256, maximS, 256)
-#        unwrap = :aes_kw.unwrap(derived, encryptedKey)
+        maximS = shared(maximP,maximK,scheme)
+        derived = kdf(:sha256, maximS, :erlang.size(maximS))
+#        unwrap = :aes_kw.unwrap(encryptedKey, derived)
         [ cert: pub,
           priv: key,
           publicKey: maximP,
           privateKey: maximK,
           sharedKey: maximS,
+          ukm: ukm,
           senderPublic: publicKey,
           encryptedKey: encryptedKey,
           encryptedMessage: msg,
