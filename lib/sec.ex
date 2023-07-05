@@ -1,24 +1,24 @@
 defmodule CA.CRYPTO do
 
-    def testCMSX509() do
-        {:ok,base} = :file.read_file "priv/encrypted.txt" ; [_,s] = :string.split base, "\n\n"
-        :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, :base64.decode(s))
-    end
-    def privat(name), do: :erlang.element(3,:public_key.pem_entry_decode(readPEM("priv/certs/",name)))
-    def public(name), do: :erlang.element(3,:erlang.element(8, :erlang.element(2, :public_key.pem_entry_decode(readPEM("priv/certs/",name)))))
-    def readPEM(folder, name), do: :erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(folder <> name))))
+    def e(x,y), do: :erlang.element(x,y)
+    def privat(name), do: e(3,:public_key.pem_entry_decode(readPEM("priv/certs/",name)))
+    def public(name), do: e(3,e(8, e(2, :public_key.pem_entry_decode(readPEM("priv/certs/",name)))))
+    def readPEM(folder, name), do: hd(:public_key.pem_decode(e(2, :file.read_file(folder <> name))))
     def decryptCBC(cipher, secret, iv), do: :crypto.crypto_one_time(:aes_256_cbc,secret,iv,cipher,[{:encrypt,false}])
     def shared(pub, key, scheme), do: :crypto.compute_key(:ecdh, pub, key, scheme)
     def eccCMS(ukm, len), do: {:'ECC-CMS-SharedInfo', {:'KeyWrapAlgorithm',{2,16,840,1,101,3,4,1,45},:asn1_NOVALUE}, ukm, <<len::32>>}
 
+    def testSMIME() do
+        {:ok,base} = :file.read_file "priv/encrypted.txt" ; [_,s] = :string.split base, "\n\n"
+        :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, :base64.decode(s))
+    end
+
     def testCMS() do
-        maximK = privat "maxim.key"
-        maximP = public "maxim.pem"
-        cms = testCMSX509
+        privateKey = privat "maxim.key"
         scheme = :prime256v1
-        {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,{_,_,{_,iv}},data},_}}} = cms
-        [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,_,[{_,_,encryptedKey}]}}|y] = x
-        sharedKey    = shared(publicKey,maximK,scheme)
+        {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,{_,_,{_,iv}},data},_}}} = testSMIME()
+        [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,_,[{_,_,encryptedKey}]}}|_] = x
+        sharedKey    = shared(publicKey,privateKey,scheme)
         {_,content}  =  :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', eccCMS(ukm, 256))
         kdf          = KDF.derive(:sha512, sharedKey, 32, content)
         unwrap       = :aes_kw.unwrap(encryptedKey, kdf)
@@ -54,28 +54,6 @@ defmodule CA.CRYPTO do
         iv     = <<187, 95, 134, 1, 63, 206, 38, 130, 149, 235, 230, 2, 143, 128, 235, 82>>
         unwrap = <<7, 54, 202, 106, 82, 159, 14, 38, 154, 188, 199, 36, 41, 123, 161, 56, 142, 171, 46, 246, 62, 18, 243, 1, 140, 31, 48, 224, 138, 166, 53, 36>>
         decryptCBC(data, unwrap, iv)
-    end
-
-    def test() do
-        scheme = :prime256v1
-        {maximK,key} = privat "maxim"
-        {maximP,pub} = public "maxim"
-        cms = testCMSX509
-        :io.format '~p~n', [cms]
-        {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,{_,_,{_,iv}},msg},_}}} = cms
-        [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,_,[{_,_,encryptedKey}]}}|y] = x
-        maximS = shared(publicKey,maximK,scheme)
-        :io.format '~p~n', [publicKey]
-        [ cert: pub,
-          priv: key,
-          publicKey: maximP,
-          privateKey: maximK,
-          sharedKey: maximS,
-          ukm: ukm,
-          senderPublic: publicKey,
-          encryptedKey: encryptedKey,
-          encryptedMessage: msg,
-          iv: iv]
     end
 
 end
