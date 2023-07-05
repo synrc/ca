@@ -1,63 +1,38 @@
 defmodule CA.CRYPTO do
 
     def testCMSX509() do
-        {_,base} = :file.read_file "priv/encrypted.txt"
-        [_,s] = :string.split base, "\n\n" # S/MIME
-        bin = :base64.decode s
-        :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, bin)
+        {:ok,base} = :file.read_file "priv/encrypted.txt" ; [_,s] = :string.split base, "\n\n"
+        :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, :base64.decode(s))
     end
-
-    def privat(name) do
-        prefix = "priv/certs/"
-        bin = :erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(prefix <> name <> ".key"))))
-        key = :public_key.pem_entry_decode(bin)
-        {_,_,keyBin,_,_,_} = key
-        :io.format '~p~n', [key]
-        {keyBin,bin}
-    end
-
-    def public(name) do
-        prefix = "priv/certs/"
-        bin = :erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(prefix <> name <> ".pem"))))
-        pub = :public_key.pem_entry_decode(bin)
-        :io.format '~p~n', [pub]
-        keyBin = :erlang.element(3,:erlang.element(8, :erlang.element(2, pub)))
-        {keyBin,bin}
-    end
-
-    def decryptCBC(cipher, secret, iv) do
-        :crypto.crypto_one_time(:aes_256_cbc,secret,iv,cipher,[{:encrypt,false}]) end
-
+    def privat(name), do: :erlang.element(3,:public_key.pem_entry_decode(readPEM("priv/certs/",name)))
+    def public(name), do: :erlang.element(3,:erlang.element(8, :erlang.element(2, :public_key.pem_entry_decode(readPEM("priv/certs/",name)))))
+    def readPEM(folder, name), do: :erlang.hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(folder <> name))))
+    def decryptCBC(cipher, secret, iv), do: :crypto.crypto_one_time(:aes_256_cbc,secret,iv,cipher,[{:encrypt,false}])
     def shared(pub, key, scheme), do: :crypto.compute_key(:ecdh, pub, key, scheme)
+    def eccCMS(ukm, len), do: {:'ECC-CMS-SharedInfo', {:'KeyWrapAlgorithm',{2,16,840,1,101,3,4,1,45},:asn1_NOVALUE}, ukm, <<len::32>>}
 
-    def test____() do
-        {maximK,_} = privat "maxim"
-        {maximP,_} = public "maxim"
+    def testCMS() do
+        maximK = privat "maxim.key"
+        maximP = public "maxim.pem"
+        cms = testCMSX509
         scheme = :prime256v1
-        kdf          = <<72, 107, 155, 26, 72, 48, 84, 17, 196, 223, 216, 171, 80, 69, 237, 114, 43, 195, 185, 109, 228, 129, 171, 72, 73, 223, 122, 52, 129, 156, 101, 121>>
-        unwrapped    = <<91, 14, 167, 227, 231, 214, 163, 73, 170, 246, 181, 226, 189, 201, 124, 243, 41,
-                         106, 120, 60, 134, 166, 142, 197, 183, 120, 127, 214, 23, 232, 212, 134>>
-        encryptedKey = <<10, 165, 23, 245, 67, 211, 61, 126, 224, 151, 243, 132, 154, 31, 124, 254, 125,
-                         210, 186, 121, 76, 166, 113, 230, 153, 105, 84, 229, 24, 160, 184, 209, 232, 50,
-                         153, 61, 186, 20, 194, 95>>
-        publicKey    = <<4,15,90,175,28,162,64,100,204,92,124,93,179,53,62,8,61,101,110,91,223,236,93,
-                         49,2,190,224,23,19,191,155,26,37,82,99,34,36,80,54,89,204,246,163,0,54,191,
-                         57,152,190,11,181,2,108,188,172,182,127,179,162,15,15,192,84,18,10>>
-        privateKey   = <<247, 207, 95, 5, 196, 153, 227, 80, 93, 7, 1, 191, 236, 109,
-                         205, 218, 155, 121, 203, 134, 243, 66, 116, 49, 205, 157, 50, 65, 245, 9, 105, 49>>
+        {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,{_,_,{_,iv}},data},_}}} = cms
+        [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,_,[{_,_,encryptedKey}]}}|y] = x
         sharedKey    = shared(publicKey,maximK,scheme)
-        unwrap       = :aes_kw.unwrap(encryptedKey, sharedKey)
+        {_,content}  =  :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', eccCMS(ukm, 256))
+        kdf          = KDF.derive(:sha512, sharedKey, 32, content)
+        unwrap       = :aes_kw.unwrap(encryptedKey, kdf)
+        decryptCBC(data, unwrap, :binary.part(iv,2,16))
     end
 
     def testKDF() do
-#        {maximK,_} = privat "maxim"
-#        {maximP,_} = public "maxim"
-#        scheme = :prime256v1
-#        sharedKey    = shared(publicKey,maximK,scheme)
+        ukm          = <<223,26,197,93,44,41,6,2,221,131,15,3,178,246,255,171,206,252,81,162,
+          246,68,56,165,0,140,202,2,197,115,90,94,50,142,83,129,17,198,186,108,
+          44,206,149,11,121,229,163,32,246,65,16,92,91,104,245,32,88,223,70,
+          116,34,53,178,249>>
         sharedKey    = <<0, 23, 75, 69, 228, 151, 69, 27, 32, 251, 44, 195, 58, 217, 225, 184, 169, 242, 86, 179, 98, 202, 182, 149, 194, 58, 0, 63, 18, 87, 112, 173>>
-        contentInfo  = <<48, 89, 48, 11, 6, 9, 96, 134, 72, 1, 101, 3, 4, 1, 45, 160, 66, 4, 64, 223, 26, 197, 93, 44, 41, 6, 2, 221, 131, 15, 3, 178, 246, 255, 171, 206, 252, 81, 162, 246, 68, 56, 165, 0, 140, 202, 2, 197, 115, 90, 94, 50, 142, 83, 129, 17, 198, 186, 108, 44, 206, 149, 11, 121, 229, 163, 32, 246, 65, 16, 92, 91, 104, 245, 32, 88, 223, 70, 116, 34, 53, 178, 249, 162, 6, 4, 4, 0, 0, 1, 0>>
-        :'CMSECCAlgs-2009-02'.decode(:'ECC-CMS-SharedInfo', contentInfo)
-        kdf          = KDF.derive(:sha512, sharedKey, 32, contentInfo)
+        {_,content}  =  :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', eccCMS(ukm, 256))
+        kdf          = KDF.derive(:sha512, sharedKey, 32, content)
         encryptedKey = <<48, 209, 23, 117, 214, 149, 195, 133, 187, 142, 81, 82, 162, 44, 102, 31, 148, 163, 53, 98, 159, 61, 20, 221, 173, 49, 230, 242, 113, 246, 19, 51, 197, 41, 225, 28, 83, 139, 169, 97>>
         unwrap       = :aes_kw.unwrap(encryptedKey, kdf)
         data         = <<128, 196, 25, 250, 68, 103, 198, 72, 197, 203, 5, 173, 43, 24, 212, 147, 239, 124, 5, 57, 164, 158, 133, 227, 90, 54, 162, 115, 41, 2, 71, 129>>
