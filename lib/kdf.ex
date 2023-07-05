@@ -7,7 +7,6 @@ defmodule KDF do
   def hl(:sha384), do: 48
   def hl(:sha512), do: 64
 
-
   def derive(h, d, len, x) do
       :binary.part(:lists.foldr(fn i, a ->
           :crypto.hash(h, d <> <<i::32>> <> x) <> a
