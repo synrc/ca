@@ -25,25 +25,6 @@ defmodule CA.CRYPTO do
         {keyBin,bin}
     end
 
-    for fun <- ~w(md5 sha sha224 sha256 sha384 sha512)a do
-      len = fun |> :crypto.hash("") |> byte_size()
-      defp hash_length(unquote(fun)) do
-        unquote(len)
-      end
-    end
-
-    def kdf(hash_fun, ikm, len, salt \\ "", info \\ ""), do: expand(hash_fun, extract(hash_fun, ikm, salt), len, info)
-    def extract(hash_fun, ikm, salt \\ ""), do: :crypto.mac(:hmac, hash_fun, salt, ikm)
-    def expand(hash_fun, prk, len, info \\ "") do
-        hash_len = hash_length(hash_fun)
-        n = Float.ceil(len/hash_len) |> round()
-        full = Enum.scan(1..n, "", fn index, prev ->
-             data = prev <> info <> <<index>>
-            :crypto.mac(:hmac, hash_fun, prk, data)
-         end) |> Enum.reduce("", &Kernel.<>(&2, &1))
-        <<output :: unit(8)-size(len), _ :: binary>> = full
-        <<output :: unit(8)-size(len)>> end
-
     def decryptCBC(cipher, secret, iv) do
         :crypto.crypto_one_time(:aes_256_cbc,secret,iv,cipher,[{:encrypt,false}]) end
 
@@ -76,28 +57,25 @@ defmodule CA.CRYPTO do
                          107, 189, 154, 58, 84, 156, 6, 228, 150, 237, 229, 15, 213, 149, 164, 132, 6,
                          242, 34, 160, 147, 27, 229, 14, 195, 38, 110, 34, 204, 139, 135, 213, 64, 80,
                          45, 234, 232, 81, 102, 125, 1, 69, 136, 162, 99, 145, 162, 6, 4, 4, 0, 0, 1, 0>>
-        kdf          = kdf(:sha256, sharedKey, 256, <<>>, contentInfo)
-#       encryptedKey = <<93, 239, 14, 185, 169, 133, 226, 122, 96, 26, 16, 228, 196, 154, 190, 213,
-#                        60, 65, 223, 176, 166, 109, 37, 253, 107, 17, 1, 206, 16, 130, 160, 79,
-#                        8, 107, 241, 218, 187, 7, 132, 89>>
-#       unwrap       = :aes_kw.unwrap(encryptedKey, kdf)
+        :'CMSECCAlgs-2009-02'.decode(:'ECC-CMS-SharedInfo', contentInfo)
+        kdf          = :hkdf.derive_secrets(:sha512, sharedKey, contentInfo, 256)
+#        encryptedKey = <<93, 239, 14, 185, 169, 133, 226, 122, 96, 26, 16, 228, 196, 154, 190, 213, 60, 65, 223, 176, 166, 109, 37, 253, 107, 17, 1, 206, 16, 130, 160, 79, 8, 107, 241, 218, 187, 7, 132, 89>>
+#        unwrap       = :aes_kw.unwrap(encryptedKey, kdf)
     end
 
     def testUnwrap() do
-        kdf          = <<217, 187, 27, 152, 7, 7, 119, 110, 226, 226, 88, 211, 48, 219, 93, 90, 130, 76,
-                         194, 66, 49, 125, 14, 88, 130, 54, 175, 10, 251, 201, 59, 67>>
-        encryptedKey = <<153, 198, 198, 10, 57, 65, 242, 44, 238, 159, 74, 127, 47, 28, 195, 207, 104,
-                         237, 99, 111, 180, 187, 238, 154, 135, 218, 93, 103, 133, 48, 50, 24, 174,
-                         236, 118, 37, 235, 232, 143, 54>>
+        kdf          = <<173, 14, 40, 253, 54, 191, 118, 69, 224, 139, 154, 211, 4, 136, 182, 44, 246, 222, 24, 35, 85, 223, 73, 150, 7, 252, 122, 67, 16, 185, 57, 77>>
+        encryptedKey = <<93, 239, 14, 185, 169, 133, 226, 122, 96, 26, 16, 228, 196, 154, 190, 213, 60, 65, 223, 176, 166, 109, 37, 253, 107, 17, 1, 206, 16, 130, 160, 79, 8, 107, 241, 218, 187, 7, 132, 89>>
         unwrap       = :aes_kw.unwrap(encryptedKey, kdf)
+        data = <<188, 48, 46, 36, 148, 107, 169, 57, 176, 145, 47, 169, 237, 241, 244, 177, 79, 249, 130, 44, 179, 129, 108, 47, 159, 68, 126, 183, 213, 213, 205, 13>>
+        iv = <<187, 95, 134, 1, 63, 206, 38, 130, 149, 235, 230, 2, 143, 128, 235, 82>>
+        decryptCBC(data, unwrap, iv)
     end
 
     def testDecode() do
-        data   = <<166, 245, 116, 20, 75, 138, 18, 153, 192, 25, 85, 227, 145, 0, 179,
-                   32, 21, 20, 219, 137, 54, 9, 34, 190, 159, 1, 108, 168, 64, 10, 128, 42>>
-        iv     = <<188, 9, 9, 162, 138, 88, 113, 80, 1, 38, 17, 80, 198, 172, 209, 69>>
-        unwrap = <<234, 54, 248, 92, 153, 222, 78, 126, 242, 118, 211, 164, 72, 164, 19, 75,
-                   213, 214, 12, 239, 142, 196, 130, 222, 64, 91, 2, 208, 144, 112, 15, 92>>
+        data   = <<188, 48, 46, 36, 148, 107, 169, 57, 176, 145, 47, 169, 237, 241, 244, 177, 79, 249, 130, 44, 179, 129, 108, 47, 159, 68, 126, 183, 213, 213, 205, 13>>
+        iv     = <<187, 95, 134, 1, 63, 206, 38, 130, 149, 235, 230, 2, 143, 128, 235, 82>>
+        unwrap = <<7, 54, 202, 106, 82, 159, 14, 38, 154, 188, 199, 36, 41, 123, 161, 56, 142, 171, 46, 246, 62, 18, 243, 1, 140, 31, 48, 224, 138, 166, 53, 36>>
         decryptCBC(data, unwrap, iv)
     end
 
