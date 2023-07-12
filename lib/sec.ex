@@ -9,7 +9,7 @@ defmodule CA.CRYPTO do
 
     def decryptCMS(cms, privateKey) do
         {:'ECPrivateKey',_,privateKeyBin,{:namedCurve,schemeOID},_,_} = privateKey
-        {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,y,_}}} = testSMIME()
+        {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,y,_}}} = cms
         {:EncryptedContentInfo,_,{_,encOID,{_,iv}},data} = y
         [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,{_,kdfOID,_},[{_,_,encryptedKey}]}}|_] = x
         {scheme,_}  = CA.ALG.lookup(schemeOID)
@@ -19,18 +19,20 @@ defmodule CA.CRYPTO do
         {_,payload} =  :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', eccCMS(ukm, 256))
         derivedKDF  = case kdf do
            :'dhSinglePass-stdDH-sha512kdf-scheme' -> KDF.derive(:sha512, sharedKey, 32, payload)
+           :'dhSinglePass-stdDH-sha384kdf-scheme' -> KDF.derive(:sha384, sharedKey, 32, payload)
+           :'dhSinglePass-stdDH-sha256kdf-scheme' -> KDF.derive(:sha256, sharedKey, 32, payload)
         end
         unwrap = :aes_kw.unwrap(encryptedKey, derivedKDF)
         case enc do
            :'id-aes256-CBC' -> CA.AES.decrypt(:aes_256_cbc, data, unwrap, :binary.part(iv,2,16))
+           :'id-aes256-GCM' -> CA.AES.decrypt(:aes_256_gcm, data, unwrap, :binary.part(iv,2,16))
+           :'id-aes256-ECB' -> CA.AES.decrypt(:aes_256_ecb, data, unwrap, :binary.part(iv,2,16))
         end
     end
 
     def testDecryptCMS() do
         cms = testSMIME()
         {privateKey,_} = testPrivateKey()
-        :io.format 'CMS: ~p~n', [cms]
-        :io.format 'PrivateKey: ~p~n', [privateKey]
         decryptCMS(cms, privateKey)
     end
 
