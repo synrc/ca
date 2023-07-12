@@ -9,12 +9,17 @@ defmodule CA.CRYPTO do
 
     def testSMIME() do
         {:ok,base} = :file.read_file "priv/encrypted.txt" ; [_,s] = :string.split base, "\n\n"
-        :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, :base64.decode(s))
+        x = :base64.decode(s)
+        :file.write_file "priv/encrypted.bin", [x]
+        y = :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
+        :io.format '~p~n', [y]
+        y
     end
 
     def testCMS() do
         privateKey = privat "maxim.key"
-        scheme = :prime256v1
+        :io.format '~p~n', [:public_key.pem_entry_decode(readPEM("priv/certs/","maxim.key"))]
+        scheme = :secp256r1 # prime256v1
         {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,{:EncryptedContentInfo,_,{_,_,{_,iv}},data},_}}} = testSMIME()
         [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,_,[{_,_,encryptedKey}]}}|_] = x
         sharedKey    = shared(publicKey,privateKey,scheme)
