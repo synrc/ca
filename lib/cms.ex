@@ -44,11 +44,7 @@ defmodule CA.CMS do
         {:ok, res}
     end
 
-    # CMS Codec PWRI: PBKDF2+AES-KW+CBC
-
-    def pwri(pwri, privateKeyBin, encOID, data, iv) do
-        {:error, ["PWRI not implemented",pwri, privateKeyBin, encOID, data, iv]}
-    end
+    # CMS DECRYPT API
 
     def decrypt(cms, {schemeOID, privateKeyBin}) do
         {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,y,_}}} = cms
@@ -63,6 +59,12 @@ defmodule CA.CMS do
                 ktri  -> ktri(ktri,   privateKeyBin, encOID, data, iv) end
                 kari  -> kari(kari,   privateKeyBin, schemeOID, encOID, data, iv)
         end
+    end
+
+    # CMS Codec PWRI: PBKDF2+AES-KW+CBC
+
+    def pwri(pwri, privateKeyBin, encOID, data, iv) do
+        {:error, ["PWRI not implemented",pwri, privateKeyBin, encOID, data, iv]}
     end
 
 end
