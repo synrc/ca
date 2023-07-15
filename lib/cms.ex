@@ -49,7 +49,7 @@ defmodule CA.CMS do
     def decrypt(cms, {schemeOID, privateKeyBin}) do
         {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,y,_}}} = cms
         {:EncryptedContentInfo,_,{_,encOID,{_,<<_::16,iv::binary>>}},data} = y
-        case :proplists.get_value(:kari, x, []) do
+                case :proplists.get_value(:kari,  x, []) do
           [] -> case :proplists.get_value(:ktri,  x, []) do
           [] -> case :proplists.get_value(:kekri, x, []) do
           [] -> case :proplists.get_value(:pwri,  x, []) do
@@ -64,7 +64,7 @@ defmodule CA.CMS do
     # CMS Codec PWRI: PBKDF2+AES-KW+CBC
 
     def pwri(pwri, privateKeyBin, encOID, data, iv) do
-        {:error, ["PWRI not implemented",pwri, privateKeyBin, encOID, data, iv]}
+        {:error, ["PWRI not implemented", pwri, privateKeyBin, encOID, data, iv]}
     end
 
 end
