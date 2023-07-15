@@ -42,17 +42,19 @@ defmodule CA.AES do
         iv <> tag <> cipher
     end
 
+    # public API is ASN.1 based
+
     def encrypt(crypto_codec, data, key, iv \\ :crypto.strong_rand_bytes(16))
-    def encrypt(:aes_256_ecb, data, key, iv), do: encryptAES256ECB(data, key, iv)
-    def encrypt(:aes_256_cbc, data, key, iv), do: encryptAES256CBC(data, key, iv)
-    def encrypt(:aes_256_gcm, data, key, iv), do: encryptAES256GCM(data, key, iv)
-    def encrypt(:aes_256_ccm, data, key, iv), do: encryptAES256CCM(data, key, iv)
+    def encrypt(:'id-aes256-ECB', data, key, iv), do: encryptAES256ECB(data, key, iv)
+    def encrypt(:'id-aes256-CBC', data, key, iv), do: encryptAES256CBC(data, key, iv)
+    def encrypt(:'id-aes256-GCM', data, key, iv), do: encryptAES256GCM(data, key, iv)
+    def encrypt(:'id-aes256-CCM', data, key, iv), do: encryptAES256CCM(data, key, iv)
 
     def decrypt(crypto_codec, data, key, iv \\ :crypto.strong_rand_bytes(16))
-    def decrypt(:aes_256_ecb, data, key, iv), do: decryptAES256ECB(data, key, iv)
-    def decrypt(:aes_256_cbc, data, key, iv), do: decryptAES256CBC(data, key, iv)
-    def decrypt(:aes_256_gcm, data, key, iv), do: decryptAES256GCM(data, key, iv)
-    def decrypt(:aes_256_ccm, data, key, iv), do: decryptAES256CCM(data, key, iv)
+    def decrypt(:'id-aes256-ECB', data, key, iv), do: decryptAES256ECB(data, key, iv)
+    def decrypt(:'id-aes256-CBC', data, key, iv), do: decryptAES256CBC(data, key, iv)
+    def decrypt(:'id-aes256-GCM', data, key, iv), do: decryptAES256GCM(data, key, iv)
+    def decrypt(:'id-aes256-CCM', data, key, iv), do: decryptAES256CCM(data, key, iv)
 
     def testSMIME() do
         {:ok,base} = :file.read_file "priv/encrypted.txt" ; [_,s] = :string.split base, "\n\n"
