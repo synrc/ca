@@ -22,6 +22,7 @@ defmodule CSR do
             extension_request: [X509.Certificate.Extension.subject_alt_name(["n2o.dev"])])
       true = X509.CSR.valid?(csr)
       subject = X509.CSR.subject(csr)
+      :io.format '~p~n', [csr]
       X509.Certificate.new(X509.CSR.public_key(csr), subject, ca, ca_key,
          extensions: [subject_alt_name:
            X509.Certificate.Extension.subject_alt_name(["n2o.dev", "erp.uno"]) ])
