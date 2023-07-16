@@ -1,8 +1,11 @@
 defmodule CA.CMS do
 
-    def map(:'dhSinglePass-stdDH-sha512kdf-scheme'), do: :sha512
-    def map(:'dhSinglePass-stdDH-sha384kdf-scheme'), do: :sha384
-    def map(:'dhSinglePass-stdDH-sha256kdf-scheme'), do: :sha256
+    def map(:'dhSinglePass-stdDH-sha512kdf-scheme'),   do: {:kdf,  :sha512}
+    def map(:'dhSinglePass-stdDH-sha384kdf-scheme'),   do: {:kdf,  :sha384}
+    def map(:'dhSinglePass-stdDH-sha256kdf-scheme'),   do: {:kdf,  :sha256}
+    def map(:'dhSinglePass-stdDH-hkdf-sha256-scheme'), do: {:hkdf, :sha256}
+    def map(:'dhSinglePass-stdDH-hkdf-sha384-scheme'), do: {:hkdf, :sha384}
+    def map(:'dhSinglePass-stdDH-hkdf-sha512-scheme'), do: {:hkdf, :sha512}
 
     def sharedInfo(ukm, len), do: {:'ECC-CMS-SharedInfo',
         {:'KeyWrapAlgorithm',{2,16,840,1,101,3,4,1,45},:asn1_NOVALUE}, ukm, <<len::32>>}
@@ -15,10 +18,13 @@ defmodule CA.CMS do
         {kdf,_}     = CA.ALG.lookup(kdfOID)
         {enc,_}     = CA.ALG.lookup(encOID)
         sharedKey   = :crypto.compute_key(:ecdh,publicKey,privateKeyBin,scheme)
-        {_,payload} =  :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', sharedInfo(ukm,256))
-        derived = KDF.derive(map(kdf), sharedKey, 32, payload)
-        unwrap = CA.AES.KW.unwrap(encryptedKey, derived)
-        res = CA.AES.decrypt(enc, data, unwrap, iv)
+        {_,payload} = :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', sharedInfo(ukm,256))
+        derived     = case map(kdf) do
+            {:kdf,hash} -> KDF.derive({:kdf,hash},  sharedKey, 32, payload)
+           {:hkdf,hash} -> HKDF.derive({:kdf,hash}, sharedKey, 32, payload)
+        end
+        unwrap      = CA.AES.KW.unwrap(encryptedKey, derived)
+        res         = CA.AES.decrypt(enc, data, unwrap, iv)
         {:ok, res}
     end
 

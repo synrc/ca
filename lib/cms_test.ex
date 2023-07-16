@@ -96,7 +96,7 @@ defmodule CA.CMS.Test do
         [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,_,[{_,_,encryptedKey}]}}|_] = x
         sharedKey   = :crypto.compute_key(:ecdh,publicKey,privateKey,scheme)
         {_,content}  =  :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', CA.CMS.sharedInfo(ukm,256))
-        kdf          = KDF.derive(:sha256, sharedKey, 32, content)
+        kdf          = KDF.derive({:kdf, :sha256}, sharedKey, 32, content)
         unwrap       = :aes_kw.unwrap(encryptedKey, kdf)
         CA.AES.decrypt(:'id-aes256-CBC', data, unwrap, iv)
     end
