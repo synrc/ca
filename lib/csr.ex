@@ -3,7 +3,7 @@ defmodule CSR do
   def ca() do
       ca_key = X509.PrivateKey.new_ec(:sect571r1)
       {ca_key, X509.Certificate.self_signed(ca_key,
-          "/C=UA/L=Kyiv/O=SYNRC/CN=ECDSA SRC G-ROOT", template: :root_ca)}
+          "/C=UA/L=Kyiv/O=SYNRC/CN=CSR-CMP", template: :root_ca)}
   end
 
   def server(cn) do
