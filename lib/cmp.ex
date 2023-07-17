@@ -22,7 +22,7 @@ defmodule CA.CMP do
                  {{_,headers},asn} = :asn1rt_nif.decode_ber_tlv(data)
                  [_,body] = :string.split asn, "\r\n\r\n", :all
                  dec = :'PKIXCMP-2009'.decode(:'PKIMessage', body)
-                 :io.format 'CMP: ~ps~n', [dec]
+                 :io.format 'CMP: ~p~n', [dec]
                  loop(socket)
             {:error, :closed} -> :exit
        end
