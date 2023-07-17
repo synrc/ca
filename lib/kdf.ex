@@ -1,4 +1,4 @@
-defmodule KDF do
+defmodule CA.KDF do
 
   def hl(:md5),    do: 16
   def hl(:sha),    do: 20

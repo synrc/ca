@@ -20,8 +20,8 @@ defmodule CA.CMS do
         sharedKey   = :crypto.compute_key(:ecdh,publicKey,privateKeyBin,scheme)
         {_,payload} = :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', sharedInfo(ukm,256))
         derived     = case map(kdf) do
-            {:kdf,hash} -> KDF.derive({:kdf,hash},  sharedKey, 32, payload)
-           {:hkdf,hash} -> HKDF.derive({:kdf,hash}, sharedKey, 32, payload)
+            {:kdf,hash} -> CA.KDF.derive({:kdf,hash},  sharedKey, 32, payload)
+           {:hkdf,hash} -> CA.HKDF.derive({:kdf,hash}, sharedKey, 32, payload)
         end
         unwrap      = CA.AES.KW.unwrap(encryptedKey, derived)
         res         = CA.AES.decrypt(enc, data, unwrap, iv)

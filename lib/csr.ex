@@ -1,4 +1,4 @@
-defmodule CSR do
+defmodule CA.CSR do
 
   def ca() do
       ca_key = X509.PrivateKey.new_ec(:sect571r1)

@@ -1,4 +1,4 @@
-defmodule HKDF do
+defmodule CA.HKDF do
 
   def hl(:sha),    do: 20
   def hl(:sha224), do: 28
