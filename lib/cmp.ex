@@ -5,6 +5,10 @@ defmodule CA.CMP do
    # openssl cmp -cmd genm -server 127.0.0.1:829 \
    #             -recipient "/CN=CMPserver" -ref 1234 -secret pass:0000
 
+   # openssl cmp -cmd ir -server 127.0.0.1:829 \
+   #             -path priv/certs -srvcert caroot.pem -ref NewUser \
+   #             -secret pass:0000 -certout x.pem -newkey maxim.key.enc -subject "/CN=maxim/O=SYNRC/ST=Kyiv/C=UA"
+ 
    def start(), do: :erlang.spawn(fn -> listen(829) end)
    def listen(port) do
        {:ok, socket} = :gen_tcp.listen(port,
