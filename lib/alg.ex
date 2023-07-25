@@ -1,6 +1,6 @@
 defmodule CA.ALG do
 
-   def lookup(oid), do: :lists.keyfind oid, 2, algorithms()
+   def lookup(oid), do: :lists.keyfind(oid, 2, algorithms())
    def algorithms() do
        [
          {:'id-gost28147-ofb',    {1,2,804,2,1,1,1,1,1,1,2}},
