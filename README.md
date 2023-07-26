@@ -17,6 +17,7 @@
 * <a href="https://ldap.erp.uno">2023-07-25 LDAP 13.7.24 (Домашня сторінка)</a><br>
 * <a href="https://ca.erp.uno">2023-07-30 CA X.509 (Домашня сторінка)</a><br>
 * <a href="https://tonpa.guru/stream/2023/2023-07-21 CMP CMC EST.htm">2023-07-21 CMP/CMC/EST</a><br>
+* <a href="https://tonpa.guru/stream/2023/2023-07-27 MLS.htm">2023-07-21 MLS ROOM CHAT</a><br>
 
 ## Credits
 
