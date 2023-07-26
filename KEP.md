@@ -2,7 +2,7 @@
 
 ## X.509 decode SignData
 
-```elixir
+```Elixir
 > {:ok,bin} = :file.read_file("priv/5HT.p7s")
 > KEP.parseSignData bin
 {{:certAttrs, "1786046", "СОХАЦЬКИЙ МАКСИМ ЕРОТЕЙОВИЧ",
@@ -17,7 +17,7 @@
 
 ## X.509 decode Cert
 
-```elixir
+```Elixir
 {{:certAttrs, "8", "А0 Адміністратор Тестовий",
   "Адміністратор Тестовий", "А0",
   "ДП \"Інфотех\"34_ТЕСТ", "Адміністратор",
