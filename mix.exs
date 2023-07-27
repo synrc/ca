@@ -4,7 +4,7 @@ defmodule CA.Mixfile do
   def project() do
     [
       app: :ca,
-      version: "4.7.14",
+      version: "4.7.26",
       elixir: "~> 1.7",
       description: "CA  CXC 138 21 Certificate Authority",
       package: package(),
