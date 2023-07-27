@@ -50,11 +50,11 @@ defmodule CA.CMP do
         csr2 = {:CertificationRequest, {:CertificationRequestInfo, v, subj(subj), x, y}, b, c}
         {ca_key, ca} = CA.CSR.read_ca()
         subject = X509.CSR.subject(csr)
-        :logger.info 'CA: ~p~n', [convertOTPtoPKIX(ca)]
-        :logger.info 'CSR 2: ~p~n', [csr2]
+#        :logger.info 'CA: ~p~n', [convertOTPtoPKIX(ca)]
+#        :logger.info 'CSR 2: ~p~n', [csr2]
         true = X509.CSR.valid?(csr2)
-        :logger.info 'Subject: ~p~n', [subj(subject)]
-        :logger.info 'Piblic Derive: ~p~n', [X509.CSR.public_key(csr2)]
+#        :logger.info 'Subject: ~p~n', [subj(subject)]
+#        :logger.info 'Piblic Derive: ~p~n', [X509.CSR.public_key(csr2)]
         cert = X509.Certificate.new(X509.CSR.public_key(csr), subj(subject), ca, ca_key,
          extensions: [subject_alt_name:
            X509.Certificate.Extension.subject_alt_name(["n2o.dev", "synrc.com"]) ])
@@ -98,7 +98,7 @@ defmodule CA.CMP do
                   [_,body] = :string.split asn, "\r\n\r\n", :all
                   {:ok,dec} = :'PKIXCMP-2009'.decode(:'PKIMessage', body)
                   {:PKIMessage, header, body, code, _} = dec
-                  :logger.info 'PKIBody:~n~p~n', [body]
+                  :logger.info 'PKIMessage:~n~p~n', [dec]
                   message(socket, header, body, code)
                   loop(socket)
              {:error, :closed} -> :exit
