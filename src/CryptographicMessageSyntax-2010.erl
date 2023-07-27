@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("CryptographicMessageSyntax-2010.hrl").
+-include_lib("ca/include/CryptographicMessageSyntax-2010.hrl").
 -asn1_info([{vsn,'5.0.21'},
             {module,'CryptographicMessageSyntax-2010'},
             {options,[warnings,ber,errors,

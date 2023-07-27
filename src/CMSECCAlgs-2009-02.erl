@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("CMSECCAlgs-2009-02.hrl").
+-include_lib("ca/include/CMSECCAlgs-2009-02.hrl").
 -asn1_info([{vsn,'5.0.21'},
             {module,'CMSECCAlgs-2009-02'},
             {options,[warnings,ber,errors,

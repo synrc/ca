@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("PKIXCRMF-2009.hrl").
+-include_lib("ca/include/PKIXCRMF-2009.hrl").
 -asn1_info([{vsn,'5.0.21'},
             {module,'PKIXCRMF-2009'},
             {options,[warnings,ber,errors,

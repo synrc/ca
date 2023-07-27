@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("PKCS-7.hrl").
+-include_lib("ca/include/PKCS-7.hrl").
 -asn1_info([{vsn,'5.0.21'},
             {module,'PKCS-7'},
             {options,[warnings,ber,errors,

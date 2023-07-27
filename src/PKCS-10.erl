@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("PKCS-10.hrl").
+-include_lib("ca/include/PKCS-10.hrl").
 -asn1_info([{vsn,'5.1'},
             {module,'PKCS-10'},
             {options,[warnings,ber,errors,

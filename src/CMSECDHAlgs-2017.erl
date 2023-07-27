@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("CMSECDHAlgs-2017.hrl").
+-include_lib("ca/include/CMSECDHAlgs-2017.hrl").
 -asn1_info([{vsn,'5.0.21'},
             {module,'CMSECDHAlgs-2017'},
             {options,[warnings,ber,errors,

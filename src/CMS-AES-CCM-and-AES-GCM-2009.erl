@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("CMS-AES-CCM-and-AES-GCM-2009.hrl").
+-include_lib("ca/include/CMS-AES-CCM-and-AES-GCM-2009.hrl").
 -asn1_info([{vsn,'5.0.21'},
             {module,'CMS-AES-CCM-and-AES-GCM-2009'},
             {options,[warnings,ber,errors,

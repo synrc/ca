@@ -86,7 +86,7 @@ defmodule CA.AES do
         aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
         iv = :crypto.strong_rand_bytes(16)
         x = encrypt(:'id-aes256-GCM', "Success!", maximS, iv)
-        "Success!" == decrypt(:'id-aes256-GCM', x, aliceS, iv)
+        "Success!" = decrypt(:'id-aes256-GCM', x, aliceS, iv)
         :ok
     end
 
@@ -98,7 +98,7 @@ defmodule CA.AES do
         aliceS = shared(maximP,aliceK,scheme)
         iv = :crypto.strong_rand_bytes(16)
         x = encrypt(:'id-aes256-GCM', "Success!", maximS, iv)
-        "Success!" == decrypt(:'id-aes256-GCM', x, aliceS, iv)
+        "Success!" = decrypt(:'id-aes256-GCM', x, aliceS, iv)
         :ok
     end
 
@@ -110,7 +110,7 @@ defmodule CA.AES do
         aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
         iv = :crypto.strong_rand_bytes(16)
         x = encrypt(:'id-aes256-GCM', "Success!", maximS, iv)
-        "Success!" == decrypt(:'id-aes256-GCM', x, aliceS, iv)
+        "Success!" = decrypt(:'id-aes256-GCM', x, aliceS, iv)
         :ok
     end
 
@@ -122,7 +122,7 @@ defmodule CA.AES do
         aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
         iv = :crypto.strong_rand_bytes(16)
         x = encrypt(:'id-aes256-GCM', "Success!", maximS, iv)
-        "Success!" == decrypt(:'id-aes256-GCM', x, aliceS, iv)
+        "Success!" = decrypt(:'id-aes256-GCM', x, aliceS, iv)
         :ok
     end
 
@@ -134,7 +134,7 @@ defmodule CA.AES do
         aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
         iv = :crypto.strong_rand_bytes(16)
         x = encrypt(:'id-aes256-GCM', "Success!", maximS, iv)
-        "Success!" == decrypt(:'id-aes256-GCM', x, aliceS, iv)
+        "Success!" = decrypt(:'id-aes256-GCM', x, aliceS, iv)
         :ok
     end
 
@@ -146,7 +146,7 @@ defmodule CA.AES do
         aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
         iv = :crypto.strong_rand_bytes(16)
         x = encrypt(:'id-aes256-GCM', "Success!", maximS, iv)
-        "Success!" == decrypt(:'id-aes256-GCM', x, aliceS, iv)
+        "Success!" = decrypt(:'id-aes256-GCM', x, aliceS, iv)
         :ok
     end
 
@@ -158,7 +158,7 @@ defmodule CA.AES do
         aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
         iv = :crypto.strong_rand_bytes(16)
         x = encrypt(:'id-aes256-GCM', "Success!", maximS, iv)
-        "Success!" == decrypt(:'id-aes256-GCM', x, aliceS, iv)
+        "Success!" = decrypt(:'id-aes256-GCM', x, aliceS, iv)
         :ok
     end
 
@@ -169,7 +169,7 @@ defmodule CA.AES do
         maximS = :binary.part(shared(aliceP,maximK,scheme),0,32)
         aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
         x = encrypt(:'id-aes256-CBC', "Success!", maximS)
-        "Success!" == decrypt(:'id-aes256-CBC', x, aliceS)
+        "Success!" = decrypt(:'id-aes256-CBC', x, aliceS)
         :ok
     end
 
@@ -180,7 +180,7 @@ defmodule CA.AES do
         maximS = :binary.part(shared(aliceP,maximK,scheme),0,32)
         aliceS = :binary.part(shared(maximP,aliceK,scheme),0,32)
         x = encrypt(:'id-aes256-ECB', "Success!", maximS)
-        "Success!" == decrypt(:'id-aes256-ECB', x, aliceS)
+        "Success!" = decrypt(:'id-aes256-ECB', x, aliceS)
         :ok
     end
 

@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("AuthenticationFramework.hrl").
+-include_lib("ca/include/AuthenticationFramework.hrl").
 -asn1_info([{vsn,'5.0.13'},
             {module,'AuthenticationFramework'},
             {options,[warnings,ber,errors,

@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("KEP.hrl").
+-include_lib("ca/include/KEP.hrl").
 -asn1_info([{vsn,'5.0.13'},
             {module,'KEP'},
             {options,[warnings,ber,errors,
