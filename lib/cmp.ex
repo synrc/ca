@@ -64,21 +64,36 @@ defmodule CA.CMP do
         body = CA."CertRepMessage"(response:
                [CA."CertResponse"(certReqId: 1,
                    certifiedKeyPair: CA."CertifiedKeyPair"(certOrEncCert: {:certificate,{:x509v3PKCert,pkix}}),
-                   status: CA."PKIStatusInfo"(status: 0))])
+                   status: CA."PKIStatusInfo"(status: 1))])
         certRepMessage = :'PKIXCMP-2009'.encode(:'CertRepMessage', body)
-        answer(socket, header, {:cp,body}, code)
+        recipient = CA."PKIHeader"(header, :recipient)
+        sender = CA."PKIHeader"(header, :sender)
+        senderKID = CA."PKIHeader"(header, :senderKID)
+        recipientKID = CA."PKIHeader"(header, :senderKID)
+#        protection = CA."PKIHeader"(header, :protection)
+        {_,protectionAlg,_} = CA."PKIHeader"(header, :protectionAlg)
+        :io.format 'Protection: ~p~n', [code]
+        :io.format 'SenderKID: ~p~n', [senderKID]
+        :io.format 'RecipientKID: ~p~n', [recipientKID]
+        :io.format 'Protection Alg: ~p~n', [CA.ALG.lookup(protectionAlg)]
+        pkiheader = CA."PKIHeader"(sender: recipient, recipient: sender, pvno: :cmp2000)
+        answer(socket, pkiheader, {:cp,body}, code)
     end
 
     def answer(socket, header, body, code) do
-        :io.format 'Answer Headers: ~p~n', [header]
         message = CA."PKIMessage"(header: header, body: body, protection: code)
         {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
-        send = :gen_tcp.send(socket, :erlang.iolist_to_binary(bytes))
+        res =  "HTTP/1.0 200 OK\r\n"
+            <> "Server: SYNR CA\r\n"
+            <> "Content-Type: application/pkixcmp\r\n\r\n"
+            <> :erlang.iolist_to_binary(bytes)
+        send = :gen_tcp.send(socket, res)
     end
 
     def loop(socket) do
         case :gen_tcp.recv(socket, 0) do
              {:ok, data} ->
+                  :io.format 'Data: ~p~n', [data]
                   {{_,headers},asn} = :asn1rt_nif.decode_ber_tlv(data)
                   [_,body] = :string.split asn, "\r\n\r\n", :all
                   {:ok,dec} = :'PKIXCMP-2009'.decode(:'PKIMessage', body)

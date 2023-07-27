@@ -3,6 +3,8 @@ defmodule CA.ALG do
    def lookup(oid), do: :lists.keyfind(oid, 2, algorithms())
    def algorithms() do
        [
+         {:'id-PasswordBasedMac', {1,2,840,113533,7,66,13}},
+         {:'id-DHBasedMac',       {1,2,840,113533,7,66,30}},
          {:'id-gost28147-ofb',    {1,2,804,2,1,1,1,1,1,1,2}},
          {:'id-gost28147-cfb',    {1,2,804,2,1,1,1,1,1,1,3}},
          {:'id-gost28147-wrap',   {1,2,804,2,1,1,1,1,1,1,5}},
