@@ -10,6 +10,7 @@ defmodule CA do
   def start(_type, _args) do
       :logger.add_handlers(:ldap)
       CA.CMP.start
+      CA.CMC.start
       :supervisor.start_link({:local, __MODULE__}, __MODULE__, [])
   end
 end
