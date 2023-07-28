@@ -14,7 +14,7 @@ defmodule CA.CMP do
     #             -path . -srvcert ca.pem -ref cmptestp10cr \
     #             -secret pass:0000 -certout $client.pem -csr $client.csr
 
-    def code(),         do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
+    def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
     def start(), do: :erlang.spawn(fn -> listen(1829) end)
 
     def listen(port) do
@@ -52,6 +52,26 @@ defmodule CA.CMP do
         base_key = :lists.foldl(fn x, acc ->
             :crypto.hash(:sha256, acc) end, bin <> salt, :lists.seq(1,iter))
         :binary.part(base_key, 0, 20)
+    end
+
+    def message(socket, header, {:ir, req} = body, code) do
+        {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
+           transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
+        {:ok, parameters} = :"PKIXCMP-2009".decode(:'PBMParameter', param)
+        {:PBMParameter, salt, {_,owf,_}, counter, {_,mac,_} } = parameters
+        :lists.map(fn {:CertReqMsg, req, sig, code} ->
+           :io.format 'request: ~p~n', [req]
+           :io.format 'signature: ~p~n', [sig]
+           :io.format 'code: ~p~n', [code]
+        end, req)
+    end
+
+    def message(socket, header, {:genm, req} = body, code) do
+        {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
+           transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
+        {:ok, parameters} = :"PKIXCMP-2009".decode(:'PBMParameter', param)
+        {:PBMParameter, salt, {_,owf,_}, counter, {_,mac,_} } = parameters
+        :io.format 'generalMessage: ~p~n', [req]
     end
 
     def message(socket, header, {:p10cr, csr} = body, code) do
@@ -101,20 +121,21 @@ defmodule CA.CMP do
 #       :io.format 'issuedOTP: ~p~n', [cert]
 #       :io.format 'issuedPKIX: ~p~n', [convertOTPtoPKIX(cert)]
 
-        pkiheader  = CA."PKIHeader"(sender: to,
-                                    recipient: from,
-                                    pvno: pvno,
-                                    protectionAlg: protectionAlg,
-                                    messageTime: messageTime,
-                                    transactionID: transactionID)
-        pkibody    = {:cp, reply}
+        pkibody = {:cp, reply}
+        pkiheader = CA."PKIHeader"(sender: to, recipient: from, pvno: pvno,
+            transactionID: transactionID, protectionAlg: protectionAlg, messageTime: messageTime)
         outgoingProtection = CA."ProtectedPart"(header: pkiheader, body: pkibody)
+
         {:ok, out} = :"PKIXCMP-2009".encode(:'ProtectedPart', outgoingProtection)
         kdf = :crypto.pbkdf2_hmac(:sha256, out, salt, counter, 20)
 #       kdf = mac(out, salt, counter)
         :io.format 'protection: ~p~n', [kdf]
 
         answer(socket, pkiheader, pkibody, kdf)
+    end
+
+    def message(_socket, _header, body, _code) do
+        :logger.info 'Unknown message request ~p', [body]
     end
 
     def answer(socket, header, body, code) do
