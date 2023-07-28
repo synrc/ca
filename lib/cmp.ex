@@ -3,12 +3,17 @@ defmodule CA.CMP do
 
     # IETF 2510:2005 X.509 PKI CMP
 
-    # openssl cmp -cmd genm -server 127.0.0.1:829 \
+    # openssl cmp -cmd genm -server 127.0.0.1:1829 \
     #             -recipient "/CN=CMPserver" -ref 1234 -secret pass:0000
 
-    # openssl cmp -cmd ir -server 127.0.0.1:829 \
+    # openssl cmp -cmd ir -server 127.0.0.1:1829 \
     #             -path priv/certs -srvcert ca.pem -ref NewUser \
     #             -secret pass:0000 -certout maxim.pem -newkey maxim.key -subject "/CN=maxim/O=SYNRC/ST=Kyiv/C=UA"
+
+    # openssl cmp -cmd p10cr -server localhost:1829 \
+    #             -path . -srvcert ca.pem -ref cmptestp10cr \
+    #             -secret pass:0000 -certout $client.pem -csr $client.csr
+
 
     def code(),         do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
     def start(), do: :erlang.spawn(fn -> listen(1829) end)
@@ -93,12 +98,11 @@ defmodule CA.CMP do
     def loop(socket) do
         case :gen_tcp.recv(socket, 0) do
              {:ok, data} ->
-                  :io.format 'Data: ~p~n', [data]
                   {{_,headers},asn} = :asn1rt_nif.decode_ber_tlv(data)
                   [_,body] = :string.split asn, "\r\n\r\n", :all
                   {:ok,dec} = :'PKIXCMP-2009'.decode(:'PKIMessage', body)
                   {:PKIMessage, header, body, code, _} = dec
-                  :logger.info 'PKIMessage:~n~p~n', [dec]
+                  :io.format 'PKIMessage:~n~p~n', [dec]
                   message(socket, header, body, code)
                   loop(socket)
              {:error, :closed} -> :exit
