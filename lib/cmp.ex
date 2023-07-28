@@ -55,7 +55,7 @@ defmodule CA.CMP do
     end
 
     def message(socket, header, {:p10cr, csr} = body, code) do
-        {:PKIHeader, pvno, from, to, messageTime, {x,oid,{y,param}} = protectionAlg, senderKID, recipKID,
+        {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
            transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
         {:ok, parameters} = :"PKIXCMP-2009".decode(:'PBMParameter', param)
         {:PBMParameter, salt, {_,owf,_}, counter, {_,mac,_} } = parameters
@@ -74,12 +74,12 @@ defmodule CA.CMP do
                   {:certificate, {:x509v3PKCert, convertOTPtoPKIX(cert)}}),
                 status: CA."PKIStatusInfo"(status: 0))])
 
-        :io.format 'code: ~p~n', [code]
-
         incomingProtection = CA."ProtectedPart"(header: header, body: body)
         {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
         verify1 = :crypto.pbkdf2_hmac(:sha256, bin, salt, counter, 20)
         verify2 = mac(bin, salt, counter)
+
+        :io.format 'code: ~p~n', [code]
         :io.format 'vfy1: ~p~n', [verify1]
         :io.format 'vfy2: ~p~n', [verify2]
         :io.format 'pvno: ~p~n', [pvno]
@@ -109,9 +109,9 @@ defmodule CA.CMP do
                                     transactionID: transactionID)
         pkibody    = {:cp, reply}
         outgoingProtection = CA."ProtectedPart"(header: pkiheader, body: pkibody)
-        {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', outgoingProtection)
-#       kdf = :crypto.pbkdf2_hmac(:sha256, bin, salt, counter, 20)
-        kdf = mac(bin, salt, counter)
+        {:ok, out} = :"PKIXCMP-2009".encode(:'ProtectedPart', outgoingProtection)
+        kdf = :crypto.pbkdf2_hmac(:sha256, out, salt, counter, 20)
+#       kdf = mac(out, salt, counter)
         :io.format 'protection: ~p~n', [kdf]
 
         answer(socket, pkiheader, pkibody, kdf)
@@ -121,7 +121,7 @@ defmodule CA.CMP do
         message = CA."PKIMessage"(header: header, body: body, protection: code)
         {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
         res =  "HTTP/1.0 200 OK\r\n"
-            <> "Server: SYNR CA\r\n"
+            <> "Server: SYNRC CA\r\n"
             <> "Content-Type: application/pkixcmp\r\n\r\n"
             <> :erlang.iolist_to_binary(bytes)
         send = :gen_tcp.send(socket, res)
