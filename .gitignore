@@ -1,7 +1,7 @@
-src/BasicAccessControl.*
-src/CertificateExtensions.*
-src/DirectoryAbstractService.*
-src/MTSUpperBounds.*
-src/SelectedAttributeTypes.*
-src/UpperBounds.*
-src/UsefulDefinitions.*
+.DS_Store
+.applist
+_build/
+cert/
+deps/
+doc/
+ebin/
