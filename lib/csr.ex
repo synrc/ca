@@ -1,4 +1,5 @@
 defmodule CA.CSR do
+  @moduledoc "CA/CSR library."
 
   def ca() do
       ca_key = X509.PrivateKey.new_ec(:secp384r1)

@@ -1,4 +1,5 @@
 defmodule CA.KDF do
+  @moduledoc "CA/KDF library."
 
   def hl(:md5),    do: 16
   def hl(:sha),    do: 20

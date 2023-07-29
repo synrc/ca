@@ -1,4 +1,4 @@
-# Кваліфікований Електронний Підпис
+# Qualified Digital Signature DSTU-4145
 
 ## X.509 decode SignData
 

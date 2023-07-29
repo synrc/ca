@@ -1,4 +1,8 @@
 defmodule CA.AES do
+    @moduledoc "CA/AES algorithms."
+
+    def keyWrap(x, y), do: :aes_kw.wrap(x, y)
+    def keyUnwrap(x, y), do: :aes_kw.unwrap(x, y)
 
     def e(x,y),       do: :erlang.element(x,y)
     def privat(name), do: e(3,:public_key.pem_entry_decode(readPEM("priv/certs/",name)))

@@ -1,4 +1,5 @@
 defmodule CA.CMP do
+    @moduledoc "CA/CMP TLS server."
     require CA
 
     # IETF 2510:2005 X.509 PKI CMP

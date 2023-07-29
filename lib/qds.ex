@@ -1,4 +1,5 @@
-defmodule CA.KEP do
+defmodule CA.QDS do
+  @moduledoc "Ukrainian (804) Qualified Digital Signature library."
   require Record
 
   Record.defrecord(:certAttrs, serial: "", cn: "", givenName: "", surname: "", o: "", title: "", ou: "", c: "", locality: "")

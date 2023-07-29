@@ -1,4 +1,5 @@
 defmodule CA do
+  @moduledoc "CA application starter and records definitions."
   use Application
   use Supervisor
 

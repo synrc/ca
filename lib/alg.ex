@@ -1,4 +1,5 @@
 defmodule CA.ALG do
+   @moduledoc "CA algorithms definitions."
 
    def lookup(oid), do: :lists.keyfind(oid, 2, algorithms())
    def algorithms() do

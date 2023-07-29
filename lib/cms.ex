@@ -1,4 +1,5 @@
 defmodule CA.CMS do
+    @moduledoc "CA/CMS library."
 
     def map(:'dhSinglePass-stdDH-sha512kdf-scheme'),   do: {:kdf,  :sha512}
     def map(:'dhSinglePass-stdDH-sha384kdf-scheme'),   do: {:kdf,  :sha384}
@@ -23,7 +24,7 @@ defmodule CA.CMS do
             {:kdf,hash} -> CA.KDF.derive({:kdf,hash},  sharedKey, 32, payload)
            {:hkdf,hash} -> CA.HKDF.derive({:kdf,hash}, sharedKey, 32, payload)
         end
-        unwrap      = CA.AES.KW.unwrap(encryptedKey, derived)
+        unwrap      = CA.AES.keyUnwrap(encryptedKey, derived)
         res         = CA.AES.decrypt(enc, data, unwrap, iv)
         {:ok, res}
     end
@@ -45,7 +46,7 @@ defmodule CA.CMS do
         {:'KEKRecipientInfo',_vsn,_,{_,kea,_},encryptedKey} = kekri
         _ = CA.ALG.lookup(kea)
         {enc,_} = CA.ALG.lookup(encOID)
-        unwrap = CA.AES.KW.unwrap(encryptedKey,privateKeyBin)
+        unwrap = CA.AES.keyUnwrap(encryptedKey,privateKeyBin)
         res = CA.AES.decrypt(enc, data, unwrap, iv)
         {:ok, res}
     end
