@@ -142,7 +142,7 @@ defmodule CA.CMP do
         message = CA."PKIMessage"(header: header, body: body, protection: code)
         {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
         res =  "HTTP/1.0 200 OK\r\n"
-            <> "Server: SYNRC CA\r\n"
+            <> "Server: SYNRC CA/CMP\r\n"
             <> "Content-Type: application/pkixcmp\r\n\r\n"
             <> :erlang.iolist_to_binary(bytes)
         send = :gen_tcp.send(socket, res)

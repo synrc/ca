@@ -1,13 +1,14 @@
 -- http://www.dsszzi.gov.ua/dsszzi/control/uk/publish/article?art_id=77726
 
 -- https://zakon.rada.gov.ua/laws/show/z1401-12
+-- https://zakon.rada.gov.ua/laws/show/z1402-12
 -- https://zakon.rada.gov.ua/laws/show/z0607-17
 -- https://zakon.rada.gov.ua/laws/show/z2230-13
 -- https://zakon.rada.gov.ua/laws/show/z1398-12
 
--- PKCS + OCSP + Authentication + Information (X.501:08, X.509:08, X.511:08, X.520:08).
+-- PKCS + OCSP + TSP + Authentication + Information (X.501:08, X.509:08, X.511:08, X.520:08).
 
--- from: Наказ Міністерства юстиції України, 
+-- from: Наказ Міністерства юстиції України,
 --   to: Адміністрації Державної служби спеціального зв’язку та захисту інформації України
 -- date: 20.08.2012 #1236/5/453
 
@@ -20,7 +21,9 @@ IMPORTS Attribute, Name
         CertificateSerialNumber, HASH{}, SIGNED{}, Extensions, Version
    FROM AuthenticationFramework {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 3}
         PolicyInformation, CRLReason
-   FROM CertificateExtensions;
+   FROM CertificateExtensions
+        PKIStatusInfo
+   FROM PKIXCMP-2009;
 
 ContentInfo ::= SEQUENCE {
   contentType ContentType,
@@ -54,24 +57,6 @@ OcspIdentifier ::= SEQUENCE {
   producedAt GeneralizedTime
 }
 
-OtherRevRefType ::= OBJECT IDENTIFIER
-ContentType  ::= OBJECT IDENTIFIER
-id-data          OBJECT IDENTIFIER ::= {1 2 840 113549 1 7 1}
-id-signedData    OBJECT IDENTIFIER ::= {1 2 840 113549 1 7 2}
-id-contentType   OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 3}
-id-messageDigest OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 4}
-id-signingTime   OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 5}
-
- id-aa-signTSToken OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 14}
- id-aa-ets-sigPolicyId OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 15}
- id-aa-ets-ContentTS OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 20}
- id-aa-ets-certRefs OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 21}
- id-aa-ets-revocationRefs OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 22}
- id-aa-ets-certValues OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 23}
- id-aa-ets-revoValues OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 24}
- id-aa-signingCertV2 OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 47}
- id-spq-ets-uri OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-spq(5) 1}
- id-spq-ets-unotice OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-spq(5) 2}
 
 CMSVersion ::= INTEGER {v0(0), v1(1), v2(2), v3(3), v4(4), v5(5)}
 
@@ -245,6 +230,54 @@ TimeStampReq ::= SEQUENCE {
   reqPolicy         TSAPolicyId OPTIONAL,
   nonce             INTEGER OPTIONAL,
   certReq           BOOLEAN DEFAULT FALSE,
-  extensions    [0] IMPLICIT Extensions OPTIONAL}
+  extensions    [0] IMPLICIT Extensions OPTIONAL }
+
+TimeStampResp ::= SEQUENCE {
+  status PKIStatusInfo,
+  timeStampToken TimeStampToken OPTIONAL }
+
+TimeStampToken ::= ContentInfo
+
+TSTInfo ::= SEQUENCE {
+  version INTEGER { v1(1)},
+  policy TSAPolicyId,
+  messageImprint MessageImprint,
+  serialNumber INTEGER,
+  genTime GeneralizedTime,
+  accuracy Accuracy OPTIONAL,
+  nonce INTEGER OPTIONAL,
+  tsa [0] GeneralName OPTIONAL,
+  extensions [1] IMPLICIT Extensions OPTIONAL }
+
+Accuracy ::= SEQUENCE {
+    seconds     INTEGER          OPTIONAL,
+    millis  [0] INTEGER (1..999) OPTIONAL,
+    micros  [1] INTEGER (1..999) OPTIONAL  }
+
+OtherRevRefType  ::= OBJECT IDENTIFIER
+ContentType      ::= OBJECT IDENTIFIER
+id-data          OBJECT IDENTIFIER ::= {1 2 840 113549 1 7 1}
+id-signedData    OBJECT IDENTIFIER ::= {1 2 840 113549 1 7 2}
+id-contentType   OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 3}
+id-messageDigest OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 4}
+id-signingTime   OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 5}
+
+id-aa-signTSToken OBJECT IDENTIFIER        ::= {1 2 840 113549 1 9 16 id-aa(2) 14}
+id-aa-ets-sigPolicyId OBJECT IDENTIFIER    ::= {1 2 840 113549 1 9 16 id-aa(2) 15}
+id-aa-ets-ContentTS OBJECT IDENTIFIER      ::= {1 2 840 113549 1 9 16 id-aa(2) 20}
+id-aa-ets-certRefs OBJECT IDENTIFIER       ::= {1 2 840 113549 1 9 16 id-aa(2) 21}
+id-aa-ets-revocationRefs OBJECT IDENTIFIER ::= {1 2 840 113549 1 9 16 id-aa(2) 22}
+id-aa-ets-certValues OBJECT IDENTIFIER     ::= {1 2 840 113549 1 9 16 id-aa(2) 23}
+id-aa-ets-revoValues OBJECT IDENTIFIER     ::= {1 2 840 113549 1 9 16 id-aa(2) 24}
+id-aa-signingCertV2 OBJECT IDENTIFIER      ::= {1 2 840 113549 1 9 16 id-aa(2) 47}
+id-spq-ets-uri OBJECT IDENTIFIER           ::= {1 2 840 113549 1 9 16 id-spq(5) 1}
+id-spq-ets-unotice OBJECT IDENTIFIER       ::= {1 2 840 113549 1 9 16 id-spq(5) 2}
+
+dstu7564-256 OBJECT IDENTIFIER ::= {iso(1) member-body(2) ukraine(804) root(2) security(1) cryptography(1) pki(1) alg(1) hash(2) dstu7564(2) 1}
+dstu7564-384 OBJECT IDENTIFIER ::= {iso(1) member-body(2) ukraine(804) root(2) security(1) cryptography(1) pki(1) alg(1) hash(2) dstu7564(2) 2}
+dstu7564-512 OBJECT IDENTIFIER ::= {iso(1) member-body(2) ukraine(804) root(2) security(1) cryptography(1) pki(1) alg(1) hash(2) dstu7564(2) 3}
+
+id-kp-timeStamping OBJECT IDENTIFIER ::= {iso(1) identified-organization(3) dod(6) internet(1) security(5) mechanisms(5) pkix(7) id-kp(3) 8}
+id-ct-TSTInfo OBJECT IDENTIFIER      ::= {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9) smime(16) ct(1)4}
 
 END
