@@ -1,9 +1,9 @@
-# Qualified Digital Signature DSTU-4145
+# CAdES Кваліфікований Електронний Підпис ДСТУ-4145
 
 ## X.509 decode SignData
 
 ```Elixir
-> {:ok,bin} = :file.read_file("priv/5HT.p7s")
+> {:ok,bin} = :file.read_file("priv/CAdES/5HT.p7s")
 > KEP.parseSignData bin
   {
     { :certAttrs, "1786046", "СОХАЦЬКИЙ МАКСИМ ЕРОТЕЙОВИЧ", "МАКСИМ ЕРОТЕЙОВИЧ", "СОХАЦЬКИЙ",
