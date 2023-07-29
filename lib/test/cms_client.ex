@@ -1,40 +1,4 @@
 defmodule CA.CMS.Test do
-#   S/MIME Working Group: https://datatracker.ietf.org/wg/smime/documents/
-
-#   Implementations MUST support key transport, key agreement, and
-#   previously distributed symmetric key-encryption keys, as represented
-#   by ktri, kari, and kekri, respectively.
-
-#   Implementations MAY support the password-based key management as represented by pwri.
-#   Implementations MAY support any other key management technique
-#   such as Boneh-Franklin and Boneh-Boyen Identity-Based Encryption (RFC 5409)
-#   or other SYNRC encryption techniques.
-
-#   IETF: 5990, 5911, 5750--5754, 5652, 5408, 5409, 5275, 5126,
-#   5035, 4853, 4490, 4262, 4134, 4056, 4010, 3850, 3851, 3852,
-#   3854, 3855, 3657, 3560, 3565, 3537, 3394, 3369, 3370, 3274,
-#   3114, 3278, 3218, 3211, 3217, 3183, 3185, 3125--3126, 3058,
-#   2984, 2876, 2785, 2630, 2631, 2632, 2633, 5083, 5084, 2634.
-
-    # ECC openssl cms support
-    # openssl cms -decrypt -in encrypted.txt -inkey client.key -recip client.pem
-    # openssl cms -encrypt -aes256 -in message.txt -out encrypted.txt \
-    #                      -recip client.pem -keyopt ecdh_kdf_md:sha256
-
-    # RSA GnuPG S/MIME support
-    # gpgsm --list-keys
-    # gpgsm --list-secret-keys
-    # gpgsm -r 0xD3C8F78A -e CNAME > cms.bin
-    # gpgsm -u 0xD3C8F78A -d cms.bin
-    # gpgsm --export-secret-key-p12 0xD3C8F78A > key.bin
-    # openssl pkcs12 -in key.bin -nokeys -out public.pem
-    # openssl pkcs12 -in key.bin -nocerts -nodes -out private.pem
-
-    # KEK openssl cms support
-    # openssl cms -encrypt -secretkeyid 07 -secretkey 0123456789ABCDEF0123456789ABCDEF \
-    #             -aes256 -in message.txt -out encrypted2.txt
-    # openssl cms -decrypt -secretkeyid 07 -secretkey 0123456789ABCDEF0123456789ABCDEF \
-    #             -in encrypted2.txt
 
     def e(x,y), do: :erlang.element(x,y)
     def pem(name), do: hd(:public_key.pem_decode(e(2,:file.read_file(name))))
