@@ -1,6 +1,4 @@
 defmodule CA.CMS.Test do
-    @moduledoc "CA/CMS client."
-
 #   S/MIME Working Group: https://datatracker.ietf.org/wg/smime/documents/
 
 #   Implementations MUST support key transport, key agreement, and

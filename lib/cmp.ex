@@ -2,19 +2,6 @@ defmodule CA.CMP do
     @moduledoc "CA/CMP TLS server."
     require CA
 
-    # IETF 2510:2005 X.509 PKI CMP
-
-    # openssl cmp -cmd genm -server 127.0.0.1:1829 \
-    #             -recipient "/CN=CMPserver" -ref 1234 -secret pass:0000
-
-    # openssl cmp -cmd ir -server 127.0.0.1:1829 \
-    #             -path priv/certs -srvcert ca.pem -ref NewUser \
-    #             -secret pass:0000 -certout maxim.pem -newkey maxim.key -subject "/CN=maxim/O=SYNRC/ST=Kyiv/C=UA"
-
-    # openssl cmp -cmd p10cr -server localhost:1829 \
-    #             -path . -srvcert ca.pem -ref cmptestp10cr \
-    #             -secret pass:0000 -certout $client.pem -csr $client.csr
-
     def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
     def start(), do: :erlang.spawn(fn -> listen(1829) end)
 
