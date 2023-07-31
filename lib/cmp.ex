@@ -36,21 +36,26 @@ defmodule CA.CMP do
         {:Certificate,{:TBSCertificate,:v3,a,ai,unsubj(rdn),v,unsubj(rdn2),{p1,{p21,p22,{:namedCurve,{1,3,132,0,34}}},p3},b,c,ext},ai,code}
     end
 
-    def mac(bin, salt, iter) do
-        base_key = :lists.foldl(fn x, acc ->
-            :crypto.hash(:sha256, acc) end, bin <> salt, :lists.seq(1,iter))
-    end
+    def baseKey(pass, salt, iter), do: :lists.foldl(fn _, acc -> :crypto.hash(:sha256, acc) end, pass <> salt, :lists.seq(1,iter))
 
     def parseSubj(csr) do
         {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
         {:CertificationRequest, {:CertificationRequestInfo, v, subj(subj), x, y}, b, c}
     end
 
+    def validateProtection(header, body, code) do
+        {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
+           transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
+        {oid, salt, owf, mac, counter} = protection(protectionAlg)
+        incomingProtection = CA."ProtectedPart"(header: header, body: body)
+        {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
+        verifyKey  = baseKey(:application.get_env(:ca, :pbm, "0000"), salt, counter)
+        :crypto.mac(:hmac, CA.KDF.hs(:erlang.size(code)), verifyKey, bin)
+    end
+
     def message(socket, header, {:ir, req} = body, code) do
         {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
            transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
-        {:ok, parameters} = :"PKIXCMP-2009".decode(:'PBMParameter', param)
-        {:PBMParameter, salt, {_,owf,_}, counter, {_,mac,_} } = parameters
         :lists.map(fn {:CertReqMsg, req, sig, code} ->
            :io.format 'request: ~p~n', [req]
            :io.format 'signature: ~p~n', [sig]
@@ -69,8 +74,8 @@ defmodule CA.CMP do
     def message(socket, header, {:p10cr, csr} = body, code) do
         {:PKIHeader, pvno, from, to, messageTime, protectionAlg, senderKID, recipKID,
            transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
+        code = validateProtection(header, body, code)
 
-        {oid, salt, owf, mac, counter} = protection(protectionAlg)
         {ca_key, ca} = CA.CSR.read_ca()
         subject = X509.CSR.subject(csr)
         true = X509.CSR.valid?(parseSubj(csr))
@@ -83,16 +88,12 @@ defmodule CA.CMP do
                   {:certificate, {:x509v3PKCert, convertOTPtoPKIX(cert)}}),
                 status: CA."PKIStatusInfo"(status: 1))])
 
-        incomingProtection = CA."ProtectedPart"(header: header, body: body)
-        {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
-        verifyKey  = mac(:application.get_env(:ca, :pbm, "0000"), salt, counter)
-        verify     = :crypto.mac(:hmac, CA.KDF.hs(:erlang.size(code)), verifyKey, bin)
-        verify     = code
+#       :io.format 'issuedOTP: ~p~n', [cert]
 
         pkibody = {:cp, reply}
         pkiheader = CA."PKIHeader"(sender: to, recipient: from, pvno: pvno, recipNonce: senderNonce,
             transactionID: transactionID, protectionAlg: protectionAlg, messageTime: messageTime)
-        answer(socket, pkiheader, pkibody, code)
+        answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
     end
 
 #       :io.format 'issuedOTP: ~p~n', [cert]
@@ -109,7 +110,7 @@ defmodule CA.CMP do
         pkibody = {:pkiconf, :asn1_NOVALUE}
         pkiheader = CA."PKIHeader"(sender: to, recipient: from, pvno: pvno, recipNonce: senderNonce,
             transactionID: transactionID, protectionAlg: protectionAlg, messageTime: messageTime)
-        answer(socket, pkiheader, pkibody, code)
+        answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
     end
 
     def message(_socket, _header, body, _code) do
@@ -124,16 +125,7 @@ defmodule CA.CMP do
         {oid, salt, owf, mac, counter}
     end
 
-    def answer(socket, header, body, size) do
-        {:PKIHeader, pvno, from, to, messageTime, protectionAlg, senderKID, recipKID,
-           transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
-        {oid, salt, owf, mac, counter} = protection(protectionAlg)
-
-        outgoingProtection = CA."ProtectedPart"(header: header, body: body)
-        {:ok, out} = :"PKIXCMP-2009".encode(:'ProtectedPart', outgoingProtection)
-        verifyKey  = mac(:application.get_env(:ca, :pbm, "0000"), salt, counter)
-        code = :crypto.mac(:hmac, CA.KDF.hs(:erlang.size(size)), verifyKey, out)
-
+    def answer(socket, header, body, code) do
         message = CA."PKIMessage"(header: header, body: body, protection: code)
         {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
         res =  "HTTP/1.0 200 OK\r\n"
