@@ -17,21 +17,20 @@ defmodule CA.CMP do
   end
 
   def baseKey(pass, salt, iter), do:
-      :lists.foldl(fn _, acc -> :crypto.hash(:sha256, acc) end, pass <> salt, :lists.seq(1,iter))
+      :lists.foldl(fn _, acc ->
+      :crypto.hash(:sha256, acc) end, pass <> salt,
+      :lists.seq(1,iter))
 
   def validateProtection(header, body, code) do
-      {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
-         transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
-      {oid, salt, owf, mac, counter} = protection(protectionAlg)
+      {:PKIHeader, _, _, _, _, protectionAlg, _, _, _, _, _, _, _} = header
+      {_oid, salt, _owf, _mac, counter} = protection(protectionAlg)
       incomingProtection = CA."ProtectedPart"(header: header, body: body)
       {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
       verifyKey  = baseKey(:application.get_env(:ca, :pbm, "0000"), salt, counter)
       :crypto.mac(:hmac, CA.KDF.hs(:erlang.size(code)), verifyKey, bin)
   end
 
-  def message(socket, header, {:ir, req} = body, code) do
-      {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
-         transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
+  def message(_socket, _header, {:ir, req}, _) do
       :lists.map(fn {:CertReqMsg, req, sig, code} ->
          :io.format 'request: ~p~n', [req]
          :io.format 'signature: ~p~n', [sig]
@@ -39,17 +38,13 @@ defmodule CA.CMP do
       end, req)
   end
 
-  def message(socket, header, {:genm, req} = body, code) do
-      {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
-         transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
-      {:ok, parameters} = :"PKIXCMP-2009".decode(:'PBMParameter', param)
-      {:PBMParameter, salt, {_,owf,_}, counter, {_,mac,_} } = parameters
+  def message(_socket, _header, {:genm, req} = _body, _code) do
       :io.format 'generalMessage: ~p~n', [req]
   end
 
   def message(socket, header, {:p10cr, csr} = body, code) do
-      {:PKIHeader, pvno, from, to, messageTime, protectionAlg, senderKID, recipKID,
-         transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
+      {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID,
+         transactionID, senderNonce, _recipNonce, _freeText, _generalInfo} = header
       code = validateProtection(header, body, code)
 
       {ca_key, ca} = CA.CSR.read_ca()
@@ -63,7 +58,7 @@ defmodule CA.CMP do
             [ CA."CertResponse"(certReqId: 0,
               certifiedKeyPair: CA."CertifiedKeyPair"(certOrEncCert:
                 {:certificate, {:x509v3PKCert, CA.convertOTPtoPKIX(cert)}}),
-              status: CA."PKIStatusInfo"(status: 1))])
+              status: CA."PKIStatusInfo"(status: 0))])
 
       pkibody = {:cp, reply}
       pkiheader = CA."PKIHeader"(sender: to, recipient: from, pvno: pvno, recipNonce: senderNonce,
@@ -71,7 +66,7 @@ defmodule CA.CMP do
       answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
   end
 
-  def message(socket, header, {:certConf, statuses} = body, code) do
+  def message(socket, header, {:certConf, statuses}, code) do
       {:PKIHeader, _, from, to, _, _, _, _, _, senderNonce, _, _, _} = header
 
       :lists.map(fn {:CertStatus,bin,no,{:PKIStatusInfo, :accepted, _, _}} ->
@@ -108,10 +103,10 @@ defmodule CA.CMP do
   def loop(socket) do
       case :gen_tcp.recv(socket, 0) do
            {:ok, data} ->
-               {{_,headers},asn} = :asn1rt_nif.decode_ber_tlv(data)
+               {{_,_headers},asn} = :asn1rt_nif.decode_ber_tlv(data)
                [_,body] = :string.split asn, "\r\n\r\n", :all
                {:ok,dec} = :'PKIXCMP-2009'.decode(:'PKIMessage', body)
-               {:PKIMessage, header, body, code, extra} = dec
+               {:PKIMessage, header, body, code, _extra} = dec
                __MODULE__.message(socket, header, body, code)
                loop(socket)
           {:error, :closed} -> :exit

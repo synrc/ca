@@ -29,7 +29,7 @@ defmodule CA.CMC do
         case :gen_tcp.recv(socket, 0) do
              {:ok, data} ->
                   {:ok, dec} = :'EnrollmentMessageSyntax-2009'.decode(:'PKIData', data)
-                  {:PKIData, controlSequence, reqSequence, cmsSequence, otherMsgSequence} = dec
+                  {:PKIData, _controlSequence, _reqSequence, cmsSequence, _otherMsgSequence} = dec
                   :io.format 'PKIData:~n~p~n', [dec]
                   __MODULE__.message(socket, cmsSequence)
                   loop(socket)

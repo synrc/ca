@@ -22,7 +22,7 @@ defmodule CA do
   end
 
   def convertOTPtoPKIX(cert) do
-      {:Certificate,{:TBSCertificate,:v3,a,ai,rdn,v,rdn2,{p1,{p21,p22,pki},p3},b,c,ext},ai,code} =
+      {:Certificate,{:TBSCertificate,:v3,a,ai,rdn,v,rdn2,{p1,{p21,p22,_pki},p3},b,c,ext},ai,code} =
          :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
       {:Certificate,{:TBSCertificate,:v3,a,ai,CA.CAdES.unsubj(rdn),v,CA.CAdES.unsubj(rdn2),
            {p1,{p21,p22,{:namedCurve,{1,3,132,0,34}}},p3},b,c,ext},ai,code}
