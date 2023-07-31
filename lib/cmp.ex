@@ -39,7 +39,7 @@ defmodule CA.CMP do
     def mac(bin, salt, iter) do
         base_key = :lists.foldl(fn x, acc ->
             :crypto.hash(:sha256, acc) end, bin <> salt, :lists.seq(1,iter))
-        :binary.part(base_key, 0, 20)
+        :binary.part(base_key, 0, 32)
     end
 
     def message(socket, header, {:ir, req} = body, code) do
@@ -84,11 +84,15 @@ defmodule CA.CMP do
 
         incomingProtection = CA."ProtectedPart"(header: header, body: body)
         {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
-        verify1 = :crypto.pbkdf2_hmac(:sha256, bin, salt, counter, 20)
-        verify2 = mac(bin, salt, counter)
+        verifyKey  = mac("0000", salt, counter)
+        verifyKey2 = :crypto.pbkdf2_hmac(:sha256, "0000", salt, counter, 32)
+        verify     = :crypto.mac(:hmac, :sha256, verifyKey, bin)
+        verify2    = :crypto.mac(:hmac, :sha256, verifyKey2, bin)
 
         :io.format 'code: ~p~n', [code]
-        :io.format 'vfy1: ~p~n', [verify1]
+        :io.format 'vfyK1: ~p~n', [verifyKey]
+        :io.format 'vfyK2: ~p~n', [verifyKey2]
+        :io.format 'vfy1: ~p~n', [verify]
         :io.format 'vfy2: ~p~n', [verify2]
         :io.format 'pvno: ~p~n', [pvno]
 #       :io.format 'from: ~p~n', [from]
@@ -143,7 +147,7 @@ defmodule CA.CMP do
                   [_,body] = :string.split asn, "\r\n\r\n", :all
                   {:ok,dec} = :'PKIXCMP-2009'.decode(:'PKIMessage', body)
                   {:PKIMessage, header, body, code, extra} = dec
-#                 :io.format 'PKIMessage:~n~p~n', [dec]
+                 :io.format 'PKIMessage:~n~p~n', [dec]
                   __MODULE__.message(socket, header, body, code)
                   loop(socket)
              {:error, :closed} -> :exit
