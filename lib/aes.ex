@@ -88,19 +88,19 @@ defmodule CA.AES do
     def encrypt(:'id-aes256-CBC', data, key, iv), do: encryptAES256CBC(data, key, iv)
     def encrypt(:'id-aes256-GCM', data, key, iv), do: encryptAES256GCM(data, key, iv)
     def encrypt(:'id-aes256-CCM', data, key, iv), do: encryptAES256CCM(data, key, iv)
+    def encrypt(:'id-aes128-ECB', data, key, iv), do: encryptAES128ECB(data, key, iv)
+    def encrypt(:'id-aes128-CBC', data, key, iv), do: encryptAES128CBC(data, key, iv)
     def encrypt(:'id-aes128-GCM', data, key, iv), do: encryptAES128GCM(data, key, iv)
     def encrypt(:'id-aes128-CCM', data, key, iv), do: encryptAES128CCM(data, key, iv)
-    def encrypt(:'id-aes128-CBC', data, key, iv), do: encryptAES128CBC(data, key, iv)
-    def encrypt(:'id-aes128-ECB', data, key, iv), do: encryptAES128ECB(data, key, iv)
 
     def decrypt(:'id-aes256-ECB', data, key, iv), do: decryptAES256ECB(data, key, iv)
     def decrypt(:'id-aes256-CBC', data, key, iv), do: decryptAES256CBC(data, key, iv)
     def decrypt(:'id-aes256-GCM', data, key, iv), do: decryptAES256GCM(data, key, iv)
     def decrypt(:'id-aes256-CCM', data, key, iv), do: decryptAES256CCM(data, key, iv)
+    def decrypt(:'id-aes128-ECB', data, key, iv), do: decryptAES128ECB(data, key, iv)
+    def decrypt(:'id-aes128-CBC', data, key, iv), do: decryptAES128CBC(data, key, iv)
     def decrypt(:'id-aes128-GCM', data, key, iv), do: decryptAES128GCM(data, key, iv)
     def decrypt(:'id-aes128-CCM', data, key, iv), do: decryptAES128CCM(data, key, iv)
-    def decrypt(:'id-aes128-CBC', data, key, iv), do: decryptAES128CBC(data, key, iv)
-    def decrypt(:'id-aes128-ECB', data, key, iv), do: decryptAES128ECB(data, key, iv)
 
     def testSMIME() do
         {:ok,base} = :file.read_file "priv/encrypted.txt" ; [_,s] = :string.split base, "\n\n"
