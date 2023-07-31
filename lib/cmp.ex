@@ -39,7 +39,7 @@ defmodule CA.CMP do
     def mac(bin, salt, iter) do
         base_key = :lists.foldl(fn x, acc ->
             :crypto.hash(:sha256, acc) end, bin <> salt, :lists.seq(1,iter))
-        :binary.part(base_key, 0, 32)
+#        :binary.part(base_key, 0, 32)
     end
 
     def message(socket, header, {:ir, req} = body, code) do
@@ -84,8 +84,8 @@ defmodule CA.CMP do
 
         incomingProtection = CA."ProtectedPart"(header: header, body: body)
         {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
-        verifyKey  = mac("0000", salt, counter)
-        verifyKey2 = :crypto.pbkdf2_hmac(:sha256, "0000", salt, counter, 32)
+        verifyKey  = mac("ThisIsClassified", salt, counter)
+        verifyKey2 = :crypto.pbkdf2_hmac(:sha256, "ThisIsClassified", salt, counter, 20)
         verify     = :crypto.mac(:hmac, :sha256, verifyKey, bin)
         verify2    = :crypto.mac(:hmac, :sha256, verifyKey2, bin)
 
@@ -119,9 +119,11 @@ defmodule CA.CMP do
         outgoingProtection = CA."ProtectedPart"(header: pkiheader, body: pkibody)
 
         {:ok, out} = :"PKIXCMP-2009".encode(:'ProtectedPart', outgoingProtection)
-        kdf = :crypto.pbkdf2_hmac(:sha256, out, salt, counter, 20)
-#       kdf = mac(out, salt, counter)
-        :io.format 'protection: ~p~n', [kdf]
+        overifyKey  = mac("ThisIsClassified", salt, counter)
+        overifyKey2 = :crypto.pbkdf2_hmac(:sha256, "ThisIsClassified", salt, counter, 32)
+        overify     = :crypto.mac(:hmac, :sha256, overifyKey, out)
+        overify2    = :crypto.mac(:hmac, :sha256, overifyKey2, out)
+        :io.format 'protection: ~p~n', [overify]
 
         answer(socket, pkiheader, pkibody, :asn1_NOVALUE)
     end
