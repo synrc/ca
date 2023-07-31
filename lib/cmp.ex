@@ -1,5 +1,5 @@
 defmodule CA.CMP do
-    @moduledoc "CA/CMP TLS server."
+    @moduledoc "CA/CMP TCP server."
     require CA
 
     def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
@@ -41,6 +41,11 @@ defmodule CA.CMP do
             :crypto.hash(:sha256, acc) end, bin <> salt, :lists.seq(1,iter))
     end
 
+    def parseSubj(csr) do
+        {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
+        {:CertificationRequest, {:CertificationRequestInfo, v, subj(subj), x, y}, b, c}
+    end
+
     def message(socket, header, {:ir, req} = body, code) do
         {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
            transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
@@ -61,66 +66,54 @@ defmodule CA.CMP do
         :io.format 'generalMessage: ~p~n', [req]
     end
 
-
     def message(socket, header, {:p10cr, csr} = body, code) do
         {:PKIHeader, pvno, from, to, messageTime, protectionAlg, senderKID, recipKID,
            transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
-        {oid, salt, owf, mac, counter} = protection(protectionAlg)
-        {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
-        csr2 = {:CertificationRequest, {:CertificationRequestInfo, v, subj(subj), x, y}, b, c}
 
+        {oid, salt, owf, mac, counter} = protection(protectionAlg)
         {ca_key, ca} = CA.CSR.read_ca()
         subject = X509.CSR.subject(csr)
-        true = X509.CSR.valid?(csr2)
+        true = X509.CSR.valid?(parseSubj(csr))
         cert = X509.Certificate.new(X509.CSR.public_key(csr), subj(subject), ca, ca_key,
            extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
         reply = CA."CertRepMessage"(response:
-              [ CA."CertResponse"(certReqId: -1,
+              [ CA."CertResponse"(certReqId: 0,
                 certifiedKeyPair: CA."CertifiedKeyPair"(certOrEncCert:
                   {:certificate, {:x509v3PKCert, convertOTPtoPKIX(cert)}}),
-                status: CA."PKIStatusInfo"(status: 0))])
+                status: CA."PKIStatusInfo"(status: 1))])
 
         incomingProtection = CA."ProtectedPart"(header: header, body: body)
         {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
-        verifyKey  = mac("1111", salt, counter)
+        verifyKey  = mac(:application.get_env(:ca, :pbm, "0000"), salt, counter)
         verify     = :crypto.mac(:hmac, CA.KDF.hs(:erlang.size(code)), verifyKey, bin)
         verify     = code
-
-        :io.format 'code: ~p~n', [code]
-        :io.format 'pvno: ~p~n', [pvno]
-        :io.format 'messageTime: ~p~n', [messageTime]
-        :io.format 'protectionAlgortihm: ~p~n', [CA.ALG.lookup(oid)]
-        :io.format 'senderKID: ~p~n', [senderKID]
-        :io.format 'recipKID: ~p~n', [recipKID]
-        :io.format 'transactionID: ~p~n', [transactionID]
-        :io.format 'senderNonce: ~p~n', [senderNonce]
-        :io.format 'recipNonce: ~p~n', [recipNonce]
-        :io.format 'freeText: ~p~n', [freeText]
-        :io.format 'generalInfo: ~p~n', [generalInfo]
-        :io.format 'salt: ~p~n', [salt]
-        :io.format 'owf: ~p~n', [CA.ALG.lookup(owf)]
-        :io.format 'counter: ~p~n', [counter]
-        :io.format 'mac: ~p~n', [CA.ALG.lookup(mac)]
-#       :io.format 'issuedOTP: ~p~n', [cert]
-#       :io.format 'issuedPKIX: ~p~n', [convertOTPtoPKIX(cert)]
 
         pkibody = {:cp, reply}
         pkiheader = CA."PKIHeader"(sender: to, recipient: from, pvno: pvno, recipNonce: senderNonce,
             transactionID: transactionID, protectionAlg: protectionAlg, messageTime: messageTime)
-
         answer(socket, pkiheader, pkibody, code)
     end
 
-    def message(_socket, _header, {:certConf, statuses} = body, _code) do
-        :logger.info 'CERTCONF request ~p', [1]
+#       :io.format 'issuedOTP: ~p~n', [cert]
+#       :io.format 'issuedPKIX: ~p~n', [convertOTPtoPKIX(cert)]
+
+    def message(socket, header, {:certConf, statuses} = body, code) do
+        {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
+           transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
+
         :lists.map(fn {:CertStatus,bin,no,{:PKIStatusInfo, :accepted, _, _}} -> 
-            :logger.info 'PKIX ~p accepted ~p', [no,bin]
+            :io.format 'CERTCONF ~p request ~p~n', [no,:binary.part(bin,0,8)]
         end, statuses)
+
+        pkibody = {:pkiconf, :asn1_NOVALUE}
+        pkiheader = CA."PKIHeader"(sender: to, recipient: from, pvno: pvno, recipNonce: senderNonce,
+            transactionID: transactionID, protectionAlg: protectionAlg, messageTime: messageTime)
+        answer(socket, pkiheader, pkibody, code)
     end
 
     def message(_socket, _header, body, _code) do
-        :logger.info 'Unknown message request ~p', [body]
+        :logger.info 'Strange PKIMessage request ~p', [body]
     end
 
     def protection(:asn1_NOVALUE), do: {"","","","",1}
@@ -138,9 +131,8 @@ defmodule CA.CMP do
 
         outgoingProtection = CA."ProtectedPart"(header: header, body: body)
         {:ok, out} = :"PKIXCMP-2009".encode(:'ProtectedPart', outgoingProtection)
-        overifyKey  = mac("1111", salt, counter)
-        code     = :crypto.mac(:hmac, CA.KDF.hs(:erlang.size(size)), overifyKey, out)
-        :io.format 'protection: ~p~n', [code]
+        verifyKey  = mac(:application.get_env(:ca, :pbm, "0000"), salt, counter)
+        code = :crypto.mac(:hmac, CA.KDF.hs(:erlang.size(size)), verifyKey, out)
 
         message = CA."PKIMessage"(header: header, body: body, protection: code)
         {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
@@ -158,7 +150,6 @@ defmodule CA.CMP do
                   [_,body] = :string.split asn, "\r\n\r\n", :all
                   {:ok,dec} = :'PKIXCMP-2009'.decode(:'PKIMessage', body)
                   {:PKIMessage, header, body, code, extra} = dec
-                 :io.format 'PKIMessage:~n~p~n', [dec]
                   __MODULE__.message(socket, header, body, code)
                   loop(socket)
              {:error, :closed} -> :exit
