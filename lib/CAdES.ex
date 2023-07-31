@@ -1,44 +1,60 @@
 defmodule CA.CAdES do
   @moduledoc "CAdES (804) Qualified Digital Signature library ."
   require Record
-  Record.defrecord(:certAttrs, serial: "", cn: "", givenName: "", surname: "", o: "", title: "", ou: "", c: "", locality: "")
+  Record.defrecord(:certAttrs, serial: "", cn: "", givenName: "", surname: "",
+                               o: "", title: "", ou: "", c: "", locality: "")
 
-   def readSignature() do
-       name = "priv/CAdES/CAdES-X-CA.p7s"
-       {:ok, bin} = :file.read_file name
-       :io.format '~p~n', [parseSignData(bin)]
-   end
+  def subj({:rdnSequence, attrs}) do
+        {:rdnSequence, :lists.map(fn
+            [{t,oid,{:uTF8String,x}}] ->
+                [{t,oid,:asn1rt_nif.encode_ber_tlv({12, :erlang.iolist_to_binary(x)})}]
+            [{t,oid,x}] when is_list(x) ->
+                [{t,oid,:asn1rt_nif.encode_ber_tlv({19, :erlang.iolist_to_binary(x)})}]
+            [{t,oid,x}] -> [{t,oid,x}] end, attrs)}
+  end
 
+  def unsubj({:rdnSequence, attrs}) do
+        {:rdnSequence, :lists.map(fn [{t,oid,x}] ->
+             case :asn1rt_nif.decode_ber_tlv(x) do
+                  {{12,a},_} -> [{t,oid,{:uTF8String,a}}]
+                  {{19,a},_} -> [{t,oid,:erlang.binary_to_list(a)}]
+             end end, attrs)}
+  end
+
+  def readSignature() do
+      name = "priv/CAdES/CAdES-X-CA.p7s"
+      {:ok, bin} = :file.read_file name
+      :io.format '~p~n', [parseSignData(bin)]
+  end
 
   def extract(code, person) do
-    case :lists.keyfind(code, 2, person) do
-      false -> ""
-      {_, _, {:printable, str}} -> str
-      {_, _, {:utf8, str}} -> str
-    end
+      case :lists.keyfind(code, 2, person) do
+           false -> ""
+           {_, _, {:printable, str}} -> str
+           {_, _, {:utf8, str}} -> str
+      end
   end
 
   def parseSignData(bin) do
-    {_, {:ContentInfo, _, ci}} = :KEP.decode(:ContentInfo, bin)
-    {:ok, {:SignedData, _, alg, x, c, x1, x2}} = :KEP.decode(:SignedData, ci)
-    parseSignDataCert({alg,x,c,x1,x2})
+      {_, {:ContentInfo, _, ci}} = :KEP.decode(:ContentInfo, bin)
+      {:ok, {:SignedData, _, alg, x, c, x1, x2}} = :KEP.decode(:SignedData, ci)
+      parseSignDataCert({alg,x,c,x1,x2})
   end
 
   def parseSignDataCert({_,_,:asn1_NOVALUE,_,_}), do: []
   def parseSignDataCert({_,_,[cert],_,_}), do: parseCert(cert)
 
   def parseAttrs(attrs) do
-    certAttrs(
-      o: extract({2, 5, 4, 10}, attrs),
-      ou: extract({2, 5, 4, 11}, attrs),
-      title: extract({2, 5, 4, 12}, attrs),
-      cn: extract({2, 5, 4, 3}, attrs),
-      givenName: extract({2, 5, 4, 42}, attrs),
-      surname: extract({2, 5, 4, 4}, attrs),
-      locality: extract({2, 5, 4, 7}, attrs),
-      serial: extract({2, 5, 4, 5}, attrs),
-      c: extract({2, 5, 4, 6}, attrs)
-    )
+      certAttrs(
+        o: extract({2, 5, 4, 10}, attrs),
+        ou: extract({2, 5, 4, 11}, attrs),
+        title: extract({2, 5, 4, 12}, attrs),
+        cn: extract({2, 5, 4, 3}, attrs),
+        givenName: extract({2, 5, 4, 42}, attrs),
+        surname: extract({2, 5, 4, 4}, attrs),
+        locality: extract({2, 5, 4, 7}, attrs),
+        serial: extract({2, 5, 4, 5}, attrs),
+        c: extract({2, 5, 4, 6}, attrs))
   end
 
   def pair([],acc), do: acc
@@ -76,4 +92,5 @@ defmodule CA.CAdES do
     ca = :lists.flatten(:erlang.element(2, issuer))
     {parseAttrs(person),parseAttrs(ca),extensions}
   end
+
 end
