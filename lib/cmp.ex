@@ -62,11 +62,11 @@ defmodule CA.CMP do
         :io.format 'generalMessage: ~p~n', [req]
     end
 
+
     def message(socket, header, {:p10cr, csr} = body, code) do
-        {:PKIHeader, pvno, from, to, messageTime, {_,oid,{_,param}} = protectionAlg, senderKID, recipKID,
+        {:PKIHeader, pvno, from, to, messageTime, protectionAlg, senderKID, recipKID,
            transactionID, senderNonce, recipNonce, freeText, generalInfo} = header
-        {:ok, parameters} = :"PKIXCMP-2009".decode(:'PBMParameter', param)
-        {:PBMParameter, salt, {_,owf,_}, counter, {_,mac,_} } = parameters
+        {oid, salt, owf, mac, counter} = protection(protectionAlg)
         {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
         csr2 = {:CertificationRequest, {:CertificationRequestInfo, v, subj(subj), x, y}, b, c}
 
@@ -123,11 +123,19 @@ defmodule CA.CMP do
 #       kdf = mac(out, salt, counter)
         :io.format 'protection: ~p~n', [kdf]
 
-        answer(socket, pkiheader, pkibody, kdf)
+        answer(socket, pkiheader, pkibody, :asn1_NOVALUE)
     end
 
     def message(_socket, _header, body, _code) do
         :logger.info 'Unknown message request ~p', [body]
+    end
+
+    def protection(:asn1_NOVALUE), do: {"","","","",1}
+    def protection(protectionAlg) do
+        {_,oid,{_,param}} = protectionAlg
+        {:ok, parameters} = :"PKIXCMP-2009".decode(:'PBMParameter', param)
+        {:PBMParameter, salt, {_,owf,_}, counter, {_,mac,_} } = parameters
+        {oid, salt, owf, mac, counter}
     end
 
     def answer(socket, header, body, code) do
