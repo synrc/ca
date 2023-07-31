@@ -1,6 +1,13 @@
 defmodule CA.KDF do
   @moduledoc "CA/KDF library."
 
+  def hs(16), do: :md5
+  def hs(20), do: :sha
+  def hs(28), do: :sha224
+  def hs(32), do: :sha256
+  def hs(48), do: :sha384
+  def hs(64), do: :sha512
+
   def hl(:md5),    do: 16
   def hl(:sha),    do: 20
   def hl(:sha224), do: 28
