@@ -54,6 +54,8 @@ defmodule CA.CMP do
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.CAdES.subj(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
+      :file.write_file "m2-1.pem", X509.Certificate.to_pem(cert)
+
       reply = CA."CertRepMessage"(response:
             [ CA."CertResponse"(certReqId: 0,
               certifiedKeyPair: CA."CertifiedKeyPair"(certOrEncCert:

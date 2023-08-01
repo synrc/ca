@@ -32,6 +32,10 @@ defmodule CA.CSR do
   def csr(user) do
       {ca_key, ca} = read_ca()
       priv = X509.PrivateKey.new_ec(:secp384r1)
+      der = :public_key.der_encode(:ECPrivateKey, priv)
+      pem = :public_key.pem_encode([{:ECPrivateKey, der, :not_encrypted}])
+      :file.write_file(user <> ".key", pem)
+      :io.format '~p~n', [priv]
       csr = X509.CSR.new(priv, "/C=UA/L=Kyiv/O=SYNRC/CN=" <> user,
             extension_request: [X509.Certificate.Extension.subject_alt_name(["n2o.dev"])])
       :io.format 'CSR: ~p~n', [csr]
