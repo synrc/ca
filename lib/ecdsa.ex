@@ -6,13 +6,13 @@ defmodule CA.ECDSA do
   # openssl dgst -sha256 -verify $client.pub -signature mix.sig mix.exs
   # CA.ECDSA.verify "mix.exs", "mix.sig", "#{client}.pub"
 
-  def verifyFile(file, signature, pem) do
+  def verify(file, signature, pem) do
       {:ok, msg} = :file.read_file file
       {:ok, sig} = :file.read_file signature
-      verify(msg, sig, public(pem))
+      verifyBin(msg, sig, public(pem))
   end
 
-  def verify(msg, sig, public) do
+  def verifyBin(msg, sig, public) do
       {CA."ECPoint"(point: point), {_namedCurve, oid}} = public
       :crypto.verify(:ecdsa, :sha256, msg, sig,
         [point, :crypto.ec_curve(:pubkey_cert_records.namedCurves(oid))])
