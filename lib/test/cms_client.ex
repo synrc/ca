@@ -1,4 +1,5 @@
 defmodule CA.CMS.Test do
+  @moduledoc false
 
     def e(x,y), do: :erlang.element(x,y)
     def pem(name), do: hd(:public_key.pem_decode(e(2,:file.read_file(name))))
