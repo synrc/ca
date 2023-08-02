@@ -14,7 +14,7 @@ defmodule CA.Mixfile do
 
   def package do
     [
-      files: ~w(src include priv lib mix.exs LICENSE),
+      files: ~w(config src include priv lib mix.exs LICENSE README.md),
       licenses: ["ISC"],
       maintainers: ["Namdak Tonpa"],
       name: :ca,
