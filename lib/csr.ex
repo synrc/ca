@@ -3,8 +3,9 @@ defmodule CA.CSR do
 
   def ca() do
       ca_key = X509.PrivateKey.new_ec(:secp384r1)
-      ca = X509.Certificate.self_signed(ca_key,
-            "/C=UA/L=Kyiv/O=SYNRC/CN=CSR-CMP", template: :root_ca)
+      dn = "/C=UA/L=Київ/O=SYNRC/CN=CA"
+      :logger.info 'CSR CMP DN ~p~n', [dn]
+      ca = X509.Certificate.self_signed(ca_key, dn, template: :root_ca)
       der = :public_key.der_encode(:ECPrivateKey, ca_key)
       pem = :public_key.pem_encode([{:ECPrivateKey, der, :not_encrypted}])
       :file.write_file "ca.key", pem
@@ -22,11 +23,12 @@ defmodule CA.CSR do
 
   def server(name) do
       {ca_key, ca} = read_ca()
+      dn = "/C=UA/L=Київ/O=SYNRC/CN=" <> name
       server_key = X509.PrivateKey.new_ec(:secp384r1)
-        X509.Certificate.new(X509.PublicKey.derive(server_key),
-           "/C=UA/L=Kyiv/O=SYNRC/CN=" <> name, ca, ca_key,
-           extensions: [subject_alt_name:
-              X509.Certificate.Extension.subject_alt_name(["n2o.dev", "erp.uno"]) ])
+      :logger.info 'CSR SERVER DN ~p~n', [dn]
+      X509.Certificate.new(X509.PublicKey.derive(server_key),
+        dn, ca, ca_key, extensions: [subject_alt_name:
+          X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
   end
 
   def csr(user) do
@@ -35,18 +37,16 @@ defmodule CA.CSR do
       der = :public_key.der_encode(:ECPrivateKey, priv)
       pem = :public_key.pem_encode([{:ECPrivateKey, der, :not_encrypted}])
       :file.write_file(user <> ".key", pem)
-      :io.format '~p~n', [priv]
-      csr = X509.CSR.new(priv, "/C=UA/L=Kyiv/O=SYNRC/CN=" <> user,
-            extension_request: [X509.Certificate.Extension.subject_alt_name(["n2o.dev"])])
-      :io.format 'CSR: ~p~n', [csr]
+      dn = "/C=UA/L=Київ/O=SYNRC/CN=" <> user
+      :logger.info 'CSR USER DN ~p~n', [dn]
+      csr = X509.CSR.new(priv, dn, extension_request: [
+            X509.Certificate.Extension.subject_alt_name(["synrc.com"])])
       :file.write_file(user <> ".csr", X509.CSR.to_pem(csr))
       true = X509.CSR.valid?(csr)
       subject = X509.CSR.subject(csr)
-      :io.format 'Subject ~p~n', [subject]
-      :io.format 'CSR ~p~n', [csr]
-      X509.Certificate.new(X509.CSR.public_key(csr), subject, ca, ca_key,
-         extensions: [subject_alt_name:
-           X509.Certificate.Extension.subject_alt_name(["n2o.dev", "erp.uno"]) ])
+      X509.Certificate.new(X509.CSR.public_key(csr),
+         subject, ca, ca_key, extensions: [subject_alt_name:
+           X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
       csr
   end
 

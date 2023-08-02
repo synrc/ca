@@ -73,7 +73,6 @@ defmodule CA.ALG do
          {:'dhSinglePass-stdDH-hkdf-sha256-scheme',    {1,2,840,113549,1,9,16,3,19}},
          {:'dhSinglePass-stdDH-hkdf-sha384-scheme',    {1,2,840,113549,1,9,16,3,20}},
          {:'dhSinglePass-stdDH-hkdf-sha512-scheme',    {1,2,840,113549,1,9,16,3,21}},
-         {:defaultPBKDF2,                              {1,3,6,1,5,5,8,1,2}},
          {:'hMAC-SHA1',                                {1,3,6,1,5,5,8,1,2}},
          {:'id-sha1',                                  {1,3,14,3,2,26}},
          {:sect163k1,                                  {1,3,132,0,1}},
