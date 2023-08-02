@@ -43,7 +43,7 @@ defmodule CA.CMP do
 
   def validateProtection(header, body, code) do
       {:PKIHeader, _, _, _, _, protectionAlg, _, _, _, _, _, _, _} = header
-      {oid, salt, owfoid, _mac, counter} = protection(protectionAlg)
+      {oid, salt, owfoid, macoid, counter} = protection(protectionAlg)
       case CA.ALG.lookup(oid) do
            {:'id-PasswordBasedMac', _ } ->
                 incomingProtection = CA."ProtectedPart"(header: header, body: body)
