@@ -51,10 +51,10 @@ defmodule CA.CMP do
                 {owf,_} = CA.ALG.lookup(owfoid) # SHA-2
                 pbm = :application.get_env(:ca, :pbm, "0000") # DH shared secret
                 verifyKey  = baseKey(pbm, salt, counter, owf)
-                mac = CA.KDF.hs(:erlang.size(code))
+                hash = CA.KDF.hs(:erlang.size(code))
                 case CA.ALG.lookup(macoid) do
-                     {:'hMAC-SHA1',_} -> :crypto.mac(:hmac, mac, verifyKey, bin)
-                     _ -> :crypto.mac(:hmac, mac, verifyKey, bin)
+                     {:'hMAC-SHA1',_} -> :crypto.mac(:hmac, hash, verifyKey, bin)
+                     _ -> :crypto.mac(:hmac, hash, verifyKey, bin)
                 end
            {_, _ } ->
                 ""
