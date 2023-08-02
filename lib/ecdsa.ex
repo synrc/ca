@@ -19,6 +19,12 @@ defmodule CA.ECDSA do
           [point, :crypto.ec_curve(:pubkey_cert_records.namedCurves(oid))])
   end
 
+  def signature(name) do
+      {:ok, sig} = :file.read_file name
+      {{_,[{_,r},{_,s}]},""} = :asn1rt_nif.decode_ber_tlv sig
+      {r,s}
+  end
+
   def sign(file, priv) do
       {:ok, msg} = :file.read_file file
       {:ok, key} = :file.read_file priv
