@@ -1,4 +1,9 @@
 defmodule CA do
+  @moduledoc """
+  The main CA module mostly contains (except OTP application prelude)
+  public_key and PKIXCMP HRL definitions. The latter are generated
+  from PKIXCMP-2009.asn1 the ASN.1 specification of CMP protocol.
+  """
   use Application
   use Supervisor
 

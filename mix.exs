@@ -22,12 +22,12 @@ defmodule CA.Mixfile do
     ]
   end
 
-  def application(), do: [mod: {CA, []}, applications: [:x509]]
+  def application(), do: [ mod: {CA, []}, applications: [:x509,:ex_doc]]
 
   def deps() do
     [
       {:x509, "~> 0.8.7"},
-      {:ex_doc, "~> 0.11", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 end
