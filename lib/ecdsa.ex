@@ -1,4 +1,4 @@
-defmodule CA.ECDSA do
+defmodule CA.ECDSA.OTP do
 
   @moduledoc "CA/ECDSA ECC Signature."
   require CA
