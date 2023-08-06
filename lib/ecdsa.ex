@@ -14,7 +14,7 @@ defmodule CA.ECDSA.OTP do
   end
 
   def verifyBin(msg, sig, pub) do
-      {CA."ECPoint"(point: point), {_namedCurve, oid}} = pub
+      {CA."ECPoint"(point: point), {:namedCurve, oid}} = pub
       :crypto.verify(:ecdsa, :sha256, msg, sig,
           [point, :crypto.ec_curve(:pubkey_cert_records.namedCurves(oid))])
   end

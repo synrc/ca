@@ -1,0 +1,248 @@
+CHAT DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+    P2P ::= SEQUENCE { src OCTET STRING, dst OCTET STRING }
+    MUC ::= SEQUENCE { room OCTET STRING }
+
+    Feature ::= SEQUENCE {
+       id OCTET STRING,
+       key OCTET STRING,
+       value OCTET STRING,
+       group OCTET STRING }
+
+    ServiceType ::= ENUMERATED {
+      synrc (0),
+      aws (1),
+      gcp (2),
+      azure (3) }
+
+    ServiceStatus ::= ENUMERATED {
+      verified (0),
+      added (1),
+      add (2),
+      remove (3) }
+
+    Service ::= SEQUENCE {
+       id OCTET STRING,
+       type ServiceType,
+       data OCTET STRING,
+       login OCTET STRING,
+       password OCTET STRING,
+       expiration INTEGER,
+       status ServiceStatus }
+
+    Register ::= SEQUENCE {
+       nickname OCTET STRING,
+       csr OCTET STRING,
+       password OCTET STRING }
+
+    PresenceType ::= ENUMERATED { offline (1), online (2) }
+    Presence ::= SEQUENCE { nickname OCTET STRING, status PresenceType }
+
+    ContactStatus ::= ENUMERATED {
+       request (1),
+       authorization (2),
+       ignore (3),
+       internal (4),
+       friend (5),
+       last-msg (6),
+       ban (7),
+       banned (8),
+       deleted (9),
+       nonexised (10) }
+
+    Contact ::= SEQUENCE {
+       nickname OCTET STRING,
+       avatar OCTET STRING,
+       names SEQUENCE OF name OCTET STRING,
+       phone-id OCTET STRING,
+       surnames SEQUENCE OF name OCTET STRING,
+       last-msg Message,
+       presence PresenceType,
+       update INTEGER,
+       created INTEGER,
+       settings SEQUENCE OF feature Feature,
+       services SEQUENCE OF service Service,
+       status ContactStatus }
+
+    RosterStatus ::= ENUMERATED {
+       get (1), create (2), del (3), remove (4), nick (5), search (6),
+       contact (7), add (8), update (9), list (10), patch (11), last-msg (12) }
+
+    Roster ::= SEQUENCE {
+       id OCTET STRING,
+       nickname OCTET STRING,
+       update INTEGER,
+       contacts SEQUENCE OF contact Contact,
+       topics SEQUENCE OF room Room,
+       status RosterStatus }
+
+    MessageType ::= ENUMERATED { sys (1), reply (2), forward (3), read (4), edited (5) }
+    MessageStatus ::= ENUMERATED { async (1), delete (2), clear (3), update (4), edit (5) }
+
+    Message ::= SEQUENCE {
+       id OCTET STRING,
+       feed-id CHOICE { p2p [0] P2P, muc [1] MUC },
+       signature OCTET STRING,
+       from OCTET STRING,
+       to OCTET STRING,
+       created INTEGER,
+       files SEQUENCE OF file FileDesc,
+       type MessageType,
+       link Message,
+       seenby OCTET STRING,
+       repliedby OCTET STRING,
+       mentioned SEQUENCE OF name OCTET STRING,
+       status MessageStatus }
+
+    MemberStatus ::= ENUMERATED { admin (1), member (2), removed (3), patch (4), owner (5) }
+
+    Member ::= SEQUENCE {
+       id INTEGER,
+       feed-id CHOICE { p2p [0] P2P, muc [1] MUC },
+       feeds SEQUENCE OF feed OCTET STRING,
+       phone-id OCTET STRING,
+       avatar OCTET STRING,
+       names SEQUENCE OF name OCTET STRING,
+       surnames SEQUENCE OF name OCTET STRING,
+       alias OCTET STRING,
+       update INTEGER,
+       settings SEQUENCE OF feature Feature,
+       services SEQUENCE OF servic Service,
+       presence PresenceType,
+       status MemberStatus }
+
+    RoomType ::= ENUMERATED { group (1), channel (2), call (3) }
+    RoomStatus ::= ENUMERATED {
+       create (1), leave (2), add (3), remove (4), removed (5),
+       join (6), joined (7), info (8), patch (9), get (10),
+       delete (11), last-msg (12), mute (13), unmute (14) }
+
+    Room ::= SEQUENCE {
+       id OCTET STRING,
+       name OCTET STRING,
+       links SEQUENCE OF link OCTET STRING,
+       description OCTET STRING,
+       settings SEQUENCE OF feature Feature,
+       members SEQUENCE OF member Member,
+       admins SEQUENCE OF member Member,
+       data SEQUENCE OF file FileDesc,
+       type RoomType,
+       tos OCTET STRING,
+       tos-update INTEGER,
+       unread INTEGER,
+       mentions SEQUENCE OF contact INTEGER,
+       last-msg Message,
+       update INTEGER,
+       created INTEGER,
+       status RoomStatus }
+
+    Server ::= SEQUENCE { service OCTET STRING, port INTEGER, host OCTET STRING }
+
+    Profile ::= SEQUENCE {
+       nickname OCTET STRING,
+       phone OCTET STRING,
+       session OCTET STRING,
+       chats SEQUENCE OF contact Contact,
+       contacts SEQUENCE OF contact Contact,
+       keys SEQUENCE OF key OCTET STRING,
+       servers SEQUENCE OF server Server,
+       settings SEQUENCE OF feature Feature,
+       update INTEGER,
+       status INTEGER,
+       roster Roster }
+
+    OS ::= ENUMERATED { apple (1), microsoft (2), google (3), ericsson (4) }
+    AuthType ::= ENUMERATED { reg (1), auth (2), forget (3), renew (4) }
+
+    Ack ::= SEQUENCE { table OCTET STRING, id OCTET STRING }
+
+    FileDesc ::= SEQUENCE {
+       id OCTET STRING,
+       mime OCTET STRING,
+       payload ANY,
+       parentid OCTET STRING,
+       data SEQUENCE OF feature Feature }
+
+    Auth ::= SEQUENCE {
+       session OCTET STRING,
+       type AuthType,
+       sms-code OCTET STRING,
+       cert OCTET STRING,
+       challange OCTET STRING,
+       push OCTET STRING,
+       os OS,
+       nickname OCTET STRING,
+       settings SEQUENCE OF feature Feature,
+       token OCTET STRING,
+       devkey OCTET STRING,
+       phone OCTET STRING }
+
+    SearchStatus ::= ENUMERATED { ok (0) }
+
+    Criteria ::= ENUMERATED {
+       equal (0), not-equal (1), like (2) }
+
+    Scope ::= ENUMERATED {
+       profile (0), folder (1), contact (2),
+       member (3), room (4), chat (5), message (6) }
+
+    Search ::= SEQUENCE {
+       dn OCTET STRING,
+       id OCTET STRING,
+       field OCTET STRING,
+       value OCTET STRING,
+       criteria Criteria,
+       type Scope,
+       status SearchStatus }
+
+    Typing ::= SEQUENCE {
+       session OCTET STRING,
+       nickname OCTET STRING,
+       comments SEQUENCE OF comment OCTET STRING }
+
+    Friendship ::= ENUMERATED {
+      request (1), confirm (2), update (3), ignore (4),
+      ban (5), unban (6) }
+
+    Friend ::= SEQUENCE {
+       nickname OCTET STRING,
+       friend OCTET STRING,
+       type Friendship }
+
+    HistoryStatus ::= ENUMERATED {
+       updated (1), get (2), update (3), last-loaded (4),
+       last-msg (5), get-reply (6), double-get (7),
+       delete (8), image (9), video (10), file (11),
+       link (12), audio (13), contact (14), location (15), text (16) }
+
+    History ::= SEQUENCE {
+       nickname OCTET STRING,
+       feed CHOICE { p2p [0] P2P, muc [1] MUC },
+       size INTEGER,
+       entity-id INTEGER,
+       data SEQUENCE OF message Message,
+       status HistoryStatus }
+
+    CHATProtocol ::= CHOICE {
+       register [0] Register,
+       auth [1] Auth,
+       feature [2] Feature,
+       service [3] Service,
+       message [4] Message,
+       profile [5] Profile,
+       room [6] Room,
+       member [7] Member,
+       search [8] Search,
+       file [9] FileDesc,
+       typing [10] Typing,
+       friend [11] Friend,
+       presence [12] Presence,
+       history [13] History,
+       roster [14] Roster }
+
+    CHATMessage ::= SEQUENCE {
+       no INTEGER,
+       headers SEQUENCE OF header OCTET STRING,
+       body CHATProtocol }
+
+END
