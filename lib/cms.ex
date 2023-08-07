@@ -54,7 +54,7 @@ defmodule CA.CMS do
     # CMS DECRYPT API
 
     def decrypt(cms, {schemeOID, privateKeyBin}) do
-        {_,{:ContentInfo,_,{:EnvelopedData,_,_,x,y,_}}} = cms
+        {:ok,{:ContentInfo,_,{:EnvelopedData,_,_,x,y,_}}} = cms
         {:EncryptedContentInfo,_,{_,encOID,{_,<<_::16,iv::binary>>}},data} = y
                 case :proplists.get_value(:kari,  x, []) do
           [] -> case :proplists.get_value(:ktri,  x, []) do
