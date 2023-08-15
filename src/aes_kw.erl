@@ -46,7 +46,7 @@ do_wrap(<< A0:8/binary, Rest/binary >>, J, I, BlockCount, KEK) ->
     << Head:HeadSize/binary, B0:8/binary, Tail/binary >> = Rest,
     Round = (BlockCount * J) + I,
     Data = << A0/binary, B0/binary >>,
-    << A1:?MSB64, B1/binary >> = crypto:crypto_one_time(codec(bit_size(KEK)), KEK, <<>>, Data, [{encrypt,true}]),
+    << A1:?MSB64, B1/binary >> = crypto:crypto_one_time(codec(bit_size(KEK)), KEK, ?DEFAULT_IV, Data, [{encrypt,true}]),
     A2 = A1 bxor Round,
     do_wrap(<< A2:?MSB64, Head/binary, B1/binary, Tail/binary >>, J, I + 1, BlockCount, KEK).
 
