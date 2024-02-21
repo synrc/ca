@@ -2,6 +2,7 @@ defmodule CA.CAdES do
   @moduledoc "CAdES (804) Qualified Digital Signature library ."
   require Record
   Record.defrecord(:certAttrs, serial: "", cn: "", givenName: "", surname: "",
+                               timeStamp: "",
                                o: "", title: "", ou: "", c: "", locality: "")
 
   def subj({:rdnSequence, attrs}) do
@@ -22,7 +23,7 @@ defmodule CA.CAdES do
   end
 
   def readSignature() do
-      name = "priv/CAdES/CAdES-X-CA.p7s"
+      name = "signature001.p7s"
       {:ok, bin} = :file.read_file name
       ber = parseSignData(bin)
       ber
@@ -37,20 +38,22 @@ defmodule CA.CAdES do
   end
 
   def parseSignData(bin) do
-      {_, {:ContentInfo, _, ci}} = :KEP.decode(:ContentInfo, bin)
-      {:ok, {:SignedData, _, alg, x, c, x1, x2}} = :KEP.decode(:SignedData, ci)
-      parseSignDataCert({alg,x,c,x1,x2})
+      {_, {:ContentInfo, x, ci}} = :KEP.decode(:ContentInfo, bin)
+      {:ok, {:SignedData, _, alg, x, c, x1, si}} = :KEP.decode(:SignedData, ci)
+      parseSignDataCert({alg,x,c,x1,si})
   end
 
   def parseSignDataCert({_,_,:asn1_NOVALUE,_,_}), do: []
-  def parseSignDataCert({_,_,[cert],_,_}), do: parseCert(cert)
+  def parseSignDataCert({_,_,[cert],_,attr}), do: parseCert(cert,attr)
 
   def parseAttrs(attrs) do
+      :io.format 'Attr: ~p~n', [attrs]
       certAttrs(
         o: extract({2, 5, 4, 10}, attrs),
         ou: extract({2, 5, 4, 11}, attrs),
         title: extract({2, 5, 4, 12}, attrs),
         cn: extract({2, 5, 4, 3}, attrs),
+        timeStamp: extract({2, 5, 4, 3}, attrs),
         givenName: extract({2, 5, 4, 42}, attrs),
         surname: extract({2, 5, 4, 4}, attrs),
         locality: extract({2, 5, 4, 7}, attrs),
@@ -75,6 +78,12 @@ defmodule CA.CAdES do
   def oid({2,5,29,32},[v]), do: {:certificatePolicies, :oid.decode v}
   def oid({2,5,29,35},v), do: {:authorityKeyIdentifier, pair(v,[])}
   def oid({2,5,29,46},v), do: {:freshestCRL, pair(v,[])}
+  def oid({2,5,29,46},v), do: {:freshestCRL, pair(v,[])}
+  def oid({1,2,840,113549,1,9,3},v), do: {:contentType, :oid.decode(v)}
+  def oid({1,2,840,113549,1,9,4},v), do: {:messageDigest, :asn1rt_nif.decode_ber_tlv v}
+  def oid({1,2,840,113549,1,9,5},v), do: {:signingTime, :asn1rt_nif.decode_ber_tlv(v)}
+  def oid({1,2,840,113549,1,9,16,2,47},v), do: {:signingCertificateV2, :erlang.element(2,:KEP.decode(:AttributeValue, v))}
+  def oid({1,2,840,113549,1,9,16,2,20},v), do: {:contentTimestamp, :erlang.element(2,:KEP.decode(:AttributeValue, v)) }
   def oid(x,v) when is_binary(x), do: {:oid.decode(x),pair(v,[])}
   def oid(x,v), do: {x,v}
 
@@ -83,15 +92,27 @@ defmodule CA.CAdES do
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
-  def parseCert(cert) do
+  def parseCert(cert, [si|_]) do
+    :io.format '1 ~p ~n',[:erlang.element(1,si)]
+    :io.format '2 ~p ~n',[:erlang.element(2,si)]
+    :io.format '3 ~p ~n',[:erlang.element(3,si)]
+    :io.format '4 ~p ~n',[:erlang.element(4,si)]
+    :io.format '5 ~p ~n',[:erlang.element(5,si)]
+    :io.format '6 ~p ~n',[:erlang.element(6,si)]
+    :io.format '7 ~p ~n',[:erlang.element(7,si)]
+    :io.format '8 ~p ~n',[:erlang.element(8,si)]
+    {:SignerInfo, _v, _serial, _alg, attrs, _, _, _} = si
     {:Certificate, a, _, _} = cert
-    {:Certificate_toBeSigned, _ver, _sel, _alg, issuer, _val, issuee, _, _, _, exts} = a
-    extensions = :lists.map(fn {:Extension,code,_,b} ->
+    {:Certificate_toBeSigned, _ver, _sel, _alg, issuer, _val, issuee, _a, _b, _c, exts} = a
+    extensions = :lists.map(fn {:Extension,code,_x,b} ->
          oid(code, :lists.flatten(flat(code,:asn1rt_nif.decode_ber_tlv(b),[])))
       end, exts)
+    attributes = :lists.map(fn {:Attribute,code,[{_,v}],_} ->
+         oid(code, v)
+      end, attrs)
     person = :lists.flatten(:erlang.element(2, issuee))
     ca = :lists.flatten(:erlang.element(2, issuer))
-    {parseAttrs(person),parseAttrs(ca),extensions}
+    {parseAttrs(person),parseAttrs(ca),extensions,attributes}
   end
 
 end
