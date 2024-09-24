@@ -14,7 +14,8 @@ defmodule CA.CSR do
   end
 
   def read_ca() do
-      {:ok, ca_key_bin} = :file.read_file "~/.chat/secp384r1/ca.key"
+#      {:ok, ca_key_bin} = :file.read_file "~/.chat/secp384r1/ca.key"
+      {:ok, ca_key_bin} = :file.read_file "ca.key"
       {:ok, ca_bin} = :file.read_file "ca.pem"
       {:ok, ca_key} = X509.PrivateKey.from_pem ca_key_bin
       {:ok, ca} = X509.Certificate.from_pem ca_bin

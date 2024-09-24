@@ -1,0 +1,92 @@
+DSTU-Cert DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+-- https://zakon.rada.gov.ua/laws/show/z1398-12#Text
+
+Certificate ::= SEQUENCE {
+ tbsCertificate TBSCertificate,
+ signatureAlgorithm AlgorithmIdentifier,
+ signatureValue BIT STRING }
+
+TBSCertificate ::= SEQUENCE {
+ version [0] Version,
+ serialNumber CertificateSerialNumber,
+ signature AlgorithmIdentifier,
+ issuer Name,
+ validity Validity,
+ subject Name,
+ subjectPublicKeyInfo SubjectPublicKeyInfo,
+ issuerUniqueID [1] IMPLICIT UniqueIdentifier OPTIONAL,
+ subjectUniqueID [2] IMPLICIT UniqueIdentifier OPTIONAL,
+ extensions [3] EXPLICIT Extensions }
+
+UniqueIdentifier  ::=  BIT STRING
+Version ::= INTEGER {v3 (2)}
+CertificateSerialNumber ::= INTEGER
+Name ::= CHOICE { rdnSequence RDNSequence }
+RDNSequence::= SEQUENCE OF RelativeDistinguishedName
+RelativeDistinguishedName ::= SET OF AttributeTypeAndValue
+AttributeTypeAndValue ::= SEQUENCE {
+ type AttributeType,
+ value AttributeValue }
+
+Extensions ::= SEQUENCE SIZE (1 .. MAX) OF Extension
+
+Extension ::= SEQUENCE {
+ extnID OBJECT IDENTIFIER,
+ critical BOOLEAN DEFAULT FALSE,
+ extnvalue OCTET STRING }
+
+AttributeType ::= OBJECT IDENTIFIER
+AttributeValue ::= ANY -- DEFINED BY AttributeType
+DirectoryString ::= CHOICE {
+ printableString PrintableString,
+ utf8String UTF8String,
+ bmpString BMPString }
+
+id-at OBJECT IDENTIFIER ::= {joint-iso-ccitt (2) ds (5) 4}
+
+AlgorithmIdentifier ::= SEQUENCE {
+ algorithm OBJECT IDENTIFIER,
+ parameters ANY }
+-- DEFINED BY algorithm OPTIONAL
+
+
+Validity ::= SEQUENCE {
+ notBefore Time,
+ notAfter Time}
+
+Time ::= CHOICE {
+ utcTime UTCTime,
+ generalTime GeneralizedTime }
+
+SubjectPublicKeyInfo ::= SEQUENCE {
+ algorithm AlgorithmIdentifier,
+ subjectPublicKey BIT STRING }
+
+AlgorithmIdentifier ::= SEQUENCE {
+ algorithm OBJECT IDENTIFIER,
+ parameters ANY }
+-- DEFINED BY algorithm OPTIONAL
+
+DSTU4145Params::= SEQUENCE {
+ definition CHOICE { ecbinary ECBinary, namedCurve OBJECT IDENTIFIER },
+ dke OCTET STRING OPTIONAL }
+
+ECBinary ::= SEQUENCE {
+ version [0] EXPLICIT INTEGER DEFAULT 0,
+ f BinaryField,
+ a INTEGER (0..1),
+ b OCTET STRING,
+ n INTEGER,
+ bp OCTET STRING }
+
+BinaryField ::= SEQUENCE {
+ m INTEGER,
+ p CHOICE { t Trinomial, p Pentanomial } OPTIONAL
+}
+
+Trinomial ::= INTEGER
+Pentanomial ::= SEQUENCE { k INTEGER, j INTEGER, l INTEGER }
+
+END
