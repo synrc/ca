@@ -31,6 +31,8 @@ ContentInfo ::= SEQUENCE {
 
 UnknownInfo ::= NULL
 
+ContentTimeStamp ::= TimeStampToken
+
 CrlValidatedID ::= SEQUENCE {
   crlHash OtherHash,
   crlIdentifier CrlIdentifier OPTIONAL}
