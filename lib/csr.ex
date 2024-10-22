@@ -29,7 +29,7 @@ defmodule CA.CSR do
       :logger.info 'CSR SERVER DN ~p~n', [dn]
       X509.Certificate.new(X509.PublicKey.derive(server_key),
         dn, ca, ca_key, extensions: [subject_alt_name:
-          X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
+          X509.Certificate.Extension.subject_alt_name(["*.synrc.com"]) ])
   end
 
   def csr(user) do

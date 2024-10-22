@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :ca,
   ldap_port: 1389,
