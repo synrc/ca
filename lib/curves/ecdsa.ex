@@ -17,8 +17,7 @@ defmodule CA.ECDSA do
   end
 
   def private(bin), do: :erlang.element(2,X509.PrivateKey.from_pem(bin))
-  def public(bin),  do: #:erlang.element(1,:erlang.element(2,
-                        :public_key.pem_entry_decode(hd(:public_key.pem_decode(bin)))
+  def public(bin),  do: :public_key.pem_entry_decode(hd(:public_key.pem_decode(bin)))
 
   def numberFromString(string) do
     Base.encode16(string)
@@ -34,9 +33,6 @@ defmodule CA.ECDSA do
       xs = :binary.part(bin, 0, baseLength)
       ys = :binary.part(bin, baseLength, :erlang.size(bin) - baseLength)
       point = %CA.Point{ x: numberFromString(xs), y: numberFromString(ys)}
-      :io.format 'ECPoint.x: ~p~n', [xs]
-      :io.format 'ECPoint.y: ~p~n', [ys]
-      :io.format 'ECPoint: ~p~n', [point]
       point
   end
 
@@ -47,7 +43,6 @@ defmodule CA.ECDSA do
   end
 
   def verify(message, {r,s}, publicKey, options) do
-      :io.format '{r,s}: ~p~n', [{r,s}]
       %{hashfunc: hashfunc} = Enum.into(options, %{hashfunc: :sha256})
       number = :crypto.hash(hashfunc, message) |> numberFromString()
       curve = CA.KnownCurves.secp384r1()

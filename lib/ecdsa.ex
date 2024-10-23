@@ -24,8 +24,6 @@ defmodule CA.ECDSA.OTP do
   def signature(name) do
       {:ok, sig} = :file.read_file name
       {{_,[{_,r},{_,s}]},""} = :asn1rt_nif.decode_ber_tlv sig
-      :io.format 'r: ~p~n', [r]
-      :io.format 's: ~p~n', [s]
       { :ca_enroll.decode_integer(r),
         :ca_enroll.decode_integer(s) }
   end
