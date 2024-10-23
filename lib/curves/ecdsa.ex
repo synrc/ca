@@ -35,6 +35,13 @@ defmodule CA.ECDSA do
       %CA.Point{ x: numberFromString(xs), y: numberFromString(ys)}
   end
 
+  def signature(name) do
+      {:ok, sig} = :file.read_file name
+      {{_,[{_,r},{_,s}]},""} = :asn1rt_nif.decode_ber_tlv sig
+      { :ca_enroll.decode_integer(r),
+        :ca_enroll.decode_integer(s) }
+  end
+
   def sign(file, key) do
       {:ok, msg} = :file.read_file file
       {:ok, pem} = :file.read_file key
@@ -44,7 +51,7 @@ defmodule CA.ECDSA do
   def verify(file, signature_file, pub) do
       {:ok, msg} = :file.read_file file
       {:ok, pem} = :file.read_file pub
-      verify(msg, CA.ECDSA.OTP.signature(signature_file), decodePointFromECPoint(public(pem)), [])
+      verify(msg, signature(signature_file), decodePointFromECPoint(public(pem)), [])
   end
 
   def verify(message, {r,s}, publicKey, options) do
