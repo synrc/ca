@@ -4,10 +4,10 @@ defmodule CA.ECDSA do
   require CA.Jacobian
   require CA.ECDSA.OTP
 
-  def sign(message, privateKey, options \\ []) do
+  def sign(message, privateKey, options) do
       %{hashfunc: hashfunc} = Enum.into(options, %{hashfunc: :sha256})
       number = :crypto.hash(hashfunc, message) |> numberFromString()
-      curve = CA.KnownCurves.secp256k1()
+      curve = CA.KnownCurves.secp384r1()
       randNum = CA.Integer.between(1, curve."N" - 1)
       r = CA.Jacobian.multiply(curve."G", randNum, curve."N", curve."A", curve."P").x
         |> CA.Integer.modulo(curve."N")
@@ -16,7 +16,7 @@ defmodule CA.ECDSA do
       {r, s}
   end
 
-  def private(bin), do: :erlang.element(2,X509.PrivateKey.from_pem(bin))
+  def private(bin), do: numberFromString(:erlang.element(3,:erlang.element(2,X509.PrivateKey.from_pem(bin))))
   def public(bin),  do: :public_key.pem_entry_decode(hd(:public_key.pem_decode(bin)))
 
   def numberFromString(string) do
@@ -33,6 +33,12 @@ defmodule CA.ECDSA do
       xs = :binary.part(bin, 0, baseLength)
       ys = :binary.part(bin, baseLength, :erlang.size(bin) - baseLength)
       %CA.Point{ x: numberFromString(xs), y: numberFromString(ys)}
+  end
+
+  def sign(file, key) do
+      {:ok, msg} = :file.read_file file
+      {:ok, pem} = :file.read_file key
+      sign(msg, private(pem), [])
   end
 
   def verify(file, signature_file, pub) do
