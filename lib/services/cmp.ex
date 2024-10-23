@@ -2,6 +2,18 @@ defmodule CA.CMP do
   @moduledoc "CA/CMP TCP server."
   require CA
 
+  def parseSubj(csr) do
+      {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
+      {:CertificationRequest, {:CertificationRequestInfo, v, CA.CAdES.subj(subj), x, y}, b, c}
+  end
+
+  def convertOTPtoPKIX(cert) do
+      {:Certificate,{:TBSCertificate,:v3,a,ai,rdn,v,rdn2,{p1,{p21,p22,_pki},p3},b,c,ext},ai,code} =
+         :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
+      {:Certificate,{:TBSCertificate,:v3,a,ai,CA.CAdES.unsubj(rdn),v,CA.CAdES.unsubj(rdn2),
+           {p1,{p21,p22,{:namedCurve,{1,3,132,0,34}}},p3},b,c,ext},ai,code}
+  end
+
   def start(), do: :erlang.spawn(fn -> listen(1829) end)
 
   def listen(port) do
@@ -89,14 +101,14 @@ defmodule CA.CMP do
 
       {ca_key, ca} = CA.CSR.read_ca()
       subject = X509.CSR.subject(csr)
-      true = X509.CSR.valid?(CA.parseSubj(csr))
+      true = X509.CSR.valid?(parseSubj(csr))
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.CAdES.subj(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
       reply = CA."CertRepMessage"(response:
             [ CA."CertResponse"(certReqId: 0,
               certifiedKeyPair: CA."CertifiedKeyPair"(certOrEncCert:
-                {:certificate, {:x509v3PKCert, CA.convertOTPtoPKIX(cert)}}),
+                {:certificate, {:x509v3PKCert, convertOTPtoPKIX(cert)}}),
               status: CA."PKIStatusInfo"(status: 0))])
 
       pkibody = {:cp, reply}
