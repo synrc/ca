@@ -20,26 +20,25 @@ defmodule CA.ECDSA do
   def public(bin),  do: :public_key.pem_entry_decode(hd(:public_key.pem_decode(bin)))
 
   def numberFromString(string) do
-    Base.encode16(string)
-    |> Integer.parse(16)
-    |> (fn {parsedInt, ""} -> parsedInt end).()
+      Base.encode16(string)
+      |> Integer.parse(16)
+      |> (fn {parsedInt, ""} -> parsedInt end).()
   end
 
-  def decodeIntegerFromECPoint(ec) do
+  def decodePointFromECPoint(ec) do
       {{:ECPoint, bin2}, {:namedCurve, oid}} = ec
       bin = :binary.part(bin2,1,:erlang.size(bin2)-1)
       curve = CA.KnownCurves.getCurveByOid(oid)
       baseLength = CA.Curve.getLength(curve)
       xs = :binary.part(bin, 0, baseLength)
       ys = :binary.part(bin, baseLength, :erlang.size(bin) - baseLength)
-      point = %CA.Point{ x: numberFromString(xs), y: numberFromString(ys)}
-      point
+      %CA.Point{ x: numberFromString(xs), y: numberFromString(ys)}
   end
 
   def verify(file, signature_file, pub) do
       {:ok, msg} = :file.read_file file
       {:ok, pem} = :file.read_file pub
-      verify(msg, CA.ECDSA.OTP.signature(signature_file), decodeIntegerFromECPoint(public(pem)), [])
+      verify(msg, CA.ECDSA.OTP.signature(signature_file), decodePointFromECPoint(public(pem)), [])
   end
 
   def verify(message, {r,s}, publicKey, options) do
