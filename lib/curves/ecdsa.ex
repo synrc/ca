@@ -4,12 +4,6 @@ defmodule CA.ECDSA do
   require CA.Jacobian
   require CA.ECDSA.OTP
 
-  def numberFromString(data) do
-      Base.encode16(data)
-      |> Integer.parse(16)
-      |> (fn {parsedInt, ""} -> parsedInt end).()
-  end
-
   def sign(message, privateKey, options \\ []) do
       %{hashfunc: hashfunc} = Enum.into(options, %{hashfunc: :sha256})
       number = :crypto.hash(hashfunc, message) |> numberFromString()
@@ -26,16 +20,37 @@ defmodule CA.ECDSA do
   def public(bin),  do: #:erlang.element(1,:erlang.element(2,
                         :public_key.pem_entry_decode(hd(:public_key.pem_decode(bin)))
 
-  def verify(file, signature, pub) do
+  def numberFromString(string) do
+    Base.encode16(string)
+    |> Integer.parse(16)
+    |> (fn {parsedInt, ""} -> parsedInt end).()
+  end
+
+  def decodeIntegerFromECPoint(ec) do
+      {{:ECPoint, bin2}, {:namedCurve, oid}} = ec
+      bin = :binary.part(bin2,1,:erlang.size(bin2)-1)
+      curve = CA.KnownCurves.getCurveByOid(oid)
+      baseLength = CA.Curve.getLength(curve)
+      xs = :binary.part(bin, 0, baseLength)
+      ys = :binary.part(bin, baseLength, :erlang.size(bin) - baseLength)
+      point = %CA.Point{ x: numberFromString(xs), y: numberFromString(ys)}
+      :io.format 'ECPoint.x: ~p~n', [xs]
+      :io.format 'ECPoint.y: ~p~n', [ys]
+      :io.format 'ECPoint: ~p~n', [point]
+      point
+  end
+
+  def verify(file, signature_file, pub) do
       {:ok, msg} = :file.read_file file
       {:ok, pem} = :file.read_file pub
-      verify(msg, CA.ECDSA.OTP.signature(signature), public(pem), [])
+      verify(msg, CA.ECDSA.OTP.signature(signature_file), decodeIntegerFromECPoint(public(pem)), [])
   end
 
   def verify(message, {r,s}, publicKey, options) do
+      :io.format '{r,s}: ~p~n', [{r,s}]
       %{hashfunc: hashfunc} = Enum.into(options, %{hashfunc: :sha256})
       number = :crypto.hash(hashfunc, message) |> numberFromString()
-      curve = CA.KnownCurves.secp256k1()
+      curve = CA.KnownCurves.secp384r1()
       inv = CA.Jacobian.inv(s, curve."N")
       v = CA.Jacobian.add(
         CA.Jacobian.multiply(curve."G", CA.Integer.modulo(number * inv, curve."N"),

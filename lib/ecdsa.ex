@@ -16,6 +16,7 @@ defmodule CA.ECDSA.OTP do
 
   def verifyBin(msg, sig, pub) do
       {CA."ECPoint"(point: point), {:namedCurve, oid}} = pub
+      :io.format 'oid: ~p~n', [oid]
       :crypto.verify(:ecdsa, :sha256, msg, sig,
           [point, :crypto.ec_curve(:pubkey_cert_records.namedCurves(oid))])
   end
@@ -23,7 +24,10 @@ defmodule CA.ECDSA.OTP do
   def signature(name) do
       {:ok, sig} = :file.read_file name
       {{_,[{_,r},{_,s}]},""} = :asn1rt_nif.decode_ber_tlv sig
-      {r,s}
+      :io.format 'r: ~p~n', [r]
+      :io.format 's: ~p~n', [s]
+      { :ca_enroll.decode_integer(r),
+        :ca_enroll.decode_integer(s) }
   end
 
   def sign(file, priv) do
