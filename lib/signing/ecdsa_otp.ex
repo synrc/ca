@@ -8,10 +8,10 @@ defmodule CA.ECDSA.OTP do
   # > CA.CSR.ca
   # > CA.CSR.csr          "maxim"
   # > CA.CSR.client       "maxim"
-  # > CA.ECDSA.sign       "mix.exs", "#{client}.key"
+  # > CA.ECDSA.sign       "mix.exs", "maxim.key"
   # > CA.ECDSA.OTP.sign   "mix.exs", "maxim.key"
-  # > CA.ECDSA.verify     "mix.exs", "mix.sig", "#{client}.pub"
-  # > CA.ECDSA.OTP.verify "mix.exs", "mix.sig", "#{client}.pub"
+  # > CA.ECDSA.verify     "mix.exs", "mix.sig", "maxim.pub"
+  # > CA.ECDSA.OTP.verify "mix.exs", "mix.sig", "maxim.pub"
 
   def signBin(msg, priv) do
       CA."ECPrivateKey"(privateKey: point, parameters: {:namedCurve, oid}) = priv
