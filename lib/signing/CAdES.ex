@@ -103,7 +103,7 @@ defmodule CA.CAdES do
 
   def parseCert(cert, []), do: parseCert(cert)
   def parseCert(cert, [si|_]) do
-      {:SignerInfo, _v, _serial, _alg, attrs, _, _, _} = si
+      {:SignerInfo, _v, serial, _alg, attrs, _, _, _} = si
       {:Certificate, a, _, _} = cert
       {:Certificate_toBeSigned, _ver, _sel, _alg, issuer, _val, issuee, _a, _b, _c, exts} = a
       extensions = :lists.map(fn {:Extension,code,_x,b} ->
