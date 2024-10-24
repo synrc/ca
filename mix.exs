@@ -1,6 +1,6 @@
 defmodule CA.Mixfile do
   use Mix.Project
-  def application(), do: [ mod: {CA, []}, applications: [:x509]]
+  def application(), do: [ mod: {CA, []}, extra_applications: [:x509,:bandit,:plug]]
   def project() do
     [
       app: :ca,
@@ -14,6 +14,9 @@ defmodule CA.Mixfile do
         links: %{"GitHub" => "https://github.com/synrc/ca"}
       ],
       deps: [
+        {:jason, "~> 1.2"},
+        {:plug, "~> 1.15.3"},
+        {:bandit, "~> 1.0"},
         {:ex_doc, ">= 0.0.0", only: :dev},
         {:x509, "~> 0.8.7"}
       ]
