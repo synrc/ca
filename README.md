@@ -3,7 +3,7 @@
 [![Actions Status](https://github.com/synrc/ca/workflows/mix/badge.svg)](https://github.com/synrc/ca/actions)
 [![Hex pm](http://img.shields.io/hexpm/v/ca.svg?style=flat)](https://hex.pm/packages/ca)
 
-![ca-shaders](https://github.com/synrc/ca/assets/144776/f8f9c280-9442-443e-a2be-7d610a1a7815)
+![ca-shaders](https://authority.erp.uno/priv/design/ca-shaders.png)
 
 ## Mentions
 
