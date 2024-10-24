@@ -5,9 +5,13 @@ defmodule CA.ECDSA.OTP do
   # openssl ec -in $client.key -pubout -out $client.pub
   # openssl dgst -sha256 -sign $client.key mix.exs > mix.sig
   # openssl dgst -sha256 -verify $client.pub -signature mix.sig mix.exs
-  # CA.ECDSA.sign "mix.exs", "#{client}.key"
-  # CA.ECDSA.verify "mix.exs", "mix.sig", "#{client}.pub"
-  # CA.ECDSA.OTP.verify "mix.exs", "mix.sig", "#{client}.pub"
+  # > CA.CSR.ca
+  # > CA.CSR.csr          "maxim"
+  # > CA.CSR.client       "maxim"
+  # > CA.ECDSA.sign       "mix.exs", "#{client}.key"
+  # > CA.ECDSA.OTP.sign   "mix.exs", "maxim.key"
+  # > CA.ECDSA.verify     "mix.exs", "mix.sig", "#{client}.pub"
+  # > CA.ECDSA.OTP.verify "mix.exs", "mix.sig", "#{client}.pub"
 
   def signBin(msg, priv) do
       CA."ECPrivateKey"(privateKey: point, parameters: {:namedCurve, oid}) = priv
