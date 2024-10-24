@@ -24,7 +24,8 @@ defmodule CA.ECDSA.OTP do
   def sign(file, priv) do
       {:ok, msg} = :file.read_file file
       {:ok, key} = :file.read_file priv
-      signBin(msg, private(key))
+      {:ok, {_,r,s}}  =:"PKIXAlgs-2009".decode(:"ECDSA-Sig-Value", signBin(msg, private(key)))
+      {r,s}
   end
 
   def verify(file, signature, pub) do
