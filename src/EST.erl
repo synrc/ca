@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include_lib("ca/include/EST.hrl").
+-include("EST.hrl").
 -asn1_info([{vsn,'5.0.17'},
             {module,'EST'},
             {options,[warnings,ber,errors,
@@ -204,7 +204,7 @@ enc_Attribute_values(Val, TagIn) ->
    {lists:reverse(AccBytes),AccLen};
 
 'enc_Attribute_values_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = encode_open_type(H, []),
+   {EncBytes,EncLen} = encode_object_identifier(H, [<<6>>]),
    'enc_Attribute_values_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
 
 
@@ -240,7 +240,7 @@ Res1.
    %% decode tag and length 
    %%-------------------------------------------------
 Tlv1 = match_tags(Tlv, TagIn),
-[decode_open_type_as_binary(V1, []) || V1 <- Tlv1].
+[decode_object_identifier(V1, [6]) || V1 <- Tlv1].
 
 
 
@@ -253,13 +253,6 @@ Tlv1 = match_tags(Tlv, TagIn),
 
 ber_decode_nif(B) ->
     asn1rt_nif:decode_ber_tlv(B).
-
-ber_encode([Tlv]) ->
-    ber_encode(Tlv);
-ber_encode(Tlv) when is_binary(Tlv) ->
-    Tlv;
-ber_encode(Tlv) ->
-    asn1rt_nif:encode_ber_tlv(Tlv).
 
 dec_subidentifiers(<<>>, _Av, Al) ->
     lists:reverse(Al);
@@ -281,9 +274,6 @@ decode_object_identifier(Tlv, Tags) ->
                 {2, AddedObjVal - 80}
         end,
     list_to_tuple([Val1, Val2 | ObjVals]).
-
-decode_open_type_as_binary(Tlv, TagIn) ->
-    ber_encode(match_tags(Tlv, TagIn)).
 
 e_object_identifier({'OBJECT IDENTIFIER', V}) ->
     e_object_identifier(V);
@@ -313,11 +303,6 @@ encode_length(L) ->
 
 encode_object_identifier(Val, TagIn) ->
     encode_tags(TagIn, e_object_identifier(Val)).
-
-encode_open_type(Val, T) when is_list(Val) ->
-    encode_open_type(list_to_binary(Val), T);
-encode_open_type(Val, Tag) ->
-    encode_tags(Tag, Val, byte_size(Val)).
 
 encode_tags(TagIn, {BytesSoFar, LenSoFar}) ->
     encode_tags(TagIn, BytesSoFar, LenSoFar).
