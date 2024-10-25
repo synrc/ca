@@ -4,6 +4,12 @@ defmodule CA.ECDSA do
   require CA.Jacobian
   @moduledoc "CA/ECDSA ECC Signature (SYNRC)."
 
+  def decode_integer(bin) do
+      len = :erlang.size(bin)
+      <<int::size(len)-big-integer-signed-unit(8)>> = bin
+      int
+  end
+
   def sign(message, privateKey, options) do
       %{hashfunc: hashfunc} = Enum.into(options, %{hashfunc: :sha256})
       number = :crypto.hash(hashfunc, message) |> numberFromString()
@@ -37,9 +43,8 @@ defmodule CA.ECDSA do
 
   def signature(name) do
       {:ok, sig} = :file.read_file name
-      {{_,[{_,r},{_,s}]},""} = :asn1rt_nif.decode_ber_tlv sig
-      { :ca_enroll.decode_integer(r),
-        :ca_enroll.decode_integer(s) }
+      {:ok, {:"ECDSA-Sig-Value",r,s}}  =:"PKIXAlgs-2009".decode(:"ECDSA-Sig-Value", sig)
+      {r, s}
   end
 
   def sign(file, key) do

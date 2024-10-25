@@ -1,12 +1,7 @@
 -module(ca_enroll).
 -copyright('Namdak Tonpa').
 -include_lib("public_key/include/public_key.hrl").
--export([init/2, boot/0, boot/1, cwd/0, ca/1, enroll/3, service/3, maybe_service/3, echo/2, decode_integer/1]).
-
-decode_integer(Bin) ->
-    Len = byte_size(Bin),
-    <<Int:Len/signed-unit:8>> = Bin,
-    Int.
+-export([init/2, boot/0, boot/1, cwd/0, ca/1, enroll/3, service/3, maybe_service/3, echo/2]).
 
 init(Req,Opts) ->
     Method  = cowboy_req:method(Req),
