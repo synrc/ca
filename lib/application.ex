@@ -15,9 +15,8 @@ defmodule CA do
 
   def start(_type, _args) do
       :logger.add_handlers(:ca)
-      children = [ { Bandit, scheme: :http, port: 8047, plug: CA.EST } ]
-      CA.CMP.start ; CA.CMC.start ; CA.TSP.start ; CA.OCSP.start
-      Supervisor.start_link(children, strategy: :one_for_one, name: CA.Supervisor)
+      :lists.foldl(fn service, _ -> {:ok, _} = service.start() end, [],
+          [ CA.CMP, CA.TSP, CA.OCSP, CA.CMC, CA.EST ])
   end
 
 end

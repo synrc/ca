@@ -1,9 +1,9 @@
 defmodule CA.CMC do
-    @moduledoc "CA/CMC TLS server."
+    @moduledoc "CA/CMC TLS TCP server."
     require CA
 
     def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
-    def start(), do: :erlang.spawn(fn -> listen(1839) end)
+    def start(), do: {:ok, :erlang.spawn(fn -> listen(1839) end)}
 
     def listen(port) do
         {:ok, socket} = :gen_tcp.listen(port,

@@ -1,9 +1,9 @@
 defmodule CA.TSP do
-    @moduledoc "CA/TSP server."
+    @moduledoc "CA/TSP TCP server."
     require CA
 
     def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
-    def start(), do: :erlang.spawn(fn -> listen(1849) end)
+    def start(), do: {:ok, :erlang.spawn(fn -> listen(1849) end)}
 
     def listen(port) do
         {:ok, socket} = :gen_tcp.listen(port,

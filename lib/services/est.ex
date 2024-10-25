@@ -1,9 +1,14 @@
 defmodule CA.EST do
-  @moduledoc "CA/EST server."
+  @moduledoc "CA/EST TLS HTTP server."
   use Plug.Router
   plug :match
   plug :dispatch
   plug Plug.Parsers, parsers: [:json], json_decoder: Jason
+
+  def start() do 
+      children = [ { Bandit, scheme: :http, port: 8047, plug: __MODULE__ } ]
+      Supervisor.start_link(children, strategy: :one_for_one, name: CA.Supervisor)
+  end
 
   # Authority PKI X.509 EST RFC 7030
 

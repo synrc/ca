@@ -14,7 +14,7 @@ defmodule CA.CMP do
            {p1,{p21,p22,{:namedCurve,{1,3,132,0,34}}},p3},b,c,ext},ai,code}
   end
 
-  def start(), do: :erlang.spawn(fn -> listen(1829) end)
+  def start(), do: {:ok, :erlang.spawn(fn -> listen(1829) end)}
 
   def listen(port) do
       {:ok, socket} = :gen_tcp.listen(port,
