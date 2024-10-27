@@ -20,7 +20,17 @@ defmodule CA.EST do
 
   # See Page 36 of RFC 7030
 
-  # > :"EST".decode(:CsrAttrs, y)
+  def csrattributes() do
+      {:ok, bin} = :"EST".encode(:CsrAttrs, [
+         oid: {1, 2, 840, 113549, 1, 9, 7},
+         attribute: {:Attribute, {1, 2, 840, 10045, 2, 1}, [{1, 3, 132, 0, 34}]},
+         attribute: {:Attribute, {1, 2, 840, 113549, 1, 9, 14}, [{1, 3, 6, 1, 1, 1, 1, 22}]},
+         oid: {1, 2, 840, 10045, 4, 3, 3}
+      ])
+      bin
+  end
+
+  # > :EST.decode :CsrAttrs, CA.EST.csrattributes
   # {:ok,
   #  [
   #    oid: {1, 2, 840, 113549, 1, 9, 7},
@@ -28,8 +38,6 @@ defmodule CA.EST do
   #    attribute: {:Attribute, {1, 2, 840, 113549, 1, 9, 14}, [{1, 3, 6, 1, 1, 1, 1, 22}]},
   #    oid: {1, 2, 840, 10045, 4, 3, 3}
   #  ]}
-  # > x
-  # "MEEGCSqGSIb3DQEJBzASBgcqhkjOPQIBMQcGBSuBBAAiMBYGCSqGSIb3DQEJDjEJBgcrBgEBAQEWBggqhkjOPQQDAw=="
 
   match _ do send_resp(conn, 404, "Please refer to https://authority.erp.uno for more information.\n") end
   def encode(x) do
