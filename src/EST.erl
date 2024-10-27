@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("EST.hrl").
+-include_lib("ca/include/EST.hrl").
 -asn1_info([{vsn,'5.0.17'},
             {module,'EST'},
             {options,[warnings,ber,errors,
@@ -18,15 +18,43 @@
          legacy_erlang_types/0]).
 -export(['dialyzer-suppressions'/1]).
 -export([
+enc_Extension/2,
+enc_Int/2,
+enc_OID/2,
 enc_CsrAttrs/2,
 enc_AttrOrOID/2,
-enc_Attribute/2
+enc_Attribute/2,
+enc_ExtensionReq/2
 ]).
 
 -export([
+dec_Extension/2,
+dec_Int/2,
+dec_OID/2,
 dec_CsrAttrs/2,
 dec_AttrOrOID/2,
-dec_Attribute/2
+dec_Attribute/2,
+dec_ExtensionReq/2
+]).
+
+-export([
+'enc_at-extension-req'/3
+]).
+
+-export([
+'dec_at-extension-req'/3
+]).
+
+-export([
+getenc_internal_object_set_argument_1/1
+]).
+
+-export([
+getdec_internal_object_set_argument_1/1
+]).
+
+-export([
+'id-ExtensionReq'/0
 ]).
 
 -export([info/0]).
@@ -69,14 +97,22 @@ try
       end
 end.
 
+encode_disp('Extension', Data) -> enc_Extension(Data);
+encode_disp('Int', Data) -> enc_Int(Data);
+encode_disp('OID', Data) -> enc_OID(Data);
 encode_disp('CsrAttrs', Data) -> enc_CsrAttrs(Data);
 encode_disp('AttrOrOID', Data) -> enc_AttrOrOID(Data);
 encode_disp('Attribute', Data) -> enc_Attribute(Data);
+encode_disp('ExtensionReq', Data) -> enc_ExtensionReq(Data);
 encode_disp(Type, _Data) -> exit({error,{asn1,{undefined_type,Type}}}).
 
+decode_disp('Extension', Data) -> dec_Extension(Data);
+decode_disp('Int', Data) -> dec_Int(Data);
+decode_disp('OID', Data) -> dec_OID(Data);
 decode_disp('CsrAttrs', Data) -> dec_CsrAttrs(Data);
 decode_disp('AttrOrOID', Data) -> dec_AttrOrOID(Data);
 decode_disp('Attribute', Data) -> dec_Attribute(Data);
+decode_disp('ExtensionReq', Data) -> dec_ExtensionReq(Data);
 decode_disp(Type, _Data) -> exit({error,{asn1,{undefined_type,Type}}}).
 
 info() ->
@@ -91,6 +127,116 @@ info() ->
      _ ->
        []
    end.
+
+
+%%================================
+%%  Extension
+%%================================
+enc_Extension(Val) ->
+    enc_Extension(Val, [<<48>>]).
+
+enc_Extension(Val, TagIn) ->
+{_,Cindex1,Cindex2,Cindex3} = Val,
+
+%%-------------------------------------------------
+%% attribute extnId(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_object_identifier(Cindex1, [<<6>>]),
+
+%%-------------------------------------------------
+%% attribute critical(2) with type BOOLEAN DEFAULT = false
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} =  case Cindex2 of
+         asn1_DEFAULT ->
+            {<<>>,0};
+         _ when Cindex2 =:= false ->
+            {<<>>,0};
+         _ ->
+            encode_boolean(Cindex2, [<<1>>])
+       end,
+
+%%-------------------------------------------------
+%% attribute extnValue(3) with type ASN1_OPEN_TYPE
+%%-------------------------------------------------
+   {EncBytes3,EncLen3} = encode_open_type(Cindex3, []),
+
+   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
+LenSoFar = EncLen1 + EncLen2 + EncLen3,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_Extension(Tlv) ->
+   dec_Extension(Tlv, [16]).
+
+dec_Extension(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute extnId(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_object_identifier(V1, [6]),
+
+%%-------------------------------------------------
+%% attribute critical(2) with type BOOLEAN DEFAULT = false
+%%-------------------------------------------------
+{Term2,Tlv3} = case Tlv2 of
+[{1,V2}|TempTlv3] ->
+    {decode_boolean(V2, []), TempTlv3};
+    _ ->
+        {false,Tlv2}
+end,
+
+%%-------------------------------------------------
+%% attribute extnValue(3) with type ASN1_OPEN_TYPE
+%%-------------------------------------------------
+[V3|Tlv4] = Tlv3, 
+Term3 = decode_open_type_as_binary(V3, []),
+
+case Tlv4 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv4}}}) % extra fields not allowed
+end,
+Res1 = {'Extension',Term1,Term2,Term3},
+Res1.
+
+
+%%================================
+%%  Int
+%%================================
+enc_Int(Val) ->
+    enc_Int(Val, [<<2>>]).
+
+enc_Int(Val, TagIn) ->
+encode_integer(Val, TagIn).
+
+
+dec_Int(Tlv) ->
+   dec_Int(Tlv, [2]).
+
+dec_Int(Tlv, TagIn) ->
+decode_integer(Tlv, TagIn).
+
+
+
+%%================================
+%%  OID
+%%================================
+enc_OID(Val) ->
+    enc_OID(Val, [<<6>>]).
+
+enc_OID(Val, TagIn) ->
+encode_object_identifier(Val, TagIn).
+
+
+dec_OID(Tlv) ->
+   dec_OID(Tlv, [6]).
+
+dec_OID(Tlv, TagIn) ->
+decode_object_identifier(Tlv, TagIn).
+
 
 
 %%================================
@@ -204,7 +350,7 @@ enc_Attribute_values(Val, TagIn) ->
    {lists:reverse(AccBytes),AccLen};
 
 'enc_Attribute_values_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = encode_object_identifier(H, [<<6>>]),
+   {EncBytes,EncLen} = encode_open_type(H, []),
    'enc_Attribute_values_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
 
 
@@ -240,7 +386,229 @@ Res1.
    %% decode tag and length 
    %%-------------------------------------------------
 Tlv1 = match_tags(Tlv, TagIn),
-[decode_object_identifier(V1, [6]) || V1 <- Tlv1].
+[decode_open_type_as_binary(V1, []) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  ExtensionReq
+%%================================
+enc_ExtensionReq(Val) ->
+    enc_ExtensionReq(Val, [<<48>>]).
+
+enc_ExtensionReq(Val, TagIn) ->
+   {EncBytes,EncLen} = 'enc_ExtensionReq_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_ExtensionReq_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_ExtensionReq_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_ExtensionReq_Extension'(H, [<<48>>]),
+   'enc_ExtensionReq_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+
+%%================================
+%%  ExtensionReq_Extension
+%%================================
+enc_ExtensionReq_Extension(Val, TagIn) ->
+   {_,Cindex1,Cindex2,Cindex3} = Val,
+
+%%-------------------------------------------------
+%% attribute extnID(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_object_identifier(Cindex1, [<<6>>]),
+
+%%-------------------------------------------------
+%% attribute critical(2) with type BOOLEAN DEFAULT = false
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} =  case Cindex2 of
+         asn1_DEFAULT ->
+            {<<>>,0};
+         _ when Cindex2 =:= false ->
+            {<<>>,0};
+         _ ->
+            encode_boolean(Cindex2, [<<1>>])
+       end,
+
+%%-------------------------------------------------
+%% attribute extnValue(3) with type OCTET STRING
+%%-------------------------------------------------
+   {EncBytes3,EncLen3} = encode_restricted_string(Cindex3, [<<4>>]),
+
+   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
+LenSoFar = EncLen1 + EncLen2 + EncLen3,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_ExtensionReq(Tlv) ->
+   dec_ExtensionReq(Tlv, [16]).
+
+dec_ExtensionReq(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_ExtensionReq_Extension'(V1, [16]) || V1 <- Tlv1].
+
+
+'dec_ExtensionReq_Extension'(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute extnID(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_object_identifier(V1, [6]),
+
+%%-------------------------------------------------
+%% attribute critical(2) with type BOOLEAN DEFAULT = false
+%%-------------------------------------------------
+{Term2,Tlv3} = case Tlv2 of
+[{1,V2}|TempTlv3] ->
+    {decode_boolean(V2, []), TempTlv3};
+    _ ->
+        {false,Tlv2}
+end,
+
+%%-------------------------------------------------
+%% attribute extnValue(3) with type OCTET STRING
+%%-------------------------------------------------
+[V3|Tlv4] = Tlv3, 
+Term3 = decode_octet_string(V3, [4]),
+
+case Tlv4 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv4}}}) % extra fields not allowed
+end,
+Res1 = {'Extension',Term1,Term2,Term3},
+Res1.
+'id-ExtensionReq'() ->
+{1,2,840,113549,1,9,14}.
+
+
+
+
+%%================================
+%%  at-extension-req
+%%================================
+'enc_at-extension-req'('Type', Val, _RestPrimFieldName) ->
+   enc_ExtensionReq(Val, [<<48>>]);
+'enc_at-extension-req'('equality-match', _,_) ->
+  exit({error,{'use of missing field in object', 'equality-match'}}).
+
+
+'dec_at-extension-req'('Type', Bytes,_) ->
+  Tlv = tlv_format(Bytes),
+   dec_ExtensionReq(Tlv, [16]);
+'dec_at-extension-req'('equality-match', _,_) ->
+  exit({error,{'illegal use of missing field in object', 'equality-match'}}).
+
+tlv_format(Bytes) when is_binary(Bytes) ->
+  {Tlv,_} = ber_decode_nif(Bytes),
+  Tlv;
+tlv_format(Bytes) ->
+  Bytes.
+
+
+
+%%================================
+%%  internal_object_set_argument_1
+%%================================
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,9} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-SubjectDirectoryAttributes'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,14} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-SubjectKeyIdentifier'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,15} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-KeyUsage'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,16} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-PrivateKeyUsagePeriod'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,17} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-SubjectAltName'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,18} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-IssuerAltName'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,19} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-BasicConstraints'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,30} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-NameConstraints'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,31} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-CRLDistributionPoints'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,32} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-CertificatePolicies'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,33} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-PolicyMappings'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,35} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-AuthorityKeyIdentifier'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,36} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-PolicyConstraints'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,37} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-ExtKeyUsage'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,46} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-FreshestCRL'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {2,5,29,54} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-InhibitAnyPolicy'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {1,3,6,1,5,5,7,1,1} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-AuthorityInfoAccess'(T,V,O) end;
+getenc_internal_object_set_argument_1(Id) when Id =:= {1,3,6,1,5,5,7,1,11} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'enc_ext-SubjectInfoAccessSyntax'(T,V,O) end;
+getenc_internal_object_set_argument_1(_) ->
+  fun(_, Val, _RestPrimFieldName) ->
+    case Val of
+      {asn1_OPENTYPE,Bin} when is_binary(Bin) ->
+        {Bin,byte_size(Bin)}
+    end
+  end.
+
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,9} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-SubjectDirectoryAttributes'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,14} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-SubjectKeyIdentifier'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,15} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-KeyUsage'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,16} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-PrivateKeyUsagePeriod'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,17} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-SubjectAltName'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,18} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-IssuerAltName'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,19} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-BasicConstraints'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,30} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-NameConstraints'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,31} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-CRLDistributionPoints'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,32} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-CertificatePolicies'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,33} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-PolicyMappings'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,35} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-AuthorityKeyIdentifier'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,36} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-PolicyConstraints'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,37} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-ExtKeyUsage'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,46} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-FreshestCRL'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {2,5,29,54} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-InhibitAnyPolicy'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {1,3,6,1,5,5,7,1,1} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-AuthorityInfoAccess'(T,V,O) end;
+getdec_internal_object_set_argument_1(Id) when Id =:= {1,3,6,1,5,5,7,1,11} ->
+   fun(T,V,O) -> 'PKIX1Implicit-2009':'dec_ext-SubjectInfoAccessSyntax'(T,V,O) end;
+getdec_internal_object_set_argument_1(_) ->
+  fun(_,Bytes, _RestPrimFieldName) ->
+    case Bytes of
+      Bin when is_binary(Bin) -> 
+        {asn1_OPENTYPE,Bin};
+      _ ->
+        {asn1_OPENTYPE,ber_encode(Bytes)}
+    end
+  end.
 
 
 
@@ -254,12 +622,53 @@ Tlv1 = match_tags(Tlv, TagIn),
 ber_decode_nif(B) ->
     asn1rt_nif:decode_ber_tlv(B).
 
+ber_encode([Tlv]) ->
+    ber_encode(Tlv);
+ber_encode(Tlv) when is_binary(Tlv) ->
+    Tlv;
+ber_encode(Tlv) ->
+    asn1rt_nif:encode_ber_tlv(Tlv).
+
+collect_parts(TlvList) ->
+    collect_parts(TlvList, []).
+
+collect_parts([{_, L} | Rest], Acc) when is_list(L) ->
+    collect_parts(Rest, [collect_parts(L) | Acc]);
+collect_parts([{3, <<Unused,Bits/binary>>} | Rest], _Acc) ->
+    collect_parts_bit(Rest, [Bits], Unused);
+collect_parts([{_T, V} | Rest], Acc) ->
+    collect_parts(Rest, [V | Acc]);
+collect_parts([], Acc) ->
+    list_to_binary(lists:reverse(Acc)).
+
+collect_parts_bit([{3, <<Unused,Bits/binary>>} | Rest], Acc, Uacc) ->
+    collect_parts_bit(Rest, [Bits | Acc], Unused + Uacc);
+collect_parts_bit([], Acc, Uacc) ->
+    list_to_binary([Uacc | lists:reverse(Acc)]).
+
 dec_subidentifiers(<<>>, _Av, Al) ->
     lists:reverse(Al);
 dec_subidentifiers(<<1:1,H:7,T/binary>>, Av, Al) ->
     dec_subidentifiers(T, Av bsl 7 + H, Al);
 dec_subidentifiers(<<H,T/binary>>, Av, Al) ->
     dec_subidentifiers(T, 0, [Av bsl 7 + H | Al]).
+
+decode_boolean(Tlv, TagIn) ->
+    Val = match_tags(Tlv, TagIn),
+    case Val of
+        <<0:8>> ->
+            false;
+        <<_:8>> ->
+            true;
+        _ ->
+            exit({error, {asn1, {decode_boolean, Val}}})
+    end.
+
+decode_integer(Tlv, TagIn) ->
+    Bin = match_tags(Tlv, TagIn),
+    Len = byte_size(Bin),
+    <<Int:Len/signed-unit:8>> = Bin,
+    Int.
 
 decode_object_identifier(Tlv, Tags) ->
     Val = match_tags(Tlv, Tags),
@@ -275,6 +684,13 @@ decode_object_identifier(Tlv, Tags) ->
         end,
     list_to_tuple([Val1, Val2 | ObjVals]).
 
+decode_octet_string(Tlv, TagsIn) ->
+    Bin = match_and_collect(Tlv, TagsIn),
+    binary:copy(Bin).
+
+decode_open_type_as_binary(Tlv, TagIn) ->
+    ber_encode(match_tags(Tlv, TagIn)).
+
 e_object_identifier({'OBJECT IDENTIFIER', V}) ->
     e_object_identifier(V);
 e_object_identifier(V) when is_tuple(V) ->
@@ -288,6 +704,38 @@ e_object_identifier([E1, E2 | Tail]) ->
 enc_obj_id_tail(H, Len) ->
     {B, L} = mk_object_val(H),
     {B, Len + L}.
+
+encode_boolean(true, TagIn) ->
+    encode_tags(TagIn, [255], 1);
+encode_boolean(false, TagIn) ->
+    encode_tags(TagIn, [0], 1);
+encode_boolean(X, _) ->
+    exit({error, {asn1, {encode_boolean, X}}}).
+
+encode_integer(Val) ->
+    Bytes =
+        if
+            Val >= 0 ->
+                encode_integer_pos(Val, []);
+            true ->
+                encode_integer_neg(Val, [])
+        end,
+    {Bytes, length(Bytes)}.
+
+encode_integer(Val, Tag) when is_integer(Val) ->
+    encode_tags(Tag, encode_integer(Val));
+encode_integer(Val, _Tag) ->
+    exit({error, {asn1, {encode_integer, Val}}}).
+
+encode_integer_neg(- 1, [B1 | _T] = L) when B1 > 127 ->
+    L;
+encode_integer_neg(N, Acc) ->
+    encode_integer_neg(N bsr 8, [N band 255 | Acc]).
+
+encode_integer_pos(0, [B | _Acc] = L) when B < 128 ->
+    L;
+encode_integer_pos(N, Acc) ->
+    encode_integer_pos(N bsr 8, [N band 255 | Acc]).
 
 encode_length(L) when L =< 127 ->
     {[L], 1};
@@ -304,6 +752,16 @@ encode_length(L) ->
 encode_object_identifier(Val, TagIn) ->
     encode_tags(TagIn, e_object_identifier(Val)).
 
+encode_open_type(Val, T) when is_list(Val) ->
+    encode_open_type(list_to_binary(Val), T);
+encode_open_type(Val, Tag) ->
+    encode_tags(Tag, Val, byte_size(Val)).
+
+encode_restricted_string(OctetList, TagIn) when is_binary(OctetList) ->
+    encode_tags(TagIn, OctetList, byte_size(OctetList));
+encode_restricted_string(OctetList, TagIn) when is_list(OctetList) ->
+    encode_tags(TagIn, OctetList, length(OctetList)).
+
 encode_tags(TagIn, {BytesSoFar, LenSoFar}) ->
     encode_tags(TagIn, BytesSoFar, LenSoFar).
 
@@ -314,6 +772,15 @@ encode_tags([Tag | Trest], BytesSoFar, LenSoFar) ->
                 LenSoFar + byte_size(Tag) + L2);
 encode_tags([], BytesSoFar, LenSoFar) ->
     {BytesSoFar, LenSoFar}.
+
+match_and_collect(Tlv, TagsIn) ->
+    Val = match_tags(Tlv, TagsIn),
+    case Val of
+        [_ | _] = PartList ->
+            collect_parts(PartList);
+        Bin when is_binary(Bin) ->
+            Bin
+    end.
 
 match_tags({T, V}, [T]) ->
     V;
