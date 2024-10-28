@@ -3,7 +3,7 @@ defmodule CA.EST.Get do
   def get(conn, [], "Authority" = type, [] = id, "ABAC" = spec) do
       :io.format 'CSRATTRS: GET/4:#{type}/#{id}/#{spec}', []
       bin = CA.EST.csrattributes()
-      base64 = :base64.encode bin <> "\r\n\r\n"
+      base64 = :base64.encode(bin)
       conn |> put_resp_content_type("application/csrattrs")
            |> put_resp_header("Content-Transfer-Encoding", "base64")
            |> put_resp_header("Content-Length", :erlang.integer_to_binary(:erlang.size(base64)))

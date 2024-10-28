@@ -31,7 +31,7 @@ defmodule CA.EST do
   def csrattributes() do
       {:ok, bin} = :"EST".encode(:CsrAttrs, [
          oid: CA.AT.oid(:"id-at-challengePassword"),
-         oid: CA.X962.oid(:"id-ds-ecdsa-with-SHA384")
+         oid: CA.X962.oid(:"id-ds-ecdsa-with-SHA384"),
          attribute: {:Attribute, CA.X962.oid(:"id-kt-ecPublicKey"), [objectIdentifier(CA.ALG.oid(:secp384r1))] },
          attribute: {:Attribute, CA.AT.oid(:"id-at-rsaEncryption"), [integer(4096)]},
          attribute: {:Attribute, CA.AT.oid(:"id-at-extensionRequest"), [
@@ -42,7 +42,7 @@ defmodule CA.EST do
                                                      CA.KP.oid(:"id-kp-clientAuth"),
                                                      CA.KP.oid(:"id-kp-codeSigning"),
                                                      CA.KP.oid(:"id-kp-emailProtection") ])})
-                    ]},
+                    ]}
       ])
       bin
   end
