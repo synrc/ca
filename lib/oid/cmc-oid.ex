@@ -1,0 +1,33 @@
+defmodule CA.CMC.AT do
+  @moduledoc "CA CMC OIDs."
+  def oid(:"id-cmc-identification"),        do: {1,3,6,1,5,5,7,7,2}
+  def oid(:"id-cmc-identityProof"),         do: {1,3,6,1,5,5,7,7,3}
+  def oid(:"id-cmc-dataReturn"),            do: {1,3,6,1,5,5,7,7,4}
+  def oid(:"id-cmc-transactionId"),         do: {1,3,6,1,5,5,7,7,5}
+  def oid(:"id-cmc-senderNonce"),           do: {1,3,6,1,5,5,7,7,6}
+  def oid(:"id-cmc-recipientNonce"),        do: {1,3,6,1,5,5,7,7,7}
+  def oid(:"id-cmc-statusInfo"),            do: {1,3,6,1,5,5,7,7,1}
+  def oid(:"id-cmc-addExtensions"),         do: {1,3,6,1,5,5,7,7,8}
+  def oid(:"id-cmc-encryptedPOP"),          do: {1,3,6,1,5,5,7,7,9}
+  def oid(:"id-cmc-decryptedPOP"),          do: {1,3,6,1,5,5,7,7,10}
+  def oid(:"id-cmc-lraPOPWitness"),         do: {1,3,6,1,5,5,7,7,11}
+  def oid(:"id-cmc-getCert"),               do: {1,3,6,1,5,5,7,7,15}
+  def oid(:"id-cmc-getCRL"),                do: {1,3,6,1,5,5,7,7,16}
+  def oid(:"id-cmc-revokeRequest"),         do: {1,3,6,1,5,5,7,7,17}
+  def oid(:"id-cmc-regInfo"),               do: {1,3,6,1,5,5,7,7,18}
+  def oid(:"id-cmc-responseInfo"),          do: {1,3,6,1,5,5,7,7,19}
+  def oid(:"id-cmc-queryPending"),          do: {1,3,6,1,5,5,7,7,21}
+  def oid(:"id-cmc-popLinkRandom"),         do: {1,3,6,1,5,5,7,7,22}
+  def oid(:"id-cmc-popLinkWitness"),        do: {1,3,6,1,5,5,7,7,23}
+  def oid(:"id-cmc-confirmCertAcceptance"), do: {1,3,6,1,5,5,7,7,24}
+  def oid(:"id-cmc-statusInfoV2"),          do: {1,3,6,1,5,5,7,7,25}
+  def oid(:"id-cmc-trustedAnchors"),        do: {1,3,6,1,5,5,7,7,26}
+  def oid(:"id-cmc-authData"),              do: {1,3,6,1,5,5,7,7,27}
+  def oid(:"id-cmc-batchRequests"),         do: {1,3,6,1,5,5,7,7,28}
+  def oid(:"id-cmc-batchResponses"),        do: {1,3,6,1,5,5,7,7,29}
+  def oid(:"id-cmc-publishCert"),           do: {1,3,6,1,5,5,7,7,30}
+  def oid(:"id-cmc-modCertTemplate"),       do: {1,3,6,1,5,5,7,7,31}
+  def oid(:"id-cmc-controlProcessed"),      do: {1,3,6,1,5,5,7,7,32}
+  def oid(:"id-cmc-identityProofV2"),       do: {1,3,6,1,5,5,7,7,33}
+  def oid(:"id-cmc-popLinkWitnessV2"),      do: {1,3,6,1,5,5,7,7,34}
+end
