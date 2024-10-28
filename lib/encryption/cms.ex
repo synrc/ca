@@ -23,17 +23,17 @@ defmodule CA.CMS do
 
   def kari(kari, privateKeyBin, schemeOID, encOID, data, iv) do
       {:'KeyAgreeRecipientInfo',:v3,{_,{_,_,publicKey}},ukm,{_,kdfOID,_},[{_,_,encryptedKey}]} = kari
-      {scheme,_}  = CA.ALG.lookup(schemeOID)
-      {kdf,_}     = CA.ALG.lookup(kdfOID)
-      {enc,_}     = CA.ALG.lookup(encOID)
-      sharedKey   = :crypto.compute_key(:ecdh,publicKey,privateKeyBin,scheme)
+      {scheme,_} = CA.ALG.lookup(schemeOID)
+      {kdf,_} = CA.ALG.lookup(kdfOID)
+      {enc,_} = CA.ALG.lookup(encOID)
+      sharedKey = :crypto.compute_key(:ecdh,publicKey,privateKeyBin,scheme)
       {_,payload} = :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', sharedInfo(ukm,256))
-      derived     = case map(kdf) do
+      derived = case map(kdf) do
           {:kdf,hash} -> CA.KDF.derive({:kdf,hash},  sharedKey, 32, payload)
          {:hkdf,hash} -> CA.HKDF.derive({:kdf,hash}, sharedKey, 32, payload)
       end
-      unwrap      = CA.AES.keyUnwrap(encryptedKey, derived)
-      res         = CA.AES.decrypt(enc, data, unwrap, iv)
+      unwrap = CA.AES.keyUnwrap(encryptedKey, derived)
+      res = CA.AES.decrypt(enc, data, unwrap, iv)
       {:ok, res}
   end
 
@@ -139,10 +139,10 @@ defmodule CA.CMS do
       scheme = :secp384r1
       {:ok,{:ContentInfo,_,{:EnvelopedData,_,_,x,{_,_,{_,_,{_,<<_::16,iv::binary>>}},data},_}}} = testECC()
       [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,_,[{_,_,encryptedKey}]}}|_] = x
-      sharedKey   = :crypto.compute_key(:ecdh,publicKey,privateKey,scheme)
+      sharedKey = :crypto.compute_key(:ecdh,publicKey,privateKey,scheme)
       {_,content}  =  :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', CA.CMS.sharedInfo(ukm,256))
-      kdf          = CA.KDF.derive({:kdf, :sha256}, sharedKey, 32, content)
-      unwrap       = :aes_kw.unwrap(encryptedKey, kdf)
+      kdf = CA.KDF.derive({:kdf, :sha256}, sharedKey, 32, content)
+      unwrap = :aes_kw.unwrap(encryptedKey, kdf)
       CA.AES.decrypt(:'id-aes256-CBC', data, unwrap, iv)
   end
 
