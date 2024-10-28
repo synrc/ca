@@ -3,7 +3,7 @@ defmodule CA.EST.Get do
 
   def get(conn, [], "Authority", [], "CA") do
       body = :base64.encode(CA.CSR.read_ca_public())
-      conn |> put_resp_content_type("application/pkcs7-mime")
+      conn |> put_resp_content_type("application/pkix-cert")
            |> put_resp_header("Content-Transfer-Encoding", "base64")
            |> put_resp_header("Content-Length", :erlang.integer_to_binary(:erlang.size(body)))
            |> resp(200, body)
