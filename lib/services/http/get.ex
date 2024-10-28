@@ -1,13 +1,11 @@
 defmodule CA.EST.Get do
   import Plug.Conn
-  def get(conn, [], "Authority" = type, [] = id, "ABAC" = spec) do
-      :io.format 'CSRATTRS: GET/4:#{type}/#{id}/#{spec}', []
-      bin = CA.EST.csrattributes()
-      base64 = :base64.encode(bin)
+  def get(conn, [], "Authority", [], "ABAC") do
+      body = :base64.encode(CA.EST.csrattributes())
       conn |> put_resp_content_type("application/csrattrs")
            |> put_resp_header("Content-Transfer-Encoding", "base64")
-           |> put_resp_header("Content-Length", :erlang.integer_to_binary(:erlang.size(base64)))
-           |> resp(200, base64)
+           |> put_resp_header("Content-Length", :erlang.integer_to_binary(:erlang.size(body)))
+           |> resp(200, body)
            |> send_resp()
   end
   def get(conn, _, type, id, spec) do
