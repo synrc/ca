@@ -22,6 +22,16 @@ defmodule CA.CSR do
       {ca_key, ca}
   end
 
+  def read_ca_public() do
+      {:ok, ca_bin} = :file.read_file "ca.pem"
+      list = String.split(ca_bin, "\n", trim: true)
+      list = :lists.reverse(tl(:lists.reverse(tl(list))))
+      bin  = :base64.decode(:erlang.iolist_to_binary(list))
+      :io.format '~p~n', [:asn1rt_nif.decode_ber_tlv bin]
+      {:ok, _cader} = :"DSTU-Cert".decode(:Certificate, bin)
+      bin
+  end
+
   def server(name) do
       {ca_key, ca} = read_ca()
       dn = "/C=UA/L=Київ/O=SYNRC/CN=" <> name
