@@ -8,6 +8,8 @@ Certificate ::= SEQUENCE {
  signatureAlgorithm AlgorithmIdentifier,
  signatureValue BIT STRING }
 
+Certificates ::= SEQUENCE OF Certificate
+
 TBSCertificate ::= SEQUENCE {
  version [0] Version,
  serialNumber CertificateSerialNumber,

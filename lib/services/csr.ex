@@ -14,7 +14,6 @@ defmodule CA.CSR do
   end
 
   def read_ca() do
-#      {:ok, ca_key_bin} = :file.read_file "~/.chat/secp384r1/ca.key"
       {:ok, ca_key_bin} = :file.read_file "ca.key"
       {:ok, ca_bin} = :file.read_file "ca.pem"
       {:ok, ca_key} = X509.PrivateKey.from_pem ca_key_bin
@@ -24,11 +23,8 @@ defmodule CA.CSR do
 
   def read_ca_public() do
       {:ok, ca_bin} = :file.read_file "ca.pem"
-      list = String.split(ca_bin, "\n", trim: true)
-      list = :lists.reverse(tl(:lists.reverse(tl(list))))
-      bin  = :base64.decode(:erlang.iolist_to_binary(list))
-      :io.format '~p~n', [:asn1rt_nif.decode_ber_tlv bin]
-      {:ok, _cader} = :"DSTU-Cert".decode(:Certificate, bin)
+      {:ok, ca} = X509.Certificate.from_pem ca_bin
+      {:ok, bin} = :"PKIX1Explicit-2009".encode(:Certificate, CA.CMP.convertOTPtoPKIX(ca))
       bin
   end
 
