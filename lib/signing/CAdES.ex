@@ -86,6 +86,17 @@ defmodule CA.CAdES do
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
+  def parseCert(cert) do
+      {:Certificate, a, _, _} = cert
+      {:Certificate_toBeSigned, _ver, _sel, _alg, issuer, _val, issuee, _a, _b, _c, exts} = a
+      extensions = :lists.map(fn {:Extension,code,_x,b} ->
+         oid(code, :lists.flatten(flat(code,:asn1rt_nif.decode_ber_tlv(b),[])))
+      end, exts)
+      person = :lists.flatten(:erlang.element(2, issuee))
+      ca = :lists.flatten(:erlang.element(2, issuer))
+      [parseAttrs(person,extensions),parseAttrs(ca,[])]
+  end
+
   def parseAttrs(attrs, options) do
       certinfo(
         o: extract({2, 5, 4, 10}, attrs),
@@ -117,16 +128,6 @@ defmodule CA.CAdES do
       [parseAttrs(person,extensions),parseAttrs(ca,attributes)]
   end
 
-  def parseCert(cert) do
-      {:Certificate, a, _, _} = cert
-      {:Certificate_toBeSigned, _ver, _sel, _alg, issuer, _val, issuee, _a, _b, _c, exts} = a
-      extensions = :lists.map(fn {:Extension,code,_x,b} ->
-         oid(code, :lists.flatten(flat(code,:asn1rt_nif.decode_ber_tlv(b),[])))
-      end, exts)
-      person = :lists.flatten(:erlang.element(2, issuee))
-      ca = :lists.flatten(:erlang.element(2, issuer))
-      [parseAttrs(person,extensions),parseAttrs(ca,[])]
-  end
 
   def parseSignData(bin) do
       {_, {:ContentInfo, oid, ci}} = :KEP.decode(:ContentInfo, bin)

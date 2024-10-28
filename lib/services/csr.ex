@@ -1,6 +1,8 @@
 defmodule CA.CSR do
   @moduledoc "CA/CSR library."
 
+  # TODO: pass CSR Attrs
+
   def ca() do
       ca_key = X509.PrivateKey.new_ec(:secp384r1)
       dn = "/C=UA/L=Київ/O=SYNRC/CN=CA"
