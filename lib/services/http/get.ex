@@ -5,7 +5,7 @@ defmodule CA.EST.Get do
       body = :base64.encode(CA.CSR.read_ca_public())
       conn |> put_resp_content_type("application/pkix-cert")
            |> put_resp_header("Content-Transfer-Encoding", "base64")
-           |> put_resp_header("Content-Length", :erlang.integer_to_binary(:erlang.size(body)))
+           |> put_resp_header("Content-Length", Integer.to_string(byte_size(body)))
            |> resp(200, body)
            |> send_resp()
   end
@@ -21,7 +21,7 @@ defmodule CA.EST.Get do
       body = :base64.encode cms
       conn |> put_resp_content_type("application/pkcs7-mime")
            |> put_resp_header("Content-Transfer-Encoding", "base64")
-           |> put_resp_header("Content-Length", :erlang.integer_to_binary(:erlang.size(body)))
+           |> put_resp_header("Content-Length", Integer.to_string(byte_size(body)))
            |> resp(200, body)
            |> send_resp()
   end
@@ -30,7 +30,7 @@ defmodule CA.EST.Get do
       body = :base64.encode(CA.EST.csrattributes())
       conn |> put_resp_content_type("application/csrattrs")
            |> put_resp_header("Content-Transfer-Encoding", "base64")
-           |> put_resp_header("Content-Length", :erlang.integer_to_binary(:erlang.size(body)))
+           |> put_resp_header("Content-Length", Integer.to_string(byte_size(body)))
            |> resp(200, body)
            |> send_resp()
   end

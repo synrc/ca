@@ -23,6 +23,7 @@ defmodule CA.EST do
   get  "/.well-known/est/ca"             do CA.EST.Get.get(conn,   [], "Authority", [], "CA") end
   get  "/.well-known/est/cacerts"        do CA.EST.Get.get(conn,   [], "Authority", [], "CMS") end
   get  "/.well-known/est/csrattrs"       do CA.EST.Get.get(conn,   [], "Authority", [], "ABAC") end
+
   post "/.well-known/est/simpleenroll"   do CA.EST.Post.post(conn, [], "Authority", [], "ENROLL") end
   post "/.well-known/est/simplereenroll" do CA.EST.Post.post(conn, [], "Authority", [], "RE-ENROLL") end
   post "/.well-known/est/serverkeygen"   do CA.EST.Post.post(conn, [], "Authority", [], "KEYGEN") end
