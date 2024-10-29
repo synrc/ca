@@ -21,6 +21,7 @@
 * <a href="https://tonpa.guru/stream/2023/2023-08-05 CA CURVE.htm">2023-08-05 CA CURVE</a><br>
 * <a href="https://tonpa.guru/stream/2023/2023-08-07 CHAT ASN.1.htm">2023-08-07 CHAT ASN.1</a><br>
 * <a href="https://tonpa.guru/stream/2023/2023-08-08 ASN.1 Компілятор.htm">2023-08-08 ASN.1 Компілятор</a><br>
+* <a href="https://tonpa.guru/stream/2024/2024-10-29 EST.htm">20224-10-29 EST сервер 7030</a><br>
 
 ## Credits
 
