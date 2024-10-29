@@ -4,6 +4,8 @@ defmodule CA.Curve do
   require CA.Point
   defstruct [:A, :B, :P, :N, :G, :name, :oid]
 
+  # ANSI X9.142–2020 ECDSA http://oid-info.com/get/1.3.132.0
+
   def oid(:sect163k1), do: {1,3,132,0,1}
   def oid(:sect163r2), do: {1,3,132,0,15}
   def oid(:secp224r1), do: {1,3,132,0,33}
