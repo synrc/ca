@@ -1,34 +1,13 @@
 EST DEFINITIONS IMPLICIT TAGS ::= BEGIN
-  EXPORTS ALL ;
-  IMPORTS
-          CertificateSerialNumber, CertificateList, AlgorithmIdentifier, EXTENSION, Time
-     FROM AuthenticationFramework authenticationFramework
-
-          AttributeSet{}, Extension{}, EXTENSION, ATTRIBUTE, Extensions
-     FROM PKIX-CommonTypes-2009
-          {iso(1) identified-organization(3) dod(6) internet(1) security(5) mechanisms(5) pkix(7) id-mod(0) id-mod-pkixCommon-02(57)}
-
-          CertificateSerialNumber, GeneralName, CRLReason, ReasonFlags, CertExtensions, ext-ExtKeyUsage
-     FROM PKIX1Implicit-2009
-          {iso(1) identified-organization(3) dod(6) internet(1) security(5) mechanisms(5) pkix(7) id-mod(0) id-mod-pkix1-implicit-02(59)} ;
-
-  Extension ::= SEQUENCE {
-    extnId     EXTENSION.&id,
-    critical   BOOLEAN DEFAULT FALSE,
-    extnValue  EXTENSION.&ExtnType }
-
-  Int ::= INTEGER
-  OID ::= OBJECT IDENTIFIER
-  CsrAttrs ::= SEQUENCE OF AttrOrOID
-  AttrOrOID ::= CHOICE { oid OBJECT IDENTIFIER, attribute Attribute }
-  Attribute ::= SEQUENCE { type ATTRIBUTE.&id, values SET SIZE(1..MAX) OF ATTRIBUTE.&Type }
-
---  Attribute { ATTRIBUTE:IOSet } ::= SEQUENCE {
---      type   ATTRIBUTE.&id({IOSet}),
---      values SET SIZE(1..MAX) OF ATTRIBUTE.&Type({IOSet}{@type})}
-
-  ExtensionReq ::= SEQUENCE SIZE (1..MAX) OF Extension{{CertExtensions}}
-  at-extension-req ATTRIBUTE ::= { TYPE ExtensionReq IDENTIFIED BY id-ExtensionReq }
-  id-ExtensionReq OBJECT IDENTIFIER ::= {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9) 14}
-
+    IMPORTS AttributeSet{}, Extension{}, EXTENSION, ATTRIBUTE FROM PKIX-CommonTypes-2009
+            CertExtensions FROM PKIX1Implicit-2009 ;
+    Int ::= INTEGER
+    OID ::= OBJECT IDENTIFIER
+    CsrAttrs ::= SEQUENCE OF AttrOrOID
+    AttrOrOID ::= CHOICE { oid OBJECT IDENTIFIER, attribute Attribute }
+    Attribute ::= SEQUENCE { type ATTRIBUTE.&id, values SET SIZE(1..MAX) OF ATTRIBUTE.&Type }
+    Extension ::= SEQUENCE { extnId EXTENSION.&id, critical BOOLEAN DEFAULT FALSE, extnValue EXTENSION.&ExtnType }
+    ExtensionReq ::= SEQUENCE SIZE (1..MAX) OF Extension{{CertExtensions}}
+    at-extension-req ATTRIBUTE ::= { TYPE ExtensionReq IDENTIFIED BY id-ExtensionReq }
+    id-ExtensionReq OBJECT IDENTIFIER ::= {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9) 14}
 END
