@@ -53,8 +53,8 @@ defmodule CA.CRT do
 
   def oid({1,3,6,1,5,5,7,1,1}, v), do: {:authorityInfoAccess, pair(v,[])}
   def oid({1,3,6,1,4,1,11129,2,4,2}, v), do: {:signedCertificateTimestamp, :base64.encode(hd(pair(v,[])))}
-  def oid({1,3,6,1,5,5,7,1,3}, [v1,v2,url,_lang,v3,v4,v5]), do: {:qcStatements, {url, mapOidsDecode([v1,v2,v3,v4,v5])}}
   def oid({1,3,6,1,5,5,7,1,11},v), do: {:subjectInfoAccess, pair(v,[])}
+  def oid({1,3,6,1,5,5,7,1,3}, v), do: {:qcStatements, mapOidsDecode(v)}
   def oid({2,5,29,9},v),  do: {:subjectDirectoryAttributes, pair(v,[])}
   def oid({2,5,29,14},v), do: {:subjectKeyIdentifier, :base64.encode(hd(pair(v,[])))}
   def oid({2,5,29,15},[v]), do: {:keyUsage, CA.EST.decodeKeyUsage(<<3,2,v::binary>>) }
@@ -91,6 +91,11 @@ defmodule CA.CRT do
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
+  def rdn({2, 5, 4, 4}), do: "surname"
+  def rdn({2, 5, 4, 42}), do: "givenName"
+  def rdn({2, 5, 4, 12}), do: "t"
+  def rdn({2, 5, 4, 11}), do: "ou"
+  def rdn({2, 5, 4, 5}), do: "sn"
   def rdn({2, 5, 4, 3}), do: "cn"
   def rdn({2, 5, 4, 6}), do: "c"
   def rdn({2, 5, 4, 7}), do: "l"
