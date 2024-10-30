@@ -48,9 +48,8 @@ id-at OBJECT IDENTIFIER ::= {joint-iso-ccitt (2) ds (5) 4}
 
 AlgorithmIdentifier ::= SEQUENCE {
  algorithm OBJECT IDENTIFIER,
- parameters ANY }
+ parameters ANY OPTIONAL }
 -- DEFINED BY algorithm OPTIONAL
-
 
 Validity ::= SEQUENCE {
  notBefore Time,
@@ -63,11 +62,6 @@ Time ::= CHOICE {
 SubjectPublicKeyInfo ::= SEQUENCE {
  algorithm AlgorithmIdentifier,
  subjectPublicKey BIT STRING }
-
-AlgorithmIdentifier ::= SEQUENCE {
- algorithm OBJECT IDENTIFIER,
- parameters ANY }
--- DEFINED BY algorithm OPTIONAL
 
 DSTU4145Params::= SEQUENCE {
  definition CHOICE { ecbinary ECBinary, namedCurve OBJECT IDENTIFIER },
