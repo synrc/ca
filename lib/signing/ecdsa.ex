@@ -4,12 +4,6 @@ defmodule CA.ECDSA do
   require CA.Jacobian
   @moduledoc "CA/ECDSA ECC Signature (SYNRC)."
 
-  def decode_integer(bin) do
-      len = :erlang.size(bin)
-      <<int::size(len)-big-integer-signed-unit(8)>> = bin
-      int
-  end
-
   def sign(message, privateKey, options) do
       %{hashfunc: hashfunc} = Enum.into(options, %{hashfunc: :sha256})
       number = :crypto.hash(hashfunc, message) |> numberFromString()

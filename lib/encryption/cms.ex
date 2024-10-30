@@ -146,4 +146,18 @@ defmodule CA.CMS do
       CA.AES.decrypt(:'id-aes256-CBC', data, unwrap, iv)
   end
 
+  def parseSignDataFile(file) do
+      {_, bin} = :file.read_file file
+      parseSignData(bin)
+  end
+
+  def parseSignData(bin) do
+      {_, {:ContentInfo, oid, ci}} = :KEP.decode(:ContentInfo, bin)
+      {:ok, {:SignedData, a, alg, x, c, x1, si}} = :KEP.decode(:SignedData, ci)
+      {:SignedData, a, alg, x, parseSignDataCert({alg,oid,x,c,x1,si}), x1, si}
+  end
+
+  def parseSignDataCert({_,_,_,:asn1_NOVALUE,_,_}), do: []
+  def parseSignDataCert({_,_,_,certs,_,si}), do: :lists.map(fn cert -> CA.CRT.parseCert(cert, si) end, certs)
+
 end

@@ -11,16 +11,17 @@ defmodule CA.CRT do
   end
 
   def unsubj({:rdnSequence, attrs}) do
-        {:rdnSequence, :lists.flatmap(fn [{t,oid,x}] ->
+        {:rdnSequence, :lists.flatmap(fn [{t,oid,x}] when is_binary(x) ->
              case :asn1rt_nif.decode_ber_tlv(x) do
                   {{12,a},_} -> [{t,oid,{:uTF8String,a}}]
                   {{19,a},_} -> [{t,oid,:erlang.binary_to_list(a)}]
-             end end, attrs)}
+             end 
+             _ -> [] end, attrs)}
   end
 
   def readSignature(name \\ "2.p7s") do
       {:ok, bin} = :file.read_file name
-      ber = parseSignData(bin)
+      ber = CA.CMS.parseSignData(bin)
       ber
   end
 
@@ -56,9 +57,13 @@ defmodule CA.CRT do
   def oid({1,3,6,1,5,5,7,1,11},v), do: {:subjectInfoAccess, pair(v,[])}
   def oid({2,5,29,9},v),  do: {:subjectDirectoryAttributes, pair(v,[])}
   def oid({2,5,29,14},v), do: {:subjectKeyIdentifier, :base64.encode(hd(pair(v,[])))}
-  def oid({2,5,29,15},[v]), do: {:keyUsage, CA.EST.decodeKeyUsage(<<3,2,v::binary>>)}
+  def oid({2,5,29,15},[v]), do: {:keyUsage, CA.EST.decodeKeyUsage(<<3,2,v::binary>>) }
   def oid({2,5,29,16},v), do: {:privateKeyUsagePeriod, v}
-  def oid({2,5,29,17},v), do: {:subjectAltName, v}
+  def oid({2,5,29,17},v), do: {:subjectAltName, :lists.map(fn x ->
+                                 case CA.ALG.lookup(:oid.decode(x)) do
+                                      false -> x
+                                      {alg,_} -> alg
+                                 end end, v)}
   def oid({2,5,29,37},v), do: {:extKeyUsage, mapOids(:lists.map(fn x -> :oid.decode(x) end, v)) }
   def oid({2,5,29,19},v), do: {:basicConstraints, v}
   def oid({2,5,29,31},v), do: {:cRLDistributionPoints, pair(v,[])}
@@ -88,9 +93,11 @@ defmodule CA.CRT do
 
   def rdn({2, 5, 4, 3}), do: "cn"
   def rdn({2, 5, 4, 6}), do: "c"
+  def rdn({2, 5, 4, 7}), do: "l"
   def rdn({2, 5, 4, 10}), do: "o"
   def rdn({:rdnSequence, list}) do
-      Enum.join :lists.map(fn {_,oid,list} -> "#{rdn(oid)}=#{list}" end, list), "/"
+      Enum.join :lists.map(fn {_,oid,{_,list}} -> "#{rdn(oid)}=#{list}"
+                              {_,oid,list} -> "#{rdn(oid)}=#{list}" end, list), "/"
   end
 
   def decodePointFromPublic(oid0,oid,publicKey) do
@@ -113,24 +120,16 @@ defmodule CA.CRT do
       extensions = :lists.map(fn {:Extension,code,_x,b} ->
          oid(code, :lists.flatten(flat(code,:asn1rt_nif.decode_ber_tlv(b),[])))
       end, exts)
+      :io.format '~p', [oid]
       [ version: ver,
         signatureAlgorithm: :erlang.element(1,CA.ALG.lookup(alg)),
         subject: rdn(unsubj(issuee)),
         issuer:  rdn(unsubj(issuer)),
         serial: :base64.encode(CA.EST.integer(serial)),
         validity: [from: nb, to: na],
-        publicKey: decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey),
+#        publicKey: decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey),
         extensions: extensions
       ]
   end
-
-  def parseSignData(bin) do
-      {_, {:ContentInfo, oid, ci}} = :KEP.decode(:ContentInfo, bin)
-      {:ok, {:SignedData, a, alg, x, c, x1, si}} = :KEP.decode(:SignedData, ci)
-      {:SignedData, a, alg, x, parseSignDataCert({alg,oid,x,c,x1,si}), x1, si}
-  end
-
-  def parseSignDataCert({_,_,_,:asn1_NOVALUE,_,_}), do: []
-  def parseSignDataCert({_,_,_,certs,_,si}), do: :lists.map(fn cert -> parseCert(cert, si) end, certs)
 
 end
