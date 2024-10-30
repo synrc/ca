@@ -32,8 +32,8 @@ defmodule CA.ECDSA do
   end
 
   def decodePointFromECPoint(ec) do
-      {{:ECPoint, bin2}, {:namedCurve, oid}} = ec
-      bin = :binary.part(bin2,1,:erlang.size(bin2)-1)
+      {{:ECPoint, point}, {:namedCurve, oid}} = ec
+      bin = :binary.part(point,1,:erlang.size(point)-1)
       curve = CA.KnownCurves.getCurveByOid(oid)
       baseLength = CA.Curve.getLength(curve)
       xs = :binary.part(bin, 0, baseLength)
