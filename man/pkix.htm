@@ -1,0 +1,179 @@
+<html><head><meta charset="utf-8" /><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="" /><meta name="author" content="Maxim Sokhatsky" />
+<title>PKIX</title>
+<link rel="stylesheet" href="https://n2o.dev/blank.css" />
+<link rel="stylesheet" href="https://n2o.dev/zima.css" />
+<link rel="stylesheet" href="https://n2o.dev/pro/pro.css" />
+</head><body><nav>
+    <a href="https://erp.uno/en/">ERP</a>
+    <a href="https://ca.erp.uno" style="background:#ededed;">CA</a>
+</nav><header>
+    <a href="https://github.com/synrc/ca"><img src="https://openmoji.org/data/color/svg/E08F.svg" /></a>
+    <h1>PKIX</h1>
+</header><aside>
+    <article>
+        <section>
+            <h3>SYNOPSIS</h3>
+            <div>Open Source Certificate Authority (CA) by SYNRC.
+                 It provides Public Key Infrastructure (PKI) with both:
+                 Elliptic Curve Cryptography (ECC), best suited for IoT security;
+                 and legacy Rivest–Shamir–Adleman (RSA) cryptography. It
+                 supports CSR certificate enrollment and provides OCSP responder
+                 for fast revokation checking.</div>
+
+        </section>
+        <section>
+            <h3>SPEC</h3>
+            <div><ul><li><a href="ocsp.htm">OCSP</a></li>
+                     <li><a href="ldap.htm">LDAP</a></li>
+                     <li><a href="kep.htm">KEP</a></li>
+                     <li><a href="rsa.htm">RSA</a></li>
+                     <li><a href="ecc.htm">ECC</a></li>
+                     <li><a href="ecc.htm">PKIX</a></li>
+                     <li><a href="csr.htm">CSR</a></li></ul></div>
+            <br />
+            <div>
+                MAR 2023 © <a href="https://github.com/5HT">5HT</a> DHARMA 2.0<br />
+                VER 7.3
+            </div>
+        </section>
+    </article>
+</aside>
+<main>
+    <article>
+        <section>
+          <h3>INTRO</h3>
+           <p>The reason we chose Erlang for securing SSL connections
+              is simple — there was no heartbleed for Erlang SSL application yet!
+              Here you can find simple 200 LOC Certificate Authority Server
+              that is used to enroll server cerficates (for SYNRC applications)
+              and client certificates (for securing device connections).
+              </p>
+            <h3>SYNRC CA</h3>
+            <figure><img src="../priv/design/ca-shaders.png" width=900></figure>
+        </section>
+        <section>
+           <h3>SETUP CA</h3>
+           <p>SYNRC CA supports Elixir package manager MIX:.</p>
+           <figure><code>
+ $ git clone git@github.com:synrc/ca && cd ca
+ $ mix deps.get
+ $ mix release
+ $ _build/dev/rel/ca/bin/ca daemon
+ $ _build/dev/rel/ca/bin/ca remote
+           </code></figure>
+           <p>You can either use you own instance or SYNRC CA instance.
+              Here is how to obtain the SYNRC root certificate:</p>
+           <figure><code>
+ $ curl http://ca.n2o.dev:8046/up/ecc
+ -----BEGIN CERTIFICATE-----
+ MIICCTCCAY+gAwIBAgIJAL7mRQ3V5XfRMAoGCCqGSM49BAMDMDkxCzAJBgNVBAYT
+ AlVBMQ0wCwYDVQQIDARLeWl2MQ4wDAYDVQQKDAVTWU5SQzELMAkGA1UEAwwCQ0Ew
+ HhcNMTkwODI4MTUxNjAwWhcNMjkwODI1MTUxNjAwWjA5MQswCQYDVQQGEwJVQTEN
+ MAsGA1UECAwES3lpdjEOMAwGA1UECgwFU1lOUkMxCzAJBgNVBAMMAkNBMHYwEAYH
+ KoZIzj0CAQYFK4EEACIDYgAETgSyGA+SvE1opUuTfgzB8l5v/oMrixxmiaL/0MBs
+ HfavVIc1kBccyVJLXa4hXkJ7gu29owsAQa8KqQbzOqE4z0O+Y0pveHayGAFOlKzg
+ Rzf1FPJwbgwKiE8DziiwXnGOo2MwYTAdBgNVHQ4EFgQUp+knJG+Hjx6QGSmL3XNr
+ VO8A5d8wHwYDVR0jBBgwFoAUp+knJG+Hjx6QGSmL3XNrVO8A5d8wDwYDVR0TAQH/
+ BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAYYwCgYIKoZIzj0EAwMDaAAwZQIwEmCAed7n
+ UdyIdmlbVq+b/ecUWx6DdqltragIeaNFXCA+2tFL071wJTId8HWl4xqrAjEAu8OE
+ AnIXa+Pv5M4XqjmqDwvx+6VffF2ZmSUrkV/FBG0tyPVwyfbwNODEcziUq++E
+ -----END CERTIFICATE-----
+          </code></figure>
+           <p>It can be stored in <b>cert/ecc/caroot.pem</b> with the following command:</p>
+           <figure><code>
+ $ mad ecc ca
+          </code></figure>
+        </section>
+        <section>
+           <h3>ISSUE SERVER CERT</h3>
+           <p>For securing your N2O application just issue server certificate
+              with your [unique] application name and specify the path to keys as a cowboy's variables.</p>
+           <figure><code>
+ $ mad ecc server BANK
+ CERT: ECC SERVER 'BANK'
+ KEY: {'OTPSubjectPublicKeyInfo',
+         {'PublicKeyAlgorithm',
+             {1,2,840,10045,2,1},
+             {namedCurve,{1,3,132,0,34}}},
+         {'ECPoint',
+             &#60;&#60;4,211,65,158,185,219,65,140,77,139,66,124,65,245,152,113,143,
+               20,103,239,206,247,99,56,248,242,0,167,24,212,86,194,228,60,
+               247,18,44,183,151,26,200,1,238,142,160,45,11,149,74,230,0,35,
+               12,134,179,219,81,230,83,214,39,1,189,223,201,49,216,66,71,42,
+               140,18,134,164,217,44,189,115,54,169,16,154,38,58,104,64,66,
+               252,49,202,98,5,109,204,254,111,103&#62;&#62;}}
+ OK
+           </code></figure>
+           <p>Here is example which you should include as a startup for <b>ranch/cowboy</b> server:</p>
+           <figure><code>
+   [
+    {certfile,   "cert/ecc/BANK.pem"},
+    {keyfile,    "cert/ecc/BANK.key"},
+    {cacertfile, "cert/ecc/caroot.pem"}
+   ]
+           </code></figure>
+        </section>
+        <section>
+           <h3>ISSUE CLIENT CERT</h3>
+           <p>Here is an example how to obtain end-user certificate that should be installed
+              manually at the device:</p>
+           <figure><code>
+ $ mad ecc client Max Socha
+ CERT: ECC CLIENT 'Max Socha'
+ KEY: {'OTPSubjectPublicKeyInfo',
+         {'PublicKeyAlgorithm',
+             {1,2,840,10045,2,1},
+             {namedCurve,{1,3,132,0,34}}},
+         {'ECPoint',
+             &#60;&#60;4,58,170,214,161,218,195,236,109,105,150,102,84,169,147,155,
+               27,88,54,237,210,191,172,253,170,212,32,92,146,239,99,135,91,
+               247,199,22,248,182,208,20,57,107,141,191,195,85,212,119,77,
+               179,139,125,95,139,42,18,55,0,85,158,77,147,60,37,215,151,39,
+               56,50,88,89,186,88,16,117,123,250,249,140,190,253,122,95,134,
+               177,127,165,172,194,178,103,113,211,118,87,134,11&#62;&#62;}}
+           </code></figure>
+           <p>Here is e.g. how to secure MQTT IoT connection with ECC cryptography.
+              First install Mosquitto, NanoMQ or EMQX server and protect
+              is with server cerficate (as described above).
+              And then use <b>emqtt</b> client and your personal client certificate:</p>
+           <figure><code>
+ 1> {ok, Conn} = emqtt:start_link([
+       {client_id, &#60;&#60;"5HT"&#62;&#62;},
+       {ssl, true},
+       {port, 8883},
+       {ssl_opts, [
+           {verify,verify_peer},
+           {customize_hostname_check,
+               [{match_fun, fun ({ip,{127,0,0,1}},{dNSName,"localhost"}) -> true;
+                                (_,_) -> false end}]},
+           {certfile,"cert/ecc/Max Socha.pem"},
+           {keyfile,"cert/ecc/Max Socha.key"},
+           {cacertfile,"cert/ecc/caroot.pem"}]}]).
+ {ok,&#60;0.193.0&#62;}
+ 2> emqtt:connect(Conn).
+ {ok,undefined}
+ 3> emqtt:subscribe(Conn, {&#60;&#60;"hello"&#62;&#62;, 0}).
+ {ok,undefined,[0]}
+ 4> emqtt:publish(Conn, &#60;&#60;"hello"&#62;&#62;, &#60;&#60;"Hello World!"&#62;&#62;, 0).
+ ok
+ 5> flush().
+ Shell got {publish,#{client_pid => &#60;0.193.0&#62;,dup => false,
+                     packet_id => undefined,payload => &#60;&#60;"Hello World!"&#62;&#62;,
+                     properties => undefined,qos => 0,retain => false,
+                     topic => &#60;&#60;"hello"&#62;&#62;}}
+ ok
+           </code></figure>
+
+   <br><center>&dot;</center>
+
+        </section>
+    </article>
+</main>
+<footer>
+   <br><center>&dot;</center>
+   <br>
+Namdak Tonpa <span class="heart">❤</span> 2023</footer>
+</body>
+</html>

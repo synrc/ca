@@ -1,0 +1,42 @@
+defmodule CA.KP do
+  @moduledoc "CA Key Purpose OIDs."
+  def oid(:"id-kp-serverAuth"),                   do: {1, 3, 6, 1, 5, 5, 7, 3, 1}
+  def oid(:"id-kp-clientAuth"),                   do: {1, 3, 6, 1, 5, 5, 7, 3, 2}
+  def oid(:"id-kp-codeSigning"),                  do: {1, 3, 6, 1, 5, 5, 7, 3, 3}
+  def oid(:"id-kp-emailProtection"),              do: {1, 3, 6, 1, 5, 5, 7, 3, 4}
+  def oid(:"id-kp-ipsecEndSystem"),               do: {1, 3, 6, 1, 5, 5, 7, 3, 5}
+  def oid(:"id-kp-ipsecTunnel"),                  do: {1, 3, 6, 1, 5, 5, 7, 3, 6}
+  def oid(:"id-kp-ipsecUser"),                    do: {1, 3, 6, 1, 5, 5, 7, 3, 7}
+  def oid(:"id-kp-timeStamping"),                 do: {1, 3, 6, 1, 5, 5, 7, 3, 8}
+  def oid(:"id-kp-OCSPSigning"),                  do: {1, 3, 6, 1, 5, 5, 7, 3, 9}
+  def oid(:"id-kp-dvcs"),                         do: {1, 3, 6, 1, 5, 5, 7, 3, 10}
+  def oid(:"id-kp-sbgpCertAAServerAuth"),         do: {1, 3, 6, 1, 5, 5, 7, 3, 11}
+  def oid(:"id-kp-scvp-responder"),               do: {1, 3, 6, 1, 5, 5, 7, 3, 12}
+  def oid(:"id-kp-eapOverPPP"),                   do: {1, 3, 6, 1, 5, 5, 7, 3, 13}
+  def oid(:"id-kp-eapOverLAN"),                   do: {1, 3, 6, 1, 5, 5, 7, 3, 14}
+  def oid(:"id-kp-scvpServer"),                   do: {1, 3, 6, 1, 5, 5, 7, 3, 15}
+  def oid(:"id-kp-scvpClient"),                   do: {1, 3, 6, 1, 5, 5, 7, 3, 16}
+  def oid(:"id-kp-ipsecIKE"),                     do: {1, 3, 6, 1, 5, 5, 7, 3, 17}
+  def oid(:"id-kp-capwapAC"),                     do: {1, 3, 6, 1, 5, 5, 7, 3, 18}
+  def oid(:"id-kp-capwapWTP"),                    do: {1, 3, 6, 1, 5, 5, 7, 3, 19}
+  def oid(:"id-kp-sipDomain"),                    do: {1, 3, 6, 1, 5, 5, 7, 3, 20}
+  def oid(:"id-kp-secureShellClient"),            do: {1, 3, 6, 1, 5, 5, 7, 3, 21}
+  def oid(:"id-kp-secureShellServer"),            do: {1, 3, 6, 1, 5, 5, 7, 3, 22}
+  def oid(:"id-kp-sendRouter"),                   do: {1, 3, 6, 1, 5, 5, 7, 3, 23}
+  def oid(:"id-kp-sendProxiedRouter"),            do: {1, 3, 6, 1, 5, 5, 7, 3, 24}
+  def oid(:"id-kp-sendOwner"),                    do: {1, 3, 6, 1, 5, 5, 7, 3, 25}
+  def oid(:"id-kp-sendProxiedOwner"),             do: {1, 3, 6, 1, 5, 5, 7, 3, 26}
+  def oid(:"id-kp-cmcCA"),                        do: {1, 3, 6, 1, 5, 5, 7, 3, 27}
+  def oid(:"id-kp-cmcRA"),                        do: {1, 3, 6, 1, 5, 5, 7, 3, 28}
+  def oid(:"id-kp-cmcArchive"),                   do: {1, 3, 6, 1, 5, 5, 7, 3, 29}
+  def oid(:"id-kp-bgpsec-router"),                do: {1, 3, 6, 1, 5, 5, 7, 3, 30}
+  def oid(:"id-kp-BrandIndicatorforMessageIdentification"), do: {1, 3, 6, 1, 5, 5, 7, 3, 31}
+  def oid(:"id-kp-cmKGA"),                        do: {1, 3, 6, 1, 5, 5, 7, 3, 32}
+  def oid(:"id-kp-rpcTLSClient"),                 do: {1, 3, 6, 1, 5, 5, 7, 3, 33}
+  def oid(:"id-kp-rpcTLSServer"),                 do: {1, 3, 6, 1, 5, 5, 7, 3, 34}
+  def oid(:"id-kp-bundleSecurity"),               do: {1, 3, 6, 1, 5, 5, 7, 3, 35}
+  def oid(:"id-kp-documentSigning"),              do: {1, 3, 6, 1, 5, 5, 7, 3, 36}
+  def oid(:"id-kp-jwt"),                          do: {1, 3, 6, 1, 5, 5, 7, 3, 37}
+  def oid(:"id-kp-httpContentEncrypt"),           do: {1, 3, 6, 1, 5, 5, 7, 3, 38}
+  def oid(:"id-kp-oauthAccessTokenSigning"),      do: {1, 3, 6, 1, 5, 5, 7, 3, 39}
+end

@@ -1,33 +1,25 @@
 defmodule CA.Mixfile do
   use Mix.Project
-
+  def application(), do: [ mod: {CA, []}, extra_applications: [:x509, :bandit, :plug]]
   def project() do
     [
       app: :ca,
-      version: "4.8.2",
-      elixir: "~> 1.7",
+      version: "5.10.4",
       description: "CA  CXC 138 21 Certificate Authority",
-      package: package(),
-      deps: deps()
-    ]
-  end
-
-  def package do
-    [
-      files: ~w(config src include priv lib mix.exs LICENSE README.md),
-      licenses: ["ISC"],
-      maintainers: ["Namdak Tonpa"],
-      name: :ca,
-      links: %{"GitHub" => "https://github.com/synrc/ca"}
-    ]
-  end
-
-  def application(), do: [ mod: {CA, []}, applications: [:x509,:ex_doc]]
-
-  def deps() do
-    [
-      {:x509, "~> 0.8.7"},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      package: [
+        name: :ca,
+        files: ~w(config src include priv lib mix.exs LICENSE README.md),
+        licenses: ["ISC"],
+        maintainers: ["Namdak Tonpa"],
+        links: %{"GitHub" => "https://github.com/synrc/ca"}
+      ],
+      deps: [
+        {:jason, "~> 1.2"},
+        {:plug, "~> 1.15.3"},
+        {:bandit, "~> 1.0"},
+        {:ex_doc, ">= 0.0.0", only: :dev},
+        {:x509, "~> 0.8.7"}
+      ]
     ]
   end
 end

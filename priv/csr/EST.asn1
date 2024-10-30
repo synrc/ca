@@ -1,0 +1,13 @@
+EST DEFINITIONS IMPLICIT TAGS ::= BEGIN
+    IMPORTS AttributeSet{}, Extension{}, EXTENSION, ATTRIBUTE FROM PKIX-CommonTypes-2009
+            CertExtensions FROM PKIX1Implicit-2009 ;
+    Int ::= INTEGER
+    OID ::= OBJECT IDENTIFIER
+    CsrAttrs ::= SEQUENCE OF AttrOrOID
+    AttrOrOID ::= CHOICE { oid OBJECT IDENTIFIER, attribute Attribute }
+    Attribute ::= SEQUENCE { type ATTRIBUTE.&id, values SET SIZE(1..MAX) OF ATTRIBUTE.&Type }
+    Extension ::= SEQUENCE { extnId EXTENSION.&id, critical BOOLEAN DEFAULT FALSE, extnValue EXTENSION.&ExtnType }
+    ExtensionReq ::= SEQUENCE SIZE (1..MAX) OF Extension{{CertExtensions}}
+    at-extension-req ATTRIBUTE ::= { TYPE ExtensionReq IDENTIFIED BY id-ExtensionReq }
+    id-ExtensionReq OBJECT IDENTIFIER ::= {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9) 14}
+END
