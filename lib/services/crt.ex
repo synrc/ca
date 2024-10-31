@@ -96,7 +96,7 @@ defmodule CA.CRT do
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 21}, v) do
       :io.format '21: ~p~n', [v]
-      {:ok, certList} = :KEP.decode(:CertificateList, v)
+#      {:ok, certList} = :KEP.decode(:CertificateList, v)
       {:"id-aa-ets-CertificateRefs", v}
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 23}, v) do
