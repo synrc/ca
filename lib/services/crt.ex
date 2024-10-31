@@ -70,6 +70,7 @@ defmodule CA.CRT do
   def oid({2,5,29,32},v), do: {:certificatePolicies, mapOids(:lists.map(fn x -> :oid.decode(x) end, v))}
   def oid({2,5,29,35},v), do: {:authorityKeyIdentifier, :base64.encode(hd(pair(v,[])))}
   def oid({2,5,29,46},v), do: {:freshestCRL, pair(v,[])}
+  def oid({2,5,29,97},v), do: {:unknown97, v}
   def oid({1,2,840,113549,1,9,3},v), do: {:contentType, hd(mapOidsDecode([v]))}
   def oid({1,2,840,113549,1,9,4},v), do: {:messageDigest, :base64.encode(:erlang.element(2,:KEP.decode(:MessageDigest, v)))}
   def oid({1,2,840,113549,1,9,5},v), do: {:signingTime, :erlang.element(2,:erlang.element(1,:asn1rt_nif.decode_ber_tlv(v)))}
@@ -89,21 +90,25 @@ defmodule CA.CRT do
       {:ok, {:TSTInfo, _vsn, _oid, {:MessageImprint, _, x}, serial, ts, _,_,_,_}} = :KEP.decode(:TSTInfo, x)
       {:contentTimestamp, {hd(mapOids([oid])), serial, :erlang.iolist_to_binary(ts), :base64.encode(x)}}
   end
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 22}, v) do
+      {:ok, x} = :KEP.decode(:CompleteRevocationRefs, v)
+      {:"id-aa-ets-revocationRefs", x}
+  end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 21}, v) do
-#      {:ok, x} = :KEP.decode(:CertificateList, v)
+      :io.format '21: ~p~n', [v]
+      {:ok, certList} = :KEP.decode(:CertificateList, v)
       {:"id-aa-ets-CertificateRefs", v}
   end
-  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 22}, v) do
-#      {:ok, x} = :KEP.decode(:CrlOcspRef, v)
-      {:"id-aa-ets-revocationRefs", v}
-  end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 23}, v) do
-#      {:ok, x} = :KEP.decode(:CertificateList, v)
-      {:"id-aa-ets-certValues", v}
+      {:ok, certList} = :KEP.decode(:Certificates, v)
+      list = :lists.map(fn cert -> CA.CRT.parseCert(cert) end, certList)
+      {:"id-aa-ets-certValues", list}
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 24}, v) do
-#      {:ok, x} = :KEP.decode(:CertificateList, v)
-      {:"id-aa-ets-revocationValues", v}
+      {:ok, {:RevocationValues, :asn1_NOVALUE, ocspVals, :asn1_NOVALUE}} = :KEP.decode(:RevocationValues, v)
+      {:ok, list} = :KEP.decode(:BasicOCSPResponses, ocspVals)
+      list = :lists.map(fn {:BasicOCSPResponse,{:ResponseData,ver,{_,rdn},time,responses,ext},alg,bin,_} -> CA.CRT.rdn(rdn) end, list)
+      {:"id-aa-ets-revocationValues", list}
   end
 
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 47}, v) do
@@ -162,7 +167,8 @@ defmodule CA.CRT do
   def parseCert(cert, _) do parseCert(cert) end
   def parseCert(cert) do
       {:Certificate, tbs, _, _} = cert
-      {_, ver, serial, {_,alg,_}, issuer, {_,{_,nb},{_,na}}, issuee, {:SubjectPublicKeyInfo, {:AlgorithmIdentifier, oid, oid2}, publicKey}, _b, _c, exts} = tbs
+      {_, ver, serial, {_,alg,_}, issuer, {_,{_,nb},{_,na}}, issuee,
+         {:SubjectPublicKeyInfo, {_, oid, oid2}, publicKey}, _b, _c, exts} = tbs
       extensions = :lists.map(fn {:Extension,code,_x,b} ->
          oid(code, :lists.flatten(flat(code,:asn1rt_nif.decode_ber_tlv(b),[])))
       end, exts)

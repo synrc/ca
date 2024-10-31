@@ -12,57 +12,66 @@
 --   to: Адміністрації Державної служби спеціального зв’язку та захисту інформації України
 -- date: 20.08.2012 #1236/5/453
 
-KEP DEFINITIONS IMPLICIT TAGS ::=
-BEGIN
+KEP DEFINITIONS EXPLICIT TAGS ::= BEGIN
+EXPORTS ALL ;
+IMPORTS Certificate FROM PKIX1Explicit-2009
+        Attribute FROM InformationFramework
+        AttributeCertificate, CertificateSerialNumber, Extensions, Version FROM AuthenticationFramework
+        PolicyInformation, CRLReason FROM CertificateExtensions
+        PKIStatusInfo FROM PKIXCMP-2009 ;
 
-IMPORTS Attribute, Name
-  FROM  InformationFramework {joint-iso-itu-t ds(5) module(1) informationFramework(1) 3}
-        AlgorithmIdentifier, AttributeCertificate, Certificate,
-        CertificateSerialNumber, HASH{}, SIGNED{}, Extensions, Version
-   FROM AuthenticationFramework {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 3}
-        PolicyInformation, CRLReason
-   FROM CertificateExtensions
-        PKIStatusInfo
-   FROM PKIXCMP-2009;
+Name ::= CHOICE { rdnSequence RDNSequence }
+RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+DistinguishedName ::= RDNSequence
+RelativeDistinguishedName ::= SET OF AttributeTypeAndValue
+
+AttributeTypeX ::= OBJECT IDENTIFIER
+AttributeValueX ::= CHOICE {
+  utf8 UTF8String,
+  printable PrintableString,
+  else ANY }
+
+AttributeTypeAndValue ::= SEQUENCE {
+  type AttributeTypeX,
+  value AttributeValueX }
+
+Time ::= CHOICE {
+      utcTime        UTCTime,
+      generalTime    GeneralizedTime }
+
+AlgorithmIdentifier  ::=  SEQUENCE  {
+     algorithm               OBJECT IDENTIFIER,
+     parameters              ANY OPTIONAL  }
+
+ListCertificateList ::= SEQUENCE OF CertificateList
+
+CertificateList ::= SEQUENCE {
+  tbsCertList TBSCertList,
+  signatureAlgorithm AlgorithmIdentifier,
+  signatureValue BIT STRING OPTIONAL }
+
+TBSCertList ::= SEQUENCE {
+  version ANY OPTIONAL,
+  signature ANY,
+  issuer ANY,
+  thisUpdate ANY OPTIONAL,
+  nextUpdate ANY OPTIONAL,
+  revokedCertificates SEQUENCE OF SEQUENCE {
+    userCertificate CertificateSerialNumber,
+    revocationDate Time,
+    crlEntryExtensions Extensions OPTIONAL} OPTIONAL,
+  crlExtensions [0] EXPLICIT ANY OPTIONAL
+}
 
 ContentInfo ::= SEQUENCE {
   contentType ContentType,
   content [0] EXPLICIT ANY DEFINED BY contentType }
 
 UnknownInfo ::= NULL
-
 ContentTimeStamp ::= TimeStampToken
-
-CrlValidatedID ::= SEQUENCE {
-  crlHash OtherHash,
-  crlIdentifier CrlIdentifier OPTIONAL}
-
-OtherHash ::= CHOICE {
-  sha1Hash OtherHashValue,
-  otherHash OtherHashAlgAndValue}
-
-OcspListID ::= SEQUENCE {
-  ocspResponses SEQUENCE OF OcspResponsesID}
-
-OcspResponsesID ::= SEQUENCE {
-  ocspIdentifier OcspIdentifier,
-  ocspRepHash OtherHash OPTIONAL
-}
-
-OtherRevRefs ::= SEQUENCE {
-  otherRevRefType OtherRevRefType,
-  otherRevRefs ANY DEFINED BY otherRevRefType
-}
-
-OcspIdentifier ::= SEQUENCE {
-  ocspResponderID ResponderID,
-  producedAt GeneralizedTime
-}
-
 CMSVersion ::= INTEGER {v0(0), v1(1), v2(2), v3(3), v4(4), v5(5)}
 
-gost34311 OBJECT IDENTIFIER ::= {iso(1) member-body(2) ua(804)
-  root(2) security(1) cryptography(1) pki(1) pki-alg(1) pki-alg-hash (2) 1}
+gost34311 OBJECT IDENTIFIER ::= {iso(1) member-body(2) ua(804) root(2) security(1) cryptography(1) pki(1) pki-alg(1) pki-alg-hash (2) 1}
 
 OTHER-NAME ::= TYPE-IDENTIFIER
 GeneralNames ::= SEQUENCE SIZE (1..MAX) OF GeneralName
@@ -73,7 +82,8 @@ GeneralName ::= CHOICE {
   directoryName              [4]  Name,
   uniformResourceIdentifier  [6]  IA5String,
   iPAddress                  [7]  OCTET STRING,
-  registeredID               [8]  OBJECT IDENTIFIER
+  registeredID               [8]  OBJECT IDENTIFIER,
+  else ANY
 }
 
 TSAPolicyId ::= OBJECT IDENTIFIER
@@ -83,7 +93,8 @@ SubjectKeyIdentifier ::= KeyIdentifier
 RevocationInfoChoices ::= SET OF CertificateList
 SignerInfos ::= SET OF SignerInfo
 CertificateSet ::= SET OF Certificate
-CertificateList ::= SET OF Certificate
+Certificates ::= SEQUENCE OF Certificate
+
 SignedData ::= SEQUENCE {
   version CMSVersion,
   digestAlgorithms DigestAlgorithmIdentifiers,
@@ -158,9 +169,11 @@ SigningCertificateV2 ::= SEQUENCE {certs SEQUENCE OF ESSCertIDv2, policies SEQUE
 SignaturePolicyImplied ::= NULL
 
 DisplayText ::= CHOICE {
-  visibleString VisibleString (SIZE (1..200)),
-  bmpString BMPString (SIZE (1..200)),
-  utf8String UTF8String (SIZE (1..200))}
+  visibleString VisibleString (SIZE (1..2200)),
+  bmpString BMPString (SIZE (1..2200)),
+  utf8String UTF8String (SIZE (1..2200))}
+
+CompleteRevocationRefs ::= SEQUENCE OF CrlOcspRef
 
 CrlOcspRef ::= SEQUENCE {
   crlids     [0] CRLListID OPTIONAL,
@@ -171,6 +184,56 @@ CrlIdentifier ::= SEQUENCE {
   crlissuer Name,
   crlIssuedTime UTCTime,
   crlNumber INTEGER OPTIONAL }
+
+CrlValidatedID ::= SEQUENCE {
+  crlHash OtherHash,
+  crlIdentifier CrlIdentifier OPTIONAL}
+
+OtherHash ::= CHOICE {
+  sha1Hash OtherHashValue,
+  otherHash OtherHashAlgAndValue}
+
+OcspListID ::= SEQUENCE {
+  ocspResponses SEQUENCE OF OcspResponsesID }
+
+OcspResponsesID ::= SEQUENCE {
+  ocspIdentifier ANY, --OcspIdentifier,
+  ocspRepHash OtherHash OPTIONAL
+}
+
+OtherRevRefs ::= SEQUENCE {
+  otherRevRefType OtherRevRefType,
+  otherRevRefs ANY DEFINED BY otherRevRefType
+}
+
+OcspIdentifier ::= SEQUENCE {
+  ocspResponderID ResponderID,
+  producedAt GeneralizedTime
+}
+
+ResponderID ::= CHOICE {
+  byName [1] Name,
+  byKey [2] KeyHash }
+
+KeyHash ::= OCTET STRING
+
+RevocationValues ::= SEQUENCE {
+  crlVals       [0] SEQUENCE OF CertificateList OPTIONAL,
+  ocspVals      [1] ANY OPTIONAL,
+  otherRevVals  [2] OtherRevVals OPTIONAL}
+
+OtherSigningCertificate ::= SEQUENCE {
+  certs SEQUENCE OF OtherCertID,
+  policies SEQUENCE OF PolicyInformation OPTIONAL
+}
+
+CompleteCertificateRefs ::= SEQUENCE OF OtherCertID
+OtherCertID ::= SEQUENCE { otherCertHash OtherHash, issuerSerial IssuerSerial OPTIONAL }
+OtherRevValType ::= OBJECT IDENTIFIER
+OtherRevVals ::= SEQUENCE { otherRevValType OtherRevValType }
+CRLListID ::= SEQUENCE { crls SEQUENCE OF CrlValidatedID }
+
+BasicOCSPResponses ::= SEQUENCE OF BasicOCSPResponse
 
 BasicOCSPResponse ::= SEQUENCE {
   tbsResponseData ResponseData,
@@ -184,12 +247,6 @@ ResponseData ::= SEQUENCE {
   producedAt GeneralizedTime,
   responses SEQUENCE OF SingleResponse,
   responseExtensions [1] EXPLICIT Extensions OPTIONAL} 
-
-ResponderID ::= CHOICE {
-  byName [1] Name,
-  byKey [2] KeyHash}
-
-KeyHash ::= OCTET STRING
 
 CertID ::= SEQUENCE {
   hashAlgorithm AlgorithmIdentifier,
@@ -213,14 +270,6 @@ SingleResponse ::= SEQUENCE {
   nextUpdate [0] EXPLICIT GeneralizedTime OPTIONAL,
   singleExtensions [1] EXPLICIT Extensions OPTIONAL }
 
-RevocationValues ::= SEQUENCE {
-  crlVals       [0] SEQUENCE OF CertificateList OPTIONAL,
-  ocspVals      [1] SEQUENCE OF BasicOCSPResponse OPTIONAL,
-  otherRevVals  [2] OtherRevVals OPTIONAL}
-
-OtherRevValType ::= OBJECT IDENTIFIER
-OtherRevVals ::= SEQUENCE { otherRevValType OtherRevValType }
-CRLListID ::= SEQUENCE { crls SEQUENCE OF CrlValidatedID}
 
 MessageImprint ::= SEQUENCE {
   hashAlgorithm AlgorithmIdentifier,

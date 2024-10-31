@@ -3,7 +3,7 @@
 AuthenticationFramework {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 3} DEFINITIONS ::=
 BEGIN
 
---  EXPORTS All 
+EXPORTS ALL ;
 --  The types and values defined in this module are exported for use in the other ASN.1 modules contained
 --  within the Directory Specifications, and for the use of other applications which will use them to access
 --  Directory services. Other applications may use them for their own purposes, but this will not constrain
@@ -223,20 +223,23 @@ HASH{ToBeHashed} ::= SEQUENCE {
     BIT STRING
       (CONSTRAINED BY {
          -- must be the result of applying a hashing procedure to the DER-encoded octets 
-         -- of a value of -- ToBeHashed})
+         -- of a value of -- ToBeHashed
+         })
 }
 
 ENCRYPTED-HASH{ToBeSigned} ::=
   BIT STRING
     (CONSTRAINED BY {
        --  must be the result of applying a hashing procedure to the DER-encoded octets 
-       --  of a value of --ToBeSigned --  and then applying an encipherment procedure to those octets --})
+       --  of a value of --ToBeSigned --  and then applying an encipherment procedure to those octets --
+       })
 
 ENCRYPTED{ToBeEnciphered} ::=
   BIT STRING
     (CONSTRAINED BY {
        --  must be the result of applying an encipherment procedure 
-       --  to the BER-encoded octets of a value of --ToBeEnciphered})
+       --  to the BER-encoded octets of a value of --ToBeEnciphered
+       })
 
 SIGNATURE{ToBeSigned} ::= SEQUENCE {
   algorithmIdentifier  AlgorithmIdentifier,

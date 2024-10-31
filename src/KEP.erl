@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include_lib("ca/include/KEP.hrl").
+-include("KEP.hrl").
 -asn1_info([{vsn,'5.2.2'},
             {module,'KEP'},
             {options,[warnings,ber,errors,
@@ -18,15 +18,21 @@
          legacy_erlang_types/0]).
 -export(['dialyzer-suppressions'/1]).
 -export([
+enc_Name/2,
+enc_RDNSequence/2,
+enc_DistinguishedName/2,
+enc_RelativeDistinguishedName/2,
+enc_AttributeTypeX/2,
+enc_AttributeValueX/2,
+enc_AttributeTypeAndValue/2,
+enc_Time/2,
+enc_AlgorithmIdentifier/2,
+enc_ListCertificateList/2,
+enc_CertificateList/2,
+enc_TBSCertList/2,
 enc_ContentInfo/2,
 enc_UnknownInfo/2,
 enc_ContentTimeStamp/2,
-enc_CrlValidatedID/2,
-enc_OtherHash/2,
-enc_OcspListID/2,
-enc_OcspResponsesID/2,
-enc_OtherRevRefs/2,
-enc_OcspIdentifier/2,
 enc_CMSVersion/2,
 enc_GeneralNames/2,
 enc_GeneralName/2,
@@ -37,7 +43,7 @@ enc_SubjectKeyIdentifier/2,
 enc_RevocationInfoChoices/2,
 enc_SignerInfos/2,
 enc_CertificateSet/2,
-enc_CertificateList/2,
+enc_Certificates/2,
 enc_SignedData/2,
 enc_EncapsulatedContentInfo/2,
 enc_SignerInfo/2,
@@ -66,20 +72,31 @@ enc_MessageDigest/2,
 enc_SigningCertificateV2/2,
 enc_SignaturePolicyImplied/2,
 enc_DisplayText/2,
+enc_CompleteRevocationRefs/2,
 enc_CrlOcspRef/2,
 enc_CrlIdentifier/2,
-enc_BasicOCSPResponse/2,
-enc_ResponseData/2,
+enc_CrlValidatedID/2,
+enc_OtherHash/2,
+enc_OcspListID/2,
+enc_OcspResponsesID/2,
+enc_OtherRevRefs/2,
+enc_OcspIdentifier/2,
 enc_ResponderID/2,
 enc_KeyHash/2,
+enc_RevocationValues/2,
+enc_OtherSigningCertificate/2,
+enc_CompleteCertificateRefs/2,
+enc_OtherCertID/2,
+enc_OtherRevValType/2,
+enc_OtherRevVals/2,
+enc_CRLListID/2,
+enc_BasicOCSPResponses/2,
+enc_BasicOCSPResponse/2,
+enc_ResponseData/2,
 enc_CertID/2,
 enc_CertStatus/2,
 enc_RevokedInfo/2,
 enc_SingleResponse/2,
-enc_RevocationValues/2,
-enc_OtherRevValType/2,
-enc_OtherRevVals/2,
-enc_CRLListID/2,
 enc_MessageImprint/2,
 enc_TimeStampReq/2,
 enc_TimeStampResp/2,
@@ -92,15 +109,21 @@ enc_ContentType/2,
 ]).
 
 -export([
+dec_Name/2,
+dec_RDNSequence/2,
+dec_DistinguishedName/2,
+dec_RelativeDistinguishedName/2,
+dec_AttributeTypeX/2,
+dec_AttributeValueX/2,
+dec_AttributeTypeAndValue/2,
+dec_Time/2,
+dec_AlgorithmIdentifier/2,
+dec_ListCertificateList/2,
+dec_CertificateList/2,
+dec_TBSCertList/2,
 dec_ContentInfo/2,
 dec_UnknownInfo/2,
 dec_ContentTimeStamp/2,
-dec_CrlValidatedID/2,
-dec_OtherHash/2,
-dec_OcspListID/2,
-dec_OcspResponsesID/2,
-dec_OtherRevRefs/2,
-dec_OcspIdentifier/2,
 dec_CMSVersion/2,
 dec_GeneralNames/2,
 dec_GeneralName/2,
@@ -111,7 +134,7 @@ dec_SubjectKeyIdentifier/2,
 dec_RevocationInfoChoices/2,
 dec_SignerInfos/2,
 dec_CertificateSet/2,
-dec_CertificateList/2,
+dec_Certificates/2,
 dec_SignedData/2,
 dec_EncapsulatedContentInfo/2,
 dec_SignerInfo/2,
@@ -140,20 +163,31 @@ dec_MessageDigest/2,
 dec_SigningCertificateV2/2,
 dec_SignaturePolicyImplied/2,
 dec_DisplayText/2,
+dec_CompleteRevocationRefs/2,
 dec_CrlOcspRef/2,
 dec_CrlIdentifier/2,
-dec_BasicOCSPResponse/2,
-dec_ResponseData/2,
+dec_CrlValidatedID/2,
+dec_OtherHash/2,
+dec_OcspListID/2,
+dec_OcspResponsesID/2,
+dec_OtherRevRefs/2,
+dec_OcspIdentifier/2,
 dec_ResponderID/2,
 dec_KeyHash/2,
+dec_RevocationValues/2,
+dec_OtherSigningCertificate/2,
+dec_CompleteCertificateRefs/2,
+dec_OtherCertID/2,
+dec_OtherRevValType/2,
+dec_OtherRevVals/2,
+dec_CRLListID/2,
+dec_BasicOCSPResponses/2,
+dec_BasicOCSPResponse/2,
+dec_ResponseData/2,
 dec_CertID/2,
 dec_CertStatus/2,
 dec_RevokedInfo/2,
 dec_SingleResponse/2,
-dec_RevocationValues/2,
-dec_OtherRevValType/2,
-dec_OtherRevVals/2,
-dec_CRLListID/2,
 dec_MessageImprint/2,
 dec_TimeStampReq/2,
 dec_TimeStampResp/2,
@@ -229,15 +263,21 @@ try
       end
 end.
 
+encode_disp('Name', Data) -> enc_Name(Data);
+encode_disp('RDNSequence', Data) -> enc_RDNSequence(Data);
+encode_disp('DistinguishedName', Data) -> enc_DistinguishedName(Data);
+encode_disp('RelativeDistinguishedName', Data) -> enc_RelativeDistinguishedName(Data);
+encode_disp('AttributeTypeX', Data) -> enc_AttributeTypeX(Data);
+encode_disp('AttributeValueX', Data) -> enc_AttributeValueX(Data);
+encode_disp('AttributeTypeAndValue', Data) -> enc_AttributeTypeAndValue(Data);
+encode_disp('Time', Data) -> enc_Time(Data);
+encode_disp('AlgorithmIdentifier', Data) -> enc_AlgorithmIdentifier(Data);
+encode_disp('ListCertificateList', Data) -> enc_ListCertificateList(Data);
+encode_disp('CertificateList', Data) -> enc_CertificateList(Data);
+encode_disp('TBSCertList', Data) -> enc_TBSCertList(Data);
 encode_disp('ContentInfo', Data) -> enc_ContentInfo(Data);
 encode_disp('UnknownInfo', Data) -> enc_UnknownInfo(Data);
 encode_disp('ContentTimeStamp', Data) -> enc_ContentTimeStamp(Data);
-encode_disp('CrlValidatedID', Data) -> enc_CrlValidatedID(Data);
-encode_disp('OtherHash', Data) -> enc_OtherHash(Data);
-encode_disp('OcspListID', Data) -> enc_OcspListID(Data);
-encode_disp('OcspResponsesID', Data) -> enc_OcspResponsesID(Data);
-encode_disp('OtherRevRefs', Data) -> enc_OtherRevRefs(Data);
-encode_disp('OcspIdentifier', Data) -> enc_OcspIdentifier(Data);
 encode_disp('CMSVersion', Data) -> enc_CMSVersion(Data);
 encode_disp('GeneralNames', Data) -> enc_GeneralNames(Data);
 encode_disp('GeneralName', Data) -> enc_GeneralName(Data);
@@ -248,7 +288,7 @@ encode_disp('SubjectKeyIdentifier', Data) -> enc_SubjectKeyIdentifier(Data);
 encode_disp('RevocationInfoChoices', Data) -> enc_RevocationInfoChoices(Data);
 encode_disp('SignerInfos', Data) -> enc_SignerInfos(Data);
 encode_disp('CertificateSet', Data) -> enc_CertificateSet(Data);
-encode_disp('CertificateList', Data) -> enc_CertificateList(Data);
+encode_disp('Certificates', Data) -> enc_Certificates(Data);
 encode_disp('SignedData', Data) -> enc_SignedData(Data);
 encode_disp('EncapsulatedContentInfo', Data) -> enc_EncapsulatedContentInfo(Data);
 encode_disp('SignerInfo', Data) -> enc_SignerInfo(Data);
@@ -277,20 +317,31 @@ encode_disp('MessageDigest', Data) -> enc_MessageDigest(Data);
 encode_disp('SigningCertificateV2', Data) -> enc_SigningCertificateV2(Data);
 encode_disp('SignaturePolicyImplied', Data) -> enc_SignaturePolicyImplied(Data);
 encode_disp('DisplayText', Data) -> enc_DisplayText(Data);
+encode_disp('CompleteRevocationRefs', Data) -> enc_CompleteRevocationRefs(Data);
 encode_disp('CrlOcspRef', Data) -> enc_CrlOcspRef(Data);
 encode_disp('CrlIdentifier', Data) -> enc_CrlIdentifier(Data);
-encode_disp('BasicOCSPResponse', Data) -> enc_BasicOCSPResponse(Data);
-encode_disp('ResponseData', Data) -> enc_ResponseData(Data);
+encode_disp('CrlValidatedID', Data) -> enc_CrlValidatedID(Data);
+encode_disp('OtherHash', Data) -> enc_OtherHash(Data);
+encode_disp('OcspListID', Data) -> enc_OcspListID(Data);
+encode_disp('OcspResponsesID', Data) -> enc_OcspResponsesID(Data);
+encode_disp('OtherRevRefs', Data) -> enc_OtherRevRefs(Data);
+encode_disp('OcspIdentifier', Data) -> enc_OcspIdentifier(Data);
 encode_disp('ResponderID', Data) -> enc_ResponderID(Data);
 encode_disp('KeyHash', Data) -> enc_KeyHash(Data);
+encode_disp('RevocationValues', Data) -> enc_RevocationValues(Data);
+encode_disp('OtherSigningCertificate', Data) -> enc_OtherSigningCertificate(Data);
+encode_disp('CompleteCertificateRefs', Data) -> enc_CompleteCertificateRefs(Data);
+encode_disp('OtherCertID', Data) -> enc_OtherCertID(Data);
+encode_disp('OtherRevValType', Data) -> enc_OtherRevValType(Data);
+encode_disp('OtherRevVals', Data) -> enc_OtherRevVals(Data);
+encode_disp('CRLListID', Data) -> enc_CRLListID(Data);
+encode_disp('BasicOCSPResponses', Data) -> enc_BasicOCSPResponses(Data);
+encode_disp('BasicOCSPResponse', Data) -> enc_BasicOCSPResponse(Data);
+encode_disp('ResponseData', Data) -> enc_ResponseData(Data);
 encode_disp('CertID', Data) -> enc_CertID(Data);
 encode_disp('CertStatus', Data) -> enc_CertStatus(Data);
 encode_disp('RevokedInfo', Data) -> enc_RevokedInfo(Data);
 encode_disp('SingleResponse', Data) -> enc_SingleResponse(Data);
-encode_disp('RevocationValues', Data) -> enc_RevocationValues(Data);
-encode_disp('OtherRevValType', Data) -> enc_OtherRevValType(Data);
-encode_disp('OtherRevVals', Data) -> enc_OtherRevVals(Data);
-encode_disp('CRLListID', Data) -> enc_CRLListID(Data);
 encode_disp('MessageImprint', Data) -> enc_MessageImprint(Data);
 encode_disp('TimeStampReq', Data) -> enc_TimeStampReq(Data);
 encode_disp('TimeStampResp', Data) -> enc_TimeStampResp(Data);
@@ -302,15 +353,21 @@ encode_disp('ContentType', Data) -> enc_ContentType(Data);
 encode_disp('INSTANCE OF', Data) -> 'enc_INSTANCE OF'(Data);
 encode_disp(Type, _Data) -> exit({error,{asn1,{undefined_type,Type}}}).
 
+decode_disp('Name', Data) -> dec_Name(Data);
+decode_disp('RDNSequence', Data) -> dec_RDNSequence(Data);
+decode_disp('DistinguishedName', Data) -> dec_DistinguishedName(Data);
+decode_disp('RelativeDistinguishedName', Data) -> dec_RelativeDistinguishedName(Data);
+decode_disp('AttributeTypeX', Data) -> dec_AttributeTypeX(Data);
+decode_disp('AttributeValueX', Data) -> dec_AttributeValueX(Data);
+decode_disp('AttributeTypeAndValue', Data) -> dec_AttributeTypeAndValue(Data);
+decode_disp('Time', Data) -> dec_Time(Data);
+decode_disp('AlgorithmIdentifier', Data) -> dec_AlgorithmIdentifier(Data);
+decode_disp('ListCertificateList', Data) -> dec_ListCertificateList(Data);
+decode_disp('CertificateList', Data) -> dec_CertificateList(Data);
+decode_disp('TBSCertList', Data) -> dec_TBSCertList(Data);
 decode_disp('ContentInfo', Data) -> dec_ContentInfo(Data);
 decode_disp('UnknownInfo', Data) -> dec_UnknownInfo(Data);
 decode_disp('ContentTimeStamp', Data) -> dec_ContentTimeStamp(Data);
-decode_disp('CrlValidatedID', Data) -> dec_CrlValidatedID(Data);
-decode_disp('OtherHash', Data) -> dec_OtherHash(Data);
-decode_disp('OcspListID', Data) -> dec_OcspListID(Data);
-decode_disp('OcspResponsesID', Data) -> dec_OcspResponsesID(Data);
-decode_disp('OtherRevRefs', Data) -> dec_OtherRevRefs(Data);
-decode_disp('OcspIdentifier', Data) -> dec_OcspIdentifier(Data);
 decode_disp('CMSVersion', Data) -> dec_CMSVersion(Data);
 decode_disp('GeneralNames', Data) -> dec_GeneralNames(Data);
 decode_disp('GeneralName', Data) -> dec_GeneralName(Data);
@@ -321,7 +378,7 @@ decode_disp('SubjectKeyIdentifier', Data) -> dec_SubjectKeyIdentifier(Data);
 decode_disp('RevocationInfoChoices', Data) -> dec_RevocationInfoChoices(Data);
 decode_disp('SignerInfos', Data) -> dec_SignerInfos(Data);
 decode_disp('CertificateSet', Data) -> dec_CertificateSet(Data);
-decode_disp('CertificateList', Data) -> dec_CertificateList(Data);
+decode_disp('Certificates', Data) -> dec_Certificates(Data);
 decode_disp('SignedData', Data) -> dec_SignedData(Data);
 decode_disp('EncapsulatedContentInfo', Data) -> dec_EncapsulatedContentInfo(Data);
 decode_disp('SignerInfo', Data) -> dec_SignerInfo(Data);
@@ -350,20 +407,31 @@ decode_disp('MessageDigest', Data) -> dec_MessageDigest(Data);
 decode_disp('SigningCertificateV2', Data) -> dec_SigningCertificateV2(Data);
 decode_disp('SignaturePolicyImplied', Data) -> dec_SignaturePolicyImplied(Data);
 decode_disp('DisplayText', Data) -> dec_DisplayText(Data);
+decode_disp('CompleteRevocationRefs', Data) -> dec_CompleteRevocationRefs(Data);
 decode_disp('CrlOcspRef', Data) -> dec_CrlOcspRef(Data);
 decode_disp('CrlIdentifier', Data) -> dec_CrlIdentifier(Data);
-decode_disp('BasicOCSPResponse', Data) -> dec_BasicOCSPResponse(Data);
-decode_disp('ResponseData', Data) -> dec_ResponseData(Data);
+decode_disp('CrlValidatedID', Data) -> dec_CrlValidatedID(Data);
+decode_disp('OtherHash', Data) -> dec_OtherHash(Data);
+decode_disp('OcspListID', Data) -> dec_OcspListID(Data);
+decode_disp('OcspResponsesID', Data) -> dec_OcspResponsesID(Data);
+decode_disp('OtherRevRefs', Data) -> dec_OtherRevRefs(Data);
+decode_disp('OcspIdentifier', Data) -> dec_OcspIdentifier(Data);
 decode_disp('ResponderID', Data) -> dec_ResponderID(Data);
 decode_disp('KeyHash', Data) -> dec_KeyHash(Data);
+decode_disp('RevocationValues', Data) -> dec_RevocationValues(Data);
+decode_disp('OtherSigningCertificate', Data) -> dec_OtherSigningCertificate(Data);
+decode_disp('CompleteCertificateRefs', Data) -> dec_CompleteCertificateRefs(Data);
+decode_disp('OtherCertID', Data) -> dec_OtherCertID(Data);
+decode_disp('OtherRevValType', Data) -> dec_OtherRevValType(Data);
+decode_disp('OtherRevVals', Data) -> dec_OtherRevVals(Data);
+decode_disp('CRLListID', Data) -> dec_CRLListID(Data);
+decode_disp('BasicOCSPResponses', Data) -> dec_BasicOCSPResponses(Data);
+decode_disp('BasicOCSPResponse', Data) -> dec_BasicOCSPResponse(Data);
+decode_disp('ResponseData', Data) -> dec_ResponseData(Data);
 decode_disp('CertID', Data) -> dec_CertID(Data);
 decode_disp('CertStatus', Data) -> dec_CertStatus(Data);
 decode_disp('RevokedInfo', Data) -> dec_RevokedInfo(Data);
 decode_disp('SingleResponse', Data) -> dec_SingleResponse(Data);
-decode_disp('RevocationValues', Data) -> dec_RevocationValues(Data);
-decode_disp('OtherRevValType', Data) -> dec_OtherRevValType(Data);
-decode_disp('OtherRevVals', Data) -> dec_OtherRevVals(Data);
-decode_disp('CRLListID', Data) -> dec_CRLListID(Data);
 decode_disp('MessageImprint', Data) -> dec_MessageImprint(Data);
 decode_disp('TimeStampReq', Data) -> dec_TimeStampReq(Data);
 decode_disp('TimeStampResp', Data) -> dec_TimeStampResp(Data);
@@ -387,6 +455,692 @@ info() ->
      _ ->
        []
    end.
+
+
+%%================================
+%%  Name
+%%================================
+enc_Name(Val) ->
+    enc_Name(Val, []).
+
+enc_Name(Val, TagIn) ->
+   {EncBytes,EncLen} = case element(1,Val) of
+      rdnSequence ->
+         'enc_RDNSequence'(element(2,Val), [<<48>>]);
+      Else -> 
+         exit({error,{asn1,{invalid_choice_type,Else}}})
+   end,
+
+encode_tags(TagIn, EncBytes, EncLen).
+
+
+
+
+dec_Name(Tlv) ->
+   dec_Name(Tlv, []).
+
+dec_Name(Tlv, TagIn) ->
+Tlv1 = match_tags(Tlv, TagIn),
+case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
+
+%% 'rdnSequence'
+    {16, V1} -> 
+        {rdnSequence, 'dec_RDNSequence'(V1, [])};
+
+      Else -> 
+         exit({error,{asn1,{invalid_choice_tag,Else}}})
+   end
+.
+
+
+%%================================
+%%  RDNSequence
+%%================================
+enc_RDNSequence(Val) ->
+    enc_RDNSequence(Val, [<<48>>]).
+
+enc_RDNSequence(Val, TagIn) ->
+   {EncBytes,EncLen} = 'enc_RDNSequence_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_RDNSequence_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_RDNSequence_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_RelativeDistinguishedName'(H, [<<49>>]),
+   'enc_RDNSequence_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_RDNSequence(Tlv) ->
+   dec_RDNSequence(Tlv, [16]).
+
+dec_RDNSequence(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_RelativeDistinguishedName'(V1, [17]) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  DistinguishedName
+%%================================
+enc_DistinguishedName(Val) ->
+    enc_DistinguishedName(Val, [<<48>>]).
+
+enc_DistinguishedName(Val, TagIn) ->
+   enc_RDNSequence(Val, TagIn).
+
+
+dec_DistinguishedName(Tlv) ->
+   dec_DistinguishedName(Tlv, [16]).
+
+dec_DistinguishedName(Tlv, TagIn) ->
+'dec_RDNSequence'(Tlv, TagIn).
+
+
+
+%%================================
+%%  RelativeDistinguishedName
+%%================================
+enc_RelativeDistinguishedName(Val) ->
+    enc_RelativeDistinguishedName(Val, [<<49>>]).
+
+enc_RelativeDistinguishedName(Val, TagIn) ->
+   {EncBytes,EncLen} = 'enc_RelativeDistinguishedName_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_RelativeDistinguishedName_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_RelativeDistinguishedName_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_AttributeTypeAndValue'(H, [<<48>>]),
+   'enc_RelativeDistinguishedName_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_RelativeDistinguishedName(Tlv) ->
+   dec_RelativeDistinguishedName(Tlv, [17]).
+
+dec_RelativeDistinguishedName(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_AttributeTypeAndValue'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  AttributeTypeX
+%%================================
+enc_AttributeTypeX(Val) ->
+    enc_AttributeTypeX(Val, [<<6>>]).
+
+enc_AttributeTypeX(Val, TagIn) ->
+encode_object_identifier(Val, TagIn).
+
+
+dec_AttributeTypeX(Tlv) ->
+   dec_AttributeTypeX(Tlv, [6]).
+
+dec_AttributeTypeX(Tlv, TagIn) ->
+decode_object_identifier(Tlv, TagIn).
+
+
+
+%%================================
+%%  AttributeValueX
+%%================================
+enc_AttributeValueX(Val) ->
+    enc_AttributeValueX(Val, []).
+
+enc_AttributeValueX(Val, TagIn) ->
+   {EncBytes,EncLen} = case element(1,Val) of
+      utf8 ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
+      printable ->
+         encode_restricted_string(element(2,Val), [<<19>>]);
+      else ->
+         encode_open_type(element(2,Val), []);
+      Else -> 
+         exit({error,{asn1,{invalid_choice_type,Else}}})
+   end,
+
+encode_tags(TagIn, EncBytes, EncLen).
+
+
+
+
+dec_AttributeValueX(Tlv) ->
+   dec_AttributeValueX(Tlv, []).
+
+dec_AttributeValueX(Tlv, TagIn) ->
+Tlv1 = match_tags(Tlv, TagIn),
+case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
+
+%% 'utf8'
+    {12, V1} -> 
+        {utf8, decode_UTF8_string(V1, [])};
+
+
+%% 'printable'
+    {19, V1} -> 
+        {printable, begin
+binary_to_list(decode_restricted_string(V1, []))
+end
+};
+
+
+%% 'else'
+      Else -> 
+         exit({error,{asn1,{invalid_choice_tag,Else}}})
+   end
+.
+
+
+%%================================
+%%  AttributeTypeAndValue
+%%================================
+enc_AttributeTypeAndValue(Val) ->
+    enc_AttributeTypeAndValue(Val, [<<48>>]).
+
+enc_AttributeTypeAndValue(Val, TagIn) ->
+{_,Cindex1,Cindex2} = Val,
+
+%%-------------------------------------------------
+%% attribute type(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_object_identifier(Cindex1, [<<6>>]),
+
+%%-------------------------------------------------
+%% attribute value(2)   External KEP:AttributeValueX
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} = 'enc_AttributeValueX'(Cindex2, []),
+
+   BytesSoFar = [EncBytes1, EncBytes2],
+LenSoFar = EncLen1 + EncLen2,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_AttributeTypeAndValue(Tlv) ->
+   dec_AttributeTypeAndValue(Tlv, [16]).
+
+dec_AttributeTypeAndValue(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute type(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_object_identifier(V1, [6]),
+
+%%-------------------------------------------------
+%% attribute value(2)   External KEP:AttributeValueX
+%%-------------------------------------------------
+[V2|Tlv3] = Tlv2, 
+Term2 = 'dec_AttributeValueX'(V2, []),
+
+case Tlv3 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
+end,
+Res1 = {'AttributeTypeAndValue',Term1,Term2},
+Res1.
+
+
+%%================================
+%%  Time
+%%================================
+enc_Time(Val) ->
+    enc_Time(Val, []).
+
+enc_Time(Val, TagIn) ->
+   {EncBytes,EncLen} = case element(1,Val) of
+      utcTime ->
+         encode_restricted_string(element(2,Val), [<<23>>]);
+      generalTime ->
+         encode_restricted_string(element(2,Val), [<<24>>]);
+      Else -> 
+         exit({error,{asn1,{invalid_choice_type,Else}}})
+   end,
+
+encode_tags(TagIn, EncBytes, EncLen).
+
+
+
+
+dec_Time(Tlv) ->
+   dec_Time(Tlv, []).
+
+dec_Time(Tlv, TagIn) ->
+Tlv1 = match_tags(Tlv, TagIn),
+case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
+
+%% 'utcTime'
+    {23, V1} -> 
+        {utcTime, begin
+binary_to_list(decode_restricted_string(V1, []))
+end
+};
+
+
+%% 'generalTime'
+    {24, V1} -> 
+        {generalTime, begin
+binary_to_list(decode_restricted_string(V1, []))
+end
+};
+
+      Else -> 
+         exit({error,{asn1,{invalid_choice_tag,Else}}})
+   end
+.
+
+
+%%================================
+%%  AlgorithmIdentifier
+%%================================
+enc_AlgorithmIdentifier(Val) ->
+    enc_AlgorithmIdentifier(Val, [<<48>>]).
+
+enc_AlgorithmIdentifier(Val, TagIn) ->
+{_,Cindex1,Cindex2} = Val,
+
+%%-------------------------------------------------
+%% attribute algorithm(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_object_identifier(Cindex1, [<<6>>]),
+
+%%-------------------------------------------------
+%% attribute parameters(2) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} =  case Cindex2 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            encode_open_type(Cindex2, [])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2],
+LenSoFar = EncLen1 + EncLen2,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_AlgorithmIdentifier(Tlv) ->
+   dec_AlgorithmIdentifier(Tlv, [16]).
+
+dec_AlgorithmIdentifier(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute algorithm(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_object_identifier(V1, [6]),
+
+%%-------------------------------------------------
+%% attribute parameters(2) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+{Term2,Tlv3} = case Tlv2 of
+[V2|TempTlv3] ->
+    {decode_open_type_as_binary(V2, []), TempTlv3};
+    _ ->
+        { asn1_NOVALUE, Tlv2}
+end,
+
+case Tlv3 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
+end,
+Res1 = {'AlgorithmIdentifier',Term1,Term2},
+Res1.
+
+
+%%================================
+%%  ListCertificateList
+%%================================
+enc_ListCertificateList(Val) ->
+    enc_ListCertificateList(Val, [<<48>>]).
+
+enc_ListCertificateList(Val, TagIn) ->
+   {EncBytes,EncLen} = 'enc_ListCertificateList_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_ListCertificateList_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_ListCertificateList_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_CertificateList'(H, [<<48>>]),
+   'enc_ListCertificateList_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_ListCertificateList(Tlv) ->
+   dec_ListCertificateList(Tlv, [16]).
+
+dec_ListCertificateList(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_CertificateList'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  CertificateList
+%%================================
+enc_CertificateList(Val) ->
+    enc_CertificateList(Val, [<<48>>]).
+
+enc_CertificateList(Val, TagIn) ->
+{_,Cindex1,Cindex2,Cindex3} = Val,
+
+%%-------------------------------------------------
+%% attribute tbsCertList(1)   External KEP:TBSCertList
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = 'enc_TBSCertList'(Cindex1, [<<48>>]),
+
+%%-------------------------------------------------
+%% attribute signatureAlgorithm(2)   External KEP:AlgorithmIdentifier
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} = 'enc_AlgorithmIdentifier'(Cindex2, [<<48>>]),
+
+%%-------------------------------------------------
+%% attribute signatureValue(3) with type BIT STRING OPTIONAL
+%%-------------------------------------------------
+   {EncBytes3,EncLen3} =  case Cindex3 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            encode_unnamed_bit_string(Cindex3, [<<3>>])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
+LenSoFar = EncLen1 + EncLen2 + EncLen3,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_CertificateList(Tlv) ->
+   dec_CertificateList(Tlv, [16]).
+
+dec_CertificateList(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute tbsCertList(1)   External KEP:TBSCertList
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = 'dec_TBSCertList'(V1, [16]),
+
+%%-------------------------------------------------
+%% attribute signatureAlgorithm(2)   External KEP:AlgorithmIdentifier
+%%-------------------------------------------------
+[V2|Tlv3] = Tlv2, 
+Term2 = 'dec_AlgorithmIdentifier'(V2, [16]),
+
+%%-------------------------------------------------
+%% attribute signatureValue(3) with type BIT STRING OPTIONAL
+%%-------------------------------------------------
+{Term3,Tlv4} = case Tlv3 of
+[{3,V3}|TempTlv4] ->
+    {decode_native_bit_string(V3, []), TempTlv4};
+    _ ->
+        { asn1_NOVALUE, Tlv3}
+end,
+
+case Tlv4 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv4}}}) % extra fields not allowed
+end,
+Res1 = {'CertificateList',Term1,Term2,Term3},
+Res1.
+
+
+%%================================
+%%  TBSCertList
+%%================================
+enc_TBSCertList(Val) ->
+    enc_TBSCertList(Val, [<<48>>]).
+
+enc_TBSCertList(Val, TagIn) ->
+{_,Cindex1,Cindex2,Cindex3,Cindex4,Cindex5,Cindex6,Cindex7} = Val,
+
+%%-------------------------------------------------
+%% attribute version(1) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} =  case Cindex1 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            encode_open_type(Cindex1, [])
+       end,
+
+%%-------------------------------------------------
+%% attribute signature(2) with type ASN1_OPEN_TYPE
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} = encode_open_type(Cindex2, []),
+
+%%-------------------------------------------------
+%% attribute issuer(3) with type ASN1_OPEN_TYPE
+%%-------------------------------------------------
+   {EncBytes3,EncLen3} = encode_open_type(Cindex3, []),
+
+%%-------------------------------------------------
+%% attribute thisUpdate(4) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+   {EncBytes4,EncLen4} =  case Cindex4 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            encode_open_type(Cindex4, [])
+       end,
+
+%%-------------------------------------------------
+%% attribute nextUpdate(5) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+   {EncBytes5,EncLen5} =  case Cindex5 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            encode_open_type(Cindex5, [])
+       end,
+
+%%-------------------------------------------------
+%% attribute revokedCertificates(6) with type SEQUENCE OF OPTIONAL
+%%-------------------------------------------------
+   {EncBytes6,EncLen6} =  case Cindex6 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            'enc_TBSCertList_revokedCertificates'(Cindex6, [<<48>>])
+       end,
+
+%%-------------------------------------------------
+%% attribute crlExtensions(7) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+   {EncBytes7,EncLen7} =  case Cindex7 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            encode_open_type(Cindex7, [<<160>>])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3, EncBytes4, EncBytes5, EncBytes6, EncBytes7],
+LenSoFar = EncLen1 + EncLen2 + EncLen3 + EncLen4 + EncLen5 + EncLen6 + EncLen7,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+
+%%================================
+%%  TBSCertList_revokedCertificates
+%%================================
+enc_TBSCertList_revokedCertificates(Val, TagIn) ->
+      {EncBytes,EncLen} = 'enc_TBSCertList_revokedCertificates_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_TBSCertList_revokedCertificates_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_TBSCertList_revokedCertificates_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_TBSCertList_revokedCertificates_SEQOF'(H, [<<48>>]),
+   'enc_TBSCertList_revokedCertificates_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+
+%%================================
+%%  TBSCertList_revokedCertificates_SEQOF
+%%================================
+enc_TBSCertList_revokedCertificates_SEQOF(Val, TagIn) ->
+   {_,Cindex1,Cindex2,Cindex3} = Val,
+
+%%-------------------------------------------------
+%% attribute userCertificate(1) with type INTEGER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_integer(Cindex1, [<<2>>]),
+
+%%-------------------------------------------------
+%% attribute revocationDate(2)   External KEP:Time
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} = 'enc_Time'(Cindex2, []),
+
+%%-------------------------------------------------
+%% attribute crlEntryExtensions(3)   External AuthenticationFramework:Extensions OPTIONAL
+%%-------------------------------------------------
+   {EncBytes3,EncLen3} =  case Cindex3 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            'AuthenticationFramework':'enc_Extensions'(Cindex3, [<<48>>])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
+LenSoFar = EncLen1 + EncLen2 + EncLen3,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_TBSCertList(Tlv) ->
+   dec_TBSCertList(Tlv, [16]).
+
+dec_TBSCertList(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute version(1) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+{Term1,Tlv2} = case Tlv1 of
+[V1|TempTlv2] ->
+    {decode_open_type_as_binary(V1, []), TempTlv2};
+    _ ->
+        { asn1_NOVALUE, Tlv1}
+end,
+
+%%-------------------------------------------------
+%% attribute signature(2) with type ASN1_OPEN_TYPE
+%%-------------------------------------------------
+[V2|Tlv3] = Tlv2, 
+Term2 = decode_open_type_as_binary(V2, []),
+
+%%-------------------------------------------------
+%% attribute issuer(3) with type ASN1_OPEN_TYPE
+%%-------------------------------------------------
+[V3|Tlv4] = Tlv3, 
+Term3 = decode_open_type_as_binary(V3, []),
+
+%%-------------------------------------------------
+%% attribute thisUpdate(4) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+{Term4,Tlv5} = case Tlv4 of
+[V4|TempTlv5] ->
+    {decode_open_type_as_binary(V4, []), TempTlv5};
+    _ ->
+        { asn1_NOVALUE, Tlv4}
+end,
+
+%%-------------------------------------------------
+%% attribute nextUpdate(5) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+{Term5,Tlv6} = case Tlv5 of
+[V5|TempTlv6] ->
+    {decode_open_type_as_binary(V5, []), TempTlv6};
+    _ ->
+        { asn1_NOVALUE, Tlv5}
+end,
+
+%%-------------------------------------------------
+%% attribute revokedCertificates(6) with type SEQUENCE OF OPTIONAL
+%%-------------------------------------------------
+{Term6,Tlv7} = case Tlv6 of
+[{16,V6}|TempTlv7] ->
+    {'dec_TBSCertList_revokedCertificates'(V6, []), TempTlv7};
+    _ ->
+        { asn1_NOVALUE, Tlv6}
+end,
+
+%%-------------------------------------------------
+%% attribute crlExtensions(7) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+{Term7,Tlv8} = case Tlv7 of
+[{131072,V7}|TempTlv8] ->
+    {decode_open_type_as_binary(V7, []), TempTlv8};
+    _ ->
+        { asn1_NOVALUE, Tlv7}
+end,
+
+case Tlv8 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv8}}}) % extra fields not allowed
+end,
+Res1 = {'TBSCertList',Term1,Term2,Term3,Term4,Term5,Term6,Term7},
+Res1.
+'dec_TBSCertList_revokedCertificates'(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_TBSCertList_revokedCertificates_SEQOF'(V1, [16]) || V1 <- Tlv1].
+
+
+'dec_TBSCertList_revokedCertificates_SEQOF'(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute userCertificate(1) with type INTEGER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_integer(V1, [2]),
+
+%%-------------------------------------------------
+%% attribute revocationDate(2)   External KEP:Time
+%%-------------------------------------------------
+[V2|Tlv3] = Tlv2, 
+Term2 = 'dec_Time'(V2, []),
+
+%%-------------------------------------------------
+%% attribute crlEntryExtensions(3)   External AuthenticationFramework:Extensions OPTIONAL
+%%-------------------------------------------------
+{Term3,Tlv4} = case Tlv3 of
+[{16,V3}|TempTlv4] ->
+    {'AuthenticationFramework':'dec_Extensions'(V3, []), TempTlv4};
+    _ ->
+        { asn1_NOVALUE, Tlv3}
+end,
+
+case Tlv4 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv4}}}) % extra fields not allowed
+end,
+Res1 = {'TBSCertList_revokedCertificates_SEQOF',Term1,Term2,Term3},
+Res1.
 
 
 %%================================
@@ -478,344 +1232,6 @@ dec_ContentTimeStamp(Tlv, TagIn) ->
 
 
 %%================================
-%%  CrlValidatedID
-%%================================
-enc_CrlValidatedID(Val) ->
-    enc_CrlValidatedID(Val, [<<48>>]).
-
-enc_CrlValidatedID(Val, TagIn) ->
-{_,Cindex1,Cindex2} = Val,
-
-%%-------------------------------------------------
-%% attribute crlHash(1)   External KEP:OtherHash
-%%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'enc_OtherHash'(Cindex1, []),
-
-%%-------------------------------------------------
-%% attribute crlIdentifier(2)   External KEP:CrlIdentifier OPTIONAL
-%%-------------------------------------------------
-   {EncBytes2,EncLen2} =  case Cindex2 of
-         asn1_NOVALUE -> {<<>>,0};
-         _ ->
-            'enc_CrlIdentifier'(Cindex2, [<<48>>])
-       end,
-
-   BytesSoFar = [EncBytes1, EncBytes2],
-LenSoFar = EncLen1 + EncLen2,
-encode_tags(TagIn, BytesSoFar, LenSoFar).
-
-
-dec_CrlValidatedID(Tlv) ->
-   dec_CrlValidatedID(Tlv, [16]).
-
-dec_CrlValidatedID(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-
-%%-------------------------------------------------
-%% attribute crlHash(1)   External KEP:OtherHash
-%%-------------------------------------------------
-[V1|Tlv2] = Tlv1, 
-Term1 = 'dec_OtherHash'(V1, []),
-
-%%-------------------------------------------------
-%% attribute crlIdentifier(2)   External KEP:CrlIdentifier OPTIONAL
-%%-------------------------------------------------
-{Term2,Tlv3} = case Tlv2 of
-[{16,V2}|TempTlv3] ->
-    {'dec_CrlIdentifier'(V2, []), TempTlv3};
-    _ ->
-        { asn1_NOVALUE, Tlv2}
-end,
-
-case Tlv3 of
-[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
-end,
-Res1 = {'CrlValidatedID',Term1,Term2},
-Res1.
-
-
-%%================================
-%%  OtherHash
-%%================================
-enc_OtherHash(Val) ->
-    enc_OtherHash(Val, []).
-
-enc_OtherHash(Val, TagIn) ->
-   {EncBytes,EncLen} = case element(1,Val) of
-      sha1Hash ->
-         encode_restricted_string(element(2,Val), [<<4>>]);
-      otherHash ->
-         'enc_OtherHashAlgAndValue'(element(2,Val), [<<48>>]);
-      Else -> 
-         exit({error,{asn1,{invalid_choice_type,Else}}})
-   end,
-
-encode_tags(TagIn, EncBytes, EncLen).
-
-
-
-
-dec_OtherHash(Tlv) ->
-   dec_OtherHash(Tlv, []).
-
-dec_OtherHash(Tlv, TagIn) ->
-Tlv1 = match_tags(Tlv, TagIn),
-case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
-
-%% 'sha1Hash'
-    {4, V1} -> 
-        {sha1Hash, decode_octet_string(V1, [])};
-
-
-%% 'otherHash'
-    {16, V1} -> 
-        {otherHash, 'dec_OtherHashAlgAndValue'(V1, [])};
-
-      Else -> 
-         exit({error,{asn1,{invalid_choice_tag,Else}}})
-   end
-.
-
-
-%%================================
-%%  OcspListID
-%%================================
-enc_OcspListID(Val) ->
-    enc_OcspListID(Val, [<<48>>]).
-
-enc_OcspListID(Val, TagIn) ->
-{_,Cindex1} = Val,
-
-%%-------------------------------------------------
-%% attribute ocspResponses(1) with type SEQUENCE OF
-%%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'enc_OcspListID_ocspResponses'(Cindex1, [<<48>>]),
-
-   BytesSoFar = [EncBytes1],
-LenSoFar = EncLen1,
-encode_tags(TagIn, BytesSoFar, LenSoFar).
-
-
-
-%%================================
-%%  OcspListID_ocspResponses
-%%================================
-enc_OcspListID_ocspResponses(Val, TagIn) ->
-      {EncBytes,EncLen} = 'enc_OcspListID_ocspResponses_components'(Val,[],0),
-   encode_tags(TagIn, EncBytes, EncLen).
-
-'enc_OcspListID_ocspResponses_components'([], AccBytes, AccLen) -> 
-   {lists:reverse(AccBytes),AccLen};
-
-'enc_OcspListID_ocspResponses_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = 'enc_OcspResponsesID'(H, [<<48>>]),
-   'enc_OcspListID_ocspResponses_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
-
-
-
-dec_OcspListID(Tlv) ->
-   dec_OcspListID(Tlv, [16]).
-
-dec_OcspListID(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-
-%%-------------------------------------------------
-%% attribute ocspResponses(1) with type SEQUENCE OF
-%%-------------------------------------------------
-[V1|Tlv2] = Tlv1, 
-Term1 = 'dec_OcspListID_ocspResponses'(V1, [16]),
-
-case Tlv2 of
-[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv2}}}) % extra fields not allowed
-end,
-Res1 = {'OcspListID',Term1},
-Res1.
-'dec_OcspListID_ocspResponses'(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-['dec_OcspResponsesID'(V1, [16]) || V1 <- Tlv1].
-
-
-
-
-%%================================
-%%  OcspResponsesID
-%%================================
-enc_OcspResponsesID(Val) ->
-    enc_OcspResponsesID(Val, [<<48>>]).
-
-enc_OcspResponsesID(Val, TagIn) ->
-{_,Cindex1,Cindex2} = Val,
-
-%%-------------------------------------------------
-%% attribute ocspIdentifier(1)   External KEP:OcspIdentifier
-%%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'enc_OcspIdentifier'(Cindex1, [<<48>>]),
-
-%%-------------------------------------------------
-%% attribute ocspRepHash(2)   External KEP:OtherHash OPTIONAL
-%%-------------------------------------------------
-   {EncBytes2,EncLen2} =  case Cindex2 of
-         asn1_NOVALUE -> {<<>>,0};
-         _ ->
-            'enc_OtherHash'(Cindex2, [])
-       end,
-
-   BytesSoFar = [EncBytes1, EncBytes2],
-LenSoFar = EncLen1 + EncLen2,
-encode_tags(TagIn, BytesSoFar, LenSoFar).
-
-
-dec_OcspResponsesID(Tlv) ->
-   dec_OcspResponsesID(Tlv, [16]).
-
-dec_OcspResponsesID(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-
-%%-------------------------------------------------
-%% attribute ocspIdentifier(1)   External KEP:OcspIdentifier
-%%-------------------------------------------------
-[V1|Tlv2] = Tlv1, 
-Term1 = 'dec_OcspIdentifier'(V1, [16]),
-
-%%-------------------------------------------------
-%% attribute ocspRepHash(2)   External KEP:OtherHash OPTIONAL
-%%-------------------------------------------------
-{Term2,Tlv3} = case Tlv2 of
-[V2 = {4,_}|TempTlv3] ->
-    {'dec_OtherHash'(V2, []), TempTlv3};
-[V2 = {16,_}|TempTlv3] ->
-    {'dec_OtherHash'(V2, []), TempTlv3};
-    _ ->
-        { asn1_NOVALUE, Tlv2}
-end,
-
-case Tlv3 of
-[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
-end,
-Res1 = {'OcspResponsesID',Term1,Term2},
-Res1.
-
-
-%%================================
-%%  OtherRevRefs
-%%================================
-enc_OtherRevRefs(Val) ->
-    enc_OtherRevRefs(Val, [<<48>>]).
-
-enc_OtherRevRefs(Val, TagIn) ->
-{_,Cindex1,Cindex2} = Val,
-
-%%-------------------------------------------------
-%% attribute otherRevRefType(1) with type OBJECT IDENTIFIER
-%%-------------------------------------------------
-   {EncBytes1,EncLen1} = encode_object_identifier(Cindex1, [<<6>>]),
-
-%%-------------------------------------------------
-%% attribute otherRevRefs(2) with type ASN1_OPEN_TYPE
-%%-------------------------------------------------
-   {EncBytes2,EncLen2} = encode_open_type(Cindex2, []),
-
-   BytesSoFar = [EncBytes1, EncBytes2],
-LenSoFar = EncLen1 + EncLen2,
-encode_tags(TagIn, BytesSoFar, LenSoFar).
-
-
-dec_OtherRevRefs(Tlv) ->
-   dec_OtherRevRefs(Tlv, [16]).
-
-dec_OtherRevRefs(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-
-%%-------------------------------------------------
-%% attribute otherRevRefType(1) with type OBJECT IDENTIFIER
-%%-------------------------------------------------
-[V1|Tlv2] = Tlv1, 
-Term1 = decode_object_identifier(V1, [6]),
-
-%%-------------------------------------------------
-%% attribute otherRevRefs(2) with type ASN1_OPEN_TYPE
-%%-------------------------------------------------
-[V2|Tlv3] = Tlv2, 
-Term2 = decode_open_type_as_binary(V2, []),
-
-case Tlv3 of
-[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
-end,
-Res1 = {'OtherRevRefs',Term1,Term2},
-Res1.
-
-
-%%================================
-%%  OcspIdentifier
-%%================================
-enc_OcspIdentifier(Val) ->
-    enc_OcspIdentifier(Val, [<<48>>]).
-
-enc_OcspIdentifier(Val, TagIn) ->
-{_,Cindex1,Cindex2} = Val,
-
-%%-------------------------------------------------
-%% attribute ocspResponderID(1)   External KEP:ResponderID
-%%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'enc_ResponderID'(Cindex1, []),
-
-%%-------------------------------------------------
-%% attribute producedAt(2) with type GeneralizedTime
-%%-------------------------------------------------
-   {EncBytes2,EncLen2} = encode_restricted_string(Cindex2, [<<24>>]),
-
-   BytesSoFar = [EncBytes1, EncBytes2],
-LenSoFar = EncLen1 + EncLen2,
-encode_tags(TagIn, BytesSoFar, LenSoFar).
-
-
-dec_OcspIdentifier(Tlv) ->
-   dec_OcspIdentifier(Tlv, [16]).
-
-dec_OcspIdentifier(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-
-%%-------------------------------------------------
-%% attribute ocspResponderID(1)   External KEP:ResponderID
-%%-------------------------------------------------
-[V1|Tlv2] = Tlv1, 
-Term1 = 'dec_ResponderID'(V1, []),
-
-%%-------------------------------------------------
-%% attribute producedAt(2) with type GeneralizedTime
-%%-------------------------------------------------
-[V2|Tlv3] = Tlv2, 
-Term2 = begin
-binary_to_list(decode_restricted_string(V2, [24]))
-end
-,
-
-case Tlv3 of
-[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
-end,
-Res1 = {'OcspIdentifier',Term1,Term2},
-Res1.
-
-
-%%================================
 %%  CMSVersion
 %%================================
 enc_CMSVersion(Val) ->
@@ -878,19 +1294,21 @@ enc_GeneralName(Val) ->
 enc_GeneralName(Val, TagIn) ->
    {EncBytes,EncLen} = case element(1,Val) of
       otherName ->
-         'enc_INSTANCE OF'(element(2,Val), [<<160>>]);
+         'enc_INSTANCE OF'(element(2,Val), [<<40>>,<<160>>]);
       rfc822Name ->
-         encode_restricted_string(element(2,Val), [<<129>>]);
+         encode_restricted_string(element(2,Val), [<<22>>,<<161>>]);
       dNSName ->
-         encode_restricted_string(element(2,Val), [<<130>>]);
+         encode_restricted_string(element(2,Val), [<<22>>,<<162>>]);
       directoryName ->
-         'InformationFramework':'enc_Name'(element(2,Val), [<<164>>]);
+         'enc_Name'(element(2,Val), [<<164>>]);
       uniformResourceIdentifier ->
-         encode_restricted_string(element(2,Val), [<<134>>]);
+         encode_restricted_string(element(2,Val), [<<22>>,<<166>>]);
       iPAddress ->
-         encode_restricted_string(element(2,Val), [<<135>>]);
+         encode_restricted_string(element(2,Val), [<<4>>,<<167>>]);
       registeredID ->
-         encode_object_identifier(element(2,Val), [<<136>>]);
+         encode_object_identifier(element(2,Val), [<<6>>,<<168>>]);
+      else ->
+         encode_open_type(element(2,Val), []);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -909,13 +1327,13 @@ case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
 
 %% 'otherName'
     {131072, V1} -> 
-        {otherName, 'dec_INSTANCE OF'(V1, [])};
+        {otherName, 'dec_INSTANCE OF'(V1, [8])};
 
 
 %% 'rfc822Name'
     {131073, V1} -> 
         {rfc822Name, begin
-binary_to_list(decode_restricted_string(V1, []))
+binary_to_list(decode_restricted_string(V1, [22]))
 end
 };
 
@@ -923,33 +1341,35 @@ end
 %% 'dNSName'
     {131074, V1} -> 
         {dNSName, begin
-binary_to_list(decode_restricted_string(V1, []))
+binary_to_list(decode_restricted_string(V1, [22]))
 end
 };
 
 
 %% 'directoryName'
     {131076, V1} -> 
-        {directoryName, 'InformationFramework':'dec_Name'(V1, [])};
+        {directoryName, 'dec_Name'(V1, [])};
 
 
 %% 'uniformResourceIdentifier'
     {131078, V1} -> 
         {uniformResourceIdentifier, begin
-binary_to_list(decode_restricted_string(V1, []))
+binary_to_list(decode_restricted_string(V1, [22]))
 end
 };
 
 
 %% 'iPAddress'
     {131079, V1} -> 
-        {iPAddress, decode_octet_string(V1, [])};
+        {iPAddress, decode_octet_string(V1, [4])};
 
 
 %% 'registeredID'
     {131080, V1} -> 
-        {registeredID, decode_object_identifier(V1, [])};
+        {registeredID, decode_object_identifier(V1, [6])};
 
+
+%% 'else'
       Else -> 
          exit({error,{asn1,{invalid_choice_tag,Else}}})
    end
@@ -981,14 +1401,14 @@ enc_SignatureAlgorithmIdentifier(Val) ->
     enc_SignatureAlgorithmIdentifier(Val, [<<48>>]).
 
 enc_SignatureAlgorithmIdentifier(Val, TagIn) ->
-   'AuthenticationFramework':enc_AlgorithmIdentifier(Val, TagIn).
+   enc_AlgorithmIdentifier(Val, TagIn).
 
 
 dec_SignatureAlgorithmIdentifier(Tlv) ->
    dec_SignatureAlgorithmIdentifier(Tlv, [16]).
 
 dec_SignatureAlgorithmIdentifier(Tlv, TagIn) ->
-'AuthenticationFramework':'dec_AlgorithmIdentifier'(Tlv, TagIn).
+'dec_AlgorithmIdentifier'(Tlv, TagIn).
 
 
 
@@ -1042,7 +1462,7 @@ enc_RevocationInfoChoices(Val, TagIn) ->
    {lists:reverse(AccBytes),AccLen};
 
 'enc_RevocationInfoChoices_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = 'enc_CertificateList'(H, [<<49>>]),
+   {EncBytes,EncLen} = 'enc_CertificateList'(H, [<<48>>]),
    'enc_RevocationInfoChoices_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
 
 
@@ -1055,7 +1475,7 @@ dec_RevocationInfoChoices(Tlv, TagIn) ->
    %% decode tag and length 
    %%-------------------------------------------------
 Tlv1 = match_tags(Tlv, TagIn),
-['dec_CertificateList'(V1, [17]) || V1 <- Tlv1].
+['dec_CertificateList'(V1, [16]) || V1 <- Tlv1].
 
 
 
@@ -1106,7 +1526,7 @@ enc_CertificateSet(Val, TagIn) ->
    {lists:reverse(AccBytes),AccLen};
 
 'enc_CertificateSet_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = 'AuthenticationFramework':'enc_Certificate'(H, [<<48>>]),
+   {EncBytes,EncLen} = 'PKIX1Explicit-2009':'enc_Certificate'(H, [<<48>>]),
    'enc_CertificateSet_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
 
 
@@ -1119,39 +1539,39 @@ dec_CertificateSet(Tlv, TagIn) ->
    %% decode tag and length 
    %%-------------------------------------------------
 Tlv1 = match_tags(Tlv, TagIn),
-['AuthenticationFramework':'dec_Certificate'(V1, [16]) || V1 <- Tlv1].
+['PKIX1Explicit-2009':'dec_Certificate'(V1, [16]) || V1 <- Tlv1].
 
 
 
 
 %%================================
-%%  CertificateList
+%%  Certificates
 %%================================
-enc_CertificateList(Val) ->
-    enc_CertificateList(Val, [<<49>>]).
+enc_Certificates(Val) ->
+    enc_Certificates(Val, [<<48>>]).
 
-enc_CertificateList(Val, TagIn) ->
-   {EncBytes,EncLen} = 'enc_CertificateList_components'(Val,[],0),
+enc_Certificates(Val, TagIn) ->
+   {EncBytes,EncLen} = 'enc_Certificates_components'(Val,[],0),
    encode_tags(TagIn, EncBytes, EncLen).
 
-'enc_CertificateList_components'([], AccBytes, AccLen) -> 
+'enc_Certificates_components'([], AccBytes, AccLen) -> 
    {lists:reverse(AccBytes),AccLen};
 
-'enc_CertificateList_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = 'AuthenticationFramework':'enc_Certificate'(H, [<<48>>]),
-   'enc_CertificateList_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+'enc_Certificates_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'PKIX1Explicit-2009':'enc_Certificate'(H, [<<48>>]),
+   'enc_Certificates_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
 
 
 
-dec_CertificateList(Tlv) ->
-   dec_CertificateList(Tlv, [17]).
+dec_Certificates(Tlv) ->
+   dec_Certificates(Tlv, [16]).
 
-dec_CertificateList(Tlv, TagIn) ->
+dec_Certificates(Tlv, TagIn) ->
    %%-------------------------------------------------
    %% decode tag and length 
    %%-------------------------------------------------
 Tlv1 = match_tags(Tlv, TagIn),
-['AuthenticationFramework':'dec_Certificate'(V1, [16]) || V1 <- Tlv1].
+['PKIX1Explicit-2009':'dec_Certificate'(V1, [16]) || V1 <- Tlv1].
 
 
 
@@ -1470,7 +1890,7 @@ enc_SignerIdentifier(Val, TagIn) ->
       issuerAndSerialNumber ->
          'enc_IssuerAndSerialNumber'(element(2,Val), [<<48>>]);
       subjectKeyIdentifier ->
-         encode_restricted_string(element(2,Val), [<<128>>]);
+         encode_restricted_string(element(2,Val), [<<4>>,<<160>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -1494,7 +1914,7 @@ case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
 
 %% 'subjectKeyIdentifier'
     {131072, V1} -> 
-        {subjectKeyIdentifier, decode_octet_string(V1, [])};
+        {subjectKeyIdentifier, decode_octet_string(V1, [4])};
 
       Else -> 
          exit({error,{asn1,{invalid_choice_tag,Else}}})
@@ -1512,9 +1932,9 @@ enc_IssuerAndSerialNumber(Val, TagIn) ->
 {_,Cindex1,Cindex2} = Val,
 
 %%-------------------------------------------------
-%% attribute issuer(1)   External InformationFramework:Name
+%% attribute issuer(1)   External KEP:Name
 %%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'InformationFramework':'enc_Name'(Cindex1, []),
+   {EncBytes1,EncLen1} = 'enc_Name'(Cindex1, []),
 
 %%-------------------------------------------------
 %% attribute serialNumber(2) with type INTEGER
@@ -1536,10 +1956,10 @@ dec_IssuerAndSerialNumber(Tlv, TagIn) ->
 Tlv1 = match_tags(Tlv, TagIn),
 
 %%-------------------------------------------------
-%% attribute issuer(1)   External InformationFramework:Name
+%% attribute issuer(1)   External KEP:Name
 %%-------------------------------------------------
 [V1|Tlv2] = Tlv1, 
-Term1 = 'InformationFramework':'dec_Name'(V1, []),
+Term1 = 'dec_Name'(V1, []),
 
 %%-------------------------------------------------
 %% attribute serialNumber(2) with type INTEGER
@@ -1634,9 +2054,9 @@ enc_ESSCertIDv2(Val, TagIn) ->
 {_,Cindex1,Cindex2,Cindex3} = Val,
 
 %%-------------------------------------------------
-%% attribute hashAlgorithm(1)   External AuthenticationFramework:AlgorithmIdentifier
+%% attribute hashAlgorithm(1)   External KEP:AlgorithmIdentifier
 %%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'AuthenticationFramework':'enc_AlgorithmIdentifier'(Cindex1, [<<48>>]),
+   {EncBytes1,EncLen1} = 'enc_AlgorithmIdentifier'(Cindex1, [<<48>>]),
 
 %%-------------------------------------------------
 %% attribute certHash(2) with type OCTET STRING
@@ -1663,10 +2083,10 @@ dec_ESSCertIDv2(Tlv, TagIn) ->
 Tlv1 = match_tags(Tlv, TagIn),
 
 %%-------------------------------------------------
-%% attribute hashAlgorithm(1)   External AuthenticationFramework:AlgorithmIdentifier
+%% attribute hashAlgorithm(1)   External KEP:AlgorithmIdentifier
 %%-------------------------------------------------
 [V1|Tlv2] = Tlv1, 
-Term1 = 'AuthenticationFramework':'dec_AlgorithmIdentifier'(V1, [16]),
+Term1 = 'dec_AlgorithmIdentifier'(V1, [16]),
 
 %%-------------------------------------------------
 %% attribute certHash(2) with type OCTET STRING
@@ -1715,9 +2135,9 @@ enc_OtherHashAlgAndValue(Val, TagIn) ->
 {_,Cindex1,Cindex2} = Val,
 
 %%-------------------------------------------------
-%% attribute hashAlgorithm(1)   External AuthenticationFramework:AlgorithmIdentifier
+%% attribute hashAlgorithm(1)   External KEP:AlgorithmIdentifier
 %%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'AuthenticationFramework':'enc_AlgorithmIdentifier'(Cindex1, [<<48>>]),
+   {EncBytes1,EncLen1} = 'enc_AlgorithmIdentifier'(Cindex1, [<<48>>]),
 
 %%-------------------------------------------------
 %% attribute hashValue(2) with type OCTET STRING
@@ -1739,10 +2159,10 @@ dec_OtherHashAlgAndValue(Tlv, TagIn) ->
 Tlv1 = match_tags(Tlv, TagIn),
 
 %%-------------------------------------------------
-%% attribute hashAlgorithm(1)   External AuthenticationFramework:AlgorithmIdentifier
+%% attribute hashAlgorithm(1)   External KEP:AlgorithmIdentifier
 %%-------------------------------------------------
 [V1|Tlv2] = Tlv1, 
-Term1 = 'AuthenticationFramework':'dec_AlgorithmIdentifier'(V1, [16]),
+Term1 = 'dec_AlgorithmIdentifier'(V1, [16]),
 
 %%-------------------------------------------------
 %% attribute hashValue(2) with type OCTET STRING
@@ -2019,14 +2439,14 @@ enc_DigestAlgorithmIdentifier(Val) ->
     enc_DigestAlgorithmIdentifier(Val, [<<48>>]).
 
 enc_DigestAlgorithmIdentifier(Val, TagIn) ->
-   'AuthenticationFramework':enc_AlgorithmIdentifier(Val, TagIn).
+   enc_AlgorithmIdentifier(Val, TagIn).
 
 
 dec_DigestAlgorithmIdentifier(Tlv) ->
    dec_DigestAlgorithmIdentifier(Tlv, [16]).
 
 dec_DigestAlgorithmIdentifier(Tlv, TagIn) ->
-'AuthenticationFramework':'dec_AlgorithmIdentifier'(Tlv, TagIn).
+'dec_AlgorithmIdentifier'(Tlv, TagIn).
 
 
 
@@ -2389,7 +2809,7 @@ case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
         {visibleString, begin
 Val1 = decode_restricted_string(V1, []),
 C1 = byte_size(Val1),
-if 1 =< C1, C1 =< 200 ->
+if 1 =< C1, C1 =< 2200 ->
 binary_to_list(Val1);
 true ->
 exit({error,{asn1,bad_range}})
@@ -2402,7 +2822,7 @@ end};
         {bmpString, begin
 Val2 = decode_BMP_string(V1, []),
 C2 = length(Val2),
-if 1 =< C2, C2 =< 200 ->
+if 1 =< C2, C2 =< 2200 ->
 Val2;
 true ->
 exit({error,{asn1,bad_range}})
@@ -2421,6 +2841,38 @@ end};
 
 
 %%================================
+%%  CompleteRevocationRefs
+%%================================
+enc_CompleteRevocationRefs(Val) ->
+    enc_CompleteRevocationRefs(Val, [<<48>>]).
+
+enc_CompleteRevocationRefs(Val, TagIn) ->
+   {EncBytes,EncLen} = 'enc_CompleteRevocationRefs_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_CompleteRevocationRefs_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_CompleteRevocationRefs_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_CrlOcspRef'(H, [<<48>>]),
+   'enc_CompleteRevocationRefs_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_CompleteRevocationRefs(Tlv) ->
+   dec_CompleteRevocationRefs(Tlv, [16]).
+
+dec_CompleteRevocationRefs(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_CrlOcspRef'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
 %%  CrlOcspRef
 %%================================
 enc_CrlOcspRef(Val) ->
@@ -2435,7 +2887,7 @@ enc_CrlOcspRef(Val, TagIn) ->
    {EncBytes1,EncLen1} =  case Cindex1 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            'enc_CRLListID'(Cindex1, [<<160>>])
+            'enc_CRLListID'(Cindex1, [<<48>>,<<160>>])
        end,
 
 %%-------------------------------------------------
@@ -2444,7 +2896,7 @@ enc_CrlOcspRef(Val, TagIn) ->
    {EncBytes2,EncLen2} =  case Cindex2 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            'enc_OcspListID'(Cindex2, [<<161>>])
+            'enc_OcspListID'(Cindex2, [<<48>>,<<161>>])
        end,
 
 %%-------------------------------------------------
@@ -2453,7 +2905,7 @@ enc_CrlOcspRef(Val, TagIn) ->
    {EncBytes3,EncLen3} =  case Cindex3 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            'enc_OtherRevRefs'(Cindex3, [<<162>>])
+            'enc_OtherRevRefs'(Cindex3, [<<48>>,<<162>>])
        end,
 
    BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
@@ -2475,7 +2927,7 @@ Tlv1 = match_tags(Tlv, TagIn),
 %%-------------------------------------------------
 {Term1,Tlv2} = case Tlv1 of
 [{131072,V1}|TempTlv2] ->
-    {'dec_CRLListID'(V1, []), TempTlv2};
+    {'dec_CRLListID'(V1, [16]), TempTlv2};
     _ ->
         { asn1_NOVALUE, Tlv1}
 end,
@@ -2485,7 +2937,7 @@ end,
 %%-------------------------------------------------
 {Term2,Tlv3} = case Tlv2 of
 [{131073,V2}|TempTlv3] ->
-    {'dec_OcspListID'(V2, []), TempTlv3};
+    {'dec_OcspListID'(V2, [16]), TempTlv3};
     _ ->
         { asn1_NOVALUE, Tlv2}
 end,
@@ -2495,7 +2947,7 @@ end,
 %%-------------------------------------------------
 {Term3,Tlv4} = case Tlv3 of
 [{131074,V3}|TempTlv4] ->
-    {'dec_OtherRevRefs'(V3, []), TempTlv4};
+    {'dec_OtherRevRefs'(V3, [16]), TempTlv4};
     _ ->
         { asn1_NOVALUE, Tlv3}
 end,
@@ -2517,9 +2969,9 @@ enc_CrlIdentifier(Val, TagIn) ->
 {_,Cindex1,Cindex2,Cindex3} = Val,
 
 %%-------------------------------------------------
-%% attribute crlissuer(1)   External InformationFramework:Name
+%% attribute crlissuer(1)   External KEP:Name
 %%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'InformationFramework':'enc_Name'(Cindex1, []),
+   {EncBytes1,EncLen1} = 'enc_Name'(Cindex1, []),
 
 %%-------------------------------------------------
 %% attribute crlIssuedTime(2) with type UTCTime
@@ -2550,10 +3002,10 @@ dec_CrlIdentifier(Tlv, TagIn) ->
 Tlv1 = match_tags(Tlv, TagIn),
 
 %%-------------------------------------------------
-%% attribute crlissuer(1)   External InformationFramework:Name
+%% attribute crlissuer(1)   External KEP:Name
 %%-------------------------------------------------
 [V1|Tlv2] = Tlv1, 
-Term1 = 'InformationFramework':'dec_Name'(V1, []),
+Term1 = 'dec_Name'(V1, []),
 
 %%-------------------------------------------------
 %% attribute crlIssuedTime(2) with type UTCTime
@@ -2582,6 +3034,876 @@ Res1.
 
 
 %%================================
+%%  CrlValidatedID
+%%================================
+enc_CrlValidatedID(Val) ->
+    enc_CrlValidatedID(Val, [<<48>>]).
+
+enc_CrlValidatedID(Val, TagIn) ->
+{_,Cindex1,Cindex2} = Val,
+
+%%-------------------------------------------------
+%% attribute crlHash(1)   External KEP:OtherHash
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = 'enc_OtherHash'(Cindex1, []),
+
+%%-------------------------------------------------
+%% attribute crlIdentifier(2)   External KEP:CrlIdentifier OPTIONAL
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} =  case Cindex2 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            'enc_CrlIdentifier'(Cindex2, [<<48>>])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2],
+LenSoFar = EncLen1 + EncLen2,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_CrlValidatedID(Tlv) ->
+   dec_CrlValidatedID(Tlv, [16]).
+
+dec_CrlValidatedID(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute crlHash(1)   External KEP:OtherHash
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = 'dec_OtherHash'(V1, []),
+
+%%-------------------------------------------------
+%% attribute crlIdentifier(2)   External KEP:CrlIdentifier OPTIONAL
+%%-------------------------------------------------
+{Term2,Tlv3} = case Tlv2 of
+[{16,V2}|TempTlv3] ->
+    {'dec_CrlIdentifier'(V2, []), TempTlv3};
+    _ ->
+        { asn1_NOVALUE, Tlv2}
+end,
+
+case Tlv3 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
+end,
+Res1 = {'CrlValidatedID',Term1,Term2},
+Res1.
+
+
+%%================================
+%%  OtherHash
+%%================================
+enc_OtherHash(Val) ->
+    enc_OtherHash(Val, []).
+
+enc_OtherHash(Val, TagIn) ->
+   {EncBytes,EncLen} = case element(1,Val) of
+      sha1Hash ->
+         encode_restricted_string(element(2,Val), [<<4>>]);
+      otherHash ->
+         'enc_OtherHashAlgAndValue'(element(2,Val), [<<48>>]);
+      Else -> 
+         exit({error,{asn1,{invalid_choice_type,Else}}})
+   end,
+
+encode_tags(TagIn, EncBytes, EncLen).
+
+
+
+
+dec_OtherHash(Tlv) ->
+   dec_OtherHash(Tlv, []).
+
+dec_OtherHash(Tlv, TagIn) ->
+Tlv1 = match_tags(Tlv, TagIn),
+case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
+
+%% 'sha1Hash'
+    {4, V1} -> 
+        {sha1Hash, decode_octet_string(V1, [])};
+
+
+%% 'otherHash'
+    {16, V1} -> 
+        {otherHash, 'dec_OtherHashAlgAndValue'(V1, [])};
+
+      Else -> 
+         exit({error,{asn1,{invalid_choice_tag,Else}}})
+   end
+.
+
+
+%%================================
+%%  OcspListID
+%%================================
+enc_OcspListID(Val) ->
+    enc_OcspListID(Val, [<<48>>]).
+
+enc_OcspListID(Val, TagIn) ->
+{_,Cindex1} = Val,
+
+%%-------------------------------------------------
+%% attribute ocspResponses(1) with type SEQUENCE OF
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = 'enc_OcspListID_ocspResponses'(Cindex1, [<<48>>]),
+
+   BytesSoFar = [EncBytes1],
+LenSoFar = EncLen1,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+
+%%================================
+%%  OcspListID_ocspResponses
+%%================================
+enc_OcspListID_ocspResponses(Val, TagIn) ->
+      {EncBytes,EncLen} = 'enc_OcspListID_ocspResponses_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_OcspListID_ocspResponses_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_OcspListID_ocspResponses_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_OcspResponsesID'(H, [<<48>>]),
+   'enc_OcspListID_ocspResponses_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_OcspListID(Tlv) ->
+   dec_OcspListID(Tlv, [16]).
+
+dec_OcspListID(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute ocspResponses(1) with type SEQUENCE OF
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = 'dec_OcspListID_ocspResponses'(V1, [16]),
+
+case Tlv2 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv2}}}) % extra fields not allowed
+end,
+Res1 = {'OcspListID',Term1},
+Res1.
+'dec_OcspListID_ocspResponses'(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_OcspResponsesID'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  OcspResponsesID
+%%================================
+enc_OcspResponsesID(Val) ->
+    enc_OcspResponsesID(Val, [<<48>>]).
+
+enc_OcspResponsesID(Val, TagIn) ->
+{_,Cindex1,Cindex2} = Val,
+
+%%-------------------------------------------------
+%% attribute ocspIdentifier(1) with type ASN1_OPEN_TYPE
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_open_type(Cindex1, []),
+
+%%-------------------------------------------------
+%% attribute ocspRepHash(2)   External KEP:OtherHash OPTIONAL
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} =  case Cindex2 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            'enc_OtherHash'(Cindex2, [])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2],
+LenSoFar = EncLen1 + EncLen2,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_OcspResponsesID(Tlv) ->
+   dec_OcspResponsesID(Tlv, [16]).
+
+dec_OcspResponsesID(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute ocspIdentifier(1) with type ASN1_OPEN_TYPE
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_open_type_as_binary(V1, []),
+
+%%-------------------------------------------------
+%% attribute ocspRepHash(2)   External KEP:OtherHash OPTIONAL
+%%-------------------------------------------------
+{Term2,Tlv3} = case Tlv2 of
+[V2 = {4,_}|TempTlv3] ->
+    {'dec_OtherHash'(V2, []), TempTlv3};
+[V2 = {16,_}|TempTlv3] ->
+    {'dec_OtherHash'(V2, []), TempTlv3};
+    _ ->
+        { asn1_NOVALUE, Tlv2}
+end,
+
+case Tlv3 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
+end,
+Res1 = {'OcspResponsesID',Term1,Term2},
+Res1.
+
+
+%%================================
+%%  OtherRevRefs
+%%================================
+enc_OtherRevRefs(Val) ->
+    enc_OtherRevRefs(Val, [<<48>>]).
+
+enc_OtherRevRefs(Val, TagIn) ->
+{_,Cindex1,Cindex2} = Val,
+
+%%-------------------------------------------------
+%% attribute otherRevRefType(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_object_identifier(Cindex1, [<<6>>]),
+
+%%-------------------------------------------------
+%% attribute otherRevRefs(2) with type ASN1_OPEN_TYPE
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} = encode_open_type(Cindex2, []),
+
+   BytesSoFar = [EncBytes1, EncBytes2],
+LenSoFar = EncLen1 + EncLen2,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_OtherRevRefs(Tlv) ->
+   dec_OtherRevRefs(Tlv, [16]).
+
+dec_OtherRevRefs(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute otherRevRefType(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_object_identifier(V1, [6]),
+
+%%-------------------------------------------------
+%% attribute otherRevRefs(2) with type ASN1_OPEN_TYPE
+%%-------------------------------------------------
+[V2|Tlv3] = Tlv2, 
+Term2 = decode_open_type_as_binary(V2, []),
+
+case Tlv3 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
+end,
+Res1 = {'OtherRevRefs',Term1,Term2},
+Res1.
+
+
+%%================================
+%%  OcspIdentifier
+%%================================
+enc_OcspIdentifier(Val) ->
+    enc_OcspIdentifier(Val, [<<48>>]).
+
+enc_OcspIdentifier(Val, TagIn) ->
+{_,Cindex1,Cindex2} = Val,
+
+%%-------------------------------------------------
+%% attribute ocspResponderID(1)   External KEP:ResponderID
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = 'enc_ResponderID'(Cindex1, []),
+
+%%-------------------------------------------------
+%% attribute producedAt(2) with type GeneralizedTime
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} = encode_restricted_string(Cindex2, [<<24>>]),
+
+   BytesSoFar = [EncBytes1, EncBytes2],
+LenSoFar = EncLen1 + EncLen2,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_OcspIdentifier(Tlv) ->
+   dec_OcspIdentifier(Tlv, [16]).
+
+dec_OcspIdentifier(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute ocspResponderID(1)   External KEP:ResponderID
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = 'dec_ResponderID'(V1, []),
+
+%%-------------------------------------------------
+%% attribute producedAt(2) with type GeneralizedTime
+%%-------------------------------------------------
+[V2|Tlv3] = Tlv2, 
+Term2 = begin
+binary_to_list(decode_restricted_string(V2, [24]))
+end
+,
+
+case Tlv3 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
+end,
+Res1 = {'OcspIdentifier',Term1,Term2},
+Res1.
+
+
+%%================================
+%%  ResponderID
+%%================================
+enc_ResponderID(Val) ->
+    enc_ResponderID(Val, []).
+
+enc_ResponderID(Val, TagIn) ->
+   {EncBytes,EncLen} = case element(1,Val) of
+      byName ->
+         'enc_Name'(element(2,Val), [<<161>>]);
+      byKey ->
+         encode_restricted_string(element(2,Val), [<<4>>,<<162>>]);
+      Else -> 
+         exit({error,{asn1,{invalid_choice_type,Else}}})
+   end,
+
+encode_tags(TagIn, EncBytes, EncLen).
+
+
+
+
+dec_ResponderID(Tlv) ->
+   dec_ResponderID(Tlv, []).
+
+dec_ResponderID(Tlv, TagIn) ->
+Tlv1 = match_tags(Tlv, TagIn),
+case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
+
+%% 'byName'
+    {131073, V1} -> 
+        {byName, 'dec_Name'(V1, [])};
+
+
+%% 'byKey'
+    {131074, V1} -> 
+        {byKey, decode_octet_string(V1, [4])};
+
+      Else -> 
+         exit({error,{asn1,{invalid_choice_tag,Else}}})
+   end
+.
+
+
+%%================================
+%%  KeyHash
+%%================================
+enc_KeyHash(Val) ->
+    enc_KeyHash(Val, [<<4>>]).
+
+enc_KeyHash(Val, TagIn) ->
+encode_restricted_string(Val, TagIn).
+
+
+dec_KeyHash(Tlv) ->
+   dec_KeyHash(Tlv, [4]).
+
+dec_KeyHash(Tlv, TagIn) ->
+decode_octet_string(Tlv, TagIn).
+
+
+
+%%================================
+%%  RevocationValues
+%%================================
+enc_RevocationValues(Val) ->
+    enc_RevocationValues(Val, [<<48>>]).
+
+enc_RevocationValues(Val, TagIn) ->
+{_,Cindex1,Cindex2,Cindex3} = Val,
+
+%%-------------------------------------------------
+%% attribute crlVals(1) with type SEQUENCE OF OPTIONAL
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} =  case Cindex1 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            'enc_RevocationValues_crlVals'(Cindex1, [<<48>>,<<160>>])
+       end,
+
+%%-------------------------------------------------
+%% attribute ocspVals(2) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} =  case Cindex2 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            encode_open_type(Cindex2, [<<161>>])
+       end,
+
+%%-------------------------------------------------
+%% attribute otherRevVals(3)   External KEP:OtherRevVals OPTIONAL
+%%-------------------------------------------------
+   {EncBytes3,EncLen3} =  case Cindex3 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            'enc_OtherRevVals'(Cindex3, [<<48>>,<<162>>])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
+LenSoFar = EncLen1 + EncLen2 + EncLen3,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+
+%%================================
+%%  RevocationValues_crlVals
+%%================================
+enc_RevocationValues_crlVals(Val, TagIn) ->
+      {EncBytes,EncLen} = 'enc_RevocationValues_crlVals_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_RevocationValues_crlVals_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_RevocationValues_crlVals_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_CertificateList'(H, [<<48>>]),
+   'enc_RevocationValues_crlVals_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_RevocationValues(Tlv) ->
+   dec_RevocationValues(Tlv, [16]).
+
+dec_RevocationValues(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute crlVals(1) with type SEQUENCE OF OPTIONAL
+%%-------------------------------------------------
+{Term1,Tlv2} = case Tlv1 of
+[{131072,V1}|TempTlv2] ->
+    {'dec_RevocationValues_crlVals'(V1, [16]), TempTlv2};
+    _ ->
+        { asn1_NOVALUE, Tlv1}
+end,
+
+%%-------------------------------------------------
+%% attribute ocspVals(2) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+{Term2,Tlv3} = case Tlv2 of
+[{131073,V2}|TempTlv3] ->
+    {decode_open_type_as_binary(V2, []), TempTlv3};
+    _ ->
+        { asn1_NOVALUE, Tlv2}
+end,
+
+%%-------------------------------------------------
+%% attribute otherRevVals(3)   External KEP:OtherRevVals OPTIONAL
+%%-------------------------------------------------
+{Term3,Tlv4} = case Tlv3 of
+[{131074,V3}|TempTlv4] ->
+    {'dec_OtherRevVals'(V3, [16]), TempTlv4};
+    _ ->
+        { asn1_NOVALUE, Tlv3}
+end,
+
+case Tlv4 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv4}}}) % extra fields not allowed
+end,
+Res1 = {'RevocationValues',Term1,Term2,Term3},
+Res1.
+'dec_RevocationValues_crlVals'(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_CertificateList'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  OtherSigningCertificate
+%%================================
+enc_OtherSigningCertificate(Val) ->
+    enc_OtherSigningCertificate(Val, [<<48>>]).
+
+enc_OtherSigningCertificate(Val, TagIn) ->
+{_,Cindex1,Cindex2} = Val,
+
+%%-------------------------------------------------
+%% attribute certs(1) with type SEQUENCE OF
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = 'enc_OtherSigningCertificate_certs'(Cindex1, [<<48>>]),
+
+%%-------------------------------------------------
+%% attribute policies(2) with type SEQUENCE OF OPTIONAL
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} =  case Cindex2 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            'enc_OtherSigningCertificate_policies'(Cindex2, [<<48>>])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2],
+LenSoFar = EncLen1 + EncLen2,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+
+%%================================
+%%  OtherSigningCertificate_certs
+%%================================
+enc_OtherSigningCertificate_certs(Val, TagIn) ->
+      {EncBytes,EncLen} = 'enc_OtherSigningCertificate_certs_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_OtherSigningCertificate_certs_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_OtherSigningCertificate_certs_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_OtherCertID'(H, [<<48>>]),
+   'enc_OtherSigningCertificate_certs_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+
+%%================================
+%%  OtherSigningCertificate_policies
+%%================================
+enc_OtherSigningCertificate_policies(Val, TagIn) ->
+      {EncBytes,EncLen} = 'enc_OtherSigningCertificate_policies_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_OtherSigningCertificate_policies_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_OtherSigningCertificate_policies_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'CertificateExtensions':'enc_PolicyInformation'(H, [<<48>>]),
+   'enc_OtherSigningCertificate_policies_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_OtherSigningCertificate(Tlv) ->
+   dec_OtherSigningCertificate(Tlv, [16]).
+
+dec_OtherSigningCertificate(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute certs(1) with type SEQUENCE OF
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = 'dec_OtherSigningCertificate_certs'(V1, [16]),
+
+%%-------------------------------------------------
+%% attribute policies(2) with type SEQUENCE OF OPTIONAL
+%%-------------------------------------------------
+{Term2,Tlv3} = case Tlv2 of
+[{16,V2}|TempTlv3] ->
+    {'dec_OtherSigningCertificate_policies'(V2, []), TempTlv3};
+    _ ->
+        { asn1_NOVALUE, Tlv2}
+end,
+
+case Tlv3 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
+end,
+Res1 = {'OtherSigningCertificate',Term1,Term2},
+Res1.
+'dec_OtherSigningCertificate_certs'(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_OtherCertID'(V1, [16]) || V1 <- Tlv1].
+
+
+'dec_OtherSigningCertificate_policies'(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['CertificateExtensions':'dec_PolicyInformation'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  CompleteCertificateRefs
+%%================================
+enc_CompleteCertificateRefs(Val) ->
+    enc_CompleteCertificateRefs(Val, [<<48>>]).
+
+enc_CompleteCertificateRefs(Val, TagIn) ->
+   {EncBytes,EncLen} = 'enc_CompleteCertificateRefs_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_CompleteCertificateRefs_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_CompleteCertificateRefs_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_OtherCertID'(H, [<<48>>]),
+   'enc_CompleteCertificateRefs_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_CompleteCertificateRefs(Tlv) ->
+   dec_CompleteCertificateRefs(Tlv, [16]).
+
+dec_CompleteCertificateRefs(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_OtherCertID'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  OtherCertID
+%%================================
+enc_OtherCertID(Val) ->
+    enc_OtherCertID(Val, [<<48>>]).
+
+enc_OtherCertID(Val, TagIn) ->
+{_,Cindex1,Cindex2} = Val,
+
+%%-------------------------------------------------
+%% attribute otherCertHash(1)   External KEP:OtherHash
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = 'enc_OtherHash'(Cindex1, []),
+
+%%-------------------------------------------------
+%% attribute issuerSerial(2)   External KEP:IssuerSerial OPTIONAL
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} =  case Cindex2 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            'enc_IssuerSerial'(Cindex2, [<<48>>])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2],
+LenSoFar = EncLen1 + EncLen2,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_OtherCertID(Tlv) ->
+   dec_OtherCertID(Tlv, [16]).
+
+dec_OtherCertID(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute otherCertHash(1)   External KEP:OtherHash
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = 'dec_OtherHash'(V1, []),
+
+%%-------------------------------------------------
+%% attribute issuerSerial(2)   External KEP:IssuerSerial OPTIONAL
+%%-------------------------------------------------
+{Term2,Tlv3} = case Tlv2 of
+[{16,V2}|TempTlv3] ->
+    {'dec_IssuerSerial'(V2, []), TempTlv3};
+    _ ->
+        { asn1_NOVALUE, Tlv2}
+end,
+
+case Tlv3 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
+end,
+Res1 = {'OtherCertID',Term1,Term2},
+Res1.
+
+
+%%================================
+%%  OtherRevValType
+%%================================
+enc_OtherRevValType(Val) ->
+    enc_OtherRevValType(Val, [<<6>>]).
+
+enc_OtherRevValType(Val, TagIn) ->
+encode_object_identifier(Val, TagIn).
+
+
+dec_OtherRevValType(Tlv) ->
+   dec_OtherRevValType(Tlv, [6]).
+
+dec_OtherRevValType(Tlv, TagIn) ->
+decode_object_identifier(Tlv, TagIn).
+
+
+
+%%================================
+%%  OtherRevVals
+%%================================
+enc_OtherRevVals(Val) ->
+    enc_OtherRevVals(Val, [<<48>>]).
+
+enc_OtherRevVals(Val, TagIn) ->
+{_,Cindex1} = Val,
+
+%%-------------------------------------------------
+%% attribute otherRevValType(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_object_identifier(Cindex1, [<<6>>]),
+
+   BytesSoFar = [EncBytes1],
+LenSoFar = EncLen1,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_OtherRevVals(Tlv) ->
+   dec_OtherRevVals(Tlv, [16]).
+
+dec_OtherRevVals(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute otherRevValType(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_object_identifier(V1, [6]),
+
+case Tlv2 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv2}}}) % extra fields not allowed
+end,
+Res1 = {'OtherRevVals',Term1},
+Res1.
+
+
+%%================================
+%%  CRLListID
+%%================================
+enc_CRLListID(Val) ->
+    enc_CRLListID(Val, [<<48>>]).
+
+enc_CRLListID(Val, TagIn) ->
+{_,Cindex1} = Val,
+
+%%-------------------------------------------------
+%% attribute crls(1) with type SEQUENCE OF
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = 'enc_CRLListID_crls'(Cindex1, [<<48>>]),
+
+   BytesSoFar = [EncBytes1],
+LenSoFar = EncLen1,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+
+%%================================
+%%  CRLListID_crls
+%%================================
+enc_CRLListID_crls(Val, TagIn) ->
+      {EncBytes,EncLen} = 'enc_CRLListID_crls_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_CRLListID_crls_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_CRLListID_crls_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_CrlValidatedID'(H, [<<48>>]),
+   'enc_CRLListID_crls_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_CRLListID(Tlv) ->
+   dec_CRLListID(Tlv, [16]).
+
+dec_CRLListID(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute crls(1) with type SEQUENCE OF
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = 'dec_CRLListID_crls'(V1, [16]),
+
+case Tlv2 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv2}}}) % extra fields not allowed
+end,
+Res1 = {'CRLListID',Term1},
+Res1.
+'dec_CRLListID_crls'(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_CrlValidatedID'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  BasicOCSPResponses
+%%================================
+enc_BasicOCSPResponses(Val) ->
+    enc_BasicOCSPResponses(Val, [<<48>>]).
+
+enc_BasicOCSPResponses(Val, TagIn) ->
+   {EncBytes,EncLen} = 'enc_BasicOCSPResponses_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_BasicOCSPResponses_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_BasicOCSPResponses_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_BasicOCSPResponse'(H, [<<48>>]),
+   'enc_BasicOCSPResponses_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_BasicOCSPResponses(Tlv) ->
+   dec_BasicOCSPResponses(Tlv, [16]).
+
+dec_BasicOCSPResponses(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_BasicOCSPResponse'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
 %%  BasicOCSPResponse
 %%================================
 enc_BasicOCSPResponse(Val) ->
@@ -2596,9 +3918,9 @@ enc_BasicOCSPResponse(Val, TagIn) ->
    {EncBytes1,EncLen1} = 'enc_ResponseData'(Cindex1, [<<48>>]),
 
 %%-------------------------------------------------
-%% attribute signatureAlgorithm(2)   External AuthenticationFramework:AlgorithmIdentifier
+%% attribute signatureAlgorithm(2)   External KEP:AlgorithmIdentifier
 %%-------------------------------------------------
-   {EncBytes2,EncLen2} = 'AuthenticationFramework':'enc_AlgorithmIdentifier'(Cindex2, [<<48>>]),
+   {EncBytes2,EncLen2} = 'enc_AlgorithmIdentifier'(Cindex2, [<<48>>]),
 
 %%-------------------------------------------------
 %% attribute signature(3) with type BIT STRING
@@ -2631,7 +3953,7 @@ enc_BasicOCSPResponse_certs(Val, TagIn) ->
    {lists:reverse(AccBytes),AccLen};
 
 'enc_BasicOCSPResponse_certs_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = 'AuthenticationFramework':'enc_Certificate'(H, [<<48>>]),
+   {EncBytes,EncLen} = 'PKIX1Explicit-2009':'enc_Certificate'(H, [<<48>>]),
    'enc_BasicOCSPResponse_certs_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
 
 
@@ -2652,10 +3974,10 @@ Tlv1 = match_tags(Tlv, TagIn),
 Term1 = 'dec_ResponseData'(V1, [16]),
 
 %%-------------------------------------------------
-%% attribute signatureAlgorithm(2)   External AuthenticationFramework:AlgorithmIdentifier
+%% attribute signatureAlgorithm(2)   External KEP:AlgorithmIdentifier
 %%-------------------------------------------------
 [V2|Tlv3] = Tlv2, 
-Term2 = 'AuthenticationFramework':'dec_AlgorithmIdentifier'(V2, [16]),
+Term2 = 'dec_AlgorithmIdentifier'(V2, [16]),
 
 %%-------------------------------------------------
 %% attribute signature(3) with type BIT STRING
@@ -2683,7 +4005,7 @@ Res1.
    %% decode tag and length 
    %%-------------------------------------------------
 Tlv1 = match_tags(Tlv, TagIn),
-['AuthenticationFramework':'dec_Certificate'(V1, [16]) || V1 <- Tlv1].
+['PKIX1Explicit-2009':'dec_Certificate'(V1, [16]) || V1 <- Tlv1].
 
 
 
@@ -2825,67 +4147,6 @@ Tlv1 = match_tags(Tlv, TagIn),
 
 
 %%================================
-%%  ResponderID
-%%================================
-enc_ResponderID(Val) ->
-    enc_ResponderID(Val, []).
-
-enc_ResponderID(Val, TagIn) ->
-   {EncBytes,EncLen} = case element(1,Val) of
-      byName ->
-         'InformationFramework':'enc_Name'(element(2,Val), [<<161>>]);
-      byKey ->
-         encode_restricted_string(element(2,Val), [<<130>>]);
-      Else -> 
-         exit({error,{asn1,{invalid_choice_type,Else}}})
-   end,
-
-encode_tags(TagIn, EncBytes, EncLen).
-
-
-
-
-dec_ResponderID(Tlv) ->
-   dec_ResponderID(Tlv, []).
-
-dec_ResponderID(Tlv, TagIn) ->
-Tlv1 = match_tags(Tlv, TagIn),
-case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
-
-%% 'byName'
-    {131073, V1} -> 
-        {byName, 'InformationFramework':'dec_Name'(V1, [])};
-
-
-%% 'byKey'
-    {131074, V1} -> 
-        {byKey, decode_octet_string(V1, [])};
-
-      Else -> 
-         exit({error,{asn1,{invalid_choice_tag,Else}}})
-   end
-.
-
-
-%%================================
-%%  KeyHash
-%%================================
-enc_KeyHash(Val) ->
-    enc_KeyHash(Val, [<<4>>]).
-
-enc_KeyHash(Val, TagIn) ->
-encode_restricted_string(Val, TagIn).
-
-
-dec_KeyHash(Tlv) ->
-   dec_KeyHash(Tlv, [4]).
-
-dec_KeyHash(Tlv, TagIn) ->
-decode_octet_string(Tlv, TagIn).
-
-
-
-%%================================
 %%  CertID
 %%================================
 enc_CertID(Val) ->
@@ -2895,9 +4156,9 @@ enc_CertID(Val, TagIn) ->
 {_,Cindex1,Cindex2,Cindex3,Cindex4} = Val,
 
 %%-------------------------------------------------
-%% attribute hashAlgorithm(1)   External AuthenticationFramework:AlgorithmIdentifier
+%% attribute hashAlgorithm(1)   External KEP:AlgorithmIdentifier
 %%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'AuthenticationFramework':'enc_AlgorithmIdentifier'(Cindex1, [<<48>>]),
+   {EncBytes1,EncLen1} = 'enc_AlgorithmIdentifier'(Cindex1, [<<48>>]),
 
 %%-------------------------------------------------
 %% attribute issuerNameHash(2) with type OCTET STRING
@@ -2929,10 +4190,10 @@ dec_CertID(Tlv, TagIn) ->
 Tlv1 = match_tags(Tlv, TagIn),
 
 %%-------------------------------------------------
-%% attribute hashAlgorithm(1)   External AuthenticationFramework:AlgorithmIdentifier
+%% attribute hashAlgorithm(1)   External KEP:AlgorithmIdentifier
 %%-------------------------------------------------
 [V1|Tlv2] = Tlv1, 
-Term1 = 'AuthenticationFramework':'dec_AlgorithmIdentifier'(V1, [16]),
+Term1 = 'dec_AlgorithmIdentifier'(V1, [16]),
 
 %%-------------------------------------------------
 %% attribute issuerNameHash(2) with type OCTET STRING
@@ -3200,268 +4461,6 @@ Res1.
 
 
 %%================================
-%%  RevocationValues
-%%================================
-enc_RevocationValues(Val) ->
-    enc_RevocationValues(Val, [<<48>>]).
-
-enc_RevocationValues(Val, TagIn) ->
-{_,Cindex1,Cindex2,Cindex3} = Val,
-
-%%-------------------------------------------------
-%% attribute crlVals(1) with type SEQUENCE OF OPTIONAL
-%%-------------------------------------------------
-   {EncBytes1,EncLen1} =  case Cindex1 of
-         asn1_NOVALUE -> {<<>>,0};
-         _ ->
-            'enc_RevocationValues_crlVals'(Cindex1, [<<160>>])
-       end,
-
-%%-------------------------------------------------
-%% attribute ocspVals(2) with type SEQUENCE OF OPTIONAL
-%%-------------------------------------------------
-   {EncBytes2,EncLen2} =  case Cindex2 of
-         asn1_NOVALUE -> {<<>>,0};
-         _ ->
-            'enc_RevocationValues_ocspVals'(Cindex2, [<<161>>])
-       end,
-
-%%-------------------------------------------------
-%% attribute otherRevVals(3)   External KEP:OtherRevVals OPTIONAL
-%%-------------------------------------------------
-   {EncBytes3,EncLen3} =  case Cindex3 of
-         asn1_NOVALUE -> {<<>>,0};
-         _ ->
-            'enc_OtherRevVals'(Cindex3, [<<162>>])
-       end,
-
-   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
-LenSoFar = EncLen1 + EncLen2 + EncLen3,
-encode_tags(TagIn, BytesSoFar, LenSoFar).
-
-
-
-%%================================
-%%  RevocationValues_crlVals
-%%================================
-enc_RevocationValues_crlVals(Val, TagIn) ->
-      {EncBytes,EncLen} = 'enc_RevocationValues_crlVals_components'(Val,[],0),
-   encode_tags(TagIn, EncBytes, EncLen).
-
-'enc_RevocationValues_crlVals_components'([], AccBytes, AccLen) -> 
-   {lists:reverse(AccBytes),AccLen};
-
-'enc_RevocationValues_crlVals_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = 'enc_CertificateList'(H, [<<49>>]),
-   'enc_RevocationValues_crlVals_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
-
-
-
-
-%%================================
-%%  RevocationValues_ocspVals
-%%================================
-enc_RevocationValues_ocspVals(Val, TagIn) ->
-      {EncBytes,EncLen} = 'enc_RevocationValues_ocspVals_components'(Val,[],0),
-   encode_tags(TagIn, EncBytes, EncLen).
-
-'enc_RevocationValues_ocspVals_components'([], AccBytes, AccLen) -> 
-   {lists:reverse(AccBytes),AccLen};
-
-'enc_RevocationValues_ocspVals_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = 'enc_BasicOCSPResponse'(H, [<<48>>]),
-   'enc_RevocationValues_ocspVals_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
-
-
-
-dec_RevocationValues(Tlv) ->
-   dec_RevocationValues(Tlv, [16]).
-
-dec_RevocationValues(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-
-%%-------------------------------------------------
-%% attribute crlVals(1) with type SEQUENCE OF OPTIONAL
-%%-------------------------------------------------
-{Term1,Tlv2} = case Tlv1 of
-[{131072,V1}|TempTlv2] ->
-    {'dec_RevocationValues_crlVals'(V1, []), TempTlv2};
-    _ ->
-        { asn1_NOVALUE, Tlv1}
-end,
-
-%%-------------------------------------------------
-%% attribute ocspVals(2) with type SEQUENCE OF OPTIONAL
-%%-------------------------------------------------
-{Term2,Tlv3} = case Tlv2 of
-[{131073,V2}|TempTlv3] ->
-    {'dec_RevocationValues_ocspVals'(V2, []), TempTlv3};
-    _ ->
-        { asn1_NOVALUE, Tlv2}
-end,
-
-%%-------------------------------------------------
-%% attribute otherRevVals(3)   External KEP:OtherRevVals OPTIONAL
-%%-------------------------------------------------
-{Term3,Tlv4} = case Tlv3 of
-[{131074,V3}|TempTlv4] ->
-    {'dec_OtherRevVals'(V3, []), TempTlv4};
-    _ ->
-        { asn1_NOVALUE, Tlv3}
-end,
-
-case Tlv4 of
-[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv4}}}) % extra fields not allowed
-end,
-Res1 = {'RevocationValues',Term1,Term2,Term3},
-Res1.
-'dec_RevocationValues_crlVals'(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-['dec_CertificateList'(V1, [17]) || V1 <- Tlv1].
-
-
-'dec_RevocationValues_ocspVals'(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-['dec_BasicOCSPResponse'(V1, [16]) || V1 <- Tlv1].
-
-
-
-
-%%================================
-%%  OtherRevValType
-%%================================
-enc_OtherRevValType(Val) ->
-    enc_OtherRevValType(Val, [<<6>>]).
-
-enc_OtherRevValType(Val, TagIn) ->
-encode_object_identifier(Val, TagIn).
-
-
-dec_OtherRevValType(Tlv) ->
-   dec_OtherRevValType(Tlv, [6]).
-
-dec_OtherRevValType(Tlv, TagIn) ->
-decode_object_identifier(Tlv, TagIn).
-
-
-
-%%================================
-%%  OtherRevVals
-%%================================
-enc_OtherRevVals(Val) ->
-    enc_OtherRevVals(Val, [<<48>>]).
-
-enc_OtherRevVals(Val, TagIn) ->
-{_,Cindex1} = Val,
-
-%%-------------------------------------------------
-%% attribute otherRevValType(1) with type OBJECT IDENTIFIER
-%%-------------------------------------------------
-   {EncBytes1,EncLen1} = encode_object_identifier(Cindex1, [<<6>>]),
-
-   BytesSoFar = [EncBytes1],
-LenSoFar = EncLen1,
-encode_tags(TagIn, BytesSoFar, LenSoFar).
-
-
-dec_OtherRevVals(Tlv) ->
-   dec_OtherRevVals(Tlv, [16]).
-
-dec_OtherRevVals(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-
-%%-------------------------------------------------
-%% attribute otherRevValType(1) with type OBJECT IDENTIFIER
-%%-------------------------------------------------
-[V1|Tlv2] = Tlv1, 
-Term1 = decode_object_identifier(V1, [6]),
-
-case Tlv2 of
-[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv2}}}) % extra fields not allowed
-end,
-Res1 = {'OtherRevVals',Term1},
-Res1.
-
-
-%%================================
-%%  CRLListID
-%%================================
-enc_CRLListID(Val) ->
-    enc_CRLListID(Val, [<<48>>]).
-
-enc_CRLListID(Val, TagIn) ->
-{_,Cindex1} = Val,
-
-%%-------------------------------------------------
-%% attribute crls(1) with type SEQUENCE OF
-%%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'enc_CRLListID_crls'(Cindex1, [<<48>>]),
-
-   BytesSoFar = [EncBytes1],
-LenSoFar = EncLen1,
-encode_tags(TagIn, BytesSoFar, LenSoFar).
-
-
-
-%%================================
-%%  CRLListID_crls
-%%================================
-enc_CRLListID_crls(Val, TagIn) ->
-      {EncBytes,EncLen} = 'enc_CRLListID_crls_components'(Val,[],0),
-   encode_tags(TagIn, EncBytes, EncLen).
-
-'enc_CRLListID_crls_components'([], AccBytes, AccLen) -> 
-   {lists:reverse(AccBytes),AccLen};
-
-'enc_CRLListID_crls_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = 'enc_CrlValidatedID'(H, [<<48>>]),
-   'enc_CRLListID_crls_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
-
-
-
-dec_CRLListID(Tlv) ->
-   dec_CRLListID(Tlv, [16]).
-
-dec_CRLListID(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-
-%%-------------------------------------------------
-%% attribute crls(1) with type SEQUENCE OF
-%%-------------------------------------------------
-[V1|Tlv2] = Tlv1, 
-Term1 = 'dec_CRLListID_crls'(V1, [16]),
-
-case Tlv2 of
-[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv2}}}) % extra fields not allowed
-end,
-Res1 = {'CRLListID',Term1},
-Res1.
-'dec_CRLListID_crls'(Tlv, TagIn) ->
-   %%-------------------------------------------------
-   %% decode tag and length 
-   %%-------------------------------------------------
-Tlv1 = match_tags(Tlv, TagIn),
-['dec_CrlValidatedID'(V1, [16]) || V1 <- Tlv1].
-
-
-
-
-%%================================
 %%  MessageImprint
 %%================================
 enc_MessageImprint(Val) ->
@@ -3471,9 +4470,9 @@ enc_MessageImprint(Val, TagIn) ->
 {_,Cindex1,Cindex2} = Val,
 
 %%-------------------------------------------------
-%% attribute hashAlgorithm(1)   External AuthenticationFramework:AlgorithmIdentifier
+%% attribute hashAlgorithm(1)   External KEP:AlgorithmIdentifier
 %%-------------------------------------------------
-   {EncBytes1,EncLen1} = 'AuthenticationFramework':'enc_AlgorithmIdentifier'(Cindex1, [<<48>>]),
+   {EncBytes1,EncLen1} = 'enc_AlgorithmIdentifier'(Cindex1, [<<48>>]),
 
 %%-------------------------------------------------
 %% attribute hashedMessage(2) with type OCTET STRING
@@ -3495,10 +4494,10 @@ dec_MessageImprint(Tlv, TagIn) ->
 Tlv1 = match_tags(Tlv, TagIn),
 
 %%-------------------------------------------------
-%% attribute hashAlgorithm(1)   External AuthenticationFramework:AlgorithmIdentifier
+%% attribute hashAlgorithm(1)   External KEP:AlgorithmIdentifier
 %%-------------------------------------------------
 [V1|Tlv2] = Tlv1, 
-Term1 = 'AuthenticationFramework':'dec_AlgorithmIdentifier'(V1, [16]),
+Term1 = 'dec_AlgorithmIdentifier'(V1, [16]),
 
 %%-------------------------------------------------
 %% attribute hashedMessage(2) with type OCTET STRING
@@ -3918,7 +4917,7 @@ enc_Accuracy(Val, TagIn) ->
    {EncBytes2,EncLen2} =  case Cindex2 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            encode_integer(Cindex2, [<<128>>])
+            encode_integer(Cindex2, [<<2>>,<<160>>])
        end,
 
 %%-------------------------------------------------
@@ -3927,7 +4926,7 @@ enc_Accuracy(Val, TagIn) ->
    {EncBytes3,EncLen3} =  case Cindex3 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            encode_integer(Cindex3, [<<129>>])
+            encode_integer(Cindex3, [<<2>>,<<161>>])
        end,
 
    BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
@@ -3960,7 +4959,7 @@ end,
 {Term2,Tlv3} = case Tlv2 of
 [{131072,V2}|TempTlv3] ->
     {begin
-Val1 = decode_integer(V2, []),
+Val1 = decode_integer(V2, [2]),
 if 1 =< Val1, Val1 =< 999 ->
 Val1;
 true ->
@@ -3977,7 +4976,7 @@ end,
 {Term3,Tlv4} = case Tlv3 of
 [{131073,V3}|TempTlv4] ->
     {begin
-Val2 = decode_integer(V3, []),
+Val2 = decode_integer(V3, [2]),
 if 1 =< Val2, Val2 =< 999 ->
 Val2;
 true ->
