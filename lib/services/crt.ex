@@ -92,28 +92,27 @@ defmodule CA.CRT do
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 22}, v) do
       {:ok, x} = :KEP.decode(:CompleteRevocationRefs, v)
-      {:"id-aa-ets-revocationRefs", x}
+      {:revocationRefs, x}
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 21}, v) do
-      :io.format '21: ~p~n', [v]
 #      {:ok, certList} = :KEP.decode(:CertificateList, v)
-      {:"id-aa-ets-CertificateRefs", v}
+      {:certificateRefs, v}
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 23}, v) do
       {:ok, certList} = :KEP.decode(:Certificates, v)
       list = :lists.map(fn cert -> CA.CRT.parseCert(cert) end, certList)
-      {:"id-aa-ets-certValues", list}
+      {:certificateValues, list}
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 24}, v) do
       {:ok, {:RevocationValues, :asn1_NOVALUE, ocspVals, :asn1_NOVALUE}} = :KEP.decode(:RevocationValues, v)
       {:ok, list} = :KEP.decode(:BasicOCSPResponses, ocspVals)
-      list = :lists.map(fn {:BasicOCSPResponse,{:ResponseData,ver,{_,rdn},time,responses,ext},alg,bin,_} -> CA.CRT.rdn(rdn) end, list)
-      {:"id-aa-ets-revocationValues", list}
+      list = :lists.map(fn {:BasicOCSPResponse,{:ResponseData,_ver,{_,rdn},_time,_responses,_ext},_alg,_bin,_} -> CA.CRT.rdn(rdn) end, list)
+      {:revocationValues, list}
   end
 
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 47}, v) do
       {:ok, {:SigningCertificateV2,[{:ESSCertIDv2, _, _, {_,_,serial}}],_}} = :KEP.decode(:SigningCertificateV2, v)
-      {:"id-aa-signingCertificateV2", serial}
+      {:signingCertificateV2, serial}
   end
 
   def oid(x,v) when is_binary(x), do: {:oid.decode(x),pair(v,[])}
@@ -164,6 +163,14 @@ defmodule CA.CRT do
       ]
   end
 
+  def decodePublicKey(oid,oid2,publicKey) do
+      :io.format '~p~n', [oid]
+      case oid do
+           {1,2,804,2,1,1,1,1,3,1,1} -> :base64.encode publicKey 
+           _ -> decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey)
+      end
+  end
+
   def parseCert(cert, _) do parseCert(cert) end
   def parseCert(cert) do
       {:Certificate, tbs, _, _} = cert
@@ -179,9 +186,15 @@ defmodule CA.CRT do
         issuer:  rdn(unsubj(issuer)),
         serial: :base64.encode(CA.EST.integer(serial)),
         validity: [from: nb, to: na],
-#        publicKey: decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey),
+        publicKey: decodePublicKey(oid, oid2, publicKey),
         extensions: extensions
       ]
+  end
+
+  def parseCertFile(file) do
+      {:ok, bin} = :file.read_file file
+      {:ok, cert} = :"AuthenticationFramework".decode :Certificate, bin
+      parseCert(cert)
   end
 
 end

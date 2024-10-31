@@ -5,7 +5,7 @@ DEFINITIONS EXPLICIT TAGS ::=
 
 BEGIN
 
--- EXPORTS ALL --
+EXPORTS ALL ;
 
 -- IMPORTS NONE --
 
@@ -184,7 +184,10 @@ X520countryName ::=     PrintableString (SIZE (2))
 
 id-at-serialNumber      AttributeType ::= { id-at 5 }
 
-X520SerialNumber ::=    PrintableString (SIZE (1..ub-serial-number))
+X520SerialNumber ::= CHOICE {
+      printableString PrintableString (SIZE (1..ub-serial-number)),
+      utf8String UTF8String (SIZE (1..ub-serial-number))
+}
 
 -- Naming attributes of type X520Pseudonym
 

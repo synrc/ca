@@ -13,8 +13,7 @@
 -- date: 20.08.2012 #1236/5/453
 
 KEP DEFINITIONS EXPLICIT TAGS ::= BEGIN
-EXPORTS ALL ;
-IMPORTS Certificate FROM PKIX1Explicit-2009
+IMPORTS Certificate FROM PKIX1Explicit88
         Attribute FROM InformationFramework
         AttributeCertificate, CertificateSerialNumber, Extensions, Version FROM AuthenticationFramework
         PolicyInformation, CRLReason FROM CertificateExtensions
@@ -28,8 +27,7 @@ RelativeDistinguishedName ::= SET OF AttributeTypeAndValue
 AttributeTypeX ::= OBJECT IDENTIFIER
 AttributeValueX ::= CHOICE {
   utf8 UTF8String,
-  printable PrintableString,
-  else ANY }
+  printable PrintableString }
 
 AttributeTypeAndValue ::= SEQUENCE {
   type AttributeTypeX,
@@ -82,8 +80,7 @@ GeneralName ::= CHOICE {
   directoryName              [4]  Name,
   uniformResourceIdentifier  [6]  IA5String,
   iPAddress                  [7]  OCTET STRING,
-  registeredID               [8]  OBJECT IDENTIFIER,
-  else ANY
+  registeredID               [8]  OBJECT IDENTIFIER
 }
 
 TSAPolicyId ::= OBJECT IDENTIFIER

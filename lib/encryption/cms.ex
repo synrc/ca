@@ -156,7 +156,7 @@ defmodule CA.CMS do
       signedAttributes = :lists.map(fn {:Attribute,code,[{:asn1_OPENTYPE,b}],_} ->
          CA.CRT.oid(code, b)
       end, signedAttrs)
-      attributes = :lists.map(fn {:Attribute,code,[{:asn1_OPENTYPE,b}],_} ->
+      attributes = :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}],_} ->
          CA.CRT.oid(code, b)
       end, attrs)
       [
