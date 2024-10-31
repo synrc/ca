@@ -91,15 +91,15 @@ defmodule CA.CRT do
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
-  def rdn({2, 5, 4, 4}), do: "surname"
-  def rdn({2, 5, 4, 42}), do: "givenName"
-  def rdn({2, 5, 4, 12}), do: "t"
-  def rdn({2, 5, 4, 11}), do: "ou"
-  def rdn({2, 5, 4, 5}), do: "sn"
-  def rdn({2, 5, 4, 3}), do: "cn"
-  def rdn({2, 5, 4, 6}), do: "c"
-  def rdn({2, 5, 4, 7}), do: "l"
+  def rdn({2, 5, 4, 3}),  do: "cn"
+  def rdn({2, 5, 4, 4}),  do: "surname"
+  def rdn({2, 5, 4, 5}),  do: "sn"
+  def rdn({2, 5, 4, 6}),  do: "c"
+  def rdn({2, 5, 4, 7}),  do: "l"
   def rdn({2, 5, 4, 10}), do: "o"
+  def rdn({2, 5, 4, 11}), do: "ou"
+  def rdn({2, 5, 4, 12}), do: "t"
+  def rdn({2, 5, 4, 42}), do: "givenName"
   def rdn({:rdnSequence, list}) do
       Enum.join :lists.map(fn {_,oid,{_,list}} -> "#{rdn(oid)}=#{list}"
                               {_,oid,list} -> "#{rdn(oid)}=#{list}" end, list), "/"
