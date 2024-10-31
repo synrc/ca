@@ -90,7 +90,7 @@ defmodule CA.CRT do
       {:contentTimestamp, {hd(mapOids([oid])), serial, :erlang.iolist_to_binary(ts), :base64.encode(x)}}
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 21}, v) do
-      {:ok, x} = :KEP.decode(:CertificateList, v)
+#      {:ok, x} = :KEP.decode(:CertificateList, v)
       {:"id-aa-ets-CertificateRefs", v}
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 22}, v) do
