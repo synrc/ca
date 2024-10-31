@@ -145,6 +145,12 @@ defmodule CA.CRT do
   def rdn({2, 5, 6, 8}),  do: "organizationalRole"
   def rdn({2, 5, 6, 9}),  do: "groupOfNames"
   def rdn({:rdnSequence, list}) do
+      :lists.map(fn [{_,oid,{_,list}}] -> {rdn(oid),"#{list}"}
+                     {_,oid,{_,list}}  -> {rdn(oid),"#{list}"}
+                     {_,oid,list}      -> {rdn(oid),"#{list}"} end, list)
+  end
+
+  def rdn2({:rdnSequence, list}) do
       Enum.join :lists.map(fn [{_,oid,{_,list}}] -> "#{rdn(oid)}=#{list}"
                               {_,oid,{_,list}} -> "#{rdn(oid)}=#{list}"
                               {_,oid,list} -> "#{rdn(oid)}=#{list}" end, list), "/"
