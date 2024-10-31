@@ -17,7 +17,7 @@ BEGIN
 
 IMPORTS Attribute, Name
   FROM  InformationFramework {joint-iso-itu-t ds(5) module(1) informationFramework(1) 3}
-        AlgorithmIdentifier, AttributeCertificate, Certificate, CertificateList,
+        AlgorithmIdentifier, AttributeCertificate, Certificate,
         CertificateSerialNumber, HASH{}, SIGNED{}, Extensions, Version
    FROM AuthenticationFramework {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 3}
         PolicyInformation, CRLReason
@@ -59,7 +59,6 @@ OcspIdentifier ::= SEQUENCE {
   producedAt GeneralizedTime
 }
 
-
 CMSVersion ::= INTEGER {v0(0), v1(1), v2(2), v3(3), v4(4), v5(5)}
 
 gost34311 OBJECT IDENTIFIER ::= {iso(1) member-body(2) ua(804)
@@ -84,6 +83,7 @@ SubjectKeyIdentifier ::= KeyIdentifier
 RevocationInfoChoices ::= SET OF CertificateList
 SignerInfos ::= SET OF SignerInfo
 CertificateSet ::= SET OF Certificate
+CertificateList ::= SET OF Certificate
 SignedData ::= SEQUENCE {
   version CMSVersion,
   digestAlgorithms DigestAlgorithmIdentifiers,

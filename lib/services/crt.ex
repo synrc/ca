@@ -73,16 +73,44 @@ defmodule CA.CRT do
   def oid({1,2,840,113549,1,9,3},v), do: {:contentType, hd(mapOidsDecode([v]))}
   def oid({1,2,840,113549,1,9,4},v), do: {:messageDigest, :base64.encode(:erlang.element(2,:KEP.decode(:MessageDigest, v)))}
   def oid({1,2,840,113549,1,9,5},v), do: {:signingTime, :erlang.element(2,:erlang.element(1,:asn1rt_nif.decode_ber_tlv(v)))}
-  def oid({1,2,840,113549,1,9,16,2,47},v) do
-      {:SigningCertificateV2,[{:ESSCertIDv2, _, _, {_,_,serial}}],_} = :erlang.element(2,:KEP.decode(:SigningCertificateV2, v))
-      {:signingCertificateV2, serial}
-  end
-  def oid({1,2,840,113549,1,9,16,2,20},v) do
-      {:ContentInfo, oid, value} = :erlang.element(2,:KEP.decode(:ContentInfo,v))
+
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2}, v) do {:"id-aa", v} end
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 14}, v) do {:"id-aa-timeStampToken", v}
+      {:ok, {:ContentInfo, oid, value}} = :KEP.decode(:ContentInfo,v)
+      {:ok, {:SignedData, _, _alg, {_,_,x}, _c, _x1, _si}} = :KEP.decode(:SignedData, value)
+      {:ok, {:TSTInfo, _vsn, _oid, {:MessageImprint, _, x}, serial, ts, _,_,_,_}} = :KEP.decode(:TSTInfo, x)
+      {:timeStampToken, {hd(mapOids([oid])), serial, :erlang.iolist_to_binary(ts), :base64.encode(x)}}
+      end
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 18}, v) do {:"id-aa-ets-signerAttr", v} end
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 19}, v) do {:"id-aa-ets-otherSigCert", v} end
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 20}, v) do
+      {:ok, {:ContentInfo, oid, value}} = :KEP.decode(:ContentInfo,v)
       {:ok, {:SignedData, _, _alg, {_,_,x}, _c, _x1, _si}} = :KEP.decode(:SignedData, value)
       {:ok, {:TSTInfo, _vsn, _oid, {:MessageImprint, _, x}, serial, ts, _,_,_,_}} = :KEP.decode(:TSTInfo, x)
       {:contentTimestamp, {hd(mapOids([oid])), serial, :erlang.iolist_to_binary(ts), :base64.encode(x)}}
   end
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 21}, v) do
+      {:ok, x} = :KEP.decode(:CertificateList, v)
+      {:"id-aa-ets-CertificateRefs", v}
+  end
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 22}, v) do
+#      {:ok, x} = :KEP.decode(:CrlOcspRef, v)
+      {:"id-aa-ets-revocationRefs", v}
+  end
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 23}, v) do
+#      {:ok, x} = :KEP.decode(:CertificateList, v)
+      {:"id-aa-ets-certValues", v}
+  end
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 24}, v) do
+#      {:ok, x} = :KEP.decode(:CertificateList, v)
+      {:"id-aa-ets-revocationValues", v}
+  end
+
+  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 47}, v) do
+      {:ok, {:SigningCertificateV2,[{:ESSCertIDv2, _, _, {_,_,serial}}],_}} = :KEP.decode(:SigningCertificateV2, v)
+      {:"id-aa-signingCertificateV2", serial}
+  end
+
   def oid(x,v) when is_binary(x), do: {:oid.decode(x),pair(v,[])}
   def oid(x,v), do: {x,v}
 
@@ -91,17 +119,30 @@ defmodule CA.CRT do
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
-  def rdn({2, 5, 4, 3}),  do: "cn"
-  def rdn({2, 5, 4, 4}),  do: "surname"
-  def rdn({2, 5, 4, 5}),  do: "sn"
-  def rdn({2, 5, 4, 6}),  do: "c"
-  def rdn({2, 5, 4, 7}),  do: "l"
-  def rdn({2, 5, 4, 10}), do: "o"
-  def rdn({2, 5, 4, 11}), do: "ou"
-  def rdn({2, 5, 4, 12}), do: "t"
+  def rdn({2, 5, 4, 3}),  do: "cn" # commonName
+  def rdn({2, 5, 4, 4}),  do: "sn" # sureName
+  def rdn({2, 5, 4, 5}),  do: "serialNumber"
+  def rdn({2, 5, 4, 6}),  do: "c" # country
+  def rdn({2, 5, 4, 7}),  do: "l" # localityName
+  def rdn({0,9,2342,19200300,100,1,25}),  do: "dc"
+  def rdn({2, 5, 4, 10}), do: "o" # organization
+  def rdn({2, 5, 4, 11}), do: "ou" # organizationalUnit
+  def rdn({2, 5, 4, 12}), do: "title"
+  def rdn({2, 5, 4, 13}), do: "description"
+  def rdn({2, 5, 4, 14}), do: "device"
+  def rdn({2, 5, 4, 15}), do: "businessCategory"
   def rdn({2, 5, 4, 42}), do: "givenName"
+  def rdn({2, 5, 4, 97}), do: "organizationIdentifier"
+  def rdn({2, 5, 6, 3}),  do: "locality"
+  def rdn({2, 5, 6, 4}),  do: "organization"
+  def rdn({2, 5, 6, 5}),  do: "organizationalUnit"
+  def rdn({2, 5, 6, 6}),  do: "person"
+  def rdn({2, 5, 6, 7}),  do: "organizationalPerson"
+  def rdn({2, 5, 6, 8}),  do: "organizationalRole"
+  def rdn({2, 5, 6, 9}),  do: "groupOfNames"
   def rdn({:rdnSequence, list}) do
-      Enum.join :lists.map(fn {_,oid,{_,list}} -> "#{rdn(oid)}=#{list}"
+      Enum.join :lists.map(fn [{_,oid,{_,list}}] -> "#{rdn(oid)}=#{list}"
+                              {_,oid,{_,list}} -> "#{rdn(oid)}=#{list}"
                               {_,oid,list} -> "#{rdn(oid)}=#{list}" end, list), "/"
   end
 
@@ -125,8 +166,8 @@ defmodule CA.CRT do
       extensions = :lists.map(fn {:Extension,code,_x,b} ->
          oid(code, :lists.flatten(flat(code,:asn1rt_nif.decode_ber_tlv(b),[])))
       end, exts)
-      :io.format '~p', [oid]
-      [ version: ver,
+      [ resourceType: :Certificate,
+        version: ver,
         signatureAlgorithm: :erlang.element(1,CA.ALG.lookup(alg)),
         subject: rdn(unsubj(issuee)),
         issuer:  rdn(unsubj(issuer)),

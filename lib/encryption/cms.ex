@@ -151,10 +151,37 @@ defmodule CA.CMS do
       parseSignData(bin)
   end
 
+  def parseSignerInfo(si) do
+      {:SignerInfo, :v1, {_,{_,issuer,_}}, {_,keyAlg,_}, signedAttrs, {_,signatureAlg,_}, sign, attrs} = si
+      signedAttributes = :lists.map(fn {:Attribute,code,[{:asn1_OPENTYPE,b}],_} ->
+         CA.CRT.oid(code, b)
+      end, signedAttrs)
+      attributes = :lists.map(fn {:Attribute,code,[{:asn1_OPENTYPE,b}],_} ->
+         CA.CRT.oid(code, b)
+      end, attrs)
+      [
+         resourceType: :SignerInfo,
+         issuer: CA.CRT.rdn(issuer),
+         keyAlg: :erlang.element(1,CA.ALG.lookup(keyAlg)),
+         signatureAlg: :erlang.element(1,CA.ALG.lookup(signatureAlg)),
+         signedAttrs: signedAttributes,
+         attrs: attributes,
+      ]
+  end
+
+  def parseSignerInfos(sis) do :lists.map(fn si -> CA.CMS.parseSignerInfo(si) end, sis) end
+
   def parseSignData(bin) do
       {_, {:ContentInfo, oid, ci}} = :KEP.decode(:ContentInfo, bin)
-      {:ok, {:SignedData, a, alg, x, c, x1, si}} = :KEP.decode(:SignedData, ci)
-      {:SignedData, a, alg, x, parseSignDataCert({alg,oid,x,c,x1,si}), x1, si}
+      {:ok, {:SignedData, ver, alg, x, c, x1, sis}} = :KEP.decode(:SignedData, ci)
+      {:EncapsulatedContentInfo, contentOid, data} = x
+      [
+         resourceType: :SignedData,
+         version: ver,
+         cert: parseSignDataCert({alg,oid,x,c,x1,sis}),
+         signerInfo: parseSignerInfos(sis),
+         signedContent: data,
+      ]
   end
 
   def parseSignDataCert({_,_,_,:asn1_NOVALUE,_,_}), do: []
