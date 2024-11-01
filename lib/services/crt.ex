@@ -19,12 +19,6 @@ defmodule CA.CRT do
              _ -> [] end, attrs)}
   end
 
-  def readSignature(name \\ "2.p7s") do
-      {:ok, bin} = :file.read_file name
-      ber = CA.CMS.parseData(bin)
-      ber
-  end
-
   def extract(code, person) do
       case :lists.keyfind(code, 2, person) do
            false -> []
@@ -33,7 +27,6 @@ defmodule CA.CRT do
            {_, _, {:utf8, str}} -> str
       end
   end
-
 
   def pair([],acc), do: acc
   def pair([x],acc), do: [x|acc]
@@ -168,8 +161,17 @@ defmodule CA.CRT do
 
   def decodePublicKey(oid,oid2,publicKey) do
       case oid do
-           {1,2,804,2,1,1,1,1,3,1,1} -> :base64.encode publicKey
-           _ -> decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey)
+           {1,2,804,2,1,1,1,1,3,6,1,1} ->
+                :base64.encode publicKey
+           {1,2,804,2,1,1,1,1,3,1,1} ->
+                :base64.encode publicKey
+           {1,2,840,10045,2,1} ->
+                decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey)
+           {1,2,840,113549,1,1,1} ->
+                :base64.encode publicKey
+           _ ->
+                :io.format 'new publicKey oid: ~p~n', [oid]
+                :base64.encode publicKey
       end
   end
 
@@ -193,7 +195,7 @@ defmodule CA.CRT do
       end, exts)
       [ resourceType: :Certificate,
         version: ver,
-        signatureAlgorithm: :erlang.element(1,CA.ALG.lookup(alg)),
+        signatureAlgorithm: CA.AT.oid(alg),
         subject: rdn(unsubj(issuee)),
         issuer:  rdn(unsubj(issuer)),
         serial: :base64.encode(CA.EST.integer(serial)),
@@ -202,6 +204,5 @@ defmodule CA.CRT do
         extensions: extensions
       ]
   end
-
 
 end

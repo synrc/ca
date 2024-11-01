@@ -161,15 +161,15 @@ defmodule CA.CMS do
       [
          resourceType: :RecipientInfo,
          issuer: CA.CRT.rdn(issuer),
-         keyAlg: :erlang.element(1,CA.ALG.lookup(keyAlg)),
+         keyAlg: CA.AT.oid(keyAlg),
       ]
   end
 
   def parseSignerInfo(si) do
       {:SignerInfo, :v1, {_,{_,issuer,_}}, {_,keyAlg,_}, signedAttrs, {_,signatureAlg,_}, sign, attrs} = si
-      signedAttributes = :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}]} -> CA.CRT.oid(code, b)
+      signedAttributes = :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}]}   -> CA.CRT.oid(code, b)
                                        {_,code,[{:asn1_OPENTYPE,b}],_} -> CA.CRT.oid(code, b)
-                                       {_,code,b} -> {CA.AT.oid(code), b}
+                                       {_,code,b}                      -> {CA.AT.oid(code), b}
                                          end, signedAttrs)
       attributes = case attrs do
           :asn1_NOVALUE -> []
@@ -181,8 +181,8 @@ defmodule CA.CMS do
       [
          resourceType: :SignerInfo,
          issuer: CA.CRT.rdn(issuer),
-         keyAlg: :erlang.element(1,CA.ALG.lookup(keyAlg)),
-         signatureAlg: :erlang.element(1,CA.ALG.lookup(signatureAlg)),
+         keyAlg: CA.AT.oid(keyAlg),
+         signatureAlg: CA.AT.oid(signatureAlg),
          signedAttrs: signedAttributes,
          attrs: attributes,
       ]
@@ -223,7 +223,7 @@ defmodule CA.CMS do
          resourceType: :EnvelopedData,
          ver: CA.ALG.oid(oid),
          signerInfo: parseRecipientInfos(ri),
-         encryption: CA.ALG.oid(encOID),
+         encryption: CA.AT.oid(encOID),
          encryptedContentInfo: [iv: :base64.encode(iv), data: :base64.encode(data)]
       ]
   end
@@ -249,7 +249,7 @@ defmodule CA.CMS do
   def parseContentInfoBinX509(bin) do {:ok, contentInfo} = :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, bin) ; parseContentInfo(contentInfo, false) end
 
   def parseContentInfoBin(bin) do
-      case :application.get_env(:ca, :ukrainian, :parseContentInfoBinX509) do
+      case :application.get_env(:ca, :ukrainian, :parseContentInfoBinUA) do
            :parseContentInfoBinX509 -> CA.CMS.parseContentInfoBinX509(bin)
              :parseContentInfoBinUA -> CA.CMS.parseContentInfoBinUA(bin)
                                   _ -> CA.CMS.parseContentInfoBinUA(bin)
