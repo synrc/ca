@@ -40,7 +40,7 @@ Extension ::= SEQUENCE {
  extnvalue OCTET STRING }
 
 AttributeType ::= OBJECT IDENTIFIER
-AttributeValue ::= ANY DEFINED BY AttributeType
+AttributeValue ::= ANY --DEFINED BY AttributeType
 DirectoryString ::= CHOICE {
  printableString PrintableString,
  utf8String UTF8String,
@@ -64,6 +64,8 @@ AlgorithmIdentifier ::= SEQUENCE {
  algorithm OBJECT IDENTIFIER,
  parameters ANY }
 -- DEFINED BY algorithm OPTIONAL
+
+OctetString ::= OCTET STRING
 
 DSTU4145Params::= SEQUENCE {
  definition CHOICE { ecbinary ECBinary, namedCurve OBJECT IDENTIFIER },

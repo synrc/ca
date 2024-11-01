@@ -108,28 +108,28 @@ defmodule CA.CRT do
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
-  def rdn({2, 5, 4, 3}),  do: :"cn" # "commonName"
-  def rdn({2, 5, 4, 4}),  do: :"sn" # "surename"
-  def rdn({2, 5, 4, 6}),  do: :"c"  # "country"
-  def rdn({2, 5, 4, 7}),  do: :"l"  # "localityName"
-  def rdn({2, 5, 4, 10}), do: :"o"  # "organization"
-  def rdn({2, 5, 4, 11}), do: :"ou" # "organizationalUnit"
+  def rdn({2, 5, 4, 3}),  do: :cn # "commonName"
+  def rdn({2, 5, 4, 4}),  do: :sn # "surename"
+  def rdn({2, 5, 4, 6}),  do: :c  # "country"
+  def rdn({2, 5, 4, 7}),  do: :l  # "localityName"
+  def rdn({2, 5, 4, 10}), do: :o  # "organization"
+  def rdn({2, 5, 4, 11}), do: :ou # "organizationalUnit"
 
-  def rdn({2, 5, 4, 5}),  do: :"serialNumber"
-  def rdn({2, 5, 4, 8}),  do: :"stateOrProvinceName"
-  def rdn({2, 5, 4, 12}), do: :"title"
-  def rdn({2, 5, 4, 13}), do: :"description"
-  def rdn({2, 5, 4, 14}), do: :"device"
-  def rdn({2, 5, 4, 15}), do: :"businessCategory"
-  def rdn({2, 5, 4, 42}), do: :"givenName"
-  def rdn({2, 5, 4, 97}), do: :"organizationIdentifier"
-  def rdn({2, 5, 6, 3}),  do: :"locality"
-  def rdn({2, 5, 6, 4}),  do: :"organization"
-  def rdn({2, 5, 6, 5}),  do: :"organizationalUnit"
-  def rdn({2, 5, 6, 6}),  do: :"person"
-  def rdn({2, 5, 6, 7}),  do: :"organizationalPerson"
-  def rdn({2, 5, 6, 8}),  do: :"organizationalRole"
-  def rdn({2, 5, 6, 9}),  do: :"groupOfNames"
+  def rdn({2, 5, 4, 5}),  do: :serialNumber
+  def rdn({2, 5, 4, 8}),  do: :stateOrProvinceName
+  def rdn({2, 5, 4, 12}), do: :title
+  def rdn({2, 5, 4, 13}), do: :description
+  def rdn({2, 5, 4, 14}), do: :device
+  def rdn({2, 5, 4, 15}), do: :businessCategory
+  def rdn({2, 5, 4, 42}), do: :givenName
+  def rdn({2, 5, 4, 97}), do: :organizationIdentifier
+  def rdn({2, 5, 6, 3}),  do: :locality
+  def rdn({2, 5, 6, 4}),  do: :organization
+  def rdn({2, 5, 6, 5}),  do: :organizationalUnit
+  def rdn({2, 5, 6, 6}),  do: :person
+  def rdn({2, 5, 6, 7}),  do: :organizationalPerson
+  def rdn({2, 5, 6, 8}),  do: :organizationalRole
+  def rdn({2, 5, 6, 9}),  do: :groupOfNames
 
   def rdn({0,9,2342,19200300,100,1,25}), do: "dc" # "domainComponent"
   def rdn({:rdnSequence, list}) do
@@ -146,27 +146,35 @@ defmodule CA.CRT do
                                {_,oid,   list}   -> "#{rdn(oid)}=#{list}" end, list), "/"
   end
 
-  def decodePointFromPublic(oid0,oid,publicKey) do
+  def baseLength(oid) when is_tuple(oid) do CA.Curve.getLength(CA.KnownCurves.getCurveByOid(oid)) end
+  def baseLength(_) do 256 end
+
+  def decodePointFromPublic(agreement,params,publicKey) do
       bin = :binary.part(publicKey,1,:erlang.size(publicKey)-1)
-      curve = CA.KnownCurves.getCurveByOid(oid)
-      baseLength = CA.Curve.getLength(curve)
+      baseLength = baseLength(params)
       xs = :binary.part(bin, 0, baseLength)
       ys = :binary.part(bin, baseLength, :erlang.size(bin) - baseLength)
-      [ scheme: :erlang.element(1,CA.ALG.lookup(oid0)),
-        curve: :erlang.element(1,CA.ALG.lookup(oid)),
-        x: CA.ECDSA.numberFromString(xs),
-        y: CA.ECDSA.numberFromString(ys)
+      [ x: CA.ECDSA.numberFromString(xs),
+        y: CA.ECDSA.numberFromString(ys),
+        scheme: CA.AT.oid(agreement),
+        curve: CA.AT.oid(params),
       ]
   end
 
-  def decodePublicKey(oid,oid2,publicKey) do
-      case oid do
-           {1,2,804,2,1,1,1,1,3,6,1,1} -> :base64.encode publicKey
-           {1,2,804,2,1,1,1,1,3,1,1}   -> :base64.encode publicKey
-           {1,2,840,10045,2,1}         -> decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey)
-           {1,2,840,113549,1,1,1}      -> {:ok, key} = :"PKCS-1".decode(:'RSAPublicKey', publicKey) ; key
-                                     _ -> :io.format 'new publicKey oid: ~p~n', [oid]
-                                          :base64.encode publicKey
+  def decodePublicKey(agreement,{:asn1_OPENTYPE, params},publicKey) do decodePublicKey(agreement,params,publicKey) end
+  def decodePublicKey(agreement,params,publicKey) do
+      case agreement do
+           {1,2,804,2,1,1,1,1,3,1,1} -> # ДСТУ-4145
+                {:ok,p} = :DSTU.decode(:DSTU4145Params, params)
+                [key: publicKey, scheme: CA.AT.oid(agreement), field: p]
+           {1,2,840,10045,2,1} -> # ECDSA
+                params = CA.EST.decodeObjectIdentifier(params)
+                decodePointFromPublic(agreement,params,publicKey)
+           {1,2,840,113549,1,1,1} -> # RSA
+                {:ok, key} = :"PKCS-1".decode(:'RSAPublicKey', publicKey)
+                [key: key, scheme: :RSA]
+           _ -> :io.format 'new publicKey agreement scheme detected: ~p~n', [agreement]
+                :base64.encode publicKey
       end
   end
 
@@ -184,7 +192,7 @@ defmodule CA.CRT do
       end
 
       {_, ver, serial, {_,alg,_}, issuer, {_,{_,nb},{_,na}}, issuee,
-         {:SubjectPublicKeyInfo, {_, oid, oid2}, publicKey}, _b, _c, exts} = tbs
+         {:SubjectPublicKeyInfo, {_, agreement, params}, publicKey}, _b, _c, exts} = tbs
       extensions = :lists.map(fn {:Extension,code,_x,b} ->
          oid(code, :lists.flatten(flat(code,:asn1rt_nif.decode_ber_tlv(b),[])))
       end, exts)
@@ -195,7 +203,7 @@ defmodule CA.CRT do
         issuer:  rdn(unsubj(issuer)),
         serial: :base64.encode(CA.EST.integer(serial)),
         validity: [from: nb, to: na],
-        publicKey: decodePublicKey(oid, oid2, publicKey),
+        publicKey: decodePublicKey(agreement, params, publicKey),
         extensions: extensions
       ]
   end
