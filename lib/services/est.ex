@@ -5,19 +5,20 @@ defmodule CA.EST do
   plug :dispatch
   plug Plug.Parsers, parsers: [:json], json_decoder: Jason
 
-  def integer(x)             do {:ok, v} = :"EST".encode(:Int, x) ; v end
-  def decodeInteger(x)       do {:ok, v} = :"EST".decode(:Int, x) ; v end
-  def objectIdentifier(x)    do {:ok, v} = :"EST".encode(:OID, x) ; v end
-  def decodeObjectIdentifier(x) do {:ok, v} = :"EST".decode(:OID, x) ; v end
-  def extension(x)           do {:ok, v} = :"EST".encode(:Extension, x) ; v end
+  def integer(x)                    do {:ok, v} = :"EST".encode(:Int, x) ; v end
+  def decodeInteger(x)              do {:ok, v} = :"EST".decode(:Int, x) ; v end
+  def objectIdentifier(x)           do {:ok, v} = :"EST".encode(:OID, x) ; v end
+  def decodeObjectIdentifier(x)     do {:ok, v} = :"EST".decode(:OID, x) ; v end
+  def extension(x)                  do {:ok, v} = :"EST".encode(:Extension, x) ; v end
 
-  def basicConstraints()     do {:ok, v} = :"PKIX1Implicit-2009".encode(:BasicConstraints, {:BasicConstraints, false, :asn1_NOVALUE}) ; v end
-  def keyUsage(list)         do {:ok, v} = :"PKIX1Implicit-2009".encode(:KeyUsage, list) ; v end
-  def decodeKeyPurposeId(list) do {:ok, v} = :"PKIX1Implicit-2009".decode(:KeyPurposeId, list) ; v end
-  def decodeKeyUsage(list)   do {:ok, v} = :"PKIX1Implicit-2009".decode(:KeyUsage, list) ; v end
-  def extendedKeyUsage(list) do {:ok, v} = :"PKIX1Implicit-2009".encode(:ExtKeyUsageSyntax, list) ; v end
-  def decodeExtendedKeyUsage(list) do {:ok, v} = :"PKIX1Implicit-2009".decode(:ExtKeyUsageSyntax, list) ; v end
-  def decodePolicyInformation(list) do {:ok, v} = :"PKIX1Implicit-2009".decode(:PolicyInformation, list) ; v end
+  def basicConstraints()            do {:ok, v} = :"PKIX1Implicit-2009".encode(:BasicConstraints, {:BasicConstraints, false, :asn1_NOVALUE}) ; v end
+  def keyUsage(list)                do {:ok, v} = :"PKIX1Implicit-2009".encode(:KeyUsage, list) ; v end
+  def decodeKeyPurposeId(list)      do {:ok, v} = :"PKIX1Implicit-2009".decode(:KeyPurposeId, list) ; v end
+  def decodeKeyUsage(list)          do {:ok, v} = :"PKIX1Implicit-2009".decode(:KeyUsage, list) ; v end
+  def extendedKeyUsage(list)        do {:ok, v} = :"PKIX1Implicit-2009".encode(:ExtKeyUsageSyntax, list) ; v end
+  def decodeExtendedKeyUsage(list)  do {:ok, v} = :"PKIX1Implicit-2009".decode(:ExtKeyUsageSyntax, list) ; v end
+  def decodePolicy(list)            do {:ok, v} = :"PKIX1Implicit-2009".decode(:PolicyInformation, list) ; v end
+  def decodeQCS(list)               do {:ok, v} = :KEP.decode(:QCStatement, list) ; v end
 
   def start() do 
       children = [ { Bandit, scheme: :http, port: 8047, plug: __MODULE__ } ]

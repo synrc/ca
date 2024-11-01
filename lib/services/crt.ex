@@ -45,16 +45,14 @@ defmodule CA.CRT do
          :erlang.tuple_to_list(:oid.decode(x))),'.')) end, list)
   end
 
-  def mapOids(list) do
-      :lists.map(fn x ->
-         :erlang.iolist_to_binary(:string.join(:lists.map(fn y -> :erlang.integer_to_list(y) end,
-         :erlang.tuple_to_list(x)),'.')) end, list)
-  end
+  def mapOid(x)     do :erlang.iolist_to_binary(:string.join(:lists.map(fn y -> :erlang.integer_to_list(y) end, :erlang.tuple_to_list(x)),'.')) end
+  def mapOids(list) do :lists.map(fn x -> mapOid(x) end, list) end
+  def isString(bin) do :lists.foldl(fn x, acc when x < 20 -> acc + 1 ; _, acc -> acc end, 0, :erlang.binary_to_list(bin)) <= 0 end
 
   def oid({1,3,6,1,5,5,7,1,1}, v),        do: {:authorityInfoAccess, pair(v,[])}
   def oid({1,3,6,1,4,1,11129,2,4,2}, v),  do: {:signedCertificateTimestamp, :base64.encode(hd(pair(v,[])))}
   def oid({1,3,6,1,5,5,7,1,11},v),        do: {:subjectInfoAccess, pair(v,[])}
-  def oid({1,3,6,1,5,5,7,1,3}, v),        do: {:qcStatements, mapOidsDecode(v)}
+  def oid({1,3,6,1,5,5,7,1,3}, v),        do: {:qcStatements, :lists.map(fn x -> case isString(x) do false -> mapOid(:oid.decode(x)) ; true -> x end end, v) }
   def oid({2,5,29,9},v),                  do: {:subjectDirectoryAttributes, pair(v,[])}
   def oid({2,5,29,14},v),                 do: {:subjectKeyIdentifier, :base64.encode(hd(pair(v,[])))}
   def oid({2,5,29,15},[v]),               do: {:keyUsage, CA.EST.decodeKeyUsage(<<3,2,v::binary>>) }
@@ -63,7 +61,7 @@ defmodule CA.CRT do
   def oid({2,5,29,37},v),                 do: {:extKeyUsage, mapOids(:lists.map(fn x -> :oid.decode(x) end, v)) }
   def oid({2,5,29,19},v),                 do: {:basicConstraints, v}
   def oid({2,5,29,31},v),                 do: {:cRLDistributionPoints, pair(v,[])}
-  def oid({2,5,29,32},v),                 do: {:certificatePolicies, mapOids(:lists.map(fn x -> :oid.decode(x) end, v))}
+  def oid({2,5,29,32},v),                 do: {:certificatePolicies, :lists.map(fn x -> case isString(x) do false -> mapOid(:oid.decode(x)) ; true -> x end end, v) }
   def oid({2,5,29,35},v),                 do: {:authorityKeyIdentifier, :base64.encode(hd(pair(v,[])))}
   def oid({2,5,29,46},v),                 do: {:freshestCRL, pair(v,[])}
   def oid({1,2,840,113549,1,9,3},v),      do: {:contentType, CA.AT.oid(CA.EST.decodeObjectIdentifier(v)) }
@@ -117,15 +115,15 @@ defmodule CA.CRT do
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
-  def rdn({2, 5, 4, 3}),  do: "commonName"                    # commonName
-  def rdn({2, 5, 4, 4}),  do: "surename"                      # sn
+  def rdn({2, 5, 4, 3}),  do: "cn"   # "commonName"
+  def rdn({2, 5, 4, 4}),  do: "sn" # "surename"
   def rdn({2, 5, 4, 5}),  do: "serialNumber"
-  def rdn({2, 5, 4, 6}),  do: "country"                       # c
-  def rdn({2, 5, 4, 7}),  do: "localityName"                  # l
+  def rdn({2, 5, 4, 6}),  do: "c"  # "country"
+  def rdn({2, 5, 4, 7}),  do: "l"  # "localityName"
   def rdn({2, 5, 4, 8}),  do: "stateOrProvinceName"
-  def rdn({0,9,2342,19200300,100,1,25}), do: "domainComponen" # dc
-  def rdn({2, 5, 4, 10}), do: "organization"                  # o
-  def rdn({2, 5, 4, 11}), do: "organizationalUnit"            # ou
+  def rdn({0,9,2342,19200300,100,1,25}), do: "dc" # "domainComponen"
+  def rdn({2, 5, 4, 10}), do: "o" # "organization"
+  def rdn({2, 5, 4, 11}), do: "ou" # "organizationalUnit"
   def rdn({2, 5, 4, 12}), do: "title"
   def rdn({2, 5, 4, 13}), do: "description"
   def rdn({2, 5, 4, 14}), do: "device"

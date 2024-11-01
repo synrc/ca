@@ -293,6 +293,19 @@ SingleResponse ::= SEQUENCE {
   nextUpdate [0] EXPLICIT GeneralizedTime OPTIONAL,
   singleExtensions [1] EXPLICIT Extensions OPTIONAL }
 
+QCStatements ::= SEQUENCE OF QCStatement
+QCStatement ::= SEQUENCE {
+  statementId OBJECT IDENTIFIER,
+  statementInfo ANY DEFINED BY statementId OPTIONAL
+}
+
+MonetaryValue::= SEQUENCE {
+  currency Iso4217CurrencyCode,
+  amount INTEGER,
+  exponent INTEGER
+}
+
+Iso4217CurrencyCode ::= CHOICE { alphabetic PrintableString }
 
 MessageImprint ::= SEQUENCE {
   hashAlgorithm AlgorithmIdentifier,

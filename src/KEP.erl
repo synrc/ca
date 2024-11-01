@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include_lib("ca/include/KEP.hrl").
+-include("KEP.hrl").
 -asn1_info([{vsn,'5.0.17'},
             {module,'KEP'},
             {options,[warnings,ber,errors,
@@ -105,6 +105,10 @@ enc_CertID/2,
 enc_CertStatus/2,
 enc_RevokedInfo/2,
 enc_SingleResponse/2,
+enc_QCStatements/2,
+enc_QCStatement/2,
+enc_MonetaryValue/2,
+enc_Iso4217CurrencyCode/2,
 enc_MessageImprint/2,
 enc_TimeStampReq/2,
 enc_TimeStampResp/2,
@@ -204,6 +208,10 @@ dec_CertID/2,
 dec_CertStatus/2,
 dec_RevokedInfo/2,
 dec_SingleResponse/2,
+dec_QCStatements/2,
+dec_QCStatement/2,
+dec_MonetaryValue/2,
+dec_Iso4217CurrencyCode/2,
 dec_MessageImprint/2,
 dec_TimeStampReq/2,
 dec_TimeStampResp/2,
@@ -366,6 +374,10 @@ encode_disp('CertID', Data) -> enc_CertID(Data);
 encode_disp('CertStatus', Data) -> enc_CertStatus(Data);
 encode_disp('RevokedInfo', Data) -> enc_RevokedInfo(Data);
 encode_disp('SingleResponse', Data) -> enc_SingleResponse(Data);
+encode_disp('QCStatements', Data) -> enc_QCStatements(Data);
+encode_disp('QCStatement', Data) -> enc_QCStatement(Data);
+encode_disp('MonetaryValue', Data) -> enc_MonetaryValue(Data);
+encode_disp('Iso4217CurrencyCode', Data) -> enc_Iso4217CurrencyCode(Data);
 encode_disp('MessageImprint', Data) -> enc_MessageImprint(Data);
 encode_disp('TimeStampReq', Data) -> enc_TimeStampReq(Data);
 encode_disp('TimeStampResp', Data) -> enc_TimeStampResp(Data);
@@ -464,6 +476,10 @@ decode_disp('CertID', Data) -> dec_CertID(Data);
 decode_disp('CertStatus', Data) -> dec_CertStatus(Data);
 decode_disp('RevokedInfo', Data) -> dec_RevokedInfo(Data);
 decode_disp('SingleResponse', Data) -> dec_SingleResponse(Data);
+decode_disp('QCStatements', Data) -> dec_QCStatements(Data);
+decode_disp('QCStatement', Data) -> dec_QCStatement(Data);
+decode_disp('MonetaryValue', Data) -> dec_MonetaryValue(Data);
+decode_disp('Iso4217CurrencyCode', Data) -> dec_Iso4217CurrencyCode(Data);
 decode_disp('MessageImprint', Data) -> dec_MessageImprint(Data);
 decode_disp('TimeStampReq', Data) -> dec_TimeStampReq(Data);
 decode_disp('TimeStampResp', Data) -> dec_TimeStampResp(Data);
@@ -4863,6 +4879,200 @@ case Tlv6 of
 end,
 Res1 = {'SingleResponse',Term1,Term2,Term3,Term4,Term5},
 Res1.
+
+
+%%================================
+%%  QCStatements
+%%================================
+enc_QCStatements(Val) ->
+    enc_QCStatements(Val, [<<48>>]).
+
+enc_QCStatements(Val, TagIn) ->
+   {EncBytes,EncLen} = 'enc_QCStatements_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_QCStatements_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_QCStatements_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_QCStatement'(H, [<<48>>]),
+   'enc_QCStatements_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_QCStatements(Tlv) ->
+   dec_QCStatements(Tlv, [16]).
+
+dec_QCStatements(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_QCStatement'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  QCStatement
+%%================================
+enc_QCStatement(Val) ->
+    enc_QCStatement(Val, [<<48>>]).
+
+enc_QCStatement(Val, TagIn) ->
+{_,Cindex1,Cindex2} = Val,
+
+%%-------------------------------------------------
+%% attribute statementId(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_object_identifier(Cindex1, [<<6>>]),
+
+%%-------------------------------------------------
+%% attribute statementInfo(2) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} =  case Cindex2 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            encode_open_type(Cindex2, [])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2],
+LenSoFar = EncLen1 + EncLen2,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_QCStatement(Tlv) ->
+   dec_QCStatement(Tlv, [16]).
+
+dec_QCStatement(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute statementId(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_object_identifier(V1, [6]),
+
+%%-------------------------------------------------
+%% attribute statementInfo(2) with type ASN1_OPEN_TYPE OPTIONAL
+%%-------------------------------------------------
+{Term2,Tlv3} = case Tlv2 of
+[V2|TempTlv3] ->
+    {decode_open_type_as_binary(V2, []), TempTlv3};
+    _ ->
+        { asn1_NOVALUE, Tlv2}
+end,
+
+case Tlv3 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
+end,
+Res1 = {'QCStatement',Term1,Term2},
+Res1.
+
+
+%%================================
+%%  MonetaryValue
+%%================================
+enc_MonetaryValue(Val) ->
+    enc_MonetaryValue(Val, [<<48>>]).
+
+enc_MonetaryValue(Val, TagIn) ->
+{_,Cindex1,Cindex2,Cindex3} = Val,
+
+%%-------------------------------------------------
+%% attribute currency(1)   External KEP:Iso4217CurrencyCode
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = 'enc_Iso4217CurrencyCode'(Cindex1, []),
+
+%%-------------------------------------------------
+%% attribute amount(2) with type INTEGER
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} = encode_integer(Cindex2, [<<2>>]),
+
+%%-------------------------------------------------
+%% attribute exponent(3) with type INTEGER
+%%-------------------------------------------------
+   {EncBytes3,EncLen3} = encode_integer(Cindex3, [<<2>>]),
+
+   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
+LenSoFar = EncLen1 + EncLen2 + EncLen3,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_MonetaryValue(Tlv) ->
+   dec_MonetaryValue(Tlv, [16]).
+
+dec_MonetaryValue(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute currency(1)   External KEP:Iso4217CurrencyCode
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = 'dec_Iso4217CurrencyCode'(V1, []),
+
+%%-------------------------------------------------
+%% attribute amount(2) with type INTEGER
+%%-------------------------------------------------
+[V2|Tlv3] = Tlv2, 
+Term2 = decode_integer(V2, [2]),
+
+%%-------------------------------------------------
+%% attribute exponent(3) with type INTEGER
+%%-------------------------------------------------
+[V3|Tlv4] = Tlv3, 
+Term3 = decode_integer(V3, [2]),
+
+case Tlv4 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv4}}}) % extra fields not allowed
+end,
+Res1 = {'MonetaryValue',Term1,Term2,Term3},
+Res1.
+
+
+%%================================
+%%  Iso4217CurrencyCode
+%%================================
+enc_Iso4217CurrencyCode(Val) ->
+    enc_Iso4217CurrencyCode(Val, []).
+
+enc_Iso4217CurrencyCode(Val, TagIn) ->
+   {EncBytes,EncLen} = case element(1,Val) of
+      alphabetic ->
+         encode_restricted_string(element(2,Val), [<<19>>]);
+      Else -> 
+         exit({error,{asn1,{invalid_choice_type,Else}}})
+   end,
+
+encode_tags(TagIn, EncBytes, EncLen).
+
+
+
+
+dec_Iso4217CurrencyCode(Tlv) ->
+   dec_Iso4217CurrencyCode(Tlv, []).
+
+dec_Iso4217CurrencyCode(Tlv, TagIn) ->
+Tlv1 = match_tags(Tlv, TagIn),
+case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
+
+%% 'alphabetic'
+    {19, V1} -> 
+        {alphabetic, begin
+binary_to_list(decode_restricted_string(V1, []))
+end
+};
+
+      Else -> 
+         exit({error,{asn1,{invalid_choice_tag,Else}}})
+   end
+.
 
 
 %%================================
