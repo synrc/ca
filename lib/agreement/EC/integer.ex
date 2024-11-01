@@ -1,5 +1,4 @@
 defmodule CA.Integer do
-  @moduledoc false
   import Bitwise
 
   def modulo(x, n), do: rem(x, n) |> correctNegativeModulo(n)

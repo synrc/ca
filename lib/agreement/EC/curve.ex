@@ -1,5 +1,4 @@
 defmodule CA.Curve do
-  @moduledoc false
   require CA.Integer
   require CA.Point
   defstruct [:A, :B, :P, :N, :G, :name, :oid]
