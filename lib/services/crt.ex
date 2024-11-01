@@ -57,7 +57,7 @@ defmodule CA.CRT do
   def oid({2,5,29,14},v),                 do: {:subjectKeyIdentifier, :base64.encode(hd(pair(v,[])))}
   def oid({2,5,29,15},[v]),               do: {:keyUsage, CA.EST.decodeKeyUsage(<<3,2,v::binary>>) }
   def oid({2,5,29,16},v),                 do: {:privateKeyUsagePeriod, v}
-  def oid({2,5,29,17},v),                 do: {:subjectAltName, :lists.map(fn x -> case CA.ALG.lookup(:oid.decode(x)) do false -> x ; {alg,_} -> alg end end, v)}
+  def oid({2,5,29,17},v),                 do: {:subjectAltName, :lists.map(fn x -> case isString(x) do false -> mapOid(:oid.decode(x)) ; true -> x end end, v) }
   def oid({2,5,29,37},v),                 do: {:extKeyUsage, mapOids(:lists.map(fn x -> :oid.decode(x) end, v)) }
   def oid({2,5,29,19},v),                 do: {:basicConstraints, v}
   def oid({2,5,29,31},v),                 do: {:cRLDistributionPoints, pair(v,[])}
