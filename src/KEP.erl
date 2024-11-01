@@ -5,7 +5,7 @@
 -compile(nowarn_unused_vars).
 -dialyzer(no_improper_lists).
 -dialyzer(no_match).
--include("KEP.hrl").
+-include_lib("ca/include/KEP.hrl").
 -asn1_info([{vsn,'5.0.17'},
             {module,'KEP'},
             {options,[warnings,ber,errors,
@@ -51,6 +51,7 @@ enc_EncryptedContentInfo/2,
 enc_ContentEncryptionAlgorithmIdentifier/2,
 enc_KeyEncryptionAlgorithmIdentifier/2,
 enc_EncryptedContent/2,
+enc_RecipientInfoUA/2,
 enc_RecipientInfo/2,
 enc_EncryptedKey/2,
 enc_EncapsulatedContentInfo/2,
@@ -154,6 +155,7 @@ dec_EncryptedContentInfo/2,
 dec_ContentEncryptionAlgorithmIdentifier/2,
 dec_KeyEncryptionAlgorithmIdentifier/2,
 dec_EncryptedContent/2,
+dec_RecipientInfoUA/2,
 dec_RecipientInfo/2,
 dec_EncryptedKey/2,
 dec_EncapsulatedContentInfo/2,
@@ -320,6 +322,7 @@ encode_disp('EncryptedContentInfo', Data) -> enc_EncryptedContentInfo(Data);
 encode_disp('ContentEncryptionAlgorithmIdentifier', Data) -> enc_ContentEncryptionAlgorithmIdentifier(Data);
 encode_disp('KeyEncryptionAlgorithmIdentifier', Data) -> enc_KeyEncryptionAlgorithmIdentifier(Data);
 encode_disp('EncryptedContent', Data) -> enc_EncryptedContent(Data);
+encode_disp('RecipientInfoUA', Data) -> enc_RecipientInfoUA(Data);
 encode_disp('RecipientInfo', Data) -> enc_RecipientInfo(Data);
 encode_disp('EncryptedKey', Data) -> enc_EncryptedKey(Data);
 encode_disp('EncapsulatedContentInfo', Data) -> enc_EncapsulatedContentInfo(Data);
@@ -422,6 +425,7 @@ decode_disp('EncryptedContentInfo', Data) -> dec_EncryptedContentInfo(Data);
 decode_disp('ContentEncryptionAlgorithmIdentifier', Data) -> dec_ContentEncryptionAlgorithmIdentifier(Data);
 decode_disp('KeyEncryptionAlgorithmIdentifier', Data) -> dec_KeyEncryptionAlgorithmIdentifier(Data);
 decode_disp('EncryptedContent', Data) -> dec_EncryptedContent(Data);
+decode_disp('RecipientInfoUA', Data) -> dec_RecipientInfoUA(Data);
 decode_disp('RecipientInfo', Data) -> dec_RecipientInfo(Data);
 decode_disp('EncryptedKey', Data) -> dec_EncryptedKey(Data);
 decode_disp('EncapsulatedContentInfo', Data) -> dec_EncapsulatedContentInfo(Data);
@@ -1338,19 +1342,19 @@ enc_GeneralName(Val) ->
 enc_GeneralName(Val, TagIn) ->
    {EncBytes,EncLen} = case element(1,Val) of
       otherName ->
-         'enc_INSTANCE OF'(element(2,Val), [<<40>>,<<160>>]);
+         'enc_INSTANCE OF'(element(2,Val), [<<160>>]);
       rfc822Name ->
-         encode_restricted_string(element(2,Val), [<<22>>,<<161>>]);
+         encode_restricted_string(element(2,Val), [<<129>>]);
       dNSName ->
-         encode_restricted_string(element(2,Val), [<<22>>,<<162>>]);
+         encode_restricted_string(element(2,Val), [<<130>>]);
       directoryName ->
          'enc_Name'(element(2,Val), [<<164>>]);
       uniformResourceIdentifier ->
-         encode_restricted_string(element(2,Val), [<<22>>,<<166>>]);
+         encode_restricted_string(element(2,Val), [<<134>>]);
       iPAddress ->
-         encode_restricted_string(element(2,Val), [<<4>>,<<167>>]);
+         encode_restricted_string(element(2,Val), [<<135>>]);
       registeredID ->
-         encode_object_identifier(element(2,Val), [<<6>>,<<168>>]);
+         encode_object_identifier(element(2,Val), [<<136>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -1369,13 +1373,13 @@ case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
 
 %% 'otherName'
     {131072, V1} -> 
-        {otherName, 'dec_INSTANCE OF'(V1, [8])};
+        {otherName, 'dec_INSTANCE OF'(V1, [])};
 
 
 %% 'rfc822Name'
     {131073, V1} -> 
         {rfc822Name, begin
-binary_to_list(decode_restricted_string(V1, [22]))
+binary_to_list(decode_restricted_string(V1, []))
 end
 };
 
@@ -1383,7 +1387,7 @@ end
 %% 'dNSName'
     {131074, V1} -> 
         {dNSName, begin
-binary_to_list(decode_restricted_string(V1, [22]))
+binary_to_list(decode_restricted_string(V1, []))
 end
 };
 
@@ -1396,19 +1400,19 @@ end
 %% 'uniformResourceIdentifier'
     {131078, V1} -> 
         {uniformResourceIdentifier, begin
-binary_to_list(decode_restricted_string(V1, [22]))
+binary_to_list(decode_restricted_string(V1, []))
 end
 };
 
 
 %% 'iPAddress'
     {131079, V1} -> 
-        {iPAddress, decode_octet_string(V1, [4])};
+        {iPAddress, decode_octet_string(V1, [])};
 
 
 %% 'registeredID'
     {131080, V1} -> 
-        {registeredID, decode_object_identifier(V1, [6])};
+        {registeredID, decode_object_identifier(V1, [])};
 
       Else -> 
          exit({error,{asn1,{invalid_choice_tag,Else}}})
@@ -1828,7 +1832,7 @@ enc_RecipientInfos_riSet(Val, TagIn) ->
    {lists:reverse(AccBytes),AccLen};
 
 'enc_RecipientInfos_riSet_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = 'enc_RecipientInfo'(H, [<<48>>]),
+   {EncBytes,EncLen} = 'enc_RecipientInfo'(H, []),
    'enc_RecipientInfos_riSet_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
 
 
@@ -1845,7 +1849,7 @@ enc_RecipientInfos_riSequence(Val, TagIn) ->
    {lists:reverse(AccBytes),AccLen};
 
 'enc_RecipientInfos_riSequence_components'([H|T],AccBytes, AccLen) ->
-   {EncBytes,EncLen} = 'enc_RecipientInfo'(H, [<<48>>]),
+   {EncBytes,EncLen} = 'enc_RecipientInfo'(H, []),
    'enc_RecipientInfos_riSequence_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
 
 
@@ -1875,7 +1879,7 @@ case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
    %% decode tag and length 
    %%-------------------------------------------------
 Tlv1 = match_tags(Tlv, TagIn),
-['dec_RecipientInfo'(V1, [16]) || V1 <- Tlv1].
+['dec_RecipientInfo'(V1, []) || V1 <- Tlv1].
 
 
 'dec_RecipientInfos_riSequence'(Tlv, TagIn) ->
@@ -1883,7 +1887,7 @@ Tlv1 = match_tags(Tlv, TagIn),
    %% decode tag and length 
    %%-------------------------------------------------
 Tlv1 = match_tags(Tlv, TagIn),
-['dec_RecipientInfo'(V1, [16]) || V1 <- Tlv1].
+['dec_RecipientInfo'(V1, []) || V1 <- Tlv1].
 
 
 
@@ -2014,12 +2018,12 @@ decode_octet_string(Tlv, TagIn).
 
 
 %%================================
-%%  RecipientInfo
+%%  RecipientInfoUA
 %%================================
-enc_RecipientInfo(Val) ->
-    enc_RecipientInfo(Val, [<<48>>]).
+enc_RecipientInfoUA(Val) ->
+    enc_RecipientInfoUA(Val, [<<48>>]).
 
-enc_RecipientInfo(Val, TagIn) ->
+enc_RecipientInfoUA(Val, TagIn) ->
 {_,Cindex1,Cindex2,Cindex3,Cindex4} = Val,
 
 %%-------------------------------------------------
@@ -2047,10 +2051,10 @@ LenSoFar = EncLen1 + EncLen2 + EncLen3 + EncLen4,
 encode_tags(TagIn, BytesSoFar, LenSoFar).
 
 
-dec_RecipientInfo(Tlv) ->
-   dec_RecipientInfo(Tlv, [16]).
+dec_RecipientInfoUA(Tlv) ->
+   dec_RecipientInfoUA(Tlv, [16]).
 
-dec_RecipientInfo(Tlv, TagIn) ->
+dec_RecipientInfoUA(Tlv, TagIn) ->
    %%-------------------------------------------------
    %% decode tag and length 
    %%-------------------------------------------------
@@ -2091,8 +2095,72 @@ Term4 = decode_octet_string(V4, [4]),
 case Tlv5 of
 [] -> true;_ -> exit({error,{asn1, {unexpected,Tlv5}}}) % extra fields not allowed
 end,
-Res1 = {'RecipientInfo',Term1,Term2,Term3,Term4},
+Res1 = {'RecipientInfoUA',Term1,Term2,Term3,Term4},
 Res1.
+
+
+%%================================
+%%  RecipientInfo
+%%================================
+enc_RecipientInfo(Val) ->
+    enc_RecipientInfo(Val, []).
+
+enc_RecipientInfo(Val, TagIn) ->
+   {EncBytes,EncLen} = case element(1,Val) of
+      ktri ->
+         'enc_RecipientInfoUA'(element(2,Val), [<<48>>]);
+      kari ->
+         encode_restricted_string(element(2,Val), [<<129>>]);
+      kekri ->
+         encode_restricted_string(element(2,Val), [<<130>>]);
+      pwri ->
+         encode_restricted_string(element(2,Val), [<<131>>]);
+      ori ->
+         encode_restricted_string(element(2,Val), [<<132>>]);
+      Else -> 
+         exit({error,{asn1,{invalid_choice_type,Else}}})
+   end,
+
+encode_tags(TagIn, EncBytes, EncLen).
+
+
+
+
+dec_RecipientInfo(Tlv) ->
+   dec_RecipientInfo(Tlv, []).
+
+dec_RecipientInfo(Tlv, TagIn) ->
+Tlv1 = match_tags(Tlv, TagIn),
+case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
+
+%% 'ktri'
+    {16, V1} -> 
+        {ktri, 'dec_RecipientInfoUA'(V1, [])};
+
+
+%% 'kari'
+    {131073, V1} -> 
+        {kari, decode_octet_string(V1, [])};
+
+
+%% 'kekri'
+    {131074, V1} -> 
+        {kekri, decode_octet_string(V1, [])};
+
+
+%% 'pwri'
+    {131075, V1} -> 
+        {pwri, decode_octet_string(V1, [])};
+
+
+%% 'ori'
+    {131076, V1} -> 
+        {ori, decode_octet_string(V1, [])};
+
+      Else -> 
+         exit({error,{asn1,{invalid_choice_tag,Else}}})
+   end
+.
 
 
 %%================================
@@ -2311,7 +2379,7 @@ enc_SignerIdentifier(Val, TagIn) ->
       issuerAndSerialNumber ->
          'enc_IssuerAndSerialNumber'(element(2,Val), [<<48>>]);
       subjectKeyIdentifier ->
-         encode_restricted_string(element(2,Val), [<<4>>,<<160>>]);
+         encode_restricted_string(element(2,Val), [<<128>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -2335,7 +2403,7 @@ case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
 
 %% 'subjectKeyIdentifier'
     {131072, V1} -> 
-        {subjectKeyIdentifier, decode_octet_string(V1, [4])};
+        {subjectKeyIdentifier, decode_octet_string(V1, [])};
 
       Else -> 
          exit({error,{asn1,{invalid_choice_tag,Else}}})
@@ -3308,7 +3376,7 @@ enc_CrlOcspRef(Val, TagIn) ->
    {EncBytes1,EncLen1} =  case Cindex1 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            'enc_CRLListID'(Cindex1, [<<48>>,<<160>>])
+            'enc_CRLListID'(Cindex1, [<<160>>])
        end,
 
 %%-------------------------------------------------
@@ -3317,7 +3385,7 @@ enc_CrlOcspRef(Val, TagIn) ->
    {EncBytes2,EncLen2} =  case Cindex2 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            'enc_OcspListID'(Cindex2, [<<48>>,<<161>>])
+            'enc_OcspListID'(Cindex2, [<<161>>])
        end,
 
 %%-------------------------------------------------
@@ -3326,7 +3394,7 @@ enc_CrlOcspRef(Val, TagIn) ->
    {EncBytes3,EncLen3} =  case Cindex3 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            'enc_OtherRevRefs'(Cindex3, [<<48>>,<<162>>])
+            'enc_OtherRevRefs'(Cindex3, [<<162>>])
        end,
 
    BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
@@ -3348,7 +3416,7 @@ Tlv1 = match_tags(Tlv, TagIn),
 %%-------------------------------------------------
 {Term1,Tlv2} = case Tlv1 of
 [{131072,V1}|TempTlv2] ->
-    {'dec_CRLListID'(V1, [16]), TempTlv2};
+    {'dec_CRLListID'(V1, []), TempTlv2};
     _ ->
         { asn1_NOVALUE, Tlv1}
 end,
@@ -3358,7 +3426,7 @@ end,
 %%-------------------------------------------------
 {Term2,Tlv3} = case Tlv2 of
 [{131073,V2}|TempTlv3] ->
-    {'dec_OcspListID'(V2, [16]), TempTlv3};
+    {'dec_OcspListID'(V2, []), TempTlv3};
     _ ->
         { asn1_NOVALUE, Tlv2}
 end,
@@ -3368,7 +3436,7 @@ end,
 %%-------------------------------------------------
 {Term3,Tlv4} = case Tlv3 of
 [{131074,V3}|TempTlv4] ->
-    {'dec_OtherRevRefs'(V3, [16]), TempTlv4};
+    {'dec_OtherRevRefs'(V3, []), TempTlv4};
     _ ->
         { asn1_NOVALUE, Tlv3}
 end,
@@ -3803,7 +3871,7 @@ enc_ResponderID(Val, TagIn) ->
       byName ->
          'enc_Name'(element(2,Val), [<<161>>]);
       byKey ->
-         encode_restricted_string(element(2,Val), [<<4>>,<<162>>]);
+         encode_restricted_string(element(2,Val), [<<130>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -3827,7 +3895,7 @@ case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
 
 %% 'byKey'
     {131074, V1} -> 
-        {byKey, decode_octet_string(V1, [4])};
+        {byKey, decode_octet_string(V1, [])};
 
       Else -> 
          exit({error,{asn1,{invalid_choice_tag,Else}}})
@@ -3868,7 +3936,7 @@ enc_RevocationValues(Val, TagIn) ->
    {EncBytes1,EncLen1} =  case Cindex1 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            'enc_RevocationValues_crlVals'(Cindex1, [<<48>>,<<160>>])
+            'enc_RevocationValues_crlVals'(Cindex1, [<<160>>])
        end,
 
 %%-------------------------------------------------
@@ -3886,7 +3954,7 @@ enc_RevocationValues(Val, TagIn) ->
    {EncBytes3,EncLen3} =  case Cindex3 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            'enc_OtherRevVals'(Cindex3, [<<48>>,<<162>>])
+            'enc_OtherRevVals'(Cindex3, [<<162>>])
        end,
 
    BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
@@ -3925,7 +3993,7 @@ Tlv1 = match_tags(Tlv, TagIn),
 %%-------------------------------------------------
 {Term1,Tlv2} = case Tlv1 of
 [{131072,V1}|TempTlv2] ->
-    {'dec_RevocationValues_crlVals'(V1, [16]), TempTlv2};
+    {'dec_RevocationValues_crlVals'(V1, []), TempTlv2};
     _ ->
         { asn1_NOVALUE, Tlv1}
 end,
@@ -3945,7 +4013,7 @@ end,
 %%-------------------------------------------------
 {Term3,Tlv4} = case Tlv3 of
 [{131074,V3}|TempTlv4] ->
-    {'dec_OtherRevVals'(V3, [16]), TempTlv4};
+    {'dec_OtherRevVals'(V3, []), TempTlv4};
     _ ->
         { asn1_NOVALUE, Tlv3}
 end,
@@ -5532,7 +5600,7 @@ enc_Accuracy(Val, TagIn) ->
    {EncBytes2,EncLen2} =  case Cindex2 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            encode_integer(Cindex2, [<<2>>,<<160>>])
+            encode_integer(Cindex2, [<<128>>])
        end,
 
 %%-------------------------------------------------
@@ -5541,7 +5609,7 @@ enc_Accuracy(Val, TagIn) ->
    {EncBytes3,EncLen3} =  case Cindex3 of
          asn1_NOVALUE -> {<<>>,0};
          _ ->
-            encode_integer(Cindex3, [<<2>>,<<161>>])
+            encode_integer(Cindex3, [<<129>>])
        end,
 
    BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
@@ -5574,7 +5642,7 @@ end,
 {Term2,Tlv3} = case Tlv2 of
 [{131072,V2}|TempTlv3] ->
     {begin
-Val1 = decode_integer(V2, [2]),
+Val1 = decode_integer(V2, []),
 if 1 =< Val1, Val1 =< 999 ->
 Val1;
 true ->
@@ -5591,7 +5659,7 @@ end,
 {Term3,Tlv4} = case Tlv3 of
 [{131073,V3}|TempTlv4] ->
     {begin
-Val2 = decode_integer(V3, [2]),
+Val2 = decode_integer(V3, []),
 if 1 =< Val2, Val2 =< 999 ->
 Val2;
 true ->

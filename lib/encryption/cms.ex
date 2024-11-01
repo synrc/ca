@@ -147,11 +147,15 @@ defmodule CA.CMS do
       CA.AES.decrypt(:'id-aes256-CBC', data, unwrap, iv)
   end
 
+  # ASN.1 DER Parsing Facilities
+
   def parseSignDataFile(file) do
       {_, bin} = :file.read_file file
       parseData(bin)
   end
 
+  def parseRecipientInfo([]) do [] end
+  def parseRecipientInfo({scheme,ri}) do {scheme,ri} end
   def parseRecipientInfo(ri) do
       {:RecipientInfo, _, {_,issuer,_}, {_,keyAlg,_}, data} = ri
       [
@@ -163,12 +167,16 @@ defmodule CA.CMS do
 
   def parseSignerInfo(si) do
       {:SignerInfo, :v1, {_,{_,issuer,_}}, {_,keyAlg,_}, signedAttrs, {_,signatureAlg,_}, sign, attrs} = si
-      signedAttributes = :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}],_} ->
-         CA.CRT.oid(code, b)
-      end, signedAttrs)
+      signedAttributes = :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}]} -> CA.CRT.oid(code, b)
+                                       {_,code,[{:asn1_OPENTYPE,b}],_} -> CA.CRT.oid(code, b)
+                                       {_,code,b} -> {CA.AT.oid(code), b}
+                                         end, signedAttrs)
       attributes = case attrs do
           :asn1_NOVALUE -> []
-          _ -> :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}],_} -> CA.CRT.oid(code, b) end, attrs)
+          _ -> :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}]}   -> CA.CRT.oid(code, b)
+                             {_,code,[{:asn1_OPENTYPE,b}],_} -> CA.CRT.oid(code, b)
+                             {_,code,b}                      -> {CA.AT.oid(code), b}
+                            end, attrs)
       end
       [
          resourceType: :SignerInfo,
@@ -180,21 +188,37 @@ defmodule CA.CMS do
       ]
   end
 
-  def parseData(content) do
-      {:ok, {:SignedData, ver, alg, x, c, x1, sis}} = :KEP.decode(:SignedData, content)
+  def parseDataBin(content) do
+      {:ok, envelopedData} = :KEP.decode(:SignedData, content)
+      parseData(envelopedData)
+  end
+  def parseData({:SignedData, ver, alg, x, c, x1, sis}) do
       {:EncapsulatedContentInfo, contentOid, data} = x
       [
          resourceType: :SignedData,
          version: ver,
-         cert: parseSignDataCert(c,sis),
+         cert: parseSignDataCert(case c do {:certificate,cert} -> cert ; c -> c end,sis),
          signerInfo: parseSignerInfos(sis),
          signedContent: data,
       ]
   end
 
-  def parseEnvelopedData(content) do
-      {:ok, {:EnvelopedData, oid, {_,ri}, ci}} = :KEP.decode(:EnvelopedData, content)
-      {:EncryptedContentInfo, _, {_,encOID,<<_::16,iv::binary>>},data} = ci
+  def parseEnvelopedDataBin(content) do
+      {:ok, envelopedData} = :KEP.decode(:EnvelopedData, content)
+      parseEnvelopedData(envelopedData)
+  end
+
+  def parseEnvelopedData({:EnvelopedData, _, oid, list, ci, tag}) do
+      parseEnvelopedData({:EnvelopedData, oid, list, ci}) end
+
+  def parseEnvelopedData({:EnvelopedData, oid, {:riSet, ri}, ci}) do
+      parseEnvelopedData({:EnvelopedData, oid, ri, ci}) end
+
+  def parseEnvelopedData({:EnvelopedData, oid, ri, ci}) do
+      {:EncryptedContentInfo, oid2, {_,encOID,<<_::16,iv::binary>>},data} = case ci do
+          {:EncryptedContentInfo, x, {y,encOID,{_,bin}},data} -> {:EncryptedContentInfo, x, {y,encOID,bin},data}
+          {:EncryptedContentInfo, x, {y,encOID,bin},data} -> {:EncryptedContentInfo, x, {y,encOID,bin},data}
+      end
       [
          resourceType: :EnvelopedData,
          ver: CA.ALG.oid(oid),
@@ -204,16 +228,47 @@ defmodule CA.CMS do
       ]
   end
 
-  def parseSignerInfos(sis) do :lists.map(fn si -> CA.CMS.parseSignerInfo(si) end, sis) end
-  def parseRecipientInfos(sis) do :lists.map(fn si -> CA.CMS.parseRecipientInfo(si) end, sis) end
+  def parseSignerInfos(sis)      do :lists.map(fn si -> CA.CMS.parseSignerInfo(si) end, sis) end
+  def parseRecipientInfos(sis)   do :lists.map(fn si -> CA.CMS.parseRecipientInfo(si) end, sis) end
 
-  def parseContentInfoFile(file) do {:ok, bin} = :file.read_file file ; parseContentInfo(bin) end
-  def parseContentInfo(bin) do
-      {:ok, {:ContentInfo, oid, content}} = :KEP.decode(:ContentInfo, bin)
+  def testECC() do
+      {:ok,base} = :file.read_file "priv/certs/encrypted.txt"
+      [_,s] = :string.split base, "\n\n"
+      x = :base64.decode s
+      :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
+  end
+
+  def parseContentInfoSMIME(file) do
+      {:ok, smime} = :file.read_file(file)
+      [_,base] = :string.split(smime, "\n\n")
+      parseContentInfoBin(:base64.decode(base))
+  end
+  def parseContentInfoB64(file)    do {:ok, bin} = :file.read_file file ; parseContentInfoBin(:base64.decode(bin)) end
+  def parseContentInfoFile(file)   do {:ok, bin} = :file.read_file file ; parseContentInfoBin(bin) end
+  def parseContentInfoBinUA(bin)   do {:ok, contentInfo} = :KEP.decode(:ContentInfo, bin) ; parseContentInfo(contentInfo, true)  end
+  def parseContentInfoBinX509(bin) do {:ok, contentInfo} = :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, bin) ; parseContentInfo(contentInfo, false) end
+
+  def parseContentInfoBin(bin) do
+      case :application.get_env(:ca, :ukrainian, :parseContentInfoBinUA) do
+           :parseContentInfoBinX509 -> CA.CMS.parseContentInfoBinX509(bin)
+             :parseContentInfoBinUA -> CA.CMS.parseContentInfoBinUA(bin)
+                                  _ -> CA.CMS.parseContentInfoBinUA(bin)
+      end
+  end
+
+  def parseContentInfo({:ContentInfo, oid, content}, false) do
       case CA.AT.oid(oid) do
            :data          -> parseData(content)
            :signedData    -> parseData(content)
            :envelopedData -> parseEnvelopedData(content)
+           _              -> []
+      end
+  end
+  def parseContentInfo({:ContentInfo, oid, content}, true) do
+      case CA.AT.oid(oid) do
+           :data          -> parseDataBin(content)
+           :signedData    -> parseDataBin(content)
+           :envelopedData -> parseEnvelopedDataBin(content)
            _              -> []
       end
   end

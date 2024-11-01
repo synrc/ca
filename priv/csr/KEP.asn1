@@ -12,7 +12,7 @@
 --   to: Адміністрації Державної служби спеціального зв’язку та захисту інформації України
 -- date: 20.08.2012 #1236/5/453
 
-KEP DEFINITIONS EXPLICIT TAGS ::= BEGIN
+KEP DEFINITIONS IMPLICIT TAGS ::= BEGIN
 IMPORTS Certificate FROM PKIX1Explicit88
         Attribute FROM InformationFramework
         AttributeCertificate, CertificateSerialNumber, Extensions, Version FROM AuthenticationFramework
@@ -117,11 +117,19 @@ ContentEncryptionAlgorithmIdentifier ::= AlgorithmIdentifier
 KeyEncryptionAlgorithmIdentifier ::= AlgorithmIdentifier
 EncryptedContent ::= OCTET STRING
 
-RecipientInfo ::= SEQUENCE {
+RecipientInfoUA ::= SEQUENCE {
   version INTEGER {riVer0(0)} (riVer0),
   issuerAndSerialNumber IssuerAndSerialNumber,
   keyEncryptionAlgorithm KeyEncryptionAlgorithmIdentifier,
   encryptedKey EncryptedKey
+}
+
+RecipientInfo ::= CHOICE { -- CMS v5
+      ktri  RecipientInfoUA,
+      kari  [1] OCTET STRING,
+      kekri [2] OCTET STRING,
+      pwri  [3] OCTET STRING,
+      ori   [4] OCTET STRING
 }
 
 EncryptedKey ::= OCTET STRING

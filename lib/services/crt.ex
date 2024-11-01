@@ -115,15 +115,15 @@ defmodule CA.CRT do
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
-  def rdn({2, 5, 4, 3}),  do: "cn"   # "commonName"
+  def rdn({2, 5, 4, 3}),  do: "cn" # "commonName"
   def rdn({2, 5, 4, 4}),  do: "sn" # "surename"
-  def rdn({2, 5, 4, 5}),  do: "serialNumber"
   def rdn({2, 5, 4, 6}),  do: "c"  # "country"
   def rdn({2, 5, 4, 7}),  do: "l"  # "localityName"
-  def rdn({2, 5, 4, 8}),  do: "stateOrProvinceName"
-  def rdn({0,9,2342,19200300,100,1,25}), do: "dc" # "domainComponen"
-  def rdn({2, 5, 4, 10}), do: "o" # "organization"
+  def rdn({2, 5, 4, 10}), do: "o"  # "organization"
   def rdn({2, 5, 4, 11}), do: "ou" # "organizationalUnit"
+
+  def rdn({2, 5, 4, 5}),  do: "serialNumber"
+  def rdn({2, 5, 4, 8}),  do: "stateOrProvinceName"
   def rdn({2, 5, 4, 12}), do: "title"
   def rdn({2, 5, 4, 13}), do: "description"
   def rdn({2, 5, 4, 14}), do: "device"
@@ -137,17 +137,20 @@ defmodule CA.CRT do
   def rdn({2, 5, 6, 7}),  do: "organizationalPerson"
   def rdn({2, 5, 6, 8}),  do: "organizationalRole"
   def rdn({2, 5, 6, 9}),  do: "groupOfNames"
+
+  def rdn({0,9,2342,19200300,100,1,25}), do: "dc" # "domainComponent"
   def rdn({:rdnSequence, list}) do
       :lists.map(fn [{_,oid,{_,list}}] -> {rdn(oid),"#{list}"}
+                    [{_,oid,list}]     -> {rdn(oid),"#{list}"}
                      {_,oid,{_,list}}  -> {rdn(oid),"#{list}"}
-                     {_,oid,list}      -> {rdn(oid),"#{list}"} end, list)
+                     {_,oid,   list}   -> {rdn(oid),"#{list}"} end, list)
   end
   def rdn(x),  do: "#{x}"
 
   def rdn2({:rdnSequence, list}) do
       Enum.join :lists.map(fn [{_,oid,{_,list}}] -> "#{rdn(oid)}=#{list}"
-                              {_,oid,{_,list}} -> "#{rdn(oid)}=#{list}"
-                              {_,oid,list} -> "#{rdn(oid)}=#{list}" end, list), "/"
+                               {_,oid,{_,list}}  -> "#{rdn(oid)}=#{list}"
+                               {_,oid,   list}   -> "#{rdn(oid)}=#{list}" end, list), "/"
   end
 
   def decodePointFromPublic(oid0,oid,publicKey) do
@@ -165,14 +168,24 @@ defmodule CA.CRT do
 
   def decodePublicKey(oid,oid2,publicKey) do
       case oid do
-           {1,2,804,2,1,1,1,1,3,1,1} -> :base64.encode publicKey 
+           {1,2,804,2,1,1,1,1,3,1,1} -> :base64.encode publicKey
            _ -> decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey)
       end
   end
 
+  def parseCertPEM(file)  do {:ok, bin} = :file.read_file file ; list = :public_key.pem_decode(bin) ; :lists.map(fn x -> parseCert(:public_key.pem_entry_decode(x)) end, list) end
+  def parseCertB64(file)  do {:ok, bin} = :file.read_file file ; parseCertBin(:base64.decode(bin)) end
+  def parseCertFile(file) do {:ok, bin} = :file.read_file file ; parseCertBin(bin) end
+  def parseCertBin(bin)   do {:ok, cert} = :"AuthenticationFramework".decode(:Certificate, bin) ; parseCert(cert) end
+
   def parseCert(cert, _) do parseCert(cert) end
+  def parseCert({:certificate, cert}) do parseCert(cert) end
   def parseCert(cert) do
-      {:Certificate, tbs, _, _} = cert
+      {:Certificate, tbs, _, _} = case cert do
+         {:Certificate, tbs, x, y} -> {:Certificate, tbs, x, y}
+         {:Certificate, tbs, x, y, _} -> {:Certificate, tbs, x, y}
+      end
+
       {_, ver, serial, {_,alg,_}, issuer, {_,{_,nb},{_,na}}, issuee,
          {:SubjectPublicKeyInfo, {_, oid, oid2}, publicKey}, _b, _c, exts} = tbs
       extensions = :lists.map(fn {:Extension,code,_x,b} ->
@@ -190,10 +203,5 @@ defmodule CA.CRT do
       ]
   end
 
-  def parseCertFile(file) do
-      {:ok, bin} = :file.read_file file
-      {:ok, cert} = :"AuthenticationFramework".decode :Certificate, bin
-      parseCert(cert)
-  end
 
 end
