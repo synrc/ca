@@ -161,19 +161,12 @@ defmodule CA.CRT do
 
   def decodePublicKey(oid,oid2,publicKey) do
       case oid do
-           {1,2,804,2,1,1,1,1,3,6,1,1} ->
-                :base64.encode publicKey
-           {1,2,804,2,1,1,1,1,3,1,1} ->
-                :base64.encode publicKey
-           {1,2,840,10045,2,1} ->
-                decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey)
-           {1,2,840,113549,1,1,1} ->
-                key = "-----BEGIN PUBLIC KEY-----\r\n" <> :base64.encode(publicKey) <> "\r\n-----END PUBLIC KEY-----"
-                [{:SubjectPublicKeyInfo,e,y}] = :public_key.pem_decode(key)
-                :public_key.der_decode(:'RSAPublicKey', e)
-           _ ->
-                :io.format 'new publicKey oid: ~p~n', [oid]
-                :base64.encode publicKey
+           {1,2,804,2,1,1,1,1,3,6,1,1} -> :base64.encode publicKey
+           {1,2,804,2,1,1,1,1,3,1,1}   -> :base64.encode publicKey
+           {1,2,840,10045,2,1}         -> decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey)
+           {1,2,840,113549,1,1,1}      -> {:ok, key} = :"PKCS-1".decode(:'RSAPublicKey', publicKey) ; key
+                                     _ -> :io.format 'new publicKey oid: ~p~n', [oid]
+                                          :base64.encode publicKey
       end
   end
 
