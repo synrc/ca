@@ -100,6 +100,32 @@ SignedData ::= SEQUENCE {
   crls [1] IMPLICIT RevocationInfoChoices OPTIONAL,
   signerInfos SignerInfos }
 
+EnvelopedData ::= SEQUENCE {
+  version         INTEGER,
+  recipientInfos  RecipientInfos,
+  encryptedContentInfo EncryptedContentInfo
+}
+
+RecipientInfos ::= CHOICE { riSet SET OF RecipientInfo, riSequence SEQUENCE OF RecipientInfo }
+EncryptedContentInfo ::= SEQUENCE {
+  contentType     ContentType,
+  contentEncryptionAlgorithm ContentEncryptionAlgorithmIdentifier,
+  encryptedContent [0] IMPLICIT EncryptedContent OPTIONAL
+}
+
+ContentEncryptionAlgorithmIdentifier ::= AlgorithmIdentifier
+KeyEncryptionAlgorithmIdentifier ::= AlgorithmIdentifier
+EncryptedContent ::= OCTET STRING
+
+RecipientInfo ::= SEQUENCE {
+  version INTEGER {riVer0(0)} (riVer0),
+  issuerAndSerialNumber IssuerAndSerialNumber,
+  keyEncryptionAlgorithm KeyEncryptionAlgorithmIdentifier,
+  encryptedKey EncryptedKey
+}
+
+EncryptedKey ::= OCTET STRING
+
 EncapsulatedContentInfo ::= SEQUENCE {
   eContentType ContentType,
   eContent [0] EXPLICIT OCTET STRING OPTIONAL }

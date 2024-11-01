@@ -21,7 +21,7 @@ defmodule CA.CRT do
 
   def readSignature(name \\ "2.p7s") do
       {:ok, bin} = :file.read_file name
-      ber = CA.CMS.parseSignData(bin)
+      ber = CA.CMS.parseData(bin)
       ber
   end
 
@@ -51,46 +51,40 @@ defmodule CA.CRT do
          :erlang.tuple_to_list(x)),'.')) end, list)
   end
 
-  def oid({1,3,6,1,5,5,7,1,1}, v), do: {:authorityInfoAccess, pair(v,[])}
-  def oid({1,3,6,1,4,1,11129,2,4,2}, v), do: {:signedCertificateTimestamp, :base64.encode(hd(pair(v,[])))}
-  def oid({1,3,6,1,5,5,7,1,11},v), do: {:subjectInfoAccess, pair(v,[])}
-  def oid({1,3,6,1,5,5,7,1,3}, v), do: {:qcStatements, mapOidsDecode(v)}
-  def oid({2,5,29,9},v),  do: {:subjectDirectoryAttributes, pair(v,[])}
-  def oid({2,5,29,14},v), do: {:subjectKeyIdentifier, :base64.encode(hd(pair(v,[])))}
-  def oid({2,5,29,15},[v]), do: {:keyUsage, CA.EST.decodeKeyUsage(<<3,2,v::binary>>) }
-  def oid({2,5,29,16},v), do: {:privateKeyUsagePeriod, v}
-  def oid({2,5,29,17},v), do: {:subjectAltName, :lists.map(fn x ->
-                                 case CA.ALG.lookup(:oid.decode(x)) do
-                                      false -> x
-                                      {alg,_} -> alg
-                                 end end, v)}
-  def oid({2,5,29,37},v), do: {:extKeyUsage, mapOids(:lists.map(fn x -> :oid.decode(x) end, v)) }
-  def oid({2,5,29,19},v), do: {:basicConstraints, v}
-  def oid({2,5,29,31},v), do: {:cRLDistributionPoints, pair(v,[])}
-  def oid({2,5,29,32},v), do: {:certificatePolicies, mapOids(:lists.map(fn x -> :oid.decode(x) end, v))}
-  def oid({2,5,29,35},v), do: {:authorityKeyIdentifier, :base64.encode(hd(pair(v,[])))}
-  def oid({2,5,29,46},v), do: {:freshestCRL, pair(v,[])}
-  def oid({2,5,29,97},v), do: {:unknown97, v}
-  def oid({1,2,840,113549,1,9,3},v), do: {:contentType, hd(mapOidsDecode([v]))}
-  def oid({1,2,840,113549,1,9,4},v), do: {:messageDigest, :base64.encode(:erlang.element(2,:KEP.decode(:MessageDigest, v)))}
-  def oid({1,2,840,113549,1,9,5},v), do: {:signingTime, :erlang.element(2,:erlang.element(1,:asn1rt_nif.decode_ber_tlv(v)))}
-
-  def oid({1, 2, 840, 113549, 1, 9, 16, 2}, v) do {:"id-aa", v} end
-  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 14}, v) do {:"id-aa-timeStampToken", v}
+  def oid({1,3,6,1,5,5,7,1,1}, v),        do: {:authorityInfoAccess, pair(v,[])}
+  def oid({1,3,6,1,4,1,11129,2,4,2}, v),  do: {:signedCertificateTimestamp, :base64.encode(hd(pair(v,[])))}
+  def oid({1,3,6,1,5,5,7,1,11},v),        do: {:subjectInfoAccess, pair(v,[])}
+  def oid({1,3,6,1,5,5,7,1,3}, v),        do: {:qcStatements, mapOidsDecode(v)}
+  def oid({2,5,29,9},v),                  do: {:subjectDirectoryAttributes, pair(v,[])}
+  def oid({2,5,29,14},v),                 do: {:subjectKeyIdentifier, :base64.encode(hd(pair(v,[])))}
+  def oid({2,5,29,15},[v]),               do: {:keyUsage, CA.EST.decodeKeyUsage(<<3,2,v::binary>>) }
+  def oid({2,5,29,16},v),                 do: {:privateKeyUsagePeriod, v}
+  def oid({2,5,29,17},v),                 do: {:subjectAltName, :lists.map(fn x -> case CA.ALG.lookup(:oid.decode(x)) do false -> x ; {alg,_} -> alg end end, v)}
+  def oid({2,5,29,37},v),                 do: {:extKeyUsage, mapOids(:lists.map(fn x -> :oid.decode(x) end, v)) }
+  def oid({2,5,29,19},v),                 do: {:basicConstraints, v}
+  def oid({2,5,29,31},v),                 do: {:cRLDistributionPoints, pair(v,[])}
+  def oid({2,5,29,32},v),                 do: {:certificatePolicies, mapOids(:lists.map(fn x -> :oid.decode(x) end, v))}
+  def oid({2,5,29,35},v),                 do: {:authorityKeyIdentifier, :base64.encode(hd(pair(v,[])))}
+  def oid({2,5,29,46},v),                 do: {:freshestCRL, pair(v,[])}
+  def oid({1,2,840,113549,1,9,3},v),      do: {:contentType, CA.AT.oid(CA.EST.decodeObjectIdentifier(v)) }
+  def oid({1,2,840,113549,1,9,4},v),      do: {:messageDigest, :base64.encode(:erlang.element(2,:KEP.decode(:MessageDigest, v)))}
+  def oid({1,2,840,113549,1,9,5},v),      do: {:signingTime, :erlang.element(2,:erlang.element(1,:asn1rt_nif.decode_ber_tlv(v)))}
+  def oid({1,2,840,113549,1,9,16,2},v),   do: {:"id-aa", v}
+  def oid({1,2,840,113549,1,9,16,2,14},v) do
       {:ok, {:ContentInfo, oid, value}} = :KEP.decode(:ContentInfo,v)
       {:ok, {:SignedData, _, _alg, {_,_,x}, _c, _x1, _si}} = :KEP.decode(:SignedData, value)
       {:ok, {:TSTInfo, _vsn, _oid, {:MessageImprint, _, x}, serial, ts, _,_,_,_}} = :KEP.decode(:TSTInfo, x)
       {:timeStampToken, {hd(mapOids([oid])), serial, :erlang.iolist_to_binary(ts), :base64.encode(x)}}
       end
-  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 18}, v) do {:"id-aa-ets-signerAttr", v} end
-  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 19}, v) do {:"id-aa-ets-otherSigCert", v} end
-  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 20}, v) do
+  def oid({1,2,840,113549,1,9,16,2,18},v) do {:"id-aa-ets-signerAttr", v} end
+  def oid({1,2,840,113549,1,9,16,2,19},v) do {:"id-aa-ets-otherSigCert", v} end
+  def oid({1,2,840,113549,1,9,16,2,20},v) do
       {:ok, {:ContentInfo, oid, value}} = :KEP.decode(:ContentInfo,v)
       {:ok, {:SignedData, _, _alg, {_,_,x}, _c, _x1, _si}} = :KEP.decode(:SignedData, value)
       {:ok, {:TSTInfo, _vsn, _oid, {:MessageImprint, _, x}, serial, ts, _,_,_,_}} = :KEP.decode(:TSTInfo, x)
       {:contentTimestamp, {hd(mapOids([oid])), serial, :erlang.iolist_to_binary(ts), :base64.encode(x)}}
   end
-  def oid({1, 2, 840, 113549, 1, 9, 16, 2, 22}, v) do
+  def oid({1,2,840,113549,1,9,16,2,22},v) do
       {:ok, x} = :KEP.decode(:CompleteRevocationRefs, v)
       {:revocationRefs, x}
   end
@@ -123,14 +117,15 @@ defmodule CA.CRT do
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
-  def rdn({2, 5, 4, 3}),  do: "cn" # commonName
-  def rdn({2, 5, 4, 4}),  do: "sn" # sureName
+  def rdn({2, 5, 4, 3}),  do: "commonName"                    # commonName
+  def rdn({2, 5, 4, 4}),  do: "surename"                      # sn
   def rdn({2, 5, 4, 5}),  do: "serialNumber"
-  def rdn({2, 5, 4, 6}),  do: "c" # country
-  def rdn({2, 5, 4, 7}),  do: "l" # localityName
-  def rdn({0,9,2342,19200300,100,1,25}),  do: "dc"
-  def rdn({2, 5, 4, 10}), do: "o" # organization
-  def rdn({2, 5, 4, 11}), do: "ou" # organizationalUnit
+  def rdn({2, 5, 4, 6}),  do: "country"                       # c
+  def rdn({2, 5, 4, 7}),  do: "localityName"                  # l
+  def rdn({2, 5, 4, 8}),  do: "stateOrProvinceName"
+  def rdn({0,9,2342,19200300,100,1,25}), do: "domainComponen" # dc
+  def rdn({2, 5, 4, 10}), do: "organization"                  # o
+  def rdn({2, 5, 4, 11}), do: "organizationalUnit"            # ou
   def rdn({2, 5, 4, 12}), do: "title"
   def rdn({2, 5, 4, 13}), do: "description"
   def rdn({2, 5, 4, 14}), do: "device"
@@ -149,6 +144,7 @@ defmodule CA.CRT do
                      {_,oid,{_,list}}  -> {rdn(oid),"#{list}"}
                      {_,oid,list}      -> {rdn(oid),"#{list}"} end, list)
   end
+  def rdn(x),  do: "#{x}"
 
   def rdn2({:rdnSequence, list}) do
       Enum.join :lists.map(fn [{_,oid,{_,list}}] -> "#{rdn(oid)}=#{list}"

@@ -8,6 +8,7 @@ defmodule CA.CMS do
   def oid(:"id-cms-encryptedData"),     do: {1,2,840,113549,1,7,5}
 
   def contentInfo(cms) do {:ok, ci} = :"CryptographicMessageSyntax-2010".decode :ContentInfo, cms ; ci end
+  def contentInfoFile(file) do {:ok, bin} = :file.read_file file ; contentInfo(bin) end
 
   def map(:'dhSinglePass-stdDH-sha512kdf-scheme'),   do: {:kdf,  :sha512}
   def map(:'dhSinglePass-stdDH-sha384kdf-scheme'),   do: {:kdf,  :sha384}
@@ -148,12 +149,21 @@ defmodule CA.CMS do
 
   def parseSignDataFile(file) do
       {_, bin} = :file.read_file file
-      parseSignData(bin)
+      parseData(bin)
+  end
+
+  def parseRecipientInfo(ri) do
+      {:RecipientInfo, _, {_,issuer,_}, {_,keyAlg,_}, data} = ri
+      [
+         resourceType: :RecipientInfo,
+         issuer: CA.CRT.rdn(issuer),
+         keyAlg: :erlang.element(1,CA.ALG.lookup(keyAlg)),
+      ]
   end
 
   def parseSignerInfo(si) do
       {:SignerInfo, :v1, {_,{_,issuer,_}}, {_,keyAlg,_}, signedAttrs, {_,signatureAlg,_}, sign, attrs} = si
-      signedAttributes = :lists.map(fn {:Attribute,code,[{:asn1_OPENTYPE,b}],_} ->
+      signedAttributes = :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}],_} ->
          CA.CRT.oid(code, b)
       end, signedAttrs)
       attributes = case attrs do
@@ -170,22 +180,45 @@ defmodule CA.CMS do
       ]
   end
 
-  def parseSignerInfos(sis) do :lists.map(fn si -> CA.CMS.parseSignerInfo(si) end, sis) end
-
-  def parseSignData(bin) do
-      {_, {:ContentInfo, oid, ci}} = :KEP.decode(:ContentInfo, bin)
-      {:ok, {:SignedData, ver, alg, x, c, x1, sis}} = :KEP.decode(:SignedData, ci)
+  def parseData(content) do
+      {:ok, {:SignedData, ver, alg, x, c, x1, sis}} = :KEP.decode(:SignedData, content)
       {:EncapsulatedContentInfo, contentOid, data} = x
       [
          resourceType: :SignedData,
          version: ver,
-         cert: parseSignDataCert({alg,oid,x,c,x1,sis}),
+         cert: parseSignDataCert(c,sis),
          signerInfo: parseSignerInfos(sis),
          signedContent: data,
       ]
   end
 
-  def parseSignDataCert({_,_,_,:asn1_NOVALUE,_,_}), do: []
-  def parseSignDataCert({_,_,_,certs,_,si}), do: :lists.map(fn cert -> CA.CRT.parseCert(cert, si) end, certs)
+  def parseEnvelopedData(content) do
+      {:ok, {:EnvelopedData, oid, {_,ri}, ci}} = :KEP.decode(:EnvelopedData, content)
+      {:EncryptedContentInfo, _, {_,encOID,<<_::16,iv::binary>>},data} = ci
+      [
+         resourceType: :EnvelopedData,
+         ver: CA.ALG.oid(oid),
+         signerInfo: parseRecipientInfos(ri),
+         encryption: CA.ALG.oid(encOID),
+         encryptedContentInfo: [iv: :base64.encode(iv), data: :base64.encode(data)]
+      ]
+  end
+
+  def parseSignerInfos(sis) do :lists.map(fn si -> CA.CMS.parseSignerInfo(si) end, sis) end
+  def parseRecipientInfos(sis) do :lists.map(fn si -> CA.CMS.parseRecipientInfo(si) end, sis) end
+
+  def parseContentInfoFile(file) do {:ok, bin} = :file.read_file file ; parseContentInfo(bin) end
+  def parseContentInfo(bin) do
+      {:ok, {:ContentInfo, oid, content}} = :KEP.decode(:ContentInfo, bin)
+      case CA.AT.oid(oid) do
+           :data          -> parseData(content)
+           :signedData    -> parseData(content)
+           :envelopedData -> parseEnvelopedData(content)
+           _              -> []
+      end
+  end
+
+  def parseSignDataCert(:asn1_NOVALUE,_), do: []
+  def parseSignDataCert(certs,si),        do: :lists.map(fn cert -> CA.CRT.parseCert(cert, si) end, certs)
 
 end

@@ -45,6 +45,14 @@ enc_SignerInfos/2,
 enc_CertificateSet/2,
 enc_Certificates/2,
 enc_SignedData/2,
+enc_EnvelopedData/2,
+enc_RecipientInfos/2,
+enc_EncryptedContentInfo/2,
+enc_ContentEncryptionAlgorithmIdentifier/2,
+enc_KeyEncryptionAlgorithmIdentifier/2,
+enc_EncryptedContent/2,
+enc_RecipientInfo/2,
+enc_EncryptedKey/2,
 enc_EncapsulatedContentInfo/2,
 enc_SignerInfo/2,
 enc_SignerIdentifier/2,
@@ -136,6 +144,14 @@ dec_SignerInfos/2,
 dec_CertificateSet/2,
 dec_Certificates/2,
 dec_SignedData/2,
+dec_EnvelopedData/2,
+dec_RecipientInfos/2,
+dec_EncryptedContentInfo/2,
+dec_ContentEncryptionAlgorithmIdentifier/2,
+dec_KeyEncryptionAlgorithmIdentifier/2,
+dec_EncryptedContent/2,
+dec_RecipientInfo/2,
+dec_EncryptedKey/2,
 dec_EncapsulatedContentInfo/2,
 dec_SignerInfo/2,
 dec_SignerIdentifier/2,
@@ -290,6 +306,14 @@ encode_disp('SignerInfos', Data) -> enc_SignerInfos(Data);
 encode_disp('CertificateSet', Data) -> enc_CertificateSet(Data);
 encode_disp('Certificates', Data) -> enc_Certificates(Data);
 encode_disp('SignedData', Data) -> enc_SignedData(Data);
+encode_disp('EnvelopedData', Data) -> enc_EnvelopedData(Data);
+encode_disp('RecipientInfos', Data) -> enc_RecipientInfos(Data);
+encode_disp('EncryptedContentInfo', Data) -> enc_EncryptedContentInfo(Data);
+encode_disp('ContentEncryptionAlgorithmIdentifier', Data) -> enc_ContentEncryptionAlgorithmIdentifier(Data);
+encode_disp('KeyEncryptionAlgorithmIdentifier', Data) -> enc_KeyEncryptionAlgorithmIdentifier(Data);
+encode_disp('EncryptedContent', Data) -> enc_EncryptedContent(Data);
+encode_disp('RecipientInfo', Data) -> enc_RecipientInfo(Data);
+encode_disp('EncryptedKey', Data) -> enc_EncryptedKey(Data);
 encode_disp('EncapsulatedContentInfo', Data) -> enc_EncapsulatedContentInfo(Data);
 encode_disp('SignerInfo', Data) -> enc_SignerInfo(Data);
 encode_disp('SignerIdentifier', Data) -> enc_SignerIdentifier(Data);
@@ -380,6 +404,14 @@ decode_disp('SignerInfos', Data) -> dec_SignerInfos(Data);
 decode_disp('CertificateSet', Data) -> dec_CertificateSet(Data);
 decode_disp('Certificates', Data) -> dec_Certificates(Data);
 decode_disp('SignedData', Data) -> dec_SignedData(Data);
+decode_disp('EnvelopedData', Data) -> dec_EnvelopedData(Data);
+decode_disp('RecipientInfos', Data) -> dec_RecipientInfos(Data);
+decode_disp('EncryptedContentInfo', Data) -> dec_EncryptedContentInfo(Data);
+decode_disp('ContentEncryptionAlgorithmIdentifier', Data) -> dec_ContentEncryptionAlgorithmIdentifier(Data);
+decode_disp('KeyEncryptionAlgorithmIdentifier', Data) -> dec_KeyEncryptionAlgorithmIdentifier(Data);
+decode_disp('EncryptedContent', Data) -> dec_EncryptedContent(Data);
+decode_disp('RecipientInfo', Data) -> dec_RecipientInfo(Data);
+decode_disp('EncryptedKey', Data) -> dec_EncryptedKey(Data);
 decode_disp('EncapsulatedContentInfo', Data) -> dec_EncapsulatedContentInfo(Data);
 decode_disp('SignerInfo', Data) -> dec_SignerInfo(Data);
 decode_disp('SignerIdentifier', Data) -> dec_SignerIdentifier(Data);
@@ -1682,6 +1714,387 @@ case Tlv7 of
 end,
 Res1 = {'SignedData',Term1,Term2,Term3,Term4,Term5,Term6},
 Res1.
+
+
+%%================================
+%%  EnvelopedData
+%%================================
+enc_EnvelopedData(Val) ->
+    enc_EnvelopedData(Val, [<<48>>]).
+
+enc_EnvelopedData(Val, TagIn) ->
+{_,Cindex1,Cindex2,Cindex3} = Val,
+
+%%-------------------------------------------------
+%% attribute version(1) with type INTEGER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_integer(Cindex1, [<<2>>]),
+
+%%-------------------------------------------------
+%% attribute recipientInfos(2)   External KEP:RecipientInfos
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} = 'enc_RecipientInfos'(Cindex2, []),
+
+%%-------------------------------------------------
+%% attribute encryptedContentInfo(3)   External KEP:EncryptedContentInfo
+%%-------------------------------------------------
+   {EncBytes3,EncLen3} = 'enc_EncryptedContentInfo'(Cindex3, [<<48>>]),
+
+   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
+LenSoFar = EncLen1 + EncLen2 + EncLen3,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_EnvelopedData(Tlv) ->
+   dec_EnvelopedData(Tlv, [16]).
+
+dec_EnvelopedData(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute version(1) with type INTEGER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_integer(V1, [2]),
+
+%%-------------------------------------------------
+%% attribute recipientInfos(2)   External KEP:RecipientInfos
+%%-------------------------------------------------
+[V2|Tlv3] = Tlv2, 
+Term2 = 'dec_RecipientInfos'(V2, []),
+
+%%-------------------------------------------------
+%% attribute encryptedContentInfo(3)   External KEP:EncryptedContentInfo
+%%-------------------------------------------------
+[V3|Tlv4] = Tlv3, 
+Term3 = 'dec_EncryptedContentInfo'(V3, [16]),
+
+case Tlv4 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv4}}}) % extra fields not allowed
+end,
+Res1 = {'EnvelopedData',Term1,Term2,Term3},
+Res1.
+
+
+%%================================
+%%  RecipientInfos
+%%================================
+enc_RecipientInfos(Val) ->
+    enc_RecipientInfos(Val, []).
+
+enc_RecipientInfos(Val, TagIn) ->
+   {EncBytes,EncLen} = case element(1,Val) of
+      riSet ->
+         'enc_RecipientInfos_riSet'(element(2,Val), [<<49>>]);
+      riSequence ->
+         'enc_RecipientInfos_riSequence'(element(2,Val), [<<48>>]);
+      Else -> 
+         exit({error,{asn1,{invalid_choice_type,Else}}})
+   end,
+
+encode_tags(TagIn, EncBytes, EncLen).
+
+
+
+
+
+%%================================
+%%  RecipientInfos_riSet
+%%================================
+enc_RecipientInfos_riSet(Val, TagIn) ->
+      {EncBytes,EncLen} = 'enc_RecipientInfos_riSet_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_RecipientInfos_riSet_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_RecipientInfos_riSet_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_RecipientInfo'(H, [<<48>>]),
+   'enc_RecipientInfos_riSet_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+
+%%================================
+%%  RecipientInfos_riSequence
+%%================================
+enc_RecipientInfos_riSequence(Val, TagIn) ->
+      {EncBytes,EncLen} = 'enc_RecipientInfos_riSequence_components'(Val,[],0),
+   encode_tags(TagIn, EncBytes, EncLen).
+
+'enc_RecipientInfos_riSequence_components'([], AccBytes, AccLen) -> 
+   {lists:reverse(AccBytes),AccLen};
+
+'enc_RecipientInfos_riSequence_components'([H|T],AccBytes, AccLen) ->
+   {EncBytes,EncLen} = 'enc_RecipientInfo'(H, [<<48>>]),
+   'enc_RecipientInfos_riSequence_components'(T,[EncBytes|AccBytes], AccLen + EncLen).
+
+
+
+dec_RecipientInfos(Tlv) ->
+   dec_RecipientInfos(Tlv, []).
+
+dec_RecipientInfos(Tlv, TagIn) ->
+Tlv1 = match_tags(Tlv, TagIn),
+case (case Tlv1 of [CtempTlv1] -> CtempTlv1; _ -> Tlv1 end) of
+
+%% 'riSet'
+    {17, V1} -> 
+        {riSet, 'dec_RecipientInfos_riSet'(V1, [])};
+
+
+%% 'riSequence'
+    {16, V1} -> 
+        {riSequence, 'dec_RecipientInfos_riSequence'(V1, [])};
+
+      Else -> 
+         exit({error,{asn1,{invalid_choice_tag,Else}}})
+   end
+.
+'dec_RecipientInfos_riSet'(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_RecipientInfo'(V1, [16]) || V1 <- Tlv1].
+
+
+'dec_RecipientInfos_riSequence'(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+['dec_RecipientInfo'(V1, [16]) || V1 <- Tlv1].
+
+
+
+
+%%================================
+%%  EncryptedContentInfo
+%%================================
+enc_EncryptedContentInfo(Val) ->
+    enc_EncryptedContentInfo(Val, [<<48>>]).
+
+enc_EncryptedContentInfo(Val, TagIn) ->
+{_,Cindex1,Cindex2,Cindex3} = Val,
+
+%%-------------------------------------------------
+%% attribute contentType(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_object_identifier(Cindex1, [<<6>>]),
+
+%%-------------------------------------------------
+%% attribute contentEncryptionAlgorithm(2)   External KEP:ContentEncryptionAlgorithmIdentifier
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} = 'enc_ContentEncryptionAlgorithmIdentifier'(Cindex2, [<<48>>]),
+
+%%-------------------------------------------------
+%% attribute encryptedContent(3) with type OCTET STRING OPTIONAL
+%%-------------------------------------------------
+   {EncBytes3,EncLen3} =  case Cindex3 of
+         asn1_NOVALUE -> {<<>>,0};
+         _ ->
+            encode_restricted_string(Cindex3, [<<128>>])
+       end,
+
+   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3],
+LenSoFar = EncLen1 + EncLen2 + EncLen3,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_EncryptedContentInfo(Tlv) ->
+   dec_EncryptedContentInfo(Tlv, [16]).
+
+dec_EncryptedContentInfo(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute contentType(1) with type OBJECT IDENTIFIER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = decode_object_identifier(V1, [6]),
+
+%%-------------------------------------------------
+%% attribute contentEncryptionAlgorithm(2)   External KEP:ContentEncryptionAlgorithmIdentifier
+%%-------------------------------------------------
+[V2|Tlv3] = Tlv2, 
+Term2 = 'dec_ContentEncryptionAlgorithmIdentifier'(V2, [16]),
+
+%%-------------------------------------------------
+%% attribute encryptedContent(3) with type OCTET STRING OPTIONAL
+%%-------------------------------------------------
+{Term3,Tlv4} = case Tlv3 of
+[{131072,V3}|TempTlv4] ->
+    {decode_octet_string(V3, []), TempTlv4};
+    _ ->
+        { asn1_NOVALUE, Tlv3}
+end,
+
+case Tlv4 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv4}}}) % extra fields not allowed
+end,
+Res1 = {'EncryptedContentInfo',Term1,Term2,Term3},
+Res1.
+
+
+%%================================
+%%  ContentEncryptionAlgorithmIdentifier
+%%================================
+enc_ContentEncryptionAlgorithmIdentifier(Val) ->
+    enc_ContentEncryptionAlgorithmIdentifier(Val, [<<48>>]).
+
+enc_ContentEncryptionAlgorithmIdentifier(Val, TagIn) ->
+   enc_AlgorithmIdentifier(Val, TagIn).
+
+
+dec_ContentEncryptionAlgorithmIdentifier(Tlv) ->
+   dec_ContentEncryptionAlgorithmIdentifier(Tlv, [16]).
+
+dec_ContentEncryptionAlgorithmIdentifier(Tlv, TagIn) ->
+'dec_AlgorithmIdentifier'(Tlv, TagIn).
+
+
+
+%%================================
+%%  KeyEncryptionAlgorithmIdentifier
+%%================================
+enc_KeyEncryptionAlgorithmIdentifier(Val) ->
+    enc_KeyEncryptionAlgorithmIdentifier(Val, [<<48>>]).
+
+enc_KeyEncryptionAlgorithmIdentifier(Val, TagIn) ->
+   enc_AlgorithmIdentifier(Val, TagIn).
+
+
+dec_KeyEncryptionAlgorithmIdentifier(Tlv) ->
+   dec_KeyEncryptionAlgorithmIdentifier(Tlv, [16]).
+
+dec_KeyEncryptionAlgorithmIdentifier(Tlv, TagIn) ->
+'dec_AlgorithmIdentifier'(Tlv, TagIn).
+
+
+
+%%================================
+%%  EncryptedContent
+%%================================
+enc_EncryptedContent(Val) ->
+    enc_EncryptedContent(Val, [<<4>>]).
+
+enc_EncryptedContent(Val, TagIn) ->
+encode_restricted_string(Val, TagIn).
+
+
+dec_EncryptedContent(Tlv) ->
+   dec_EncryptedContent(Tlv, [4]).
+
+dec_EncryptedContent(Tlv, TagIn) ->
+decode_octet_string(Tlv, TagIn).
+
+
+
+%%================================
+%%  RecipientInfo
+%%================================
+enc_RecipientInfo(Val) ->
+    enc_RecipientInfo(Val, [<<48>>]).
+
+enc_RecipientInfo(Val, TagIn) ->
+{_,Cindex1,Cindex2,Cindex3,Cindex4} = Val,
+
+%%-------------------------------------------------
+%% attribute version(1) with type INTEGER
+%%-------------------------------------------------
+   {EncBytes1,EncLen1} = encode_integer(Cindex1, [{riVer0,0}], [<<2>>]),
+
+%%-------------------------------------------------
+%% attribute issuerAndSerialNumber(2)   External KEP:IssuerAndSerialNumber
+%%-------------------------------------------------
+   {EncBytes2,EncLen2} = 'enc_IssuerAndSerialNumber'(Cindex2, [<<48>>]),
+
+%%-------------------------------------------------
+%% attribute keyEncryptionAlgorithm(3)   External KEP:KeyEncryptionAlgorithmIdentifier
+%%-------------------------------------------------
+   {EncBytes3,EncLen3} = 'enc_KeyEncryptionAlgorithmIdentifier'(Cindex3, [<<48>>]),
+
+%%-------------------------------------------------
+%% attribute encryptedKey(4) with type OCTET STRING
+%%-------------------------------------------------
+   {EncBytes4,EncLen4} = encode_restricted_string(Cindex4, [<<4>>]),
+
+   BytesSoFar = [EncBytes1, EncBytes2, EncBytes3, EncBytes4],
+LenSoFar = EncLen1 + EncLen2 + EncLen3 + EncLen4,
+encode_tags(TagIn, BytesSoFar, LenSoFar).
+
+
+dec_RecipientInfo(Tlv) ->
+   dec_RecipientInfo(Tlv, [16]).
+
+dec_RecipientInfo(Tlv, TagIn) ->
+   %%-------------------------------------------------
+   %% decode tag and length 
+   %%-------------------------------------------------
+Tlv1 = match_tags(Tlv, TagIn),
+
+%%-------------------------------------------------
+%% attribute version(1) with type INTEGER
+%%-------------------------------------------------
+[V1|Tlv2] = Tlv1, 
+Term1 = begin
+Val1 = decode_integer(V1, [2]),
+if 0 =< Val1, Val1 =< 0 ->
+Val2 = Val1,
+number2name(Val2, [{riVer0,0}]);
+true ->
+exit({error,{asn1,bad_range}})
+end
+end,
+
+%%-------------------------------------------------
+%% attribute issuerAndSerialNumber(2)   External KEP:IssuerAndSerialNumber
+%%-------------------------------------------------
+[V2|Tlv3] = Tlv2, 
+Term2 = 'dec_IssuerAndSerialNumber'(V2, [16]),
+
+%%-------------------------------------------------
+%% attribute keyEncryptionAlgorithm(3)   External KEP:KeyEncryptionAlgorithmIdentifier
+%%-------------------------------------------------
+[V3|Tlv4] = Tlv3, 
+Term3 = 'dec_KeyEncryptionAlgorithmIdentifier'(V3, [16]),
+
+%%-------------------------------------------------
+%% attribute encryptedKey(4) with type OCTET STRING
+%%-------------------------------------------------
+[V4|Tlv5] = Tlv4, 
+Term4 = decode_octet_string(V4, [4]),
+
+case Tlv5 of
+[] -> true;_ -> exit({error,{asn1, {unexpected,Tlv5}}}) % extra fields not allowed
+end,
+Res1 = {'RecipientInfo',Term1,Term2,Term3,Term4},
+Res1.
+
+
+%%================================
+%%  EncryptedKey
+%%================================
+enc_EncryptedKey(Val) ->
+    enc_EncryptedKey(Val, [<<4>>]).
+
+enc_EncryptedKey(Val, TagIn) ->
+encode_restricted_string(Val, TagIn).
+
+
+dec_EncryptedKey(Tlv) ->
+   dec_EncryptedKey(Tlv, [4]).
+
+dec_EncryptedKey(Tlv, TagIn) ->
+decode_octet_string(Tlv, TagIn).
+
 
 
 %%================================
