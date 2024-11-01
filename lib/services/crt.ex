@@ -169,7 +169,7 @@ defmodule CA.CRT do
                 decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey)
            {1,2,840,113549,1,1,1} ->
                 key = "-----BEGIN PUBLIC KEY-----\r\n" <> :base64.encode(publicKey) <> "\r\n-----END PUBLIC KEY-----"
-                [{x,e,y}] = :public_key.pem_decode(key)
+                [{:SubjectPublicKeyInfo,e,y}] = :public_key.pem_decode(key)
                 :public_key.der_decode(:'RSAPublicKey', e)
            _ ->
                 :io.format 'new publicKey oid: ~p~n', [oid]
