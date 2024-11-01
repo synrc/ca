@@ -164,7 +164,6 @@ defmodule CA.CRT do
   end
 
   def decodePublicKey(oid,oid2,publicKey) do
-      :io.format '~p~n', [oid]
       case oid do
            {1,2,804,2,1,1,1,1,3,1,1} -> :base64.encode publicKey 
            _ -> decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey)
