@@ -108,28 +108,28 @@ defmodule CA.CRT do
   def flat(code,k,acc) when is_list(k), do: [:lists.map(fn x -> flat(code,x,acc) end, k)|acc]
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
-  def rdn({2, 5, 4, 3}),  do: "cn" # "commonName"
-  def rdn({2, 5, 4, 4}),  do: "sn" # "surename"
-  def rdn({2, 5, 4, 6}),  do: "c"  # "country"
-  def rdn({2, 5, 4, 7}),  do: "l"  # "localityName"
-  def rdn({2, 5, 4, 10}), do: "o"  # "organization"
-  def rdn({2, 5, 4, 11}), do: "ou" # "organizationalUnit"
+  def rdn({2, 5, 4, 3}),  do: :"cn" # "commonName"
+  def rdn({2, 5, 4, 4}),  do: :"sn" # "surename"
+  def rdn({2, 5, 4, 6}),  do: :"c"  # "country"
+  def rdn({2, 5, 4, 7}),  do: :"l"  # "localityName"
+  def rdn({2, 5, 4, 10}), do: :"o"  # "organization"
+  def rdn({2, 5, 4, 11}), do: :"ou" # "organizationalUnit"
 
-  def rdn({2, 5, 4, 5}),  do: "serialNumber"
-  def rdn({2, 5, 4, 8}),  do: "stateOrProvinceName"
-  def rdn({2, 5, 4, 12}), do: "title"
-  def rdn({2, 5, 4, 13}), do: "description"
-  def rdn({2, 5, 4, 14}), do: "device"
-  def rdn({2, 5, 4, 15}), do: "businessCategory"
-  def rdn({2, 5, 4, 42}), do: "givenName"
-  def rdn({2, 5, 4, 97}), do: "organizationIdentifier"
-  def rdn({2, 5, 6, 3}),  do: "locality"
-  def rdn({2, 5, 6, 4}),  do: "organization"
-  def rdn({2, 5, 6, 5}),  do: "organizationalUnit"
-  def rdn({2, 5, 6, 6}),  do: "person"
-  def rdn({2, 5, 6, 7}),  do: "organizationalPerson"
-  def rdn({2, 5, 6, 8}),  do: "organizationalRole"
-  def rdn({2, 5, 6, 9}),  do: "groupOfNames"
+  def rdn({2, 5, 4, 5}),  do: :"serialNumber"
+  def rdn({2, 5, 4, 8}),  do: :"stateOrProvinceName"
+  def rdn({2, 5, 4, 12}), do: :"title"
+  def rdn({2, 5, 4, 13}), do: :"description"
+  def rdn({2, 5, 4, 14}), do: :"device"
+  def rdn({2, 5, 4, 15}), do: :"businessCategory"
+  def rdn({2, 5, 4, 42}), do: :"givenName"
+  def rdn({2, 5, 4, 97}), do: :"organizationIdentifier"
+  def rdn({2, 5, 6, 3}),  do: :"locality"
+  def rdn({2, 5, 6, 4}),  do: :"organization"
+  def rdn({2, 5, 6, 5}),  do: :"organizationalUnit"
+  def rdn({2, 5, 6, 6}),  do: :"person"
+  def rdn({2, 5, 6, 7}),  do: :"organizationalPerson"
+  def rdn({2, 5, 6, 8}),  do: :"organizationalRole"
+  def rdn({2, 5, 6, 9}),  do: :"groupOfNames"
 
   def rdn({0,9,2342,19200300,100,1,25}), do: "dc" # "domainComponent"
   def rdn({:rdnSequence, list}) do
@@ -168,7 +168,9 @@ defmodule CA.CRT do
            {1,2,840,10045,2,1} ->
                 decodePointFromPublic(oid, CA.EST.decodeObjectIdentifier(oid2),publicKey)
            {1,2,840,113549,1,1,1} ->
-                :base64.encode publicKey
+                key = "-----BEGIN PUBLIC KEY-----\r\n" <> :base64.encode(publicKey) <> "\r\n-----END PUBLIC KEY-----"
+                [{x,e,y}] = :public_key.pem_decode(key)
+                :public_key.der_decode(:'RSAPublicKey', e)
            _ ->
                 :io.format 'new publicKey oid: ~p~n', [oid]
                 :base64.encode publicKey
