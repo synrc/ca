@@ -98,7 +98,7 @@ defmodule CA.CMS do
       ]
 
   def testPrivateKeyECC() do
-      privateKey = :public_key.pem_entry_decode(pem("priv/certs/client.key"))
+      privateKey = :public_key.pem_entry_decode(pem("test/certs/client.key"))
       {:'ECPrivateKey',_,privateKeyBin,{:namedCurve,schemeOID},_,_} = privateKey
       {schemeOID,privateKeyBin}
   end
@@ -108,7 +108,7 @@ defmodule CA.CMS do
   end
 
   def testPrivateKeyRSA() do
-      {:ok,bin} = :file.read_file("priv/rsa-cms.key")
+      {:ok,bin} = :file.read_file("test/cms/rsa-cms.key")
       pki = :public_key.pem_decode(bin)
       [{:PrivateKeyInfo,_,_}] = pki
       rsa = :public_key.pem_entry_decode(hd(pki))
@@ -117,26 +117,26 @@ defmodule CA.CMS do
   end
 
   def testECC() do
-      {:ok,base} = :file.read_file "priv/certs/encrypted.txt"
+      {:ok,base} = :file.read_file "test/cms/encrypted.txt"
       [_,s] = :string.split base, "\n\n"
       x = :base64.decode s
       :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
   end
 
   def testKEK() do
-      {:ok,base} = :file.read_file "priv/certs/encrypted2.txt"
+      {:ok,base} = :file.read_file "test/cms/encrypted2.txt"
       [_,s] = :string.split base, "\n\n"
       x = :base64.decode s
       :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
   end
 
   def testRSA() do
-      {:ok,x} = :file.read_file "priv/rsa-cms.bin"
+      {:ok,x} = :file.read_file "test/cms/rsa-cms.bin"
       :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
   end
 
   def testCMS() do
-      privateKey = :erlang.element(3,:public_key.pem_entry_decode(pem("priv/certs/client.key")))
+      privateKey = :erlang.element(3,:public_key.pem_entry_decode(pem("test/certs/client.key")))
       scheme = :secp384r1
       {:ok,{:ContentInfo,_,{:EnvelopedData,_,_,x,{_,_,{_,_,{_,<<_::16,iv::binary>>}},data},_}}} = testECC()
       [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,_,[{_,_,encryptedKey}]}}|_] = x
@@ -144,7 +144,7 @@ defmodule CA.CMS do
       {_,content}  =  :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', CA.CMS.sharedInfo(ukm,256))
       kdf = CA.KDF.derive({:kdf, :sha256}, sharedKey, 32, content)
       unwrap = :aes_kw.unwrap(encryptedKey, kdf)
-      CA.AES.decrypt(:'id-aes256-CBC', data, unwrap, iv)
+      {:ok, CA.AES.decrypt(:'id-aes256-CBC', data, unwrap, iv)}
   end
 
   # ASN.1 DER Parsing Facilities
@@ -208,7 +208,7 @@ defmodule CA.CMS do
       parseEnvelopedData(envelopedData)
   end
 
-  def parseEnvelopedData({:EnvelopedData, _, oid, list, ci, tag}) do
+  def parseEnvelopedData({:EnvelopedData, oid, _, list, ci, tag}) do
       parseEnvelopedData({:EnvelopedData, oid, list, ci}) end
 
   def parseEnvelopedData({:EnvelopedData, oid, {:riSet, ri}, ci}) do
@@ -232,7 +232,7 @@ defmodule CA.CMS do
   def parseRecipientInfos(sis)   do :lists.map(fn si -> CA.CMS.parseRecipientInfo(si) end, sis) end
 
   def testECC() do
-      {:ok,base} = :file.read_file "priv/certs/encrypted.txt"
+      {:ok,base} = :file.read_file "test/cms/encrypted.txt"
       [_,s] = :string.split base, "\n\n"
       x = :base64.decode s
       :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
@@ -249,7 +249,7 @@ defmodule CA.CMS do
   def parseContentInfoBinX509(bin) do {:ok, contentInfo} = :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, bin) ; parseContentInfo(contentInfo, false) end
 
   def parseContentInfoBin(bin) do
-      case :application.get_env(:ca, :ukrainian, :parseContentInfoBinUA) do
+      case :application.get_env(:ca, :ukrainian, :parseContentInfoBinX509) do
            :parseContentInfoBinX509 -> CA.CMS.parseContentInfoBinX509(bin)
              :parseContentInfoBinUA -> CA.CMS.parseContentInfoBinUA(bin)
                                   _ -> CA.CMS.parseContentInfoBinUA(bin)
