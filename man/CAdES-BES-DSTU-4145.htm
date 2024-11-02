@@ -1,0 +1,121 @@
+<html><head><meta charset="utf-8" /><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="" /><meta name="author" content="Maxim Sokhatsky" />
+<title>CAdES</title>
+<link rel="stylesheet" href="https://n2o.dev/blank.css" />
+<link rel="stylesheet" href="https://n2o.dev/zima.css" />
+<link rel="stylesheet" href="https://n2o.dev/pro/pro.css" />
+</head><body><nav>
+    <a href="https://erp.uno">ERP</a>
+    <a href="https://authority.erp.uno">CA</a>
+    <a href="https://authority.erp.uno/man/CAdES.htm">CAdES</a>
+    <a href="#" style="background:#ededed;">BES ДСТУ-4145</a>
+</nav><header>
+    <a href="../index.html"><img src="https://openmoji.org/data/color/svg/E08F.svg" /></a>
+    <h1>CAdES</h1>
+</header><main>
+    <section>
+
+<h3>BES ДСТУ-4145</h3>
+
+    <figure><code>
+> CA.CMS.parseContentInfoFile "test/CAdES/CAdES-BES-DSTU-4145.p7s"
+[
+  resourceType: :SignedData,
+  version: :v1,
+  cert: [
+    [
+      resourceType: :Certificate,
+      version: :v3,
+      signatureAlgorithm: :"dstu4145WithGost34311-pb",
+      subject: [
+        cn: "ТЕСТ Тестовий Тест Тестович",
+        sn: "Тестовий",
+        givenName: "Тест Тестович",
+        serialNumber: "1058",
+        c: "UA",
+        l: "Київ"
+      ],
+      issuer: [
+        o: "ДП \"ДІЯ\" (ТЕСТ)",
+        cn: "Адміністратор ІТС ЦЗО (CA TEST)",
+        serialNumber: "UA-43395033-2101",
+        c: "UA",
+        l: "Київ",
+        organizationIdentifier: "NTRUA-43395033"
+      ],
+      serial: "AhQ2MEOAPpo0HAQAAAAiBAAA+XgAAA==",
+      validity: [from: '240303220000Z', to: '260303215959Z'],
+      publicKey: [
+        key: <<4, 33, 91, 177, 14, 11, 252, 136, 216, 23, 38, 65, 187, 197, 216,
+          35, 74, 43, 11, 64, 60, 163, 34, 100, 204, 35, 145, 239, 135, 242,
+          217, 222, 35, 110, 1>>,
+        scheme: :"dstu4145WithGost34311-pb",
+        field: {:DSTU4145Params,
+         {:ecbinary,
+          {:ECBinary, 0, {:BinaryField, 257, {:t, 12}}, 0,
+           <<16, 190, 227, 219, 106, 234, 158, 31, 134, 87, 140, 69, 193, 37,
+             148, 255, 148, 35, 148, 167, 215, 56, 249, 24, 126, 101, ...>>,
+           57896044618658097711785492504343953926772365604796032451169741553099060627213,
+           <<182, 15, 210, 216, 220, 232, 169, 52, 35, 198, 16, 27, 202, 145,
+             196, 122, 0, 126, 108, 48, 11, 38, 205, 85, ...>>}},
+         <<169, 214, 235, 69, 241, 60, 112, 130, 128, 196, 150, 123, 35, 31, 94,
+           173, 246, 88, 235, 164, 192, 55, 41, 29, 56, 217, 107, 240, 37, 202,
+           78, 23, ...>>}
+      ],
+      extensions: [
+        subjectKeyIdentifier: "igFayiwDI1Vfh0ROFRArg3OA4ZmOoAQKtTxbsxzEAOo=",
+        authorityKeyIdentifier: "NjBDgD6aNByal5kSRWH423OMfj+3vaPxn+Y3qLHDyiA=",
+        keyUsage: [:digitalSignature, :nonRepudiation],
+        certificatePolicies: ["1.2.804.2.1.1.1.2.2", "1.3.6.1.5.5.7.2.1",
+         "https://ca-test.czo.gov.ua/cps"],
+        basicConstraints: [],
+        qcStatements: ["0.4.0.1862.1.1", "0.4.0.1862.1.2", "UAH", "0.15.66.64",
+         "0.0", "0.4.0.1862.1.5", "https://ca-test.czo.gov.ua/reglament", "en",
+         "1.2.804.2.1.1.1.2.1"],
+        subjectAltName: ["Test@Test.test", "1.3.6.1.4.1.311.20.2.3", "1"],
+        cRLDistributionPoints: ["http://ca-test.czo.gov.ua/download/crls/TestCSK-2021-Full.crl"],
+        freshestCRL: ["http://ca-test.czo.gov.ua/download/crls/TestCSK-2021-Delta.crl"],
+        authorityInfoAccess: [
+          {"1.3.6.1.5.5.7.48.2",
+           "https://ca-test.czo.gov.ua/download/certificates/TestCA2021.p7b"},
+          {"1.3.6.1.5.5.7.48.1", "http://ca-test.czo.gov.ua/services/ocsp/"}
+        ],
+        subjectInfoAccess: [
+          {"1.3.6.1.5.5.7.48.3", "http://ca-test.czo.gov.ua/services/tsp/"}
+        ]
+      ]
+    ]
+  ],
+  signerInfo: [
+    [
+      resourceType: :SignerInfo,
+      issuer: [
+        o: "ДП \"ДІЯ\" (ТЕСТ)",
+        cn: "Адміністратор ІТС ЦЗО (CA TEST)",
+        serialNumber: "UA-43395033-2101",
+        c: "UA",
+        l: "Київ",
+        organizationIdentifier: "NTRUA-43395033"
+      ],
+      keyAlg: :gost34311,
+      signatureAlg: :"dstu4145WithGost34311-pb",
+      signedAttrs: [
+        contentType: :data,
+        signingTime: "240304082625Z",
+        messageDigest: "vhSPLtug9UJy3ZGsXHecfG28cC7KmSiw96+Y0foq+Tg=",
+        signingCertificateV2: 309361817556530004395837158894224188190313938944,
+        contentTimestamp: {"1.2.840.113549.1.7.2", 4585411, "20240304082626Z",
+         "vhSPLtug9UJy3ZGsXHecfG28cC7KmSiw96+Y0foq+Tg="}
+      ],
+      attrs: []
+    ]
+  ],
+  signedContent: "Test\r\n"
+]
+    </code></figure>
+       <br><center>&dot;</center>
+
+    </section>
+</main><footer>   <br><center>&dot;</center><br>    2005—2024 © Synrc Research Center
+</footer></body></html>

@@ -60,15 +60,14 @@ defmodule CA.CRT do
   def oid({1,2,840,113549,1,9,3},v),      do: {:contentType, CA.AT.oid(CA.EST.decodeObjectIdentifier(v)) }
   def oid({1,2,840,113549,1,9,4},v),      do: {:messageDigest, :base64.encode(:erlang.element(2,:KEP.decode(:MessageDigest, v)))}
   def oid({1,2,840,113549,1,9,5},v),      do: {:signingTime, :erlang.element(2,:erlang.element(1,:asn1rt_nif.decode_ber_tlv(v)))}
-  def oid({1,2,840,113549,1,9,16,2},v),   do: {:"id-aa", v}
   def oid({1,2,840,113549,1,9,16,2,14},v) do
       {:ok, {:ContentInfo, oid, value}} = :KEP.decode(:ContentInfo,v)
       {:ok, {:SignedData, _, _alg, {_,_,x}, _c, _x1, _si}} = :KEP.decode(:SignedData, value)
       {:ok, {:TSTInfo, _vsn, _oid, {:MessageImprint, _, x}, serial, ts, _,_,_,_}} = :KEP.decode(:TSTInfo, x)
       {:timeStampToken, {hd(mapOids([oid])), serial, :erlang.iolist_to_binary(ts), :base64.encode(x)}}
       end
-  def oid({1,2,840,113549,1,9,16,2,18},v) do {:"id-aa-ets-signerAttr", v} end
-  def oid({1,2,840,113549,1,9,16,2,19},v) do {:"id-aa-ets-otherSigCert", v} end
+  def oid({1,2,840,113549,1,9,16,2,18},v) do {:signerAttr, v} end
+  def oid({1,2,840,113549,1,9,16,2,19},v) do {:otherSigCert, v} end
   def oid({1,2,840,113549,1,9,16,2,20},v) do
       {:ok, {:ContentInfo, oid, value}} = :KEP.decode(:ContentInfo,v)
       {:ok, {:SignedData, _, _alg, {_,_,x}, _c, _x1, _si}} = :KEP.decode(:SignedData, value)

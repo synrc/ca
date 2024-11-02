@@ -1,0 +1,113 @@
+<html><head><meta charset="utf-8" /><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="" /><meta name="author" content="Maxim Sokhatsky" />
+<title>CAdES</title>
+<link rel="stylesheet" href="https://n2o.dev/blank.css" />
+<link rel="stylesheet" href="https://n2o.dev/zima.css" />
+<link rel="stylesheet" href="https://n2o.dev/pro/pro.css" />
+</head><body><nav>
+    <a href="https://erp.uno">ERP</a>
+    <a href="https://authority.erp.uno">CA</a>
+    <a href="https://authority.erp.uno/man/CAdES.htm">CAdES</a>
+    <a href="#" style="background:#ededed;">BES RSA</a>
+</nav><header>
+    <a href="../index.html"><img src="https://openmoji.org/data/color/svg/E08F.svg" /></a>
+    <h1>CAdES</h1>
+</header><main>
+    <section>
+
+<h3>BES RSA</h3>
+
+    <figure><code>
+> CA.CMS.parseContentInfoFile "test/CAdES/CAdES-BES-RSA.p7s"
+[
+  resourceType: :SignedData,
+  version: :v1,
+  cert: [
+    [
+      resourceType: :Certificate,
+      version: :v3,
+      signatureAlgorithm: :sha256WithRSAEncryption,
+      subject: [
+        cn: "TEST Testovyi Test",
+        sn: "Testovyi",
+        givenName: "Test",
+        serialNumber: "TINUA-1234567892",
+        c: "UA",
+        stateOrProvinceName: "Kyiv"
+      ],
+      issuer: [
+        o: "SE \"DIIA\" (TEST)",
+        cn: "Administrator ITS CCA (CA TEST)",
+        serialNumber: "UA-43395033-2102",
+        c: "UA",
+        l: "Kyiv",
+        organizationIdentifier: "NTRUA-43395033"
+      ],
+      serial: "AhQjMne5F5iItAQAAAALCAAA/XgAAA==",
+      validity: [from: '240303220000Z', to: '260303215959Z'],
+      publicKey: [
+        key: {:RSAPublicKey,
+         22187404362961238339917410231546328056407465180080956713717509189409289530432870092643308303451805944974404811412343650855876470470125137988128941009997742965676672647736736526522672548434341492058873023019666880237440160375082259024922249663930760739689656164616594513136106497263270721373197529886005769571668109803343308661763813962488613822375714675446183732275450954508110191658437532499459381201588758436722454618686880129813584119373748897687623020918497712119758414019861122653837650619612398898123470175411355593676463875409428280583634016885965870957893791824545019896089270858150258503492134987075766702099,
+         65537},
+        scheme: :RSA
+      ],
+      extensions: [
+        subjectKeyIdentifier: "LZ661sO5ss/unbXl20Nzl2XZQmc=",
+        authorityKeyIdentifier: "IzJ3uReYiLRJQT/X/OcZ0TL19D4=",
+        keyUsage: [:digitalSignature, :nonRepudiation, :keyEncipherment],
+        certificatePolicies: ["1.2.804.2.1.1.1.2.2", "1.3.6.1.5.5.7.2.1",
+         "https://ca-test.czo.gov.ua/cps"],
+        basicConstraints: [],
+        qcStatements: ["0.4.0.1862.1.1", "0.4.0.1862.1.2", "UAH", "0.15.66.64",
+         "0.0", "0.4.0.1862.1.5", "https://ca-test.czo.gov.ua/reglament", "en",
+         "0.4.0.1862.1.7", "UA", "1.3.6.1.5.5.7.11.2", "0.4.0.194121.1.1",
+         "1.2.804.2.1.1.1.2.1"],
+        subjectAltName: ["Testovyi.T@test.test"],
+        cRLDistributionPoints: ["http://ca-test.czo.gov.ua/download/crls/TestCSK-RSA-2021-Full.crl"],
+        freshestCRL: ["http://ca-test.czo.gov.ua/download/crls/TestCSK-RSA-2021-Delta.crl"],
+        authorityInfoAccess: [
+          {"1.3.6.1.5.5.7.48.2",
+           "https://ca-test.czo.gov.ua/download/certificates/TestCA2021.p7b"},
+          {"1.3.6.1.5.5.7.48.1", "http://ca-test.czo.gov.ua/services/ocsp/"}
+        ],
+        subjectInfoAccess: [
+          {"1.3.6.1.5.5.7.48.3", "http://ca-test.czo.gov.ua/services/tsp/rsa/"}
+        ],
+        subjectDirectoryAttributes: [
+          {"1.2.804.2.1.1.1.11.1.4.1.1", "1234567892"}
+        ]
+      ]
+    ]
+  ],
+  signerInfo: [
+    [
+      resourceType: :SignerInfo,
+      issuer: [
+        o: "SE \"DIIA\" (TEST)",
+        cn: "Administrator ITS CCA (CA TEST)",
+        serialNumber: "UA-43395033-2102",
+        c: "UA",
+        l: "Kyiv",
+        organizationIdentifier: "NTRUA-43395033"
+      ],
+      keyAlg: :sha256,
+      signatureAlg: :sha256WithRSAEncryption,
+      signedAttrs: [
+        contentType: :data,
+        signingTime: "240304122824Z",
+        messageDigest: "fdkeB/A0FkbVP2k4J4pNPoeWH6vqBm9+b0C3OY87Cw8=",
+        signingCertificateV2: 200940143584388920043767158716067800538754318336,
+        contentTimestamp: {"1.2.840.113549.1.7.2", 4652369, "20240304122825Z",
+         "fdkeB/A0FkbVP2k4J4pNPoeWH6vqBm9+b0C3OY87Cw8="}
+      ],
+      attrs: []
+    ]
+  ],
+  signedContent: "Test\r\n"
+]    </code></figure>
+       <br><center>&dot;</center>
+
+    </section>
+</main><footer>   <br><center>&dot;</center><br>    2005—2024 © Synrc Research Center
+</footer></body></html>
