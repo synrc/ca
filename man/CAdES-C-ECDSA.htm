@@ -9,17 +9,17 @@
     <a href="https://erp.uno">ERP</a>
     <a href="https://authority.erp.uno">CA</a>
     <a href="https://authority.erp.uno/man/CAdES.htm">CAdES</a>
-    <a href="#" style="background:#ededed;">BES ECDSA</a>
+    <a href="#" style="background:#ededed;">C ECDSA</a>
 </nav><header>
     <a href="../index.html"><img src="https://openmoji.org/data/color/svg/E08F.svg" /></a>
     <h1>CAdES</h1>
 </header><main>
     <section>
 
-<h3>BES ECDSA</h3>
+<h3>C ECDSA</h3>
 
     <figure><code>
-> CA.CMS.parseContentInfoFile "test/CAdES/CAdES-BES-ECDSA.p7s"
+> CA.CMS.parseContentInfoFile "test/CAdES/CAdES-C-ECDSA.p7s"
 [
   resourceType: :SignedData,
   version: :v1,
@@ -96,13 +96,24 @@
       signatureAlg: :"ecdsa-with-SHA256",
       signedAttrs: [
         contentType: :data,
-        signingTime: "240304105050Z",
+        signingTime: "240304104954Z",
         messageDigest: "fdkeB/A0FkbVP2k4J4pNPoeWH6vqBm9+b0C3OY87Cw8=",
         signingCertificateV2: 319980610285451294959334116032709222651938734080,
-        contentTimestamp: {"1.2.840.113549.1.7.2", 4625554, "20240304105050Z",
+        contentTimestamp: {"1.2.840.113549.1.7.2", 4625330, "20240304104955Z",
          "fdkeB/A0FkbVP2k4J4pNPoeWH6vqBm9+b0C3OY87Cw8="}
       ],
-      attrs: []
+      attrs: [
+        revocationRefs: [
+          {:CrlOcspRef, :asn1_NOVALUE, :asn1_NOVALUE, :asn1_NOVALUE},
+          {:CrlOcspRef, :asn1_NOVALUE, :asn1_NOVALUE, :asn1_NOVALUE},
+          {:CrlOcspRef, :asn1_NOVALUE, :asn1_NOVALUE, :asn1_NOVALUE}
+        ],
+        certificateRefs: <<48, 130, 2, 82, 48, 130, 1, 37, 4, 20, 58, 64, 253,
+          171, 25, 135, 60, 140, 127, 106, 55, 220, 148, 210, 171, 57, 62, 199,
+          122, 160, 48, 130, 1, 11, 48, 129, 242, ...>>,
+        timeStampToken: {"1.2.840.113549.1.7.2", 4625331, "20240304104955Z",
+         "hArTBt7G2ZRIxToQJDvl6F7NkysjH+7Y5xHFDIiwvIQ="}
+      ]
     ]
   ],
   signedContent: "Test\r\n"

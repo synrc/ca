@@ -9,10 +9,8 @@ defmodule CA.ECDSA do
       number = :crypto.hash(hashfunc, message) |> numberFromString()
       curve = CA.KnownCurves.secp384r1()
       randNum = CA.Integer.between(1, curve."N" - 1)
-      r = CA.Jacobian.multiply(curve."G", randNum, curve."N", curve."A", curve."P").x
-        |> CA.Integer.modulo(curve."N")
-      s = ((number + r * privateKey) * CA.Jacobian.inv(randNum, curve."N"))
-        |> CA.Integer.modulo(curve."N")
+      r = CA.Jacobian.multiply(curve."G", randNum, curve."N", curve."A", curve."P").x |> CA.Integer.modulo(curve."N")
+      s = ((number + r * privateKey) * CA.Jacobian.inv(randNum, curve."N"))           |> CA.Integer.modulo(curve."N")
       {r, s}
   end
 
@@ -59,10 +57,8 @@ defmodule CA.ECDSA do
       curve = CA.KnownCurves.secp384r1()
       inv = CA.Jacobian.inv(s, curve."N")
       v = CA.Jacobian.add(
-        CA.Jacobian.multiply(curve."G", CA.Integer.modulo(number * inv, curve."N"),
-           curve."N", curve."A", curve."P"),
-        CA.Jacobian.multiply(publicKey, CA.Integer.modulo(r * inv, curve."N"),
-           curve."N", curve."A", curve."P" ), curve."A", curve."P")
+          CA.Jacobian.multiply(curve."G", CA.Integer.modulo(number * inv, curve."N"), curve."N", curve."A", curve."P"),
+          CA.Jacobian.multiply(publicKey, CA.Integer.modulo(r * inv, curve."N"), curve."N", curve."A", curve."P" ), curve."A", curve."P")
       cond do
         r < 1 || r >= curve."N" -> false
         s < 1 || s >= curve."N" -> false
