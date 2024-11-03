@@ -1,5 +1,8 @@
 defmodule CA.CE do
   @moduledoc "CA Certificate Extensions OIDs."
+
+  # https://zakon.rada.gov.ua/laws/show/z1398-12
+
   def oid(:"id-ce-subjectDirectoryAttributes"),   do: {2, 5, 29, 9}
   def oid(:"id-ce-subjectKeyIdentifier"),         do: {2, 5, 29, 14}
   def oid(:"id-ce-keyUsage"),                     do: {2, 5, 29, 15}
