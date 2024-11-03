@@ -6,6 +6,9 @@ defmodule CA.AT do
            false -> CA.ALG.oid(x)
       end
   end
+
+  # https://zakon.rada.gov.ua/laws/show/z0423-17
+
   def algorithms() do
     [
       {:'id-gost28147-ofb',                           {1, 2, 804, 2, 1, 1, 1, 1, 1, 1, 2}},
