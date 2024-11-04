@@ -59,6 +59,7 @@ defmodule CA.CMP do
       case CA.ALG.lookup(oid) do
            {:'id-PasswordBasedMac', _ } ->
                 incomingProtection = CA."ProtectedPart"(header: header, body: body)
+                :io.format 'protection: ~p~n', [incomingProtection]
                 {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
                 {owf,_} = CA.ALG.lookup(owfoid) # SHA-2
                 pbm = :application.get_env(:ca, :pbm, "0000") # DH shared secret
@@ -114,6 +115,10 @@ defmodule CA.CMP do
       pkibody = {:cp, reply}
       pkiheader = CA."PKIHeader"(sender: to, recipient: from, pvno: pvno, recipNonce: senderNonce,
           transactionID: transactionID, protectionAlg: protectionAlg, messageTime: messageTime)
+
+      :logger.info 'P10CR OTP ~p~n', [cert]
+      :logger.info 'P10CR PKIX ~p~n', [convertOTPtoPKIX(cert)]
+
       :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
       :logger.info 'CP ~p~n', [senderNonce]
   end

@@ -3,20 +3,18 @@ defmodule CA.CRT do
 
   def subj({:rdnSequence, attrs}) do
         {:rdnSequence, :lists.map(fn
-            [{t,oid,{:uTF8String,x}}] ->
-                [{t,oid,:asn1rt_nif.encode_ber_tlv({12, :erlang.iolist_to_binary(x)})}]
-            [{t,oid,x}] when is_list(x) ->
-                [{t,oid,:asn1rt_nif.encode_ber_tlv({19, :erlang.iolist_to_binary(x)})}]
+            [{t,oid,{:uTF8String,x}}] -> [{t,oid,:asn1rt_nif.encode_ber_tlv({12, :erlang.iolist_to_binary(x)})}]
+            [{t,oid,x}] when is_list(x) -> [{t,oid,:asn1rt_nif.encode_ber_tlv({19, :erlang.iolist_to_binary(x)})}]
             [{t,oid,x}] -> [{t,oid,x}] end, attrs)}
   end
 
   def unsubj({:rdnSequence, attrs}) do
-        {:rdnSequence, :lists.flatmap(fn [{t,oid,x}] when is_binary(x) ->
+        {:rdnSequence, :lists.map(fn [{t,oid,x}] when is_binary(x) ->
              case :asn1rt_nif.decode_ber_tlv(x) do
                   {{12,a},_} -> [{t,oid,{:uTF8String,a}}]
                   {{19,a},_} -> [{t,oid,:erlang.binary_to_list(a)}]
-             end 
-             _ -> [] end, attrs)}
+             end
+             x -> x end, attrs)}
   end
 
   def extract(code, person) do
