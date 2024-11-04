@@ -1,7 +1,7 @@
 defmodule CA.ALG do
    @moduledoc "CA algorithms definitions."
 
-   def oid(x) do case :lists.keyfind(x, 2, algorithms()) do {v,_} ->  v ; false -> x end end
+   def oid(x) do case :lists.keyfind(x, 1, algorithms()) do {_,v} ->  v ; false -> x end end
    def lookup(oid), do: :lists.keyfind(oid, 2, algorithms())
    def algorithms() do
        [
