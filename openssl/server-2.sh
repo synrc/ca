@@ -1,4 +1,4 @@
 #!/bin/bash
 
 export SERVER=server
-openssl ec -in cert/ecc/$SERVER.key.enc -out cert/ecc/$SERVER.key -passin pass:0
+openssl ec -in ecc/$SERVER.key.enc -out ecc/$SERVER.key -passin pass:0

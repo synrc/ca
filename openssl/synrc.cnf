@@ -2,15 +2,15 @@
 default_ca = CA_default
 
 [ CA_default ]
-dir               = /Users/maxim/depot/synrc/ca/cert/ecc
+dir               = /Users/5ht/depot/synrc/ca/openssl
 certs             = $dir
 crl_dir           = $dir
 new_certs_dir     = $dir
 database          = $dir/index.txt
 serial            = $dir/serial
 RANDFILE          = $dir/.rand
-private_key       = $dir/caroot.key
-certificate       = $dir/caroot.pem
+private_key       = $dir/ca.key
+certificate       = $dir/ca.pem
 crlnumber         = $dir/crlnumber
 crl               = $dir/eccroot.crl
 crl_extensions    = crl_ext
