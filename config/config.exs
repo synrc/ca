@@ -3,7 +3,7 @@ import Config
 config :ca,
   est_port: 8047,
   ldap_port: 1389,
-  cmp_port: 829,
+  cmp_port: 8829,
   ocsp_port: 1000,
   tsp_port: 1001,
   ca_port: 8088,
