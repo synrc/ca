@@ -1,4 +1,5 @@
 defmodule CA.EST.Get do
+  @moduledoc "CA/ETS GET Method HTTP handlers."
   import Plug.Conn
 
   def get(conn, [], "Authority", [], "CA") do

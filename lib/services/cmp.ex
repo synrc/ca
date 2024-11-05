@@ -25,7 +25,7 @@ defmodule CA.CMP do
   def start(), do: {:ok, :erlang.spawn(fn -> listen(8829) end)}
 
   def listen(port) do
-      {:ok, socket} = :gen_tcp.listen(port, [:binary, {:packet, :raw}, {:active, false}, {:reuseaddr, true}, {:keepalive, true}])
+      {:ok, socket} = :gen_tcp.listen(port, [:binary, {:active, false}, {:reuseaddr, true}])
       accept(socket)
   end
 
@@ -39,13 +39,18 @@ defmodule CA.CMP do
       case :gen_tcp.recv(socket, 0) do
            {:error, :closed} -> :exit
            {:ok, stage1} ->
-               [_headers|body] = :string.split stage1, "\r\n\r\n", :all
-               case body do
+               try do
+                 [_headers|body] = :string.split stage1, "\r\n\r\n", :all
+                 case body do
                     [""] -> case :gen_tcp.recv(socket, 0) do
                                  {:error, :closed} -> :exit
                                  {:ok, stage2} -> handleMessage(socket,stage2) end
-                                             _ -> handleMessage(socket,body)   end
-               loop(socket)
+                       _ -> handleMessage(socket,body)
+                 end
+                 loop(socket)
+               catch _ ->
+                 loop(socket)
+               end
       end
   end
 

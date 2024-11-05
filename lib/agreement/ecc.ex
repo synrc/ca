@@ -1,4 +1,5 @@
 defmodule CA.KnownCurves do
+  @moduledoc "CA/ECC library."
   require CA.Curve
   require CA.Point
 

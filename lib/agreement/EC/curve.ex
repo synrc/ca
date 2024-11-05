@@ -1,4 +1,5 @@
 defmodule CA.Curve do
+  @moduledoc "CA Curve library."
   require CA.Integer
   require CA.Point
   defstruct [:A, :B, :P, :N, :G, :name, :oid]

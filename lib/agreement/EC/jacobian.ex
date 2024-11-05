@@ -1,4 +1,5 @@
 defmodule CA.Jacobian do
+  @moduledoc "CA Jacobian library."
   require CA.Integer
   require CA.Point
 
