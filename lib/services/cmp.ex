@@ -31,11 +31,15 @@ defmodule CA.CMP do
 
   def accept(socket) do
       {:ok, fd} = :gen_tcp.accept(socket)
-      :erlang.spawn(fn -> __MODULE__.loop(fd) end)
+      :erlang.spawn(fn ->
+            # Read CA here
+            ca = []
+            __MODULE__.loop(fd,ca)
+      end)
       accept(socket)
   end
 
-  def loop(socket) do
+  def loop(socket,ca) do
       case :gen_tcp.recv(socket, 0) do
            {:error, :closed} -> :exit
            {:ok, stage1} ->
@@ -47,9 +51,9 @@ defmodule CA.CMP do
                                  {:ok, stage2} -> handleMessage(socket,stage2) end
                        _ -> handleMessage(socket,body)
                  end
-                 loop(socket)
+                 loop(socket,ca)
                catch _ ->
-                 loop(socket)
+                 loop(socket,ca)
                end
       end
   end
