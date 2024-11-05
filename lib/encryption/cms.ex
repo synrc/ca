@@ -85,17 +85,37 @@ defmodule CA.CMS do
 
   # Test
 
-  def pem(name), do: hd(:public_key.pem_decode(:erlang.element(2,:file.read_file(name))))
-  def testDecryptECC(), do: CA.CMS.decrypt(testECC(), testPrivateKeyECC())
-  def testDecryptKEK(), do: CA.CMS.decrypt(testKEK(), testPrivateKeyKEK())
-  def testDecryptRSA(), do: CA.CMS.decrypt(testRSA(), testPrivateKeyRSA())
+  def pem(name), do: hd(:public_key.pem_decode(:erlang.element(2, :file.read_file(name))))
+  def testDecryptECC(), do: [cipher: :binary.part(:erlang.element(2, CA.CMS.decrypt(testECC(), testPrivateKeyECC())),0,48)]
+  def testDecryptKEK(), do: [cipher: :binary.part(:erlang.element(2, CA.CMS.decrypt(testKEK(), testPrivateKeyKEK())),0,48)]
+  def testDecryptRSA(), do: [cipher: :erlang.element(2, CA.CMS.decrypt(testRSA(), testPrivateKeyRSA()))]
+  def testDecryptCMS(), do: [cipher: :binary.part(:erlang.element(2, CA.CMS.testCMS()),0,48)]
   def test(),           do:
       [
-         testDecryptECC(),
-         testDecryptKEK(),
-         testDecryptRSA(),
-         testCMS(),
+        testFolder("czo"),
+        testFolder("CAdES"),
+        testFolder("certs"),
+        testFolder("cms"),
+        [
+          testDecryptECC(),
+          testDecryptKEK(),
+          testDecryptCMS(),
+          testDecryptRSA(),
+        ],
       ]
+
+  def parseKeyFile(file)  do {:ok, bin} = :file.read_file file ; list = :public_key.pem_decode(bin) ; :lists.map(fn x -> :public_key.pem_entry_decode(x) end, list) end
+
+  def testFolder(folder \\ "CAdES") do
+      :lists.map(fn x -> case :filename.extension(x) do
+         '.p7s' -> [cms: byte_size(:erlang.term_to_binary(CA.CMS.parseContentInfoFile(x))), name: x]
+         '.txt' -> [smime: byte_size(:erlang.term_to_binary(CA.CMS.parseContentInfoSMIME(x))), name: x]
+         '.key' -> [key: byte_size(:erlang.term_to_binary(CA.CMS.parseKeyFile(x))), name: x]
+         '.b64' -> [base64: byte_size(:erlang.term_to_binary(CA.CRT.parseCertB64(x))), name: x]
+         '.pem' -> [pem: byte_size(:erlang.term_to_binary(CA.CRT.parseCertPEM(x))), name: x]
+         '.cer' -> [cert: byte_size(:erlang.term_to_binary(CA.CRT.parseCertFile(x))), name: x]
+      end end, :filelib.wildcard ['test/#{folder}/*'])
+  end
 
   def testPrivateKeyECC() do
       privateKey = :public_key.pem_entry_decode(pem("test/certs/client.key"))
@@ -131,7 +151,7 @@ defmodule CA.CMS do
   end
 
   def testRSA() do
-      {:ok,x} = :file.read_file "test/cms/rsa-cms.bin"
+      {:ok,x} = :file.read_file "test/cms/rsa-cms.p7s"
       :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
   end
 

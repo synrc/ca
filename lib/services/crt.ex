@@ -2,19 +2,21 @@ defmodule CA.CRT do
   @moduledoc "X.509 Certificates."
 
   def subj({:rdnSequence, attrs}) do
-        {:rdnSequence, :lists.map(fn
-            [{t,oid,{:uTF8String,x}}] -> [{t,oid,:asn1rt_nif.encode_ber_tlv({12, :erlang.iolist_to_binary(x)})}]
-            [{t,oid,x}] when is_list(x) -> [{t,oid,:asn1rt_nif.encode_ber_tlv({19, :erlang.iolist_to_binary(x)})}]
-            [{t,oid,x}] -> [{t,oid,x}] end, attrs)}
+      {:rdnSequence, :lists.map(fn
+          [{t,oid,{:uTF8String,x}}]   -> [{t,oid,:asn1rt_nif.encode_ber_tlv({12, :erlang.iolist_to_binary(x)})}]
+          [{t,oid,x}] when is_list(x) -> [{t,oid,:asn1rt_nif.encode_ber_tlv({19, :erlang.iolist_to_binary(x)})}]
+          [{t,oid,x}] -> [{t,oid,x}] end, attrs)}
   end
 
   def unsubj({:rdnSequence, attrs}) do
-        {:rdnSequence, :lists.map(fn [{t,oid,x}] when is_binary(x) ->
-             case :asn1rt_nif.decode_ber_tlv(x) do
-                  {{12,a},_} -> [{t,oid,{:uTF8String,a}}]
-                  {{19,a},_} -> [{t,oid,:erlang.binary_to_list(a)}]
-             end
-             x -> x end, attrs)}
+      {:rdnSequence, :lists.map(fn [{t,oid,x}] when is_binary(x) ->
+           case :asn1rt_nif.decode_ber_tlv(x) do
+                {{12,a},_} -> [{t,oid,{:uTF8String,a}}]
+                {{19,a},_} -> [{t,oid,:erlang.binary_to_list(a)}]
+           end
+           {t,oid,x} -> [{t,oid,x}]
+           x -> x
+      end, attrs)}
   end
 
   def extract(code, person) do
@@ -53,7 +55,7 @@ defmodule CA.CRT do
   def oid({2,5,29,19},v),                 do: {:basicConstraints, v}
   def oid({2,5,29,31},v),                 do: {:cRLDistributionPoints, pair(v,[])}
   def oid({2,5,29,32},v),                 do: {:certificatePolicies, :lists.map(fn x -> case isString(x) do false -> mapOid(:oid.decode(x)) ; true -> x end end, v) }
-  def oid({2,5,29,35},v),                 do: {:authorityKeyIdentifier, :base64.encode(hd(pair(v,[])))}
+  def oid({2,5,29,35},v),                 do: {:authorityKeyIdentifier, v}
   def oid({2,5,29,46},v),                 do: {:freshestCRL, pair(v,[])}
   def oid({1,2,840,113549,1,9,3},v),      do: {:contentType, CA.AT.oid(CA.EST.decodeObjectIdentifier(v)) }
   def oid({1,2,840,113549,1,9,4},v),      do: {:messageDigest, :base64.encode(:erlang.element(2,:KEP.decode(:MessageDigest, v)))}
@@ -132,7 +134,8 @@ defmodule CA.CRT do
       :lists.map(fn [{_,oid,{_,list}}] -> {rdn(oid),"#{list}"}
                     [{_,oid,list}]     -> {rdn(oid),"#{list}"}
                      {_,oid,{_,list}}  -> {rdn(oid),"#{list}"}
-                     {_,oid,   list}   -> {rdn(oid),"#{list}"} end, list)
+                     {_,oid,   list}   -> {rdn(oid),"#{list}"}
+                                     x -> x end, list)
   end
   def rdn(x),  do: "#{x}"
 
