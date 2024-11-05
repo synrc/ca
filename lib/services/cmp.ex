@@ -2,6 +2,14 @@ defmodule CA.CMP do
   @moduledoc "CA/CMP TCP server."
   require CA
 
+# WSL Service
+# netsh interface portproxy add v4tov4 listenport=8829 listenaddress=192.168.0.3 connectport=8829 connectaddress=172.31.45.170
+# netsh interface portproxy add v4tov4 listenport=8047 listenaddress=192.168.0.3 connectport=8047 connectaddress=172.31.45.170
+# New-NetFireWallRule -DisplayName 'CMP-OUT' -Direction Outbound -LocalPort 8829 -Action Allow -Protocol TCP
+# New-NetFireWallRule -DisplayName 'CMP-IN'  -Direction Inbound  -LocalPort 8829 -Action Allow -Protocol TCP
+# New-NetFireWallRule -DisplayName 'EST-OUT' -Direction Outbound -LocalPort 8047 -Action Allow -Protocol TCP
+# New-NetFireWallRule -DisplayName 'EST-IN'  -Direction Inbound  -LocalPort 8047 -Action Allow -Protocol TCP
+
   def parseSubj(csr) do
       {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
       {:CertificationRequest, {:CertificationRequestInfo, v, CA.CRT.subj(subj), x, y}, b, c}
@@ -18,7 +26,9 @@ defmodule CA.CMP do
 
   def listen(port) do
       {:ok, socket} = :gen_tcp.listen(port,
-        [:binary, {:packet, 0}, {:active, false}, {:reuseaddr, true}])
+        [:binary, {:packet, :raw}, {:ip, {172,31,45,170}},
+                  {:active, false}, {:reuseaddr, true},
+                  {:keepalive, true}])
       accept(socket)
   end
 
@@ -30,14 +40,23 @@ defmodule CA.CMP do
 
   def loop(socket) do
       case :gen_tcp.recv(socket, 0) do
-           {:ok, data} ->
-               [_headers,body] = :string.split data, "\r\n\r\n", :all
-               {:ok,dec} = :'PKIXCMP-2009'.decode(:'PKIMessage', body)
-               {:PKIMessage, header, body, code, _extra} = dec
-               __MODULE__.message(socket, header, body, code)
+           {:error, :closed} -> :exit
+           {:ok, stage1} ->
+               [_headers|body] = :string.split stage1, "\r\n\r\n", :all
+               case body do
+                    [""] -> case :gen_tcp.recv(socket, 0) do
+                                 {:error, :closed} -> :exit
+                                 {:ok, stage2} -> handleMessage(socket,stage2) end
+                       _ -> handleMessage(socket,body)
+               end
                loop(socket)
-          {:error, :closed} -> :exit
       end
+  end
+
+  def handleMessage(socket,body) do
+      {:ok,dec} = :'PKIXCMP-2009'.decode(:'PKIMessage', body)
+      {:PKIMessage, header, body, code, _extra} = dec
+      __MODULE__.message(socket, header, body, code)
   end
 
   def baseKey(pass, salt, iter, owf \\ :sha256), do:
