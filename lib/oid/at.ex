@@ -1,11 +1,7 @@
 defmodule CA.AT do
   @moduledoc "CA CSR Attributes OIDs."
-  def oid(x) do
-      case :lists.keyfind(x, 1, algorithms()) do
-           {_,val} -> val
-           false -> CA.ALG.oid(x)
-      end
-  end
+  def oid(x) do case :lists.keyfind(x, 1, algorithms()) do {_,val} -> val ; false -> CA.ALG.oid(x) end end
+  def code(x) do case :lists.keyfind(x, 2, algorithms()) do {code,_} -> code ; false -> CA.ALG.lookup(x) end end
 
   # https://zakon.rada.gov.ua/laws/show/z0423-17
 

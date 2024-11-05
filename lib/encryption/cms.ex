@@ -257,7 +257,7 @@ defmodule CA.CMS do
   end
 
   def parseContentInfo({:ContentInfo, oid, content}, false) do
-      case CA.AT.oid(oid) do
+      case CA.AT.code(oid) do
            :data          -> parseData(content)
            :signedData    -> parseData(content)
            :envelopedData -> parseEnvelopedData(content)
@@ -265,7 +265,7 @@ defmodule CA.CMS do
       end
   end
   def parseContentInfo({:ContentInfo, oid, content}, true) do
-      case CA.AT.oid(oid) do
+      case CA.AT.code(oid) do
            :data          -> parseDataBin(content)
            :signedData    -> parseDataBin(content)
            :envelopedData -> parseEnvelopedDataBin(content)
