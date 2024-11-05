@@ -107,7 +107,7 @@ defmodule CA.CRT do
   def flat(_code,k,acc) when is_binary(k), do: [k|acc]
 
   def rdn({2, 5, 4, 3}),  do: :cn # "commonName"
-  def rdn({2, 5, 4, 4}),  do: :sn # "surename"
+  def rdn({2, 5, 4, 4}),  do: :sn # "surname"
   def rdn({2, 5, 4, 6}),  do: :c  # "country"
   def rdn({2, 5, 4, 7}),  do: :l  # "localityName"
   def rdn({2, 5, 4, 10}), do: :o  # "organization"
@@ -129,7 +129,7 @@ defmodule CA.CRT do
   def rdn({2, 5, 6, 8}),  do: :organizationalRole
   def rdn({2, 5, 6, 9}),  do: :groupOfNames
 
-  def rdn({0,9,2342,19200300,100,1,25}), do: "dc" # "domainComponent"
+  def rdn({0,9,2342,19200300,100,1,25}), do: :dc # "domainComponent"
   def rdn({:rdnSequence, list}) do
       :lists.map(fn [{_,oid,{_,list}}] -> {rdn(oid),"#{list}"}
                     [{_,oid,list}]     -> {rdn(oid),"#{list}"}
