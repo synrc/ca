@@ -18,7 +18,7 @@ maybe_service(<<"GET">>, _, R)  -> service(bind('crypto',R),R);
 maybe_service(_, _, R)          -> reply(405, #{}, <<"Unknown.">>, R).
 
 service(Crypto,Req) ->
-    {ok,PEM} = file:read_file("cert/"++Crypto++"/caroot.pem"),
+    {ok,PEM} = file:read_file("openssl/"++Crypto++"/caroot.pem"),
     {_,{_,D,_}} = lists:keysearch('Certificate',1,public_key:pem_decode(PEM)),
     OTPCert = public_key:pkix_decode_cert(D,otp),
     PKIInfo = OTPCert#'OTPCertificate'.tbsCertificate#'OTPTBSCertificate'.subjectPublicKeyInfo,

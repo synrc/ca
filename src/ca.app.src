@@ -1,7 +1,7 @@
 {application, ca,
  [
   {description, "CA  CXC 138 21 Certificate Authority"},
-  {vsn, "4.8.2"},
+  {vsn, "5.11.5"},
   {registered, []},
   {applications, [kernel,stdlib,ranch,cowboy]},
   {mod, { 'Elixir.CA', []}},

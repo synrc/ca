@@ -77,7 +77,6 @@ defmodule CA.CRT do
       {:revocationRefs, x}
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 21}, v) do
-#      {:ok, certList} = :KEP.decode(:CertificateList, v)
       {:certificateRefs, v}
   end
   def oid({1, 2, 840, 113549, 1, 9, 16, 2, 23}, v) do
@@ -161,15 +160,15 @@ defmodule CA.CRT do
   def decodePublicKey(agreement,{:asn1_OPENTYPE, params},publicKey) do decodePublicKey(agreement,params,publicKey) end
   def decodePublicKey(agreement,params,publicKey) do
       case agreement do
-           {1,2,804,2,1,1,1,1,3,1,1} -> # ДСТУ-4145
-                {:ok,p} = :DSTU.decode(:DSTU4145Params, params)
-                [key: publicKey, scheme: CA.AT.oid(agreement), field: p]
-           {1,2,840,10045,2,1} -> # ECDSA
-                params = CA.EST.decodeObjectIdentifier(params)
-                decodePointFromPublic(agreement,params,publicKey)
            {1,2,840,113549,1,1,1} -> # RSA
                 {:ok, key} = :"PKCS-1".decode(:'RSAPublicKey', publicKey)
                 [key: key, scheme: :RSA]
+           {1,2,840,10045,2,1} -> # ECDSA
+                params = CA.EST.decodeObjectIdentifier(params)
+                decodePointFromPublic(agreement,params,publicKey)
+           {1,2,804,2,1,1,1,1,3,1,1} -> # ДСТУ-4145, ДСТУ-7564
+                {:ok,p} = :DSTU.decode(:DSTU4145Params, params)
+                [key: publicKey, scheme: CA.AT.oid(agreement), field: p]
            _ -> :io.format 'new publicKey agreement scheme detected: ~p~n', [agreement]
                 :base64.encode publicKey
       end

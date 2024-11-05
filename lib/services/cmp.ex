@@ -25,10 +25,7 @@ defmodule CA.CMP do
   def start(), do: {:ok, :erlang.spawn(fn -> listen(8829) end)}
 
   def listen(port) do
-      {:ok, socket} = :gen_tcp.listen(port,
-        [:binary, {:packet, :raw}, {:ip, {172,31,45,170}},
-                  {:active, false}, {:reuseaddr, true},
-                  {:keepalive, true}])
+      {:ok, socket} = :gen_tcp.listen(port, [:binary, {:packet, :raw}, {:active, false}, {:reuseaddr, true}, {:keepalive, true}])
       accept(socket)
   end
 
