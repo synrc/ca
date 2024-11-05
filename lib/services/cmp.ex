@@ -47,8 +47,7 @@ defmodule CA.CMP do
                     [""] -> case :gen_tcp.recv(socket, 0) do
                                  {:error, :closed} -> :exit
                                  {:ok, stage2} -> handleMessage(socket,stage2) end
-                       _ -> handleMessage(socket,body)
-               end
+                                             _ -> handleMessage(socket,body)   end
                loop(socket)
       end
   end
