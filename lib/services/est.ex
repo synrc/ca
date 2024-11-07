@@ -36,6 +36,8 @@ defmodule CA.EST do
   post "/.well-known/est/serverkeygen"   do CA.EST.Post.post(conn, [], "Authority", [], "KEYGEN") end
   post "/.well-known/est/fullcmc"        do CA.EST.Post.post(conn, [], "Authority", [], "CMC") end
 
+  post  "/.well-known/cmp/p/:profile"     do CA.EST.Post.post(conn, [], "Authority", [], "CMC") end
+
   # See Page 36 of RFC 7030
   # [1] https://www.rfc-editor.org/rfc/rfc7030
   # [2] https://www.ietf.org/archive/id/draft-ietf-lamps-rfc7030-csrattrs-07.html

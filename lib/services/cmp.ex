@@ -118,13 +118,13 @@ defmodule CA.CMP do
   end
 
   def message(socket, header, {:p10cr, csr} = body, code) do
-      {:PKIHeader, pvno, from, to, messageTime, protectionAlg, senderKID, _recipKID,
+      {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID,
          transactionID, senderNonce, _recipNonce, _freeText, _generalInfo} = header
       true = code == validateProtection(header, body, code)
-      :logger.info 'P10CR ~p~n', [senderKID]
 
       {ca_key, ca} = CA.CSR.read_ca()
       subject = X509.CSR.subject(csr)
+      :logger.info 'P10CR ~tp~n', [CA.CRT.rdn(subject)]
       true = X509.CSR.valid?(parseSubj(csr))
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.CRT.subj(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
