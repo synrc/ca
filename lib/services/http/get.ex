@@ -3,7 +3,7 @@ defmodule CA.EST.Get do
   import Plug.Conn
 
   def get(conn, [], "Authority", [], "CA") do
-      body = :base64.encode(CA.CSR.read_ca_public())
+      body = :base64.encode(CA.CSR.read_ca_public("secp384r1"))
       conn |> put_resp_content_type("application/pkix-cert")
            |> put_resp_header("Content-Transfer-Encoding", "base64")
            |> put_resp_header("Content-Length", Integer.to_string(byte_size(body)))
@@ -12,7 +12,7 @@ defmodule CA.EST.Get do
   end
 
   def get(conn, [], "Authority", [], "CMS") do
-      ca = CA.CSR.read_ca_public()
+      ca = CA.CSR.read_ca_public("secp384r1")
       {:ok, cacert} = :"PKIX1Explicit-2009".decode(:Certificate, ca)
       ci = {:ContentInfo, {1, 2, 840, 113549, 1, 7, 2},
              {:SignedData, :v1, [],

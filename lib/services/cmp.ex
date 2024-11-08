@@ -10,9 +10,16 @@ defmodule CA.CMP do
 # New-NetFireWallRule -DisplayName 'EST-OUT' -Direction Outbound -LocalPort 8047 -Action Allow -Protocol TCP
 # New-NetFireWallRule -DisplayName 'EST-IN'  -Direction Inbound  -LocalPort 8047 -Action Allow -Protocol TCP
 
+  def ref() do to_string(:lists.filter(fn x -> true == x > 44 and x < 59 end, :erlang.ref_to_list(:erlang.make_ref()))) end
+
   def parseSubj(csr) do
       {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
       {:CertificationRequest, {:CertificationRequestInfo, v, CA.CRT.subj(subj), x, y}, b, c}
+  end
+
+  def parseUnSubj(csr) do
+      {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
+      {:CertificationRequest, {:CertificationRequestInfo, v, CA.CRT.unsubj(subj), x, y}, b, c}
   end
 
   def convertOTPtoPKIX(cert) do
@@ -107,6 +114,22 @@ defmodule CA.CMP do
       :gen_tcp.send(socket, res)
   end
 
+  def storeReply(csr, cert, cn, profile) do
+      {:ok, _} = :"PKCS-10".encode(:CertificationRequest, csr)
+
+      :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.csr",
+          X509.CSR.to_pem(parseSubj(csr)))
+
+      :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer",
+          X509.Certificate.to_pem(cert))
+
+      [ CA."CertResponse"(certReqId: 0,
+          certifiedKeyPair: CA."CertifiedKeyPair"(certOrEncCert:
+             {:certificate, {:x509v3PKCert, convertOTPtoPKIX(cert)}}),
+                 status: CA."PKIStatusInfo"(status: 0))
+      ]
+  end
+
   def message(_socket, _header, {:ir, req}, _) do
       :lists.map(fn {:CertReqMsg, req, sig, code} ->
          :logger.info 'request: ~p ~p ~p~n', [req,sig,code]
@@ -122,39 +145,38 @@ defmodule CA.CMP do
          transactionID, senderNonce, _recipNonce, _freeText, _generalInfo} = header
       true = code == validateProtection(header, body, code)
 
-      {ca_key, ca} = CA.CSR.read_ca()
+      profile = "secp384r1"
+      {ca_key, ca} = CA.CSR.read_ca(profile)
       subject = X509.CSR.subject(csr)
-      :logger.info 'P10CR ~tp~n', [CA.CRT.rdn(subject)]
+     :logger.info 'P10CR from ~tp~n', [CA.CRT.rdn(subject)]
       true = X509.CSR.valid?(parseSubj(csr))
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.CRT.subj(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
-      reply = CA."CertRepMessage"(response:
-            [ CA."CertResponse"(certReqId: 0,
-              certifiedKeyPair: CA."CertifiedKeyPair"(certOrEncCert:
-                {:certificate, {:x509v3PKCert, convertOTPtoPKIX(cert)}}),
-              status: CA."PKIStatusInfo"(status: 0))])
+      reply = case Keyword.get(CA.CRT.rdn(subject), :cn) do
+        nil -> storeReply(csr,cert,ref(),profile)
+        cn -> case :filelib.is_regular("#{CA.CSR.dir(profile)}/#{cn}.csr") do
+                   false -> storeReply(csr,cert,cn,profile)
+                   true -> [] end end
 
-      pkibody = {:cp, reply}
+      pkibody = {:cp, CA."CertRepMessage"(response: reply)}
       pkiheader = CA."PKIHeader"(sender: to, recipient: from, pvno: pvno, recipNonce: senderNonce,
           transactionID: transactionID, protectionAlg: protectionAlg, messageTime: messageTime)
 
       :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
-      :logger.info 'CP ~p~n', [senderNonce]
   end
 
   def message(socket, header, {:certConf, statuses}, code) do
       {:PKIHeader, _, from, to, _, _, _, _, _, senderNonce, _, _, _} = header
 
       :lists.map(fn {:CertStatus,bin,no,{:PKIStatusInfo, :accepted, _, _}} ->
-          :logger.info 'CERTCONF ~p request ~p~n', [no,:binary.part(bin,0,8)]
+          :logger.info 'CERTCONF ~p request ~p~n', [no,:base64.encode(bin)]
       end, statuses)
 
       pkibody = {:pkiconf, :asn1_NOVALUE}
       pkiheader = CA."PKIHeader"(header, sender: to, recipient: from, recipNonce: senderNonce)
       :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
-      :logger.info 'PKICONF ~p~n', [senderNonce]
-
+#     :logger.info 'PKICONF ~p~n', [senderNonce]
   end
 
   def message(_socket, _header, body, _code) do
