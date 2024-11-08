@@ -1,9 +1,7 @@
 defmodule CA.CSR do
   @moduledoc "CA/CSR library."
 
-  # TODO: pass CSR Attrs
-
-  def ca           do root("secp384r1",   [rdn: "/C=UA/L=Київ/O=SYNRC/CN=CA"]) end
+  def ca           do   root("secp384r1", [rdn: "/C=UA/L=Київ/O=SYNRC/CN=CA"]) end
   def server(name) do server("secp384r1", [rdn: "/C=UA/L=Київ/O=SYNRC/CN=#{name}", cn: "#{name}"]) end
   def client(name) do client("secp384r1", [rdn: "/C=UA/L=Київ/O=SYNRC/CN=#{name}", cn: "#{name}"]) end
   def dir(profile) do "synrc/ecc/#{profile}/" end
@@ -61,26 +59,28 @@ defmodule CA.CSR do
       csr
   end
 
-  def read_ca(profile) do
+  def init(profile) do
       case :filelib.is_regular("#{CA.CSR.dir(profile)}/ca.key") do
-           true ->
+           false -> root(profile, [rdn: "/C=UA/L=Київ/O=SYNRC/CN=CA"])
+           true -> []
+      end
+  end
+
+  def read_ca(profile) do
+      init(profile)
       {:ok, ca_key_bin} = :file.read_file "#{CA.CSR.dir(profile)}/ca.key"
       {:ok, ca_bin} = :file.read_file "#{CA.CSR.dir(profile)}/ca.pem"
       {:ok, ca_key} = X509.PrivateKey.from_pem ca_key_bin
       {:ok, ca} = X509.Certificate.from_pem ca_bin
       {ca_key, ca}
-           false ->
-              root(profile, [rdn: "/C=UA/L=Київ/O=SYNRC/CN=CA"])
-              read_ca(profile)
-      end
   end
 
   def read_ca_public(profile) do
+      init(profile)
       {:ok, ca_bin} = :file.read_file "#{CA.CSR.dir(profile)}/ca.pem"
       {:ok, ca} = X509.Certificate.from_pem ca_bin
       {:ok, bin} = :"PKIX1Explicit-2009".encode(:Certificate, CA.CMP.convertOTPtoPKIX(ca))
       bin
   end
-
 
 end
