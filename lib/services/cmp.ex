@@ -23,9 +23,9 @@ defmodule CA.CMP do
   end
 
   def convertOTPtoPKIX(cert) do
-      {:Certificate,{:TBSCertificate,:v3,a,ai,rdn,v,rdn2,{p1,{p21,p22,_pki},p3},b,c,ext},ai,code} =
+      {:Certificate,{:TBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,_pki},p3},b,c,ext},ai,code} =
          :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
-      {:Certificate,{:TBSCertificate,:v3,a,ai,CA.CRT.unsubj(rdn),v,CA.CRT.unsubj(rdn2),
+      {:Certificate,{:TBSCertificate,:v3,a,ai,CA.CRT.unsubj(rdn1),v,CA.CRT.unsubj(rdn2),
            {p1,{p21,p22,{:namedCurve,{1,3,132,0,34}}},p3},b,c,ext},ai,code}
   end
 
@@ -148,12 +148,12 @@ defmodule CA.CMP do
       profile = "secp384r1"
       {ca_key, ca} = CA.CSR.read_ca(profile)
       subject = X509.CSR.subject(csr)
-     :logger.info 'P10CR from ~tp~n', [CA.CRT.rdn(subject)]
+     :logger.info 'P10CR from ~tp~n', [CA.RDN.rdn(subject)]
       true = X509.CSR.valid?(parseSubj(csr))
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.CRT.subj(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
-      reply = case Keyword.get(CA.CRT.rdn(subject), :cn) do
+      reply = case Keyword.get(CA.RDN.rdn(subject), :cn) do
         nil -> storeReply(csr,cert,ref(),profile)
         cn -> case :filelib.is_regular("#{CA.CSR.dir(profile)}/#{cn}.csr") do
                    false -> storeReply(csr,cert,cn,profile)

@@ -136,12 +136,6 @@ defmodule CA.CMS do
       {:rsaEncryption,rsa}
   end
 
-  def testECC() do
-      {:ok,base} = :file.read_file "test/cms/encrypted.txt"
-      [_,s] = :string.split base, "\n\n"
-      x = :base64.decode s
-      :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
-  end
 
   def testKEK() do
       {:ok,base} = :file.read_file "test/cms/encrypted2.txt"
@@ -177,16 +171,16 @@ defmodule CA.CMS do
   def parseRecipientInfo([]) do [] end
   def parseRecipientInfo({scheme,ri}) do {scheme,ri} end
   def parseRecipientInfo(ri) do
-      {:RecipientInfo, _, {_,issuer,_}, {_,keyAlg,_}, data} = ri
+      {:RecipientInfo, _, {_,issuer,_}, {_,keyAlg,_}, _data} = ri
       [
          resourceType: :RecipientInfo,
-         issuer: CA.CRT.rdn(issuer),
+         issuer: CA.RDN.rdn(issuer),
          keyAlg: CA.AT.oid(keyAlg),
       ]
   end
 
   def parseSignerInfo(si) do
-      {:SignerInfo, :v1, {_,{_,issuer,_}}, {_,keyAlg,_}, signedAttrs, {_,signatureAlg,_}, sign, attrs} = si
+      {:SignerInfo, :v1, {_,{_,issuer,_}}, {_,keyAlg,_}, signedAttrs, {_,signatureAlg,_}, _sign, attrs} = si
       signedAttributes = :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}]}   -> CA.CRT.oid(code, b)
                                        {_,code,[{:asn1_OPENTYPE,b}],_} -> CA.CRT.oid(code, b)
                                        {_,code,b}                      -> {CA.AT.oid(code), b}
@@ -200,7 +194,7 @@ defmodule CA.CMS do
       end
       [
          resourceType: :SignerInfo,
-         issuer: CA.CRT.rdn(issuer),
+         issuer: CA.RDN.rdn(issuer),
          keyAlg: CA.AT.oid(keyAlg),
          signatureAlg: CA.AT.oid(signatureAlg),
          signedAttrs: signedAttributes,
@@ -212,8 +206,8 @@ defmodule CA.CMS do
       {:ok, envelopedData} = :KEP.decode(:SignedData, content)
       parseData(envelopedData)
   end
-  def parseData({:SignedData, ver, alg, x, c, x1, sis}) do
-      {:EncapsulatedContentInfo, contentOid, data} = x
+  def parseData({:SignedData, ver, _alg, x, c, _x1, sis}) do
+      {:EncapsulatedContentInfo, _contentOid, data} = x
       [
          resourceType: :SignedData,
          version: ver,
@@ -228,14 +222,14 @@ defmodule CA.CMS do
       parseEnvelopedData(envelopedData)
   end
 
-  def parseEnvelopedData({:EnvelopedData, oid, _, list, ci, tag}) do
+  def parseEnvelopedData({:EnvelopedData, oid, _, list, ci, _tag}) do
       parseEnvelopedData({:EnvelopedData, oid, list, ci}) end
 
   def parseEnvelopedData({:EnvelopedData, oid, {:riSet, ri}, ci}) do
       parseEnvelopedData({:EnvelopedData, oid, ri, ci}) end
 
   def parseEnvelopedData({:EnvelopedData, oid, ri, ci}) do
-      {:EncryptedContentInfo, oid2, {_,encOID,<<_::16,iv::binary>>},data} = case ci do
+      {:EncryptedContentInfo, _oid2, {_,encOID,<<_::16,iv::binary>>},data} = case ci do
           {:EncryptedContentInfo, x, {y,encOID,{_,bin}},data} -> {:EncryptedContentInfo, x, {y,encOID,bin},data}
           {:EncryptedContentInfo, x, {y,encOID,bin},data} -> {:EncryptedContentInfo, x, {y,encOID,bin},data}
       end
