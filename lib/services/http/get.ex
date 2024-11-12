@@ -1,9 +1,10 @@
 defmodule CA.EST.Get do
   @moduledoc "CA/ETS GET Method HTTP handlers."
+  @profiles ["secp256k1","secp384r1","secp521r1"]
   import Plug.Conn
 
-  def get(conn, [], "Authority", [], "CA") do
-      body = :base64.encode(CA.CSR.read_ca_public("secp384r1"))
+  def get(conn, "CA", profile, _, "CA") when profile in @profiles do
+      body = :base64.encode(CA.CSR.read_ca_public(profile))
       conn |> put_resp_content_type("application/pkix-cert")
            |> put_resp_header("Content-Transfer-Encoding", "base64")
            |> put_resp_header("Content-Length", Integer.to_string(byte_size(body)))
@@ -11,8 +12,8 @@ defmodule CA.EST.Get do
            |> send_resp()
   end
 
-  def get(conn, [], "Authority", [], "CMS") do
-      ca = CA.CSR.read_ca_public("secp384r1")
+  def get(conn, "CA", profile, _, "CMS") when profile in @profiles do
+      ca = CA.CSR.read_ca_public(profile)
       {:ok, cacert} = :"PKIX1Explicit-2009".decode(:Certificate, ca)
       ci = {:ContentInfo, {1, 2, 840, 113549, 1, 7, 2},
              {:SignedData, :v1, [],
@@ -27,7 +28,7 @@ defmodule CA.EST.Get do
            |> send_resp()
   end
 
-  def get(conn, [], "Authority", [], "ABAC") do
+  def get(conn, "CA", profile, _, "ABAC") when profile in @profiles do
       body = :base64.encode(CA.EST.csrattributes())
       conn |> put_resp_content_type("application/csrattrs")
            |> put_resp_header("Content-Transfer-Encoding", "base64")
@@ -36,9 +37,8 @@ defmodule CA.EST.Get do
            |> send_resp()
   end
 
-  def get(conn, _, type, id, spec) do
-      :io.format 'GET/4:#{type}/#{id}/#{spec}', []
-      send_resp(conn, 200, CA.EST.encode([%{"type" => type, "id" => id, "spec" => spec}]))
+  def get(conn, _, curve, template, operation) when curve in @profiles do
+      send_resp(conn, 200, CA.EST.encode([%{"template" => template, "curve" => curve, "operation" => operation}]))
   end
 
 end
