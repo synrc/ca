@@ -33,12 +33,12 @@ defmodule CA.RDN do
       "#{alg}"
   end
 
-  def parseSubj(csr) do
+  def encodeAttrsCSR(csr) do
       {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
       {:CertificationRequest, {:CertificationRequestInfo, v, encodeAttrs(subj), x, y}, b, c}
   end
 
-  def parseUnSubj(csr) do
+  def decodeAttrsCSR(csr) do
       {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
       {:CertificationRequest, {:CertificationRequestInfo, v, decodeAttrs(subj), x, y}, b, c}
   end

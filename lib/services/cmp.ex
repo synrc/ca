@@ -101,7 +101,7 @@ defmodule CA.CMP do
       {:ok, _} = :"PKCS-10".encode(:CertificationRequest, csr)
 
       :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.csr",
-          X509.CSR.to_pem(CA.RDN.parseSubj(csr)))
+          X509.CSR.to_pem(CA.RDN.encodeAttrsCSR(csr)))
 
       :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer",
           X509.Certificate.to_pem(cert))
@@ -132,7 +132,7 @@ defmodule CA.CMP do
       {ca_key, ca} = CA.CSR.read_ca(profile)
       subject = X509.CSR.subject(csr)
      :logger.info 'TCP P10CR from ~tp~n', [CA.RDN.rdn(subject)]
-      true = X509.CSR.valid?(CA.RDN.parseSubj(csr))
+      true = X509.CSR.valid?(CA.RDN.encodeAttrsCSR(csr))
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.encodeAttrs(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
