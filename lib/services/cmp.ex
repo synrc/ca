@@ -12,11 +12,11 @@ defmodule CA.CMP do
 
   def ref() do to_string(:lists.filter(fn x -> true == x > 44 and x < 59 end, :erlang.ref_to_list(:erlang.make_ref()))) end
 
-  def start_link(port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
-  def child_spec(_) do
+  def start_link(port: port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
+  def child_spec(opt) do
       %{
          id: CMP,
-         start: {CA.CMP, :start_link, [8829]},
+         start: {CA.CMP, :start_link, [opt]},
          type: :supervisor,
          restart: :permanent,
          shutdown: 500

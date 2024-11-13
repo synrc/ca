@@ -23,7 +23,7 @@ defmodule CA.EST do
   def decodePolicy(list)            do {:ok, v} = :"PKIX1Implicit-2009".decode(:PolicyInformation, list) ; v end
   def decodeQCS(list)               do {:ok, v} = :KEP.decode(:QCStatement, list) ; v end
 
-  def start_link(args) do Bandit.start_link(args) end
+  def start_link(opt) do Bandit.start_link(opt) end
   def child_spec(opt) do
       %{
         id: EST,
