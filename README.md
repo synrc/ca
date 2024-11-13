@@ -5,6 +5,18 @@
 
 ![ca-shaders](https://authority.erp.uno/priv/design/ca-shaders.png)
 
+## Features
+
+* Classes: `CA`, `PKI`, `SERVER`, `CLIENT`, `HUMAN`, `COMPUTER`
+* Templates: `TLS`, `SSH`, `SCVP`, `IPSEC`, `CMC`, `SIP`, `CAP`, `EAP`, `BGP`, `OCSP`
+* Curves: `secp256k1`, `secp384r1`, `secp521r1`
+* RFC: CMS, PKCS-10, CMP, ESP, OCSP, TSP
+* Ports: CMP (TCP 8829), EST (HTTP 8047)
+* Size: 2000 LOC
+* ECDSA: Pure Elixir
+* CMS: Pure Elixir
+* Support for DSTU-4145 Polynomials over Binary Galois Fields GF(2^m) envelops
+
 ## Mentions
 
 * <a href="https://tonpa.guru/stream/2010/2010-10-18 LDAP.htm">2010-10-18 LDAP</a><br>
