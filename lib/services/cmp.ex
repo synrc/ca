@@ -1,8 +1,7 @@
 defmodule CA.CMP do
   @moduledoc "CA/CMP TCP server."
   require CA
-  use Supervisor
-
+ 
 # WSL Service
 # netsh interface portproxy add v4tov4 listenport=8829 listenaddress=192.168.0.3 connectport=8829 connectaddress=172.31.45.170
 # netsh interface portproxy add v4tov4 listenport=8047 listenaddress=192.168.0.3 connectport=8047 connectaddress=172.31.45.170
@@ -13,6 +12,7 @@ defmodule CA.CMP do
 
   def ref() do to_string(:lists.filter(fn x -> true == x > 44 and x < 59 end, :erlang.ref_to_list(:erlang.make_ref()))) end
 
+  def start_link(port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
   def child_spec(_) do
       %{
          id: CMP,
@@ -22,9 +22,7 @@ defmodule CA.CMP do
          shutdown: 500
       }
   end
-  def start_link(port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
 
-  def init(port) do listen(port) end
   def listen(port) do
       :logger.info '~nCMP server ~p on TCP port ~p just started.', [self(),port]
       {:ok, socket} = :gen_tcp.listen(port, [:binary, {:active, false}, {:reuseaddr, true}])

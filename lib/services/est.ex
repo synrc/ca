@@ -25,14 +25,13 @@ defmodule CA.EST do
 
   def start_link(args) do Bandit.start_link(args) end
   def child_spec(opt) do
-    %{
-      id: EST,
-      start: {Bandit, :start_link, [opt]},
-      type: :supervisor,
-      restart: :permanent
-    }
+      %{
+        id: EST,
+        start: {CA.EST, :start_link, [opt]},
+        type: :supervisor,
+        restart: :permanent
+      }
   end
-
 
   # Authority PKI X.509 CMP over HTTP  RFC 9483 6.1, 6.2
   # Authority PKI X.509 EST over HTTPS RFC 7030 3.2.2
