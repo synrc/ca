@@ -123,7 +123,8 @@ defmodule CA.CRT do
   def parseCertPEM(file)  do {:ok, bin} = :file.read_file file ; list = :public_key.pem_decode(bin) ; :lists.map(fn x -> parseCert(:public_key.pem_entry_decode(x)) end, list) end
   def parseCertB64(file)  do {:ok, bin} = :file.read_file file ; parseCertBin(:base64.decode(bin)) end
   def parseCertFile(file) do {:ok, bin} = :file.read_file file ; parseCertBin(bin) end
-  def parseCertBin(bin)   do {:ok, cert} = :"AuthenticationFramework".decode(:Certificate, bin) ; parseCert(cert) end
+# def parseCertBin(bin)   do {:ok, cert} = :"AuthenticationFramework".decode(:Certificate, bin) ; parseCert(cert) end
+  def parseCertBin(bin)   do {:ok, cert} = :"PKIX1Explicit88".decode(:Certificate, bin) ; parseCert(cert) end
 
   def parseCert(cert, _) do parseCert(cert) end
   def parseCert({:certificate, cert}) do parseCert(cert) end
@@ -140,7 +141,7 @@ defmodule CA.CRT do
       end, exts)
       [ resourceType: :Certificate,
         version: ver,
-        signatureAlgorithm: CA.AT.oid(alg),
+        signatureAlgorithm: CA.AT.code(alg),
         subject: CA.RDN.rdn(CA.RDN.unsubj(issuee)),
         issuer:  CA.RDN.rdn(CA.RDN.unsubj(issuer)),
         serial: :base64.encode(CA.EST.integer(serial)),

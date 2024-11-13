@@ -79,7 +79,8 @@ defmodule CA.CSR do
       init(profile)
       {:ok, ca_bin} = :file.read_file "#{CA.CSR.dir(profile)}/ca.pem"
       {:ok, ca} = X509.Certificate.from_pem ca_bin
-      {:ok, bin} = :"PKIX1Explicit-2009".encode(:Certificate, CA.CMP.convertOTPtoPKIX(ca))
+#     {:ok, bin} = :"PKIX1Explicit-2009".encode(:Certificate, CA.RDN.convertOTPtoPKIX(ca))
+      {:ok, bin} = :"PKIX1Explicit88".encode(:Certificate, CA.RDN.convertOTPtoPKIX_subj(ca))
       bin
   end
 
