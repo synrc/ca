@@ -181,15 +181,15 @@ defmodule CA.CMS do
 
   def parseSignerInfo(si) do
       {:SignerInfo, :v1, {_,{_,issuer,_}}, {_,keyAlg,_}, signedAttrs, {_,signatureAlg,_}, _sign, attrs} = si
-      signedAttributes = :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}]}   -> CA.CRT.oid(code, b)
-                                       {_,code,[{:asn1_OPENTYPE,b}],_} -> CA.CRT.oid(code, b)
-                                       {_,code,b}                      -> {CA.AT.oid(code), b}
+      signedAttributes = :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}]}   ->   CA.CE.oid(code, b)
+                                       {_,code,[{:asn1_OPENTYPE,b}],_} ->   CA.CE.oid(code, b)
+                                       {_,code,b}                      -> { CA.AT.oid(code), b }
                                          end, signedAttrs)
       attributes = case attrs do
           :asn1_NOVALUE -> []
-          _ -> :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}]}   -> CA.CRT.oid(code, b)
-                             {_,code,[{:asn1_OPENTYPE,b}],_} -> CA.CRT.oid(code, b)
-                             {_,code,b}                      -> {CA.AT.oid(code), b}
+          _ -> :lists.map(fn {_,code,[{:asn1_OPENTYPE,b}]}   ->   CA.CE.oid(code, b)
+                             {_,code,[{:asn1_OPENTYPE,b}],_} ->   CA.CE.oid(code, b)
+                             {_,code,b}                      -> { CA.AT.oid(code), b }
                             end, attrs)
       end
       [

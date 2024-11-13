@@ -1,5 +1,5 @@
 defmodule CA.EST do
-  @moduledoc "CA/EST TLS HTTP server."
+  @moduledoc "CA/EST/CMP HTTPS/HTTP server."
   @profiles ["secp256k1","secp384r1","secp521r1"]
   @templates ["ca", "ra", "human", "device", "client", "server", "ocsp"]
 
