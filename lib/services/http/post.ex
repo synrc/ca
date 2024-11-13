@@ -19,7 +19,7 @@ defmodule CA.EST.Post do
       :logger.info 'HTTP P10CR from ~tp template ~tp profile ~p~n', [CA.RDN.rdn(subject), template, CA.RDN.profile(csr)]
 
       true = X509.CSR.valid?(CA.RDN.parseSubj(csr))
-      cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.subj(subject), ca, ca_key,
+      cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.encodeAttrs(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
       reply = case Keyword.get(CA.RDN.rdn(subject), :cn) do

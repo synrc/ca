@@ -1,14 +1,14 @@
 defmodule CA.RDN do
   @moduledoc "CA RDN OIDs."
 
-  def subj({:rdnSequence, attrs}) do
+  def encodeAttrs({:rdnSequence, attrs}) do
       {:rdnSequence, :lists.map(fn
           [{t,oid,{:uTF8String,x}}]   -> [{t,oid,:asn1rt_nif.encode_ber_tlv({12, :erlang.iolist_to_binary(x)})}]
           [{t,oid,x}] when is_list(x) -> [{t,oid,:asn1rt_nif.encode_ber_tlv({19, :erlang.iolist_to_binary(x)})}]
           [{t,oid,x}] -> [{t,oid,x}] end, attrs)}
   end
 
-  def unsubj({:rdnSequence, attrs}) do
+  def decodeAttrs({:rdnSequence, attrs}) do
       {:rdnSequence, :lists.map(fn [{t,oid,x}] when is_binary(x) ->
            case :asn1rt_nif.decode_ber_tlv(x) do
                 {{12,a},_} -> [{t,oid,{:uTF8String,a}}]
@@ -28,25 +28,25 @@ defmodule CA.RDN do
 
   def parseSubj(csr) do
       {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
-      {:CertificationRequest, {:CertificationRequestInfo, v, subj(subj), x, y}, b, c}
+      {:CertificationRequest, {:CertificationRequestInfo, v, encodeAttrs(subj), x, y}, b, c}
   end
 
   def parseUnSubj(csr) do
       {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
-      {:CertificationRequest, {:CertificationRequestInfo, v, unsubj(subj), x, y}, b, c}
+      {:CertificationRequest, {:CertificationRequestInfo, v, decodeAttrs(subj), x, y}, b, c}
   end
 
-  def convertOTPtoPKIX(cert) do
+  def decodeAttrsCert(cert) do
       {:Certificate,{:TBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,_pki},p3},b,c,ext},ai,code} =
          :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
-      {:Certificate,{:TBSCertificate,:v3,a,ai,unsubj(rdn1),v,unsubj(rdn2),
+      {:Certificate,{:TBSCertificate,:v3,a,ai,decodeAttrs(rdn1),v,decodeAttrs(rdn2),
            {p1,{p21,p22,{:namedCurve,{1,3,132,0,34}}},p3},b,c,ext},ai,code}
   end
 
-  def convertOTPtoPKIX_subj(cert) do
+  def encodeAttrsCert(cert) do
       {:Certificate,{:TBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,pki},p3},b,c,ext},ai,code} =
          :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
-      {:Certificate,{:TBSCertificate,:v3,a,ai,subj(rdn1),v,subj(rdn2),
+      {:Certificate,{:TBSCertificate,:v3,a,ai,encodeAttrs(rdn1),v,encodeAttrs(rdn2),
            {p1,{p21,p22,pki},p3},b,c,ext},ai,code}
   end
 

@@ -108,7 +108,7 @@ defmodule CA.CMP do
 
       [ CA."CertResponse"(certReqId: 0,
           certifiedKeyPair: CA."CertifiedKeyPair"(certOrEncCert:
-             {:certificate, {:x509v3PKCert, CA.RDN.convertOTPtoPKIX(cert)}}),
+             {:certificate, {:x509v3PKCert, CA.RDN.decodeAttrsCert(cert)}}),
                  status: CA."PKIStatusInfo"(status: 0))
       ]
   end
@@ -133,7 +133,7 @@ defmodule CA.CMP do
       subject = X509.CSR.subject(csr)
      :logger.info 'P10CR from ~tp~n', [CA.RDN.rdn(subject)]
       true = X509.CSR.valid?(CA.RDN.parseSubj(csr))
-      cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.subj(subject), ca, ca_key,
+      cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.encodeAttrs(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
       reply = case Keyword.get(CA.RDN.rdn(subject), :cn) do
