@@ -1,7 +1,7 @@
 defmodule CA.EST do
   @moduledoc "CA/EST/CMP HTTPS/HTTP server."
   @profiles [ "secp256k1", "secp384r1", "secp521r1" ]
-  @templates [ "ca", "ra", "human", "device", "client", "server", "ocsp", "ipsec", "bgp", "eap", "cap", "sip", "cmc", "scvp" ]
+  @templates [ "ca", "ra", "human", "device", "client", "server", "ocsp", "ipsec", "bgp", "eap", "cap", "sip", "cmc", "scvp", "ssh" ]
 
   use Plug.Router
   plug :match
