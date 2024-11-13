@@ -3,8 +3,8 @@ defmodule CA.RDN do
 
   def encodeAttrs({:rdnSequence, attrs}) do
       {:rdnSequence, :lists.map(fn
-          [{t,oid,{:uTF8String,x}}]      -> encodeString(t,oid,x,12) # [{t,oid,:asn1rt_nif.encode_ber_tlv({12, :erlang.iolist_to_binary(x)})}]
-          [{t,oid,x}] when is_list(x)    -> encodeString(t,oid,x,19) # [{t,oid,:asn1rt_nif.encode_ber_tlv({19, :erlang.iolist_to_binary(x)})}]
+          [{t,oid,{:uTF8String,x}}]      -> encodeString(t,oid,x,12)
+          [{t,oid,x}] when is_list(x)    -> encodeString(t,oid,x,19)
                                        x -> x end, attrs)}
   end
 
