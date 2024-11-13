@@ -3,19 +3,26 @@ defmodule CA.RDN do
 
   def encodeAttrs({:rdnSequence, attrs}) do
       {:rdnSequence, :lists.map(fn
-          [{t,oid,{:uTF8String,x}}]   -> [{t,oid,:asn1rt_nif.encode_ber_tlv({12, :erlang.iolist_to_binary(x)})}]
-          [{t,oid,x}] when is_list(x) -> [{t,oid,:asn1rt_nif.encode_ber_tlv({19, :erlang.iolist_to_binary(x)})}]
-          [{t,oid,x}] -> [{t,oid,x}] end, attrs)}
+          [{t,oid,{:uTF8String,x}}]      -> encodeString(t,oid,x,12) # [{t,oid,:asn1rt_nif.encode_ber_tlv({12, :erlang.iolist_to_binary(x)})}]
+          [{t,oid,x}] when is_list(x)    -> encodeString(t,oid,x,19) # [{t,oid,:asn1rt_nif.encode_ber_tlv({19, :erlang.iolist_to_binary(x)})}]
+                                       x -> x end, attrs)}
   end
 
   def decodeAttrs({:rdnSequence, attrs}) do
-      {:rdnSequence, :lists.map(fn [{t,oid,x}] when is_binary(x) ->
-           case :asn1rt_nif.decode_ber_tlv(x) do
-                {{12,a},_} -> [{t,oid,{:uTF8String,a}}]
-                {{19,a},_} -> [{t,oid,:erlang.binary_to_list(a)}]
-           end
-           x -> x
-      end, attrs)}
+      {:rdnSequence, :lists.map(fn
+           [{t,oid,x}] when is_binary(x) -> decodeString(t,oid,x)
+                                       x -> x end, attrs)}
+  end
+
+  def decodeString(t,oid,x) do
+      case :asn1rt_nif.decode_ber_tlv(x) do
+           {{12,a},_} -> [{t,oid,{:uTF8String,a}}]
+           {{19,a},_} -> [{t,oid,:erlang.binary_to_list(a)}]
+      end
+  end
+
+  def encodeString(t,oid,x,code) do
+      [{t,oid,:asn1rt_nif.encode_ber_tlv({code, :erlang.iolist_to_binary(x)})}]
   end
 
   def profile(csr) do
