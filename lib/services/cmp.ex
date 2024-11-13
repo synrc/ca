@@ -131,7 +131,7 @@ defmodule CA.CMP do
       profile = CA.RDN.profile(csr)
       {ca_key, ca} = CA.CSR.read_ca(profile)
       subject = X509.CSR.subject(csr)
-     :logger.info 'P10CR from ~tp~n', [CA.RDN.rdn(subject)]
+     :logger.info 'TCP P10CR from ~tp~n', [CA.RDN.rdn(subject)]
       true = X509.CSR.valid?(CA.RDN.parseSubj(csr))
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.encodeAttrs(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
@@ -153,7 +153,7 @@ defmodule CA.CMP do
       {:PKIHeader, _, from, to, _, _, _, _, _, senderNonce, _, _, _} = header
 
       :lists.map(fn {:CertStatus,bin,no,{:PKIStatusInfo, :accepted, _, _}} ->
-          :logger.info 'CERTCONF ~p request ~p~n', [no,:base64.encode(bin)]
+          :logger.info 'TCP CERTCONF ~p request ~p~n', [no,:base64.encode(bin)]
       end, statuses)
 
       pkibody = {:pkiconf, :asn1_NOVALUE}
