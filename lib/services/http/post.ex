@@ -15,11 +15,10 @@ defmodule CA.EST.Post do
       {:ok, csr} = :"PKCS-10".decode :CertificationRequest, bin
 
       subject = X509.CSR.subject(csr)
-      :logger.info 'HTTP P10CR from ~tp~n', [CA.RDN.rdn(subject)]
-      :logger.info 'HTTP P10CR template ~tp~n', [template]
+      :logger.info 'HTTP P10CR from ~tp template ~tp~n', [CA.RDN.rdn(subject), template]
 
-      true = X509.CSR.valid?(CA.CMP.parseSubj(csr))
-      cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.CRT.subj(subject), ca, ca_key,
+      true = X509.CSR.valid?(CA.RDN.parseSubj(csr))
+      cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.subj(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
       reply = case Keyword.get(CA.RDN.rdn(subject), :cn) do
@@ -28,10 +27,10 @@ defmodule CA.EST.Post do
                     false -> CA.CMP.storeReply(csr,cert,cn,profile)
                     true -> [] end end
 
-      response = CA."CertRepMessage"(response: reply)
-      {:ok, bin} = :'PKIXCMP-2009'.encode(:CertRepMessage, response)
+#     {:ok, cert} = :"PKIX1Explicit88".encode(:Certificate, CA.CMP.convertOTPtoPKIX_subj(cert))
+      {:ok, certRepMsg} = :'PKIXCMP-2009'.encode(:CertRepMessage, CA."CertRepMessage"(response: reply))
 
-      body = :base64.encode bin
+      body = :base64.encode certRepMsg
       conn |> put_resp_content_type("application/pkix-cert")
            |> put_resp_header("Content-Transfer-Encoding", "base64")
            |> put_resp_header("Content-Length", Integer.to_string(byte_size(body)))
