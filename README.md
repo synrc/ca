@@ -18,7 +18,32 @@
 * CMS: Pure Elixir
 * Support for DSTU-4145 Polynomials over Binary Galois Fields GF(2^m) envelops
 
-## Mentions
+## Documentation
+
+* Hex Docs https://hexdocs.pm/ca/api-reference.html
+
+## Online Instances
+
+* https://authority.erp.uno
+
+## How to use?
+
+On Windows:
+
+```
+c:\Progra~1\OpenSSL-Win64\bin\openssl.exe ecparam -name secp384r1 -genkey | Out-File -Encoding utf8 "1.txt"
+c:\Progra~1\OpenSSL-Win64\bin\openssl.exe req -passout pass:0 -new -key 1.txt -keyout dima.key.enc -out dima.csr -subj "/C=FI/ST=Helsinki/O=AR.VO/CN=A13" 2>null
+c:\Progra~1\OpenSSL-Win64/bin/openssl.exe cmp -cmd p10cr -server http://ca.synrc.com:8829/ -secret pass:0000 -ref cmptestp10cr -csr dima.csr -certout dima.pem
+```
+
+On UNIX:
+
+```
+$ openssl req -passout pass:0 -new -newkey ec:<(openssl ecparam -name secp384r1) -keyout dima.key.enc -out dima.csr -subj "/C=UA/ST=Kyiv/O=SYNRC/CN=dima"
+$ openssl cmp -cmd p10cr -server "ca.synrc.com":8829 -secret pass:0000 -ref cmptestp10cr -certout dima.pem -csr dima.csr
+```
+
+## Publications
 
 * <a href="https://tonpa.guru/stream/2010/2010-10-18 LDAP.htm">2010-10-18 LDAP</a><br>
 * <a href="https://tonpa.guru/stream/2020/2020-02-03 Кваліфікований Електронний Підпис.htm">2020-02-03 Кваліфікований Електронний Підпис</a><br>
