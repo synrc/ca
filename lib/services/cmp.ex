@@ -1,6 +1,7 @@
 defmodule CA.CMP do
   @moduledoc "CA/CMP TCP server."
   require CA
+  use Supervisor
 
 # WSL Service
 # netsh interface portproxy add v4tov4 listenport=8829 listenaddress=192.168.0.3 connectport=8829 connectaddress=172.31.45.170
@@ -12,9 +13,20 @@ defmodule CA.CMP do
 
   def ref() do to_string(:lists.filter(fn x -> true == x > 44 and x < 59 end, :erlang.ref_to_list(:erlang.make_ref()))) end
 
-  def start(), do: {:ok, :erlang.spawn(fn -> listen(8829) end)}
+  def child_spec(_) do
+      %{
+         id: CMP,
+         start: {CA.CMP, :start_link, [8829]},
+         type: :supervisor,
+         restart: :permanent,
+         shutdown: 500
+      }
+  end
+  def start_link(port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
 
+  def init(port) do listen(port) end
   def listen(port) do
+      :logger.info '~nCMP server ~p on TCP port ~p just started.', [self(),port]
       {:ok, socket} = :gen_tcp.listen(port, [:binary, {:active, false}, {:reuseaddr, true}])
       accept(socket)
   end
@@ -159,7 +171,6 @@ defmodule CA.CMP do
       pkibody = {:pkiconf, :asn1_NOVALUE}
       pkiheader = CA."PKIHeader"(header, sender: to, recipient: from, recipNonce: senderNonce)
       :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
-#     :logger.info 'PKICONF ~p~n', [senderNonce]
   end
 
   def message(_socket, _header, body, _code) do

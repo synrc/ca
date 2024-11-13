@@ -23,10 +23,16 @@ defmodule CA.EST do
   def decodePolicy(list)            do {:ok, v} = :"PKIX1Implicit-2009".decode(:PolicyInformation, list) ; v end
   def decodeQCS(list)               do {:ok, v} = :KEP.decode(:QCStatement, list) ; v end
 
-  def start() do 
-      children = [ { Bandit, scheme: :http, port: 8047, plug: __MODULE__ } ]
-      Supervisor.start_link(children, strategy: :one_for_one, name: CA.Supervisor)
+  def start_link(args) do Bandit.start_link(args) end
+  def child_spec(opt) do
+    %{
+      id: EST,
+      start: {Bandit, :start_link, [opt]},
+      type: :supervisor,
+      restart: :permanent
+    }
   end
+
 
   # Authority PKI X.509 CMP over HTTP  RFC 9483 6.1, 6.2
   # Authority PKI X.509 EST over HTTPS RFC 7030 3.2.2

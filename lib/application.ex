@@ -5,6 +5,7 @@ defmodule CA do
   from PKIXCMP-2009.asn1 the ASN.1 specification of CMP protocol.
   """
   use Application
+  use Supervisor
   require Record
 
   Enum.each(Record.extract_all(from_lib: "ca/include/PKIXCMP-2009.hrl"),
@@ -15,8 +16,10 @@ defmodule CA do
 
   def start(_type, _args) do
       :logger.add_handlers(:ca)
-      :lists.foldl(fn service, _ -> {:ok, _} = service.start() end, [],
-          [ CA.CMP, CA.TSP, CA.OCSP, CA.CMC, CA.EST ])
+      Supervisor.start_link([
+          { CA.CMP, [] },
+          { CA.EST, scheme: :http, port: 8047, plug: CA.EST }
+        ], strategy: :one_for_one, name: CA.Supervisor)
   end
 
 end
