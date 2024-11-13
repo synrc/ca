@@ -10,6 +10,7 @@
 * Classes: `CA`, `RA`, `SERVER`, `CLIENT`, `HUMAN`, `COMPUTER`
 * Templates: `TLS`, `SSH`, `SCVP`, `IPSEC`, `CMC`, `SIP`, `CAP`, `EAP`, `BGP`, `OCSP`
 * Curves: `secp256k1`, `secp384r1`, `secp521r1`
+* Schemes: `RSA`, `GF(p)`, `GF(2^m)`
 * RFC: CMS, PKCS-10, CMP, ESP, OCSP, TSP
 * Ports: CMP (TCP 8829), EST (HTTP 8047)
 * Size: 2000 LOC
