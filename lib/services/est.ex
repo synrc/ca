@@ -1,29 +1,21 @@
 defmodule CA.EST do
   @moduledoc "CA/EST/CMP HTTPS/HTTP server."
-  @profiles [ "secp256k1", "secp384r1", "secp521r1" ]
-  @templates [ "ca", "ra", "human", "device", "client", "server", "ocsp", "ipsec", "bgp", "eap", "cap", "sip", "cmc", "scvp", "ssh" ]
+  @profiles  [ "secp256k1", "secp384r1", "secp521r1" ]
+  @templates [ "ocsp", "ipsec", "bgp", "eap", "cap", "sip", "cmc", "scvp", "ssh", "tls" ]
+  @classes   [ "ca", "pki", "server", "client", "human", "computer" ]
 
   use Plug.Router
   plug :match
   plug :dispatch
   plug Plug.Parsers, parsers: [:json], json_decoder: Jason
 
-  def integer(x)                    do {:ok, v} = :"EST".encode(:Int, x) ; v end
-  def decodeInteger(x)              do {:ok, v} = :"EST".decode(:Int, x) ; v end
-  def objectIdentifier(x)           do {:ok, v} = :"EST".encode(:OID, x) ; v end
-  def decodeObjectIdentifier(x)     do {:ok, v} = :"EST".decode(:OID, x) ; v end
-  def extension(x)                  do {:ok, v} = :"EST".encode(:Extension, x) ; v end
+  def start_link(opt) do
+      :logger.info "Classes: ~tp", [@classes]
+      :logger.info "Templates: ~tp", [@templates]
+      :logger.info "Profiles: ~tp", [@profiles]
+      Bandit.start_link(opt)
+  end
 
-  def basicConstraints()            do {:ok, v} = :"PKIX1Implicit-2009".encode(:BasicConstraints, {:BasicConstraints, false, :asn1_NOVALUE}) ; v end
-  def keyUsage(list)                do {:ok, v} = :"PKIX1Implicit-2009".encode(:KeyUsage, list) ; v end
-  def decodeKeyPurposeId(list)      do {:ok, v} = :"PKIX1Implicit-2009".decode(:KeyPurposeId, list) ; v end
-  def decodeKeyUsage(list)          do {:ok, v} = :"PKIX1Implicit-2009".decode(:KeyUsage, list) ; v end
-  def extendedKeyUsage(list)        do {:ok, v} = :"PKIX1Implicit-2009".encode(:ExtKeyUsageSyntax, list) ; v end
-  def decodeExtendedKeyUsage(list)  do {:ok, v} = :"PKIX1Implicit-2009".decode(:ExtKeyUsageSyntax, list) ; v end
-  def decodePolicy(list)            do {:ok, v} = :"PKIX1Implicit-2009".decode(:PolicyInformation, list) ; v end
-  def decodeQCS(list)               do {:ok, v} = :KEP.decode(:QCStatement, list) ; v end
-
-  def start_link(opt) do Bandit.start_link(opt) end
   def child_spec(opt) do
       %{
         id: EST,
@@ -55,7 +47,7 @@ defmodule CA.EST do
 
   def template(profile) do
       case String.split(profile,"-") do
-           [_,template|_] when template in @templates -> template
+           [_,template|_] when template in @classes -> template
                    _ -> [] end
   end
 
@@ -93,16 +85,16 @@ defmodule CA.EST do
       {:ok, bin} = :"EST".encode(:CsrAttrs, [
          oid: CA.AT.oid(:"id-at-challengePassword"),
          oid: CA.X962.oid(:"id-ds-ecdsa-with-SHA384"),
-         attribute: {:Attribute, CA.X962.oid(:"id-kt-ecPublicKey"), [objectIdentifier(CA.ALG.oid(:secp384r1))] },
-         attribute: {:Attribute, CA.AT.oid(:rsaEncryption), [integer(4096)]},
+         attribute: {:Attribute, CA.X962.oid(:"id-kt-ecPublicKey"), [CA.CE.objectIdentifier(CA.ALG.oid(:secp384r1))] },
+         attribute: {:Attribute, CA.AT.oid(:rsaEncryption), [CA.CE.integer(4096)]},
          attribute: {:Attribute, CA.AT.oid(:"id-at-extensionRequest"), [
-                      extension({:Extension, CA.CE.oid(:"id-ce-keyUsage"), true, keyUsage([:digitalSignature, :keyCertSign, :cRLSign])}),
-                      extension({:Extension, CA.CE.oid(:"id-ce-basicConstraints"), true, basicConstraints()}),
-                      extension({:Extension, CA.CE.oid(:"id-ce-extKeyUsage"), false,
-                                  extendedKeyUsage([ CA.KP.oid(:"id-kp-serverAuth"),
-                                                     CA.KP.oid(:"id-kp-clientAuth"),
-                                                     CA.KP.oid(:"id-kp-codeSigning"),
-                                                     CA.KP.oid(:"id-kp-emailProtection") ])})
+                      CA.CE.extension({:Extension, CA.CE.oid(:"id-ce-keyUsage"), true, CA.CE.keyUsage([:digitalSignature, :keyCertSign, :cRLSign])}),
+                      CA.CE.extension({:Extension, CA.CE.oid(:"id-ce-basicConstraints"), true, CA.CE.basicConstraints()}),
+                      CA.CE.extension({:Extension, CA.CE.oid(:"id-ce-extKeyUsage"), false,
+                          CA.CE.extendedKeyUsage([ CA.KP.oid(:"id-kp-serverAuth"),
+                                                   CA.KP.oid(:"id-kp-clientAuth"),
+                                                   CA.KP.oid(:"id-kp-codeSigning"),
+                                                   CA.KP.oid(:"id-kp-emailProtection") ])})
                     ]}
       ])
       bin

@@ -24,7 +24,7 @@ defmodule CA.CMP do
   end
 
   def listen(port) do
-      :logger.info '~nCMP server ~p on TCP port ~p just started.', [self(),port]
+      :logger.info 'Running CA.CMP with Authority 5.11.13 at 0.0.0.0:~p (tcp)', [port]
       {:ok, socket} = :gen_tcp.listen(port, [:binary, {:active, false}, {:reuseaddr, true}])
       accept(socket)
   end

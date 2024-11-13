@@ -3,6 +3,21 @@ defmodule CA.CE do
 
   # https://zakon.rada.gov.ua/laws/show/z1398-12
 
+  def integer(x)                    do {:ok, v} = :"EST".encode(:Int, x) ; v end
+  def decodeInteger(x)              do {:ok, v} = :"EST".decode(:Int, x) ; v end
+  def objectIdentifier(x)           do {:ok, v} = :"EST".encode(:OID, x) ; v end
+  def decodeObjectIdentifier(x)     do {:ok, v} = :"EST".decode(:OID, x) ; v end
+  def extension(x)                  do {:ok, v} = :"EST".encode(:Extension, x) ; v end
+
+  def basicConstraints()            do {:ok, v} = :"PKIX1Implicit-2009".encode(:BasicConstraints, {:BasicConstraints, false, :asn1_NOVALUE}) ; v end
+  def keyUsage(list)                do {:ok, v} = :"PKIX1Implicit-2009".encode(:KeyUsage, list) ; v end
+  def decodeKeyPurposeId(list)      do {:ok, v} = :"PKIX1Implicit-2009".decode(:KeyPurposeId, list) ; v end
+  def decodeKeyUsage(list)          do {:ok, v} = :"PKIX1Implicit-2009".decode(:KeyUsage, list) ; v end
+  def extendedKeyUsage(list)        do {:ok, v} = :"PKIX1Implicit-2009".encode(:ExtKeyUsageSyntax, list) ; v end
+  def decodeExtendedKeyUsage(list)  do {:ok, v} = :"PKIX1Implicit-2009".decode(:ExtKeyUsageSyntax, list) ; v end
+  def decodePolicy(list)            do {:ok, v} = :"PKIX1Implicit-2009".decode(:PolicyInformation, list) ; v end
+  def decodeQCS(list)               do {:ok, v} = :KEP.decode(:QCStatement, list) ; v end
+
   def oid(:"id-ce-subjectDirectoryAttributes"),   do: {2, 5, 29, 9}
   def oid(:"id-ce-subjectKeyIdentifier"),         do: {2, 5, 29, 14}
   def oid(:"id-ce-keyUsage"),                     do: {2, 5, 29, 15}
@@ -84,7 +99,7 @@ defmodule CA.CE do
   def oid({1,3,6,1,5,5,7,1,3}, v),        do: {:qcStatements, :lists.map(fn x -> case isString(x) do false -> mapOid(:oid.decode(x)) ; true -> x end end, v) }
   def oid({2,5,29,9},v),                  do: {:subjectDirectoryAttributes, pair(v,[])}
   def oid({2,5,29,14},v),                 do: {:subjectKeyIdentifier, :base64.encode(hd(pair(v,[])))}
-  def oid({2,5,29,15},[v]),               do: {:keyUsage, CA.EST.decodeKeyUsage(<<3,2,v::binary>>) }
+  def oid({2,5,29,15},[v]),               do: {:keyUsage, CA.CE.decodeKeyUsage(<<3,2,v::binary>>) }
   def oid({2,5,29,16},v),                 do: {:privateKeyUsagePeriod, v}
   def oid({2,5,29,17},v),                 do: {:subjectAltName, :lists.map(fn x -> case isString(x) do false -> mapOid(:oid.decode(x)) ; true -> x end end, v) }
   def oid({2,5,29,37},v),                 do: {:extKeyUsage, mapOids(:lists.map(fn x -> :oid.decode(x) end, v)) }
@@ -93,7 +108,7 @@ defmodule CA.CE do
   def oid({2,5,29,32},v),                 do: {:certificatePolicies, :lists.map(fn x -> case isString(x) do false -> mapOid(:oid.decode(x)) ; true -> x end end, v) }
   def oid({2,5,29,35},v),                 do: {:authorityKeyIdentifier, v}
   def oid({2,5,29,46},v),                 do: {:freshestCRL, pair(v,[])}
-  def oid({1,2,840,113549,1,9,3},v),      do: {:contentType, CA.AT.oid(CA.EST.decodeObjectIdentifier(v)) }
+  def oid({1,2,840,113549,1,9,3},v),      do: {:contentType, CA.AT.oid(CA.CE.decodeObjectIdentifier(v)) }
   def oid({1,2,840,113549,1,9,4},v),      do: {:messageDigest, :base64.encode(:erlang.element(2,:KEP.decode(:MessageDigest, v)))}
   def oid({1,2,840,113549,1,9,5},v),      do: {:signingTime, :erlang.element(2,:erlang.element(1,:asn1rt_nif.decode_ber_tlv(v)))}
   def oid({1,2,840,113549,1,9,16,2,14},v) do
