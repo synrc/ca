@@ -128,7 +128,7 @@ defmodule CA.CMP do
          transactionID, senderNonce, _recipNonce, _freeText, _generalInfo} = header
       true = code == validateProtection(header, body, code)
 
-      profile = "secp384r1"
+      profile = CA.RDN.profile(csr)
       {ca_key, ca} = CA.CSR.read_ca(profile)
       subject = X509.CSR.subject(csr)
      :logger.info 'P10CR from ~tp~n', [CA.RDN.rdn(subject)]

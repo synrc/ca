@@ -14,8 +14,9 @@ defmodule CA.EST.Post do
       bin = :base64.decode(:binary.part(body, 35, byte_size(body) - 68))
       {:ok, csr} = :"PKCS-10".decode :CertificationRequest, bin
 
+      true = profile == CA.RDN.profile(csr)
       subject = X509.CSR.subject(csr)
-      :logger.info 'HTTP P10CR from ~tp template ~tp~n', [CA.RDN.rdn(subject), template]
+      :logger.info 'HTTP P10CR from ~tp template ~tp profile ~p~n', [CA.RDN.rdn(subject), template, CA.RDN.profile(csr)]
 
       true = X509.CSR.valid?(CA.RDN.parseSubj(csr))
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.subj(subject), ca, ca_key,

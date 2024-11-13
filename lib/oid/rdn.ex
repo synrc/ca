@@ -18,6 +18,14 @@ defmodule CA.RDN do
       end, attrs)}
   end
 
+  def profile(csr) do
+      {:CertificationRequest, {:CertificationRequestInfo, _ver, _subj, subjectPKI, _attr}, _signatureAlg, _signature} = csr
+      {_, {_, {1,2,840,10045,2,1}, {:asn1_OPENTYPE,x}}, _} = subjectPKI
+      {{6,oid},_} = :asn1rt_nif.decode_ber_tlv(x)
+      {alg,_} = CA.ALG.lookup(:oid.decode(oid))
+      "#{alg}"
+  end
+
   def parseSubj(csr) do
       {:CertificationRequest, {:CertificationRequestInfo, v, subj, x, y}, b, c} = csr
       {:CertificationRequest, {:CertificationRequestInfo, v, subj(subj), x, y}, b, c}
