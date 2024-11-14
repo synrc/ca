@@ -1,7 +1,8 @@
 defmodule CA.CMP do
   @moduledoc "CA/CMP TCP server."
   require CA
- 
+  require CA.CMP.Scheme
+
 # WSL Service
 # netsh interface portproxy add v4tov4 listenport=8829 listenaddress=192.168.0.3 connectport=8829 connectaddress=172.31.45.170
 # netsh interface portproxy add v4tov4 listenport=8047 listenaddress=192.168.0.3 connectport=8047 connectaddress=172.31.45.170
@@ -15,11 +16,11 @@ defmodule CA.CMP do
   def start_link(port: port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
   def child_spec(opt) do
       %{
-         id: CMP,
-         start: {CA.CMP, :start_link, [opt]},
-         type: :supervisor,
-         restart: :permanent,
-         shutdown: 500
+        id: CMP,
+        start: {CA.CMP, :start_link, [opt]},
+        type: :supervisor,
+        restart: :permanent,
+        shutdown: 500
       }
   end
 
@@ -47,7 +48,7 @@ defmodule CA.CMP do
                  [_headers|body] = :string.split stage1, "\r\n\r\n", :all
                  case body do
                     [""] -> case :gen_tcp.recv(socket, 0) do
-                                 {:error, :closed} -> :exit
+                                 {:error, _} -> :exit
                                  {:ok, stage2} -> handleMessage(socket,stage2) end
                        _ -> handleMessage(socket,body)
                  end
@@ -82,7 +83,7 @@ defmodule CA.CMP do
       {oid, salt, owfoid, macoid, counter} = protection(protectionAlg)
       case CA.ALG.lookup(oid) do
            {:'id-PasswordBasedMac', _ } ->
-                incomingProtection = CA."ProtectedPart"(header: header, body: body)
+                incomingProtection = CA.CMP.Scheme."ProtectedPart"(header: header, body: body)
                 {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
                 {owf,_} = CA.ALG.lookup(owfoid) # SHA-2
                 pbm = :application.get_env(:ca, :pbm, "0000") # DH shared secret
@@ -98,7 +99,7 @@ defmodule CA.CMP do
   end
 
   def answer(socket, header, body, code) do
-      message = CA."PKIMessage"(header: header, body: body, protection: code)
+      message = CA.CMP.Scheme."PKIMessage"(header: header, body: body, protection: code)
       {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
       res =  "HTTP/1.0 200 OK\r\n"
           <> "Server: SYNRC CA/CMP\r\n"
@@ -116,10 +117,10 @@ defmodule CA.CMP do
       :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer",
           X509.Certificate.to_pem(cert))
 
-      [ CA."CertResponse"(certReqId: 0,
-          certifiedKeyPair: CA."CertifiedKeyPair"(certOrEncCert:
+      [ CA.CMP.Scheme."CertResponse"(certReqId: 0,
+          certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert:
              {:certificate, {:x509v3PKCert, CA.RDN.decodeAttrsCert(cert)}}),
-                 status: CA."PKIStatusInfo"(status: 0))
+                 status: CA.CMP.Scheme."PKIStatusInfo"(status: 0))
       ]
   end
 
@@ -141,7 +142,7 @@ defmodule CA.CMP do
       profile = CA.RDN.profile(csr)
       {ca_key, ca} = CA.CSR.read_ca(profile)
       subject = X509.CSR.subject(csr)
-     :logger.info 'TCP P10CR from ~tp~n', [CA.RDN.rdn(subject)]
+      :logger.info 'TCP P10CR from ~tp~n', [CA.RDN.rdn(subject)]
       true = X509.CSR.valid?(CA.RDN.encodeAttrsCSR(csr))
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.encodeAttrs(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
@@ -152,9 +153,11 @@ defmodule CA.CMP do
                    false -> storeReply(csr,cert,cn,profile)
                    true -> [] end end
 
-      pkibody = {:cp, CA."CertRepMessage"(response: reply)}
-      pkiheader = CA."PKIHeader"(sender: to, recipient: from, pvno: pvno, recipNonce: senderNonce,
-          transactionID: transactionID, protectionAlg: protectionAlg, messageTime: messageTime)
+      pkibody = {:cp, CA.CMP.Scheme."CertRepMessage"(response: reply)}
+      pkiheader = CA.CMP.Scheme."PKIHeader"(sender: to, recipient: from,
+          pvno: pvno, recipNonce: senderNonce,
+          transactionID: transactionID, protectionAlg: protectionAlg,
+          messageTime: messageTime)
 
       :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
   end
@@ -167,7 +170,7 @@ defmodule CA.CMP do
       end, statuses)
 
       pkibody = {:pkiconf, :asn1_NOVALUE}
-      pkiheader = CA."PKIHeader"(header, sender: to, recipient: from, recipNonce: senderNonce)
+      pkiheader = CA.CMP.Scheme."PKIHeader"(header, sender: to, recipient: from, recipNonce: senderNonce)
       :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
   end
 

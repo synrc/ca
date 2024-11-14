@@ -14,13 +14,13 @@ defmodule CA.ECDSA.OTP do
   # > CA.ECDSA.OTP.verify "mix.exs", "mix.sig", "maxim.pub"
 
   def signBin(msg, priv) do
-      CA."ECPrivateKey"(privateKey: point, parameters: {:namedCurve, oid}) = priv
+      {:ECPrivateKey, point, {:namedCurve, oid}} = priv
       :crypto.sign(:ecdsa, :sha256, msg,
           [point, :crypto.ec_curve(:pubkey_cert_records.namedCurves(oid))])
   end
 
   def verifyBin(msg, sig, pub) do
-      {CA."ECPoint"(point: point), {:namedCurve, oid}} = pub
+      {{:ECPoint,point}, {:namedCurve, oid}} = pub
       :crypto.verify(:ecdsa, :sha256, msg, sig,
           [point, :crypto.ec_curve(:pubkey_cert_records.namedCurves(oid))])
   end
@@ -28,7 +28,7 @@ defmodule CA.ECDSA.OTP do
   def sign(file, priv) do
       {:ok, msg} = :file.read_file file
       {:ok, key} = :file.read_file priv
-      {:ok, {_,r,s}}  =:"PKIXAlgs-2009".decode(:"ECDSA-Sig-Value", signBin(msg, private(key)))
+      {:ok, {_,r,s}} = :"PKIXAlgs-2009".decode(:"ECDSA-Sig-Value", signBin(msg, private(key)))
       {r,s}
   end
 

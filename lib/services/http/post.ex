@@ -1,13 +1,14 @@
 defmodule CA.EST.Post do
-  @moduledoc "CA/ETS POST Method HTTP handlers."
+  @moduledoc "CA/EST POST Method HTTP handlers."
   @profiles ["secp256k1","secp384r1","secp521r1"]
-  @templates ["ca", "ra", "human", "device", "client", "server", "ocsp", "agent"]
+  @classes   [ "ca", "pki", "server", "client", "human", "computer" ]
 
   import Plug.Conn
   require CA
   require CA.CMP
+  require CA.CMP.Scheme
 
-  def post(conn, "CA", profile, template, "PKCS-10") when profile in @profiles and template in @templates do
+  def post(conn, "CA", profile, template, "PKCS-10") when profile in @profiles and template in @classes do
 
       {ca_key, ca} = CA.CSR.read_ca(profile)
       {:ok, body, _} = Plug.Conn.read_body(conn, [])
@@ -29,7 +30,7 @@ defmodule CA.EST.Post do
                     true -> [] end end
 
 #     {:ok, cert} = :"PKIX1Explicit88".encode(:Certificate, CA.CMP.convertOTPtoPKIX_subj(cert))
-      {:ok, certRepMsg} = :'PKIXCMP-2009'.encode(:CertRepMessage, CA."CertRepMessage"(response: reply))
+      {:ok, certRepMsg} = :'PKIXCMP-2009'.encode(:CertRepMessage, CA.CMP.Scheme."CertRepMessage"(response: reply))
 
       body = :base64.encode certRepMsg
       conn |> put_resp_content_type("application/pkix-cert")
