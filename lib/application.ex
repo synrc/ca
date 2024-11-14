@@ -8,6 +8,9 @@ defmodule CA do
       :logger.add_handlers(:ca)
       Supervisor.start_link([
          { CA.CMP, port: Application.fetch_env!(:ca, :cmp) },
+         { CA.CMC, port: Application.fetch_env!(:ca, :cmc) },
+         { CA.OCSP, port: Application.fetch_env!(:ca, :ocsp) },
+         { CA.TSP, port: Application.fetch_env!(:ca, :tsp) },
          { CA.EST, port: Application.fetch_env!(:ca, :est), plug: CA.EST, scheme: :http, thousand_island_options: [num_acceptors: 1] }
       ], strategy: :one_for_one, name: CA.Supervisor)
   end

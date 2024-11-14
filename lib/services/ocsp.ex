@@ -1,9 +1,19 @@
 defmodule CA.OCSP do
-    @moduledoc "CA/OCSP TCP server."
-    require CA
+  @moduledoc "CA/OCSP TCP server."
+  require CA
 
-    def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
-    def start(), do: {:ok, :erlang.spawn(fn -> listen(1859) end)}
+  def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
+
+  def start_link(port: port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
+  def child_spec(opt) do
+      %{
+        id: OCSP,
+        start: {CA.OCSP, :start_link, [opt]},
+        type: :supervisor,
+        restart: :permanent,
+        shutdown: 500
+      }
+  end
 
     def listen(port) do
         {:ok, socket} = :gen_tcp.listen(port,

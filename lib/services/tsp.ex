@@ -3,7 +3,17 @@ defmodule CA.TSP do
     require CA
 
     def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
-    def start(), do: {:ok, :erlang.spawn(fn -> listen(1849) end)}
+
+  def start_link(port: port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
+  def child_spec(opt) do
+      %{
+        id: TSP,
+        start: {CA.TSP, :start_link, [opt]},
+        type: :supervisor,
+        restart: :permanent,
+        shutdown: 500
+      }
+  end
 
     def listen(port) do
         {:ok, socket} = :gen_tcp.listen(port,
