@@ -35,10 +35,13 @@ defmodule CA.CMC do
 
   def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
 
-  # Authority PKI X.509 CMC over HTTP RFC 5272 6402
+  # Authority PKI X.509 CMC over HTTP RFC 5272 5273 5274 5275 6402
 
-  # [1] https://www.rfc-editor.org/rfc/rfc5272
-  # [2] https://www.rfc-editor.org/rfc/rfc6402
+  # [2] https://www.rfc-editor.org/rfc/rfc5272
+  # [2] https://www.rfc-editor.org/rfc/rfc5273
+  # [2] https://www.rfc-editor.org/rfc/rfc5274
+  # [2] https://www.rfc-editor.org/rfc/rfc5275
+  # [3] https://www.rfc-editor.org/rfc/rfc6402
 
   def start_link(port: port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
   def child_spec(opt) do
