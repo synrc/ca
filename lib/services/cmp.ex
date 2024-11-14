@@ -41,7 +41,7 @@ defmodule CA.CMP do
 
   def loop(socket,ca) do
       case :gen_tcp.recv(socket, 0) do
-           {:error, :closed} -> :exit
+           {:error, _} -> :exit
            {:ok, stage1} ->
                try do
                  [_headers|body] = :string.split stage1, "\r\n\r\n", :all
