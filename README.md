@@ -7,7 +7,7 @@
 
 ## Features
 
-* Classes: `CA`, `RA`, `SERVER`, `CLIENT`, `HUMAN`, `COMPUTER`
+* Classes: `CA`, `RA`, `SERVER`, `CLIENT`, `HUMAN`, `PROGRAM`
 * Templates: `TLS`, `SSH`, `SCVP`, `IPSEC`, `CMC`, `SIP`, `CAP`, `EAP`, `BGP`, `OCSP`
 * Curves: `secp256k1`, `secp384r1`, `secp521r1`
 * Schemes: `RSA`, `GF(p)`, `GF(2^m)`
