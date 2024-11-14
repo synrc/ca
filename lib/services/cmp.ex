@@ -3,14 +3,6 @@ defmodule CA.CMP do
   require CA
   require CA.CMP.Scheme
 
-# WSL Service
-# netsh interface portproxy add v4tov4 listenport=8829 listenaddress=192.168.0.3 connectport=8829 connectaddress=172.31.45.170
-# netsh interface portproxy add v4tov4 listenport=8047 listenaddress=192.168.0.3 connectport=8047 connectaddress=172.31.45.170
-# New-NetFireWallRule -DisplayName 'CMP-OUT' -Direction Outbound -LocalPort 8829 -Action Allow -Protocol TCP
-# New-NetFireWallRule -DisplayName 'CMP-IN'  -Direction Inbound  -LocalPort 8829 -Action Allow -Protocol TCP
-# New-NetFireWallRule -DisplayName 'EST-OUT' -Direction Outbound -LocalPort 8047 -Action Allow -Protocol TCP
-# New-NetFireWallRule -DisplayName 'EST-IN'  -Direction Inbound  -LocalPort 8047 -Action Allow -Protocol TCP
-
   # Authority PKI X.509 CMP over TCP RFC 4210 9480 9481
 
   # [1] https://datatracker.ietf.org/doc/html/rfc4210
@@ -182,5 +174,13 @@ defmodule CA.CMP do
   def message(_socket, _header, body, _code) do
       :logger.info 'Strange PKIMessage request ~p', [body]
   end
+
+# WSL Service
+# netsh interface portproxy add v4tov4 listenport=8829 listenaddress=192.168.0.3 connectport=8829 connectaddress=172.31.45.170
+# netsh interface portproxy add v4tov4 listenport=8047 listenaddress=192.168.0.3 connectport=8047 connectaddress=172.31.45.170
+# New-NetFireWallRule -DisplayName 'CMP-OUT' -Direction Outbound -LocalPort 8829 -Action Allow -Protocol TCP
+# New-NetFireWallRule -DisplayName 'CMP-IN'  -Direction Inbound  -LocalPort 8829 -Action Allow -Protocol TCP
+# New-NetFireWallRule -DisplayName 'EST-OUT' -Direction Outbound -LocalPort 8047 -Action Allow -Protocol TCP
+# New-NetFireWallRule -DisplayName 'EST-IN'  -Direction Inbound  -LocalPort 8047 -Action Allow -Protocol TCP
 
 end

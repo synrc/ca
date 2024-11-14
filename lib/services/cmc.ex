@@ -2,46 +2,13 @@ defmodule CA.CMC do
   @moduledoc "CA/CMC TLS TCP server."
   require CA
 
-  def oid(:"id-cmc-identification"),        do: {1,3,6,1,5,5,7,7,2}
-  def oid(:"id-cmc-identityProof"),         do: {1,3,6,1,5,5,7,7,3}
-  def oid(:"id-cmc-dataReturn"),            do: {1,3,6,1,5,5,7,7,4}
-  def oid(:"id-cmc-transactionId"),         do: {1,3,6,1,5,5,7,7,5}
-  def oid(:"id-cmc-senderNonce"),           do: {1,3,6,1,5,5,7,7,6}
-  def oid(:"id-cmc-recipientNonce"),        do: {1,3,6,1,5,5,7,7,7}
-  def oid(:"id-cmc-statusInfo"),            do: {1,3,6,1,5,5,7,7,1}
-  def oid(:"id-cmc-addExtensions"),         do: {1,3,6,1,5,5,7,7,8}
-  def oid(:"id-cmc-encryptedPOP"),          do: {1,3,6,1,5,5,7,7,9}
-  def oid(:"id-cmc-decryptedPOP"),          do: {1,3,6,1,5,5,7,7,10}
-  def oid(:"id-cmc-lraPOPWitness"),         do: {1,3,6,1,5,5,7,7,11}
-  def oid(:"id-cmc-getCert"),               do: {1,3,6,1,5,5,7,7,15}
-  def oid(:"id-cmc-getCRL"),                do: {1,3,6,1,5,5,7,7,16}
-  def oid(:"id-cmc-revokeRequest"),         do: {1,3,6,1,5,5,7,7,17}
-  def oid(:"id-cmc-regInfo"),               do: {1,3,6,1,5,5,7,7,18}
-  def oid(:"id-cmc-responseInfo"),          do: {1,3,6,1,5,5,7,7,19}
-  def oid(:"id-cmc-queryPending"),          do: {1,3,6,1,5,5,7,7,21}
-  def oid(:"id-cmc-popLinkRandom"),         do: {1,3,6,1,5,5,7,7,22}
-  def oid(:"id-cmc-popLinkWitness"),        do: {1,3,6,1,5,5,7,7,23}
-  def oid(:"id-cmc-confirmCertAcceptance"), do: {1,3,6,1,5,5,7,7,24}
-  def oid(:"id-cmc-statusInfoV2"),          do: {1,3,6,1,5,5,7,7,25}
-  def oid(:"id-cmc-trustedAnchors"),        do: {1,3,6,1,5,5,7,7,26}
-  def oid(:"id-cmc-authData"),              do: {1,3,6,1,5,5,7,7,27}
-  def oid(:"id-cmc-batchRequests"),         do: {1,3,6,1,5,5,7,7,28}
-  def oid(:"id-cmc-batchResponses"),        do: {1,3,6,1,5,5,7,7,29}
-  def oid(:"id-cmc-publishCert"),           do: {1,3,6,1,5,5,7,7,30}
-  def oid(:"id-cmc-modCertTemplate"),       do: {1,3,6,1,5,5,7,7,31}
-  def oid(:"id-cmc-controlProcessed"),      do: {1,3,6,1,5,5,7,7,32}
-  def oid(:"id-cmc-identityProofV2"),       do: {1,3,6,1,5,5,7,7,33}
-  def oid(:"id-cmc-popLinkWitnessV2"),      do: {1,3,6,1,5,5,7,7,34}
-
-  def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
-
   # Authority PKI X.509 CMC over HTTP RFC 5272 5273 5274 5275 6402
 
+  # [1] https://www.rfc-editor.org/rfc/rfc6402
   # [2] https://www.rfc-editor.org/rfc/rfc5272
-  # [2] https://www.rfc-editor.org/rfc/rfc5273
-  # [2] https://www.rfc-editor.org/rfc/rfc5274
-  # [2] https://www.rfc-editor.org/rfc/rfc5275
-  # [3] https://www.rfc-editor.org/rfc/rfc6402
+  # [3] https://www.rfc-editor.org/rfc/rfc5273
+  # [4] https://www.rfc-editor.org/rfc/rfc5274
+  # [5] https://www.rfc-editor.org/rfc/rfc5275
 
   def start_link(port: port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
   def child_spec(opt) do
@@ -86,5 +53,38 @@ defmodule CA.CMC do
            {:error, :closed} -> :exit
       end
   end
+
+  def oid(:"id-cmc-identification"),        do: {1,3,6,1,5,5,7,7,2}
+  def oid(:"id-cmc-identityProof"),         do: {1,3,6,1,5,5,7,7,3}
+  def oid(:"id-cmc-dataReturn"),            do: {1,3,6,1,5,5,7,7,4}
+  def oid(:"id-cmc-transactionId"),         do: {1,3,6,1,5,5,7,7,5}
+  def oid(:"id-cmc-senderNonce"),           do: {1,3,6,1,5,5,7,7,6}
+  def oid(:"id-cmc-recipientNonce"),        do: {1,3,6,1,5,5,7,7,7}
+  def oid(:"id-cmc-statusInfo"),            do: {1,3,6,1,5,5,7,7,1}
+  def oid(:"id-cmc-addExtensions"),         do: {1,3,6,1,5,5,7,7,8}
+  def oid(:"id-cmc-encryptedPOP"),          do: {1,3,6,1,5,5,7,7,9}
+  def oid(:"id-cmc-decryptedPOP"),          do: {1,3,6,1,5,5,7,7,10}
+  def oid(:"id-cmc-lraPOPWitness"),         do: {1,3,6,1,5,5,7,7,11}
+  def oid(:"id-cmc-getCert"),               do: {1,3,6,1,5,5,7,7,15}
+  def oid(:"id-cmc-getCRL"),                do: {1,3,6,1,5,5,7,7,16}
+  def oid(:"id-cmc-revokeRequest"),         do: {1,3,6,1,5,5,7,7,17}
+  def oid(:"id-cmc-regInfo"),               do: {1,3,6,1,5,5,7,7,18}
+  def oid(:"id-cmc-responseInfo"),          do: {1,3,6,1,5,5,7,7,19}
+  def oid(:"id-cmc-queryPending"),          do: {1,3,6,1,5,5,7,7,21}
+  def oid(:"id-cmc-popLinkRandom"),         do: {1,3,6,1,5,5,7,7,22}
+  def oid(:"id-cmc-popLinkWitness"),        do: {1,3,6,1,5,5,7,7,23}
+  def oid(:"id-cmc-confirmCertAcceptance"), do: {1,3,6,1,5,5,7,7,24}
+  def oid(:"id-cmc-statusInfoV2"),          do: {1,3,6,1,5,5,7,7,25}
+  def oid(:"id-cmc-trustedAnchors"),        do: {1,3,6,1,5,5,7,7,26}
+  def oid(:"id-cmc-authData"),              do: {1,3,6,1,5,5,7,7,27}
+  def oid(:"id-cmc-batchRequests"),         do: {1,3,6,1,5,5,7,7,28}
+  def oid(:"id-cmc-batchResponses"),        do: {1,3,6,1,5,5,7,7,29}
+  def oid(:"id-cmc-publishCert"),           do: {1,3,6,1,5,5,7,7,30}
+  def oid(:"id-cmc-modCertTemplate"),       do: {1,3,6,1,5,5,7,7,31}
+  def oid(:"id-cmc-controlProcessed"),      do: {1,3,6,1,5,5,7,7,32}
+  def oid(:"id-cmc-identityProofV2"),       do: {1,3,6,1,5,5,7,7,33}
+  def oid(:"id-cmc-popLinkWitnessV2"),      do: {1,3,6,1,5,5,7,7,34}
+
+  def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
 
 end
