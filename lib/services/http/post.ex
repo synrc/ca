@@ -1,7 +1,7 @@
 defmodule CA.EST.Post do
   @moduledoc "CA/EST POST Method HTTP handlers."
   @profiles ["secp256k1","secp384r1","secp521r1"]
-  @classes   [ "ca", "pki", "server", "client", "human", "computer" ]
+  @classes   [ "ca", "ra", "server", "client", "human", "program" ]
 
   import Plug.Conn
   require CA

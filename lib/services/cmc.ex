@@ -35,6 +35,11 @@ defmodule CA.CMC do
 
   def code(),  do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
 
+  # Authority PKI X.509 CMC over HTTP RFC 5272 6402
+
+  # [1] https://www.rfc-editor.org/rfc/rfc5272
+  # [2] https://www.rfc-editor.org/rfc/rfc6402
+
   def start_link(port: port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
   def child_spec(opt) do
       %{
@@ -47,6 +52,7 @@ defmodule CA.CMC do
   end
 
   def listen(port) do
+      :logger.info 'Running CA.CMC with Authority 5.11.15 at 0.0.0.0:~p (tcp)', [port]
       {:ok, socket} = :gen_tcp.listen(port,
         [:binary, {:packet, 0}, {:active, false}, {:reuseaddr, true}])
       accept(socket)

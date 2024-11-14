@@ -2,7 +2,7 @@ defmodule CA.EST do
   @moduledoc "CA/EST/CMP HTTPS/HTTP server."
   @profiles  [ "secp256k1", "secp384r1", "secp521r1" ]
   @templates [ "ocsp", "ipsec", "bgp", "eap", "cap", "sip", "cmc", "scvp", "ssh", "tls" ]
-  @classes   [ "ca", "pki", "server", "client", "human", "computer" ]
+  @classes   [ "ca", "ra", "server", "client", "human", "program" ]
 
   use Plug.Router
   plug :match
@@ -25,8 +25,9 @@ defmodule CA.EST do
       }
   end
 
-  # Authority PKI X.509 CMP over HTTP  RFC 9483 6.1, 6.2
-  # Authority PKI X.509 EST over HTTPS RFC 7030 3.2.2
+  # Authority PKI X.509 CMP over CoAP RFC 9482
+  # Authority PKI X.509 CMP over HTTP RFC 9483
+  # Authority PKI X.509 EST over HTTPS RFC 7030
 
   # [1] https://www.rfc-editor.org/rfc/rfc9483
   # [2] https://www.rfc-editor.org/rfc/rfc7030

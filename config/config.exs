@@ -3,7 +3,7 @@ import Config
 config :ca,
   est:  8047,
   cmp:  8829,
-  cmc:  8880,
+  cmc:  5318,
   mad:  8088,
   ocsp: 8020,
   tsp:  8021,

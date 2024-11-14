@@ -11,6 +11,11 @@ defmodule CA.CMP do
 # New-NetFireWallRule -DisplayName 'EST-OUT' -Direction Outbound -LocalPort 8047 -Action Allow -Protocol TCP
 # New-NetFireWallRule -DisplayName 'EST-IN'  -Direction Inbound  -LocalPort 8047 -Action Allow -Protocol TCP
 
+  # Authority PKI X.509 CMP over TCP RFC 4210 9480 9481
+
+  # [1] https://datatracker.ietf.org/doc/html/rfc4210
+  # [2] https://datatracker.ietf.org/doc/html/rfc9480
+
   def ref() do to_string(:lists.filter(fn x -> true == x > 44 and x < 59 end, :erlang.ref_to_list(:erlang.make_ref()))) end
 
   def start_link(port: port), do: {:ok, :erlang.spawn_link(fn -> listen(port) end)}
@@ -25,7 +30,7 @@ defmodule CA.CMP do
   end
 
   def listen(port) do
-      :logger.info 'Running CA.CMP with Authority 5.11.13 at 0.0.0.0:~p (tcp)', [port]
+      :logger.info 'Running CA.CMP with Authority 5.11.15 at 0.0.0.0:~p (tcp)', [port]
       {:ok, socket} = :gen_tcp.listen(port, [:binary, {:active, false}, {:reuseaddr, true}])
       accept(socket)
   end
