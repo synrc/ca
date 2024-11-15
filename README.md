@@ -7,12 +7,12 @@
 
 ## Features
 
-* Classes: `CA`, `RA`, `SERVER`, `CLIENT`, `HUMAN`, `PROGRAM`
-* Templates: `TLS`, `SSH`, `SCVP`, `IPSEC`, `CMC`, `SIP`, `CAP`, `EAP`, `BGP`, `OCSP`
-* Curves: `secp256k1`, `secp384r1`, `secp521r1`
-* Schemes: `RSA`, `GF(p)`, `GF(2^m)`
+* PKI Entities: `CA`, `RA`, `SERVER`, `CLIENT`, `HUMAN`, `PROGRAM`
+* Key purposes: `TLS`, `ECDSA`, `AES`, `SSH`, `SCVP`, `IPSEC`, `CMC`, `SIP`, `CAP`, `EAP`, `BGP`, `OCSP`
+* Curve profiles: `secp256k1`, `secp384r1`, `secp521r1`
+* DH Schemes: `RSA`, `GF(p)`, `GF(2^m)`
 * RFC: CMS, PKCS-10, CMP, ESP, OCSP, TSP
-* Ports: CMP (TCP 8829), EST (HTTP 8047)
+* Ports: CMP (TCP 8829), EST (HTTP 8047), CMC (TCP 5318)
 * Size: 2000 LOC
 * ECDSA: Pure Elixir
 * CMS: Pure Elixir
