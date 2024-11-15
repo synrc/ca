@@ -7,8 +7,9 @@
 
 ## Features
 
-* PKI Entities: `CA`, `RA`, `SERVER`, `CLIENT`, `HUMAN`, `PROGRAM`
+* PKI entities: `CA`, `RA`, `SERVER`, `CLIENT`, `HUMAN`, `PROGRAM`
 * Key purposes: `TLS`, `ECDSA`, `AES`, `SSH`, `SCVP`, `IPSEC`, `CMC`, `SIP`, `CAP`, `EAP`, `BGP`, `OCSP`
+* EUID documents: `TAXID`, `PID`, `IBAN`, `HIID`, `LOYAL`
 * Curve profiles: `secp256k1`, `secp384r1`, `secp521r1`
 * DH Schemes: `RSA`, `GF(p)`, `GF(2^m)`
 * RFC: CMS, PKCS-10, CMP, ESP, OCSP, TSP
