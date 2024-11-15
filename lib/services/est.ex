@@ -4,6 +4,14 @@ defmodule CA.EST do
   @templates [ "ocsp", "ipsec", "bgp", "eap", "cap", "sip", "cmc", "scvp", "ssh", "tls" ]
   @classes   [ "ca", "ra", "server", "client", "human", "program" ]
 
+  # Authority PKI X.509 CMP over CoAP RFC 9482
+  # Authority PKI X.509 CMP over HTTP RFC 9483
+  # Authority PKI X.509 EST over HTTPS RFC 7030
+
+  # [1] https://www.rfc-editor.org/rfc/rfc9483
+  # [2] https://www.rfc-editor.org/rfc/rfc7030
+  # [3] https://www.ietf.org/archive/id/draft-ietf-lamps-rfc7030-csrattrs-07.html
+
   use Plug.Router
   plug :match
   plug :dispatch
@@ -24,14 +32,6 @@ defmodule CA.EST do
         restart: :permanent
       }
   end
-
-  # Authority PKI X.509 CMP over CoAP RFC 9482
-  # Authority PKI X.509 CMP over HTTP RFC 9483
-  # Authority PKI X.509 EST over HTTPS RFC 7030
-
-  # [1] https://www.rfc-editor.org/rfc/rfc9483
-  # [2] https://www.rfc-editor.org/rfc/rfc7030
-  # [3] https://www.ietf.org/archive/id/draft-ietf-lamps-rfc7030-csrattrs-07.html
 
   get  "/.well-known/est/:operation"            do CA.EST.Get.get(conn,   "CA", [],             [],                action(operation)) end
   get  "/.well-known/est/:profile/:operation"   do CA.EST.Get.get(conn,   "CA", curve(profile), template(profile), action(operation)) end

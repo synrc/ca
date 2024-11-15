@@ -65,7 +65,8 @@ defmodule CA.CRT do
       extensions = :lists.map(fn {:Extension,code,_x,b} ->
          CA.CE.oid(code, :lists.flatten(CA.CE.flat(code,:asn1rt_nif.decode_ber_tlv(b),[])))
       end, exts)
-      [ resourceType: :Certificate,
+      [
+        resourceType: :Certificate,
         version: ver,
         signatureAlgorithm: CA.AT.code(alg),
         subject: CA.RDN.rdn(CA.RDN.decodeAttrs(issuee)),
