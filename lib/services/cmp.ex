@@ -49,9 +49,9 @@ defmodule CA.CMP do
                                  {:ok, stage2} -> handleMessage(socket,stage2) end
                        _ -> handleMessage(socket,body)
                  end
-                 loop(socket,ca)
+                 __MODULE__.loop(socket,ca)
                catch _ ->
-                 loop(socket,ca)
+                 __MODULE__.loop(socket,ca)
                end
       end
   end

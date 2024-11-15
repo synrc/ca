@@ -49,8 +49,8 @@ defmodule CA.CMC do
                 {:PKIData, _controlSequence, _reqSequence, cmsSequence, _otherMsgSequence} = dec
                 :io.format 'PKIData:~n~p~n', [dec]
                 __MODULE__.message(socket, cmsSequence)
-                loop(socket)
-           {:error, :closed} -> :exit
+                __MODULE__.loop(socket)
+           {:error, _} -> :exit
       end
   end
 

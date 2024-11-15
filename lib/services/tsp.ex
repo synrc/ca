@@ -41,8 +41,8 @@ defmodule CA.TSP do
                   {:ok, dec} = :KEP.decode(:TimeStampReq, data)
                   :io.format 'TimeStampReq:~n~p~n', [dec]
                   __MODULE__.message(socket, dec)
-                  loop(socket)
-             {:error, :closed} -> :exit
+                  __MODULE__.loop(socket)
+             {:error, _} -> :exit
         end
     end
 end

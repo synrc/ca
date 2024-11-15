@@ -41,8 +41,8 @@ defmodule CA.OCSP do
                   {:ok, dec} = :'OCSP'.decode(:OCSPRequest, data)
                   :io.format 'OCSPRequest:~n~p~n', [dec]
                   __MODULE__.message(socket, dec)
-                  loop(socket)
-             {:error, :closed} -> :exit
+                  __MODULE__.loop(socket)
+             {:error, _} -> :exit
         end
     end
 end
