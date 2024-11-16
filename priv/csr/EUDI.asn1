@@ -1,0 +1,49 @@
+EUDI DEFINITIONS ::=
+BEGIN
+
+id-eleg OBJECT IDENTIFIER ::= {iso(1) member-body(2) se(752) e-legitimationsnamnden(201)}
+
+-- Sweden Connect arcs
+id-mod    OBJECT IDENTIFIER ::= { id-eleg 0 }    -- ASN.1 modules
+id-test   OBJECT IDENTIFIER ::= { id-eleg 1 }    -- OIDs for test
+id-pol    OBJECT IDENTIFIER ::= { id-eleg 2 }    -- Policy
+id-attr   OBJECT IDENTIFIER ::= { id-eleg 3 }    -- Attributes
+id-qcs    OBJECT IDENTIFIER ::= { id-eleg 4 }    -- QC Statement
+id-ce     OBJECT IDENTIFIER ::= { id-eleg 5 }    -- Cert Extensions
+
+-- Sweden Connect Modules
+id-mod-auth-context-88 OBJECT IDENTIFIER ::= { id-mod 1 }    -- Used in RFC 7773
+id-mod-auth-context-08 OBJECT IDENTIFIER ::= { id-mod 2 }    -- Used in RFC 7773
+
+-- Sweden Connect OIDs for test
+
+-- Sweden Connect Policies
+id-pol-svt-ts-policy         OBJECT IDENTIFIER ::= { id-pol 1 }     -- SVT RFC 3161 timestamp policy
+
+-- Sweden Connect Attributes
+id-attr-org-affiliation      OBJECT IDENTIFIER ::= { id-attr 1 }    -- Organizational affiliation
+id-attr-transaction-id       OBJECT IDENTIFIER ::= { id-attr 2 }    -- Transaction identifier
+id-attr-auth-context-params  OBJECT IDENTIFIER ::= { id-attr 3 }    -- Authentication context parameters
+id-attr-prid                 OBJECT IDENTIFIER ::= { id-attr 4 }    -- Provisional ID
+id-attr-prid-persistence     OBJECT IDENTIFIER ::= { id-attr 5 }    -- Provisional ID persistence indicator
+id-attr-pnr-binding          OBJECT IDENTIFIER ::= { id-attr 6 }    -- Personal Identity Number binding URI
+id-attr-eidas-pid            OBJECT IDENTIFIER ::= { id-attr 7 }    -- eIDAS Person Identifier
+id-attr-birth-name           OBJECT IDENTIFIER ::= { id-attr 8 }    -- Birth name
+id-attr-eidas-np-address     OBJECT IDENTIFIER ::= { id-attr 9 }    -- eIDAS Natural Person Address
+id-attr-user-certificate     OBJECT IDENTIFIER ::= { id-attr 10 }   -- User certificate
+id-attr-user-signature       OBJECT IDENTIFIER ::= { id-attr 11 }   -- User signature
+id-attr-sad                  OBJECT IDENTIFIER ::= { id-attr 12 }   -- Signature activation data
+id-attr-auth-srv-signature   OBJECT IDENTIFIER ::= { id-attr 13 }   -- Authentication server signature
+id-attr-sign-message-digest  OBJECT IDENTIFIER ::= { id-attr 14 }   -- Sign message digest
+id-attr-previous-pid-number  OBJECT IDENTIFIER ::= { id-attr 15 }   -- Previous personal identity number
+id-attr-mapped-pid-number    OBJECT IDENTIFIER ::= { id-attr 16 }   -- Mapped personal identity number
+
+-- Sweden Connect QC Statement extension
+id-qcs-sid         OBJECT IDENTIFIER ::= { id-qcs 1 }   -- Semantics Identifiers
+id-qcs-statement   OBJECT IDENTIFIER ::= { id-qcs 2 }   -- QC statements
+
+-- Sweden Connect Certificate Extensions
+id-ce-authContext  OBJECT IDENTIFIER ::= { id-ce 1 }    -- Auth context extension used in RFC 7773
+id-ce-svt          OBJECT IDENTIFIER ::= { id-ce 2 }    -- Signature Validation Token extension
+
+END
