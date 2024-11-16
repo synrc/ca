@@ -1,18 +1,33 @@
 EU Digital Identity
 ===================
 
-SYNRC CA server supports decentralized EUDI issuing architecture.
+SYNRC CA server supports EUDI.
 
-EUDI Architecture
------------------
+### Architecture
+
+EUDI is decetralized PKIX with ABAC level control over attributes that is using JSON as encoding and HTTP as transport.
 
 * eIDAS Node -- State Certificate Authority
-* EUID Wallet -- iOS/Android Application
-* EUDI Provider -- OpenID for Verifiable Credentials (OpenID4VC)
-* Personal Identification Data Provider (PP) -- Diia State Enterprise (PID) MSO mDOC
-* Attestation Providers (AT) -- Qualified and Non-Qualified Electronic Attestation (QEAA) of Attributes Schema Providers
-* Qualifiied Electronic Signature Provider (QP) -- Qualified Certificates (QC)
 * EUDI Verifier -- Verifiable Presentations
+* EUID Wallet (Holder) -- iOS/Android Application 
+* EUDI Provider (Issuer) -- OpenID for Verifiable Credentials (OpenID4VC)
+* Personal Identification Data (PID) Provider -- Diia State Enterprise (MSO mDOC)
+* Qualified and Non-Qualified Electronic Attestation of Attributes (QEAA) Schema Providers
+* Qualifiied Electronic Signature Provider (QP) -- Qualified Certificates (QC)
+
+### Holder, Issuer, Verifier
+
+In an OpenID4VC ecosystem, the Verifier and the Issuer are connected indirectly
+through the credential lifecycle, with interactions primarily mediated by the Holder. 
+This architecture ensures trust without requiring a direct, continuous relationship
+between the Verifier and the Issuer, adhering to privacy and decentralization principles.
+The Verifier does not directly contact the Issuer during typical operations unless a status check is required.
+The Holder acts as the intermediary, ensuring their privacy and control over the data being shared.
+
+EUDI Wallet acts as Holder, QEAA, EAA, PIP (TSPs) act as EUDI Providers or Issuers. EUDI Verifier perform
+status verification of credentials and acts as presentations Verifier.
+
+### PKIX vs OpenID4VC
 
 EUDI model has a similarity with PKIX.
 The same way person use a signed attribute set (a X.509 certificate from CSR attributes)
@@ -24,3 +39,11 @@ However, unlike PKIX with its centralized model,
 EUDI provide distributed model without single root CA,
 where all parties bounded cryptographycally. Also, EUDI has more subtle
 and rigorous control over attributes (claims) like in ABAC model.
+
+CRLs and OCSP can create privacy concerns since they involve
+querying a CA, potentially exposing the user's activity.
+OpenID4VC mitigates this by enabling the Holder to mediate
+the process, and some implementations avoid real-time statu
+checks entirely by including cryptographic proofs within the
+credential itself.
+
