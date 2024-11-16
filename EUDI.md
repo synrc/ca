@@ -5,7 +5,7 @@ SYNRC CA server supports decentralized EUDI issuing architecture.
 
 ### Architecture
 
-EUDI is decetralized PKIX with ABAC level control over attributes.
+EUDI is decetralized PKIX with ABAC level control over attributes that is using JSON as encoding and HTTP as transport.
 
 * eIDAS Node -- State Certificate Authority
 * EUID Wallet -- iOS/Android Application
