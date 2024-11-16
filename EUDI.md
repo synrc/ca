@@ -9,8 +9,8 @@ EUDI Architecture
 * eIDAS Node -- State Certificate Authority
 * EUID Wallet -- iOS/Android Application
 * EUDI Provider -- OpenID for Verifiable Credentials (OpenID4VC)
-  Personal Identification Data Provider (PP) -- Diia State Enterprise (PID) mDOC
-  Attestation Providers (AT) -- Qualified and Non-Qualified Electronic Attestation (QEAA) of Attributes Schema Providers
+* Personal Identification Data Provider (PP) -- Diia State Enterprise (PID) mDOC
+* Attestation Providers (AT) -- Qualified and Non-Qualified Electronic Attestation (QEAA) of Attributes Schema Providers
 * Qualifiied Electronic Signature Provider (QP) -- Qualified Certificates (QC)
 * EUDI Verifier -- Verifiable Presentations
 
