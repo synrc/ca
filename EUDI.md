@@ -12,8 +12,6 @@ EUDI Architecture
 * Qualified Electronica Attestation (QEAA) Provider -- Government agencies and registries
 * Non-Qualified Electronica Attestation (EAA) Provider -- Commertical affiliated companies
 
-<img src="https://eu-digital-identity-wallet.github.io/eudi-doc-architecture-and-reference-framework/1.1.0/media/image1.png">
-
 ISO/IEC 18013-5-compliant EUDI Wallets:
 
 ```asn1
