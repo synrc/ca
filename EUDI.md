@@ -3,16 +3,7 @@ EU Digital Identity
 
 SYNRC CA server supports decentralized EUDI issuing architecture.
 
-EUDI Architecture
------------------
-
-* eIDAS Node -- State Certificate Authority
-* EUID Wallet -- iOS/Android Application
-* EUDI Provider -- OpenID for Verifiable Credentials (OpenID4VC)
-* Personal Identification Data Provider (PP) -- Diia State Enterprise (PID) mDOC
-* Attestation Providers (AT) -- Qualified and Non-Qualified Electronic Attestation (QEAA) of Attributes Schema Providers
-* Qualifiied Electronic Signature Provider (QP) -- Qualified Certificates (QC)
-* EUDI Verifier -- Verifiable Presentations
+### PKIX vs OpenID4VC
 
 EUDI model has a similarity with PKIX.
 The same way person use a signed attribute set (a X.509 certificate from CSR attributes)
@@ -24,3 +15,25 @@ However, unlike PKIX with its centralized model,
 EUDI provide distributed model without single root CA,
 where all parties bounded cryptographycally. Also, EUDI has more subtle
 and rigorous control over attributes (claims) like in ABAC model.
+
+### Holder, Issuer, Verifier
+
+In an OpenID4VC ecosystem, the Verifier and the Issuer are connected indirectly
+through the credential lifecycle, with interactions primarily mediated by the Holder. 
+This architecture ensures trust without requiring a direct, continuous relationship
+between the Verifier and the Issuer, adhering to privacy and decentralization principles.
+The Verifier does not directly contact the Issuer during typical operations unless a status check is required.
+The Holder acts as the intermediary, ensuring their privacy and control over the data being shared.
+
+EUDI Wallet acts as Holder, QEAA, EAA, PIP (TSPs) act as EUDI Providers or Issuers. EUDI Verifier perform
+status verification of credentials and acts as Verifier.
+
+### Architecture
+
+* eIDAS Node -- State Certificate Authority
+* EUID Wallet -- iOS/Android Application
+* EUDI Provider -- OpenID for Verifiable Credentials (OpenID4VC)
+* Personal Identification Data Provider (PP) -- Diia State Enterprise (PID) mDOC
+* Attestation Providers (AT) -- Qualified and Non-Qualified Electronic Attestation (QEAA) of Attributes Schema Providers
+* Qualifiied Electronic Signature Provider (QP) -- Qualified Certificates (QC)
+* EUDI Verifier -- Verifiable Presentations
