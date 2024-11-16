@@ -1,7 +1,7 @@
 EU Digital Identity
 ===================
 
-SYNRC CA server supports decentralized EUDI issuing architecture.
+SYNRC CA server supports EUDI.
 
 ### Architecture
 
