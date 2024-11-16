@@ -10,7 +10,7 @@ EUDI is decetralized PKIX with ABAC level control over attributes that is using 
 * eIDAS Node (CA) -- State Certificate Authority (SAML/HTTP, PKIX, JSON/HTTP)
 * EUDI Verification Service Provider (VSP), Verifier -- Verifiable Presentations (VP, mDOC)
 * EUID Wallet, Holder -- iOS/Android Application (PKIX, mDOC, OpenID4VC)
-* EUDI Trusted Service Provider (TSP), Issuer -- OpenID for Verifiable Credentials (OpenID4VC, mDOC)
+* EUDI Trusted Service Provider (TSP), Issuer -- OpenID for Verifiable Credentials (OpenID4VC, mDOC, SAML)
 * Personal Identification Data (PID) Provider -- Diia State Enterprise (MSO mDOC)
 * Qualified and Non-Qualified Electronic Attestation of Attributes (QEAA) Schema Providers (MSO mDOC)
 * Qualifiied Electronic Signature Provider (QSP) -- Qualified Certificates (QC)
