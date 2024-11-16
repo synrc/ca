@@ -8,12 +8,12 @@ SYNRC CA server supports EUDI.
 EUDI is decetralized PKIX with ABAC level control over attributes that is using JSON as encoding and HTTP as transport.
 
 * eIDAS Node -- State Certificate Authority
-* EUID Wallet -- iOS/Android Application
-* EUDI Provider -- OpenID for Verifiable Credentials (OpenID4VC)
-* Personal Identification Data Provider (PP) -- Diia State Enterprise (PID) mDOC
-* Attestation Providers (AT) -- Qualified and Non-Qualified Electronic Attestation (QEAA) of Attributes Schema Providers
-* Qualifiied Electronic Signature Provider (QP) -- Qualified Certificates (QC)
 * EUDI Verifier -- Verifiable Presentations
+* EUID Wallet (Holder) -- iOS/Android Application 
+* EUDI Provider (Issuer) -- OpenID for Verifiable Credentials (OpenID4VC)
+* Personal Identification Data (PID) Provider -- Diia State Enterprise (mDOC)
+* Qualified and Non-Qualified Electronic Attestation of Attributes (QEAA) Schema Providers
+* Qualifiied Electronic Signature Provider (QP) -- Qualified Certificates (QC)
 
 ### Holder, Issuer, Verifier
 
