@@ -6,12 +6,13 @@ CA Server supports EUDI architecture.
 EUDI Architecture
 -----------------
 
-* EUID Wallet (iOS/Android) Application
-* EUDI Wallet Provider
-* eIDAS Node -- State Authority
-* Personal Identification Data (PID) Provider -- Diia State Enterprise
-* Qualified Electronica Attestation (QEAA) Provider -- Government agencies and registries
-* Non-Qualified Electronica Attestation (EAA) Provider -- Commertical affiliated companies
+* eIDAS Node -- State Certificate Authority
+* EUID Wallet -- iOS/Android Application
+* EUDI Provider -- OpenID for Verifiable Credentials (OpenID4VC)
+  Personal Identification Data Provider (PP) -- Diia State Enterprise (PID) mDOC
+  Attestation Providers (AT) -- Qualified and Non-Qualified Electronic Attestation (QEAA) of Attributes Schema Providers
+* Qualifiied Electronic Signature Provider (QP) -- Qualified Certificates (QC)
+* EUDI Verifier -- Verifiable Presentations
 
 ISO/IEC 18013-5-compliant EUDI Wallets:
 
