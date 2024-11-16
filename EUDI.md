@@ -1,7 +1,7 @@
 EU Digital Identity
 ===================
 
-CA Server supports EUDI architecture.
+SYNRC CA server supports decentralized EUDI issuing architecture.
 
 EUDI Architecture
 -----------------
@@ -14,29 +14,13 @@ EUDI Architecture
 * Qualifiied Electronic Signature Provider (QP) -- Qualified Certificates (QC)
 * EUDI Verifier -- Verifiable Presentations
 
-ISO/IEC 18013-5-compliant EUDI Wallets:
+EUDI model has a similarity with PKIX.
+The same way person use a signed attribute set (a X.509 certificate from CSR attributes)
+for authentication and authorization in PKI, the OpenID4VC provider (PIP) envelops
+set of attributes (digital presentation of claims) and
+issue and Electronic Documents in mDOC format for EUDI Wallet.
 
-```asn1
-id-eudi OBJECT IDENTIFIER ::= {european-commission 2}
-id-eudi-iso OBJECT IDENTIFIER ::= {id-eudi 0}
-id-eudi-iso-pid OBJECT IDENTIFIER ::= {id-eudi-iso 0}
-id-eudi-iso-pid-kp OBJECT IDENTIFIER ::= {id- eudi-iso-pid 1}
-id-eudi-iso-pid-kp-DS OBJECT IDENTIFIER ::= {id-eudi-iso-pid-kp 2}
-id-eudi-iso-pid-kp-ReaderAuth OBJECT IDENTIFIER ::= {id-eudi-iso-pid-kp 6}
-id-eudi-iso-pid-kp-IACALink OBJECT IDENTIFIER ::= {id-eudi-iso-pid-kp 4}
-id-eudi-iso-pid-kp-IACA OBJECT IDENTIFIER ::= {id-eudi-iso-pid-kp 7}
-```
-
-Conformance
------------
-
-6 Use Cases of EUDI https://www.digital-identity-wallet.eu/
-
-1. PID issuance
-2. PID attribution
-3. (Q)EAA issuance
-4. mDL attribution
-5. HIID attribution
-6. IBAN attribution
-7. eSIM attribution
-   
+However, unlike PKIX with its centralized model,
+EUDI provide distributed model without single root CA,
+where all parties bounded cryptographycally. Also, EUDI has more subtle
+and rigorous control over attributes (claims) like in ABAC model.
