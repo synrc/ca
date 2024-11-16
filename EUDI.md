@@ -8,6 +8,7 @@ EUDI Architecture
 
 * EUID Wallet (iOS/Android) Application
 * EUDI Wallet Provider
+* eIDAS Node -- State Authority
 * Personal Identification Data (PID) Provider -- Diia State Enterprise
 * Qualified Electronica Attestation (QEAA) Provider -- Government agencies and registries
 * Non-Qualified Electronica Attestation (EAA) Provider -- Commertical affiliated companies
