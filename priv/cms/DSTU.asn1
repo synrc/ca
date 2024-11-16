@@ -11,7 +11,7 @@ Certificate ::= SEQUENCE {
 Certificates ::= SEQUENCE OF Certificate
 
 TBSCertificate ::= SEQUENCE {
- version [0] Version,
+ version [0] Version DEFAULT v3,
  serialNumber CertificateSerialNumber,
  signature AlgorithmIdentifier,
  issuer Name,
@@ -23,7 +23,7 @@ TBSCertificate ::= SEQUENCE {
  extensions [3] EXPLICIT Extensions }
 
 UniqueIdentifier  ::=  BIT STRING
-Version ::= INTEGER {v3 (2)}
+Version ::= INTEGER { v1(0), v2(1), v3(2) }
 CertificateSerialNumber ::= INTEGER
 Name ::= CHOICE { rdnSequence RDNSequence }
 RDNSequence::= SEQUENCE OF RelativeDistinguishedName
@@ -40,7 +40,7 @@ Extension ::= SEQUENCE {
  extnvalue OCTET STRING }
 
 AttributeType ::= OBJECT IDENTIFIER
-AttributeValue ::= ANY -- DEFINED BY AttributeType
+AttributeValue ::= ANY --DEFINED BY AttributeType
 DirectoryString ::= CHOICE {
  printableString PrintableString,
  utf8String UTF8String,
@@ -59,6 +59,13 @@ Time ::= CHOICE {
 SubjectPublicKeyInfo ::= SEQUENCE {
  algorithm AlgorithmIdentifier,
  subjectPublicKey BIT STRING }
+
+AlgorithmIdentifier ::= SEQUENCE {
+ algorithm OBJECT IDENTIFIER,
+ parameters ANY }
+-- DEFINED BY algorithm OPTIONAL
+
+OctetString ::= OCTET STRING
 
 DSTU4145Params::= SEQUENCE {
  definition CHOICE { ecbinary ECBinary, namedCurve OBJECT IDENTIFIER },

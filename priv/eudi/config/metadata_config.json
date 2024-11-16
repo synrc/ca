@@ -1,0 +1,11 @@
+{
+  "credential_issuer": "http://127.0.0.1:5000",
+  "credential_endpoint": "http://127.0.0.1:5000/credential",
+  "batch_credential_endpoint": "http://127.0.0.1:5000/batch_credential",
+  "notification_endpoint": "http://127.0.0.1:5000/notification",
+  "deferred_credential_endpoint": "http://127.0.0.1:5000/deferred_credential",
+  "credential_configurations_supported": {
+    
+
+  }
+}
