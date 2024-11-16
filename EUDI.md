@@ -25,7 +25,7 @@ The Verifier does not directly contact the Issuer during typical operations unle
 The Holder acts as the intermediary, ensuring their privacy and control over the data being shared.
 
 EUDI Wallet acts as Holder, QEAA, EAA, PIP (TSPs) act as EUDI Providers or Issuers. EUDI Verifier perform
-status verification of credentials and acts as Verifier.
+status verification of credentials and acts as presentations Verifier.
 
 ### PKIX vs OpenID4VC
 
