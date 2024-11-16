@@ -27,6 +27,8 @@ id-eudi-iso-pid-kp-ReaderAuth OBJECT IDENTIFIER ::= {id-eudi-iso-pid-kp 6}
 Conformance
 -----------
 
+6 Use Cases of EUDI https://www.digital-identity-wallet.eu/
+
 1. PID issuance
 2. PID attribution
 3. (Q)EAA issuance
