@@ -22,6 +22,8 @@ id-eudi-iso-pid OBJECT IDENTIFIER ::= {id-eudi-iso 0}
 id-eudi-iso-pid-kp OBJECT IDENTIFIER ::= {id- eudi-iso-pid 1}
 id-eudi-iso-pid-kp-DS OBJECT IDENTIFIER ::= {id-eudi-iso-pid-kp2}
 id-eudi-iso-pid-kp-ReaderAuth OBJECT IDENTIFIER ::= {id-eudi-iso-pid-kp 6}
+id-eudi-iso-pid-kp-IACALink OBJECT IDENTIFIER ::= {id-eudi-iso-pid-kp 4}
+id-eudi-iso-pid-kp-IACA OBJECT IDENTIFIER ::= {id-eudi-iso-pid-kp 7}
 ```
 
 Conformance
