@@ -1,6 +1,9 @@
 import Config
 
 config :ca,
+  issuer:   8107,
+  wallet:   8108,
+  verifier: 8109,
   est:  8047,
   cmp:  8829,
   cmc:  5318,

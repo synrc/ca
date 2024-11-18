@@ -12,8 +12,10 @@ defmodule CA do
          { CA.CMC,  port: port(:cmc) },
          { CA.OCSP, port: port(:ocsp) },
          { CA.TSP,  port: port(:tsp) },
-         { CA.EST,  port: port(:est), plug: CA.EST, scheme: :http,
-                    thousand_island_options: [num_acceptors: 1] }
+         { CA.EUDI.Issuer, port: port(:issuer), plug: CA.EUDI.Issuer, scheme: :http, thousand_island_options: [num_acceptors: 1] },
+         { CA.EUDI.Verifier, port: port(:verifier), plug: CA.EUDI.Verifier, scheme: :http, thousand_island_options: [num_acceptors: 1] },
+         { CA.EUDI.Wallet, port: port(:wallet), plug: CA.EUDI.Wallet, scheme: :http, thousand_island_options: [num_acceptors: 1] },
+         { CA.EST,  port: port(:est), plug: CA.EST, scheme: :http, thousand_island_options: [num_acceptors: 1] }
       ], strategy: :one_for_one, name: CA.Supervisor)
   end
 
