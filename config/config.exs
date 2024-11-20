@@ -1,6 +1,10 @@
 import Config
 
 config :ca,
+  enabled: [:issuer, :wallet, :verifier, :est, :cmp, :cmc, :ocsp, :tsp],
+  issuer:   8107,
+  wallet:   8108,
+  verifier: 8109,
   est:  8047,
   cmp:  8829,
   cmc:  5318,

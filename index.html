@@ -112,8 +112,59 @@
 * <a href="https://tonpa.guru/stream/2023/2023-08-13 SWIFT X.509.htm">2023-08-13 SWIFT X.509</a><br>
 * <a href="https://tonpa.guru/stream/2023/2023-09-01 ASN1.EX X.680.htm">2023-09-01 ASN1.EX X.680</a><br>
 * <a href="https://tonpa.guru/stream/2024/2024-10-29 EST.htm">2024-10-29 EST</a><br>
+* <a href="https://tonpa.guru/stream/2024/2024-11-17 EUDI.htm">2024-11-17 EUDI</a><br>
 
 </p>
+    </section>
+    <section>
+   <h3>ARCHITECTURE</h3>
+
+<p>EUDI is decetralized PKIX with ABAC level control over attributes that is using JSON as encoding and HTTP as transport.</p>
+
+<p>
+<ul>
+<li>● eIDAS Node &mdash; State Certificate Authority</li>
+<li>● EUDI Verifier &mdash; Verifiable Presentations</li>
+<li>● EUID Wallet (Holder) &mdash; iOS/Android Application </li>
+<li>● EUDI Provider (Issuer) &mdash; OpenID for Verifiable Credentials</li>
+<li>● Personal Identification Data (PID) Provider &mdash; Diia State Enterprise</li>
+<li>● Qualified and Non-Qualified Electronic Attestation of Attributes (QEAA)</li>
+<li>● Qualifiied Electronic Signature Provider (QP) &mdash; Qualified Certificates (QC)</li>
+</ul>
+</p>
+
+<h4>HOLDER, ISSUER, VERIFIER</h4>
+
+<p>In an OpenID4VC ecosystem, the Verifier and the Issuer are connected indirectly
+through the credential lifecycle, with interactions primarily mediated by the Holder. 
+This architecture ensures trust without requiring a direct, continuous relationship
+between the Verifier and the Issuer, adhering to privacy and decentralization principles.
+The Verifier does not directly contact the Issuer during typical operations unless a status check is required.
+The Holder acts as the intermediary, ensuring their privacy and control over the data being shared.</p>
+
+<p>EUDI Wallet acts as Holder, QEAA, EAA, PIP (TSPs) act as EUDI Providers or Issuers. EUDI Verifier perform
+status verification of credentials and acts as presentations Verifier.</P>
+
+<h4>PKIX vs OpenID4VC</h4>
+
+<p>EUDI model has a similarity with PKIX.
+The same way person use a signed attribute set (a X.509 certificate from CSR attributes)
+for authentication and authorization in PKI, the OpenID4VC provider (PIP) envelops
+set of attributes (digital presentation of claims) and
+issue and Electronic Documents in mDOC format for EUDI Wallet.</p>
+
+<p>However, unlike PKIX with its centralized model,
+EUDI provide distributed model without single root CA,
+where all parties bounded cryptographycally. Also, EUDI has more subtle
+and rigorous control over attributes (claims) like in ABAC model.</p>
+
+<p>CRLs and OCSP can create privacy concerns since they involve
+querying a CA, potentially exposing the user's activity.
+OpenID4VC mitigates this by enabling the Holder to mediate
+the process, and some implementations avoid real-time statu
+checks entirely by including cryptographic proofs within the
+credential itself.</p>
+
    <br>
    <br><center>&dot;</center>
     </section>
