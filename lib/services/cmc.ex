@@ -2,7 +2,7 @@ defmodule CA.CMC do
   @moduledoc "CA/CMC TLS TCP server."
   require CA
 
-  # Authority PKI X.509 CMC over TCP RFC 5272 5273 5274 5275 6402
+  # Authority PKI X.509 CMC over TCP RFC 5272-5275 6402
 
   # [1] https://www.rfc-editor.org/rfc/rfc6402
   # [2] https://www.rfc-editor.org/rfc/rfc5272

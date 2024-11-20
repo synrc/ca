@@ -14,6 +14,7 @@ defmodule CA.Mixfile do
         links: %{"GitHub" => "https://github.com/synrc/ca"}
       ],
       deps: [
+        {:cose, "~> 0.11.20"},
         {:jason, "~> 1.2"},
         {:plug, "~> 1.15.3"},
         {:bandit, "~> 1.0"},
