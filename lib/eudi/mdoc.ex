@@ -10,6 +10,7 @@ defmodule CA.MDoc do
 
   def replace(s,a,b) do :re.replace(s,a,b,[:global,{:return,:binary}]) end
   def parseMDocB64(x) do {:ok, b64} = :file.read_file x ; decode(:base64.decode(b64)) end
+  def parseMDocB64UJWT(x) do {:ok, b64} = :file.read_file x ; String.split(replace(replace(b64,"_","/"),"-","+"),".") end
   def parseMDocB64U(x) do {:ok, b64} = :file.read_file x ; decode(:base64.decode(replace(replace(b64,"_","/"),"-","+"))) end
   def parseMDocHex(x) do {:ok, hex} = :file.read_file x ; decode(:oid.unhex(hex)) end
 
@@ -18,8 +19,10 @@ defmodule CA.MDoc do
       {:ok, bin} = :file.read_file x
       case :filename.extension(x) do
          ".b64" -> [bin: byte_size(:erlang.term_to_binary(:base64.decode(bin))), name: x]
+         ".b64s" -> [bin: :erlang."div"(byte_size(:erlang.term_to_binary(bin)),2), name: x]
          ".b64u" -> [bin: byte_size(:erlang.term_to_binary(:base64.decode(replace(replace(bin,"_","/"),"-","+")))), name: x]
          ".hex" -> [bin: byte_size(:erlang.term_to_binary(:oid.unhex(bin))), name: x]
+         ".jwt" -> [bin: :erlang."div"(byte_size(:erlang.term_to_binary(bin)),2), name: x]
          ".hexbin" -> [bin: byte_size(:erlang.term_to_binary(:oid.unhex(bin))), name: x]
       end
   end
@@ -155,6 +158,12 @@ defmodule CA.MDoc do
       {:ok, bin} = :file.read_file x
       case :filename.extension(x) do
          ".b64"  -> {:ok, mDoc, _} = parseMDocB64(x)  ; parseMDoc(mDoc)
+         ".jwt" -> [x5c,response,sig] = parseMDocB64UJWT(x)
+                    [
+                      header: :erlang.element(2,Jason.decode(:base64.decode(x5c))),
+                      payload: :erlang.element(2,Jason.decode(:base64.decode(response))),
+                      signature: sig
+                    ]
          ".b64u" -> {:ok, mDoc, _} = parseMDocB64U(x) ; parseMDoc(mDoc)
          ".hex"  -> {:ok, mDoc, _} = parseMDocHex(x)  ; parseMDoc(mDoc)
          ".hexbin"  -> {:ok, mDoc, _} = CBOR.decode(:oid.unhex(bin))  ; mDoc
