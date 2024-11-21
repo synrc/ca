@@ -61,6 +61,9 @@ $ openssl cmp -cmd p10cr -server "ca.synrc.com":8829 -secret pass:0000 -ref cmpt
 * <a href="https://tonpa.guru/stream/2023/2023-08-07 CHAT ASN.1.htm">2023-08-07 CHAT ASN.1</a><br>
 * <a href="https://tonpa.guru/stream/2023/2023-08-08 ASN.1 Компілятор.htm">2023-08-08 ASN.1 Компілятор</a><br>
 * <a href="https://tonpa.guru/stream/2024/2024-10-29 EST.htm">2024-10-29 EST сервер 7030</a><br>
+* <a href="https://tonpa.guru/stream/2024/2024-11-17 EUDI.htm">2024-11-17 EUDI</a><br>
+* <a href="https://tonpa.guru/stream/2024/2024-11-20 CBOR COSE.htm">2024-11-20 CBOR COSE</a><br>
+* <a href="https://tonpa.guru/stream/2024/2024-11-21 MSO MDoc.htm">2024-11-21 MSO MDoc</a><br>
 
 ## Credits
 
