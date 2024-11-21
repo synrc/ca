@@ -154,6 +154,7 @@ defmodule CA.MDoc do
          ".b64"  -> {:ok, mDoc, _} = parseMDocB64(x)  ; parseMDoc(mDoc)
          ".b64u" -> {:ok, mDoc, _} = parseMDocB64U(x) ; parseMDoc(mDoc)
          ".hex"  -> {:ok, mDoc, _} = parseMDocHex(x)  ; parseMDoc(mDoc)
+         ".hexbin"  -> {:ok, mDoc, _} = CBOR.decode(:oid.unhex(bin))  ; mDoc
       end
   end
 
