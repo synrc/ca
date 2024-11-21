@@ -88,7 +88,6 @@ defmodule CA.MDoc do
   end
 
   def parseTag(%CBOR.Tag{tag: :simple, value: bytes}) when is_binary(bytes) do
-      {:ok, cbor, _} = decode(bytes)
       [tag: :simple, value: :base64.encode(bytes)]
   end
 
