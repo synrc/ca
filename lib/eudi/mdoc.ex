@@ -2,6 +2,8 @@ defmodule CA.MDoc do
   require CBOR
   @moduledoc "CA/MDOC MSO mDOC library."
 
+# https://mobiledl-e5018.web.app/ISO_18013-5_E_draft.pdf
+
   def decode(nil) do nil end
   def decode(bin) do CBOR.decode(bin) end
 
@@ -17,6 +19,7 @@ defmodule CA.MDoc do
          ".b64" -> [bin: byte_size(:erlang.term_to_binary(:base64.decode(bin))), name: x]
          ".b64u" -> [bin: byte_size(:erlang.term_to_binary(:base64.decode(replace(replace(bin,"_","/"),"-","+")))), name: x]
          ".hex" -> [bin: byte_size(:erlang.term_to_binary(:oid.unhex(bin))), name: x]
+         ".hexbin" -> [bin: byte_size(:erlang.term_to_binary(:oid.unhex(bin))), name: x]
       end
   end
 
