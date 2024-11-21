@@ -40,13 +40,14 @@ defmodule CA.MDoc do
       version = :maps.get("version", map, [])
       validityInfo = :maps.get("validityInfo", map, [])
       valueDigests = :maps.get("valueDigests", map, [])
+      [{_,nameSpacesList}] = :maps.to_list(valueDigests)
       [
         docType: docType,
         digestAlgorithm: da,
         deviceKeyInfo: dki,
         validityInfo: validityInfo,
         status: status,
-        valueDigests: valueDigests,
+        valueDigests: :lists.map(fn x -> parseTag(x) end, nameSpacesList),
         version: version,
       ]
   end
@@ -56,13 +57,17 @@ defmodule CA.MDoc do
   end
 
   def parseTag(%{33 => %CBOR.Tag{tag: type, value: value}}) when is_binary(value) do
-      {:ok, cbor, _} = decode(value)
       [tag: {33,type}, value: :base64.encode(value)]
   end
 
+  def parseTag(%{33 => tags}) when is_list(tags) do
+      :lists.map(fn %CBOR.Tag{tag: type, value: value} ->
+        [tag: {33,type}, value: :base64.encode(value)]
+      end, tags)
+  end
+
   def parseTag(%{33 => %CBOR.Tag{tag: type, value: value}}) do
-      {:ok, cbor, _} = decode(value)
-      [tag: {33,type}, value: cbor]
+      [tag: {33,type}, value: :base64.encode(value)]
   end
 
   def parseTag(%CBOR.Tag{tag: :bytes, value: bytes}) when is_binary(bytes) do
@@ -71,11 +76,12 @@ defmodule CA.MDoc do
              {:ok, cbor, _} -> [tag: :bytes, decoded: true, value: parseTag(cbor)]
         end
       rescue _ ->
-         [tag: :bytes, value: :base64.encode(bytes)]
+         [tag: :bytes, value: :base64.encode(bytes), raw: true]
       end
   end
 
   def parseTag(%CBOR.Tag{tag: :simple, value: bytes}) when is_binary(bytes) do
+      {:ok, cbor, _} = decode(bytes)
       [tag: :simple, value: :base64.encode(bytes)]
   end
 
@@ -101,14 +107,29 @@ defmodule CA.MDoc do
 
   def parseTag(value) do value end
 
-  def parseMDoc(%{"issuerAuth"=> [f,s|issuerAuth], "nameSpaces"=> nameSpaces}) do
-      [{name,nameSpacesList}] = :maps.to_list(nameSpaces)
+  def parseMDoc(%{"deviceAuth"=> %{"deviceSignature" => tags}, "nameSpaces"=> ns}) do
       [
-        ns: name,
+        deviceAuth: [deviceSignature: :lists.map(fn x -> parseTag(x) end, tags)],
+        nameSpaces: :lists.map(fn x -> parseTag(x) end, :lists.flatten([ns])),
+      ]
+  end
+
+  def parseMDoc(%{"issuerAuth"=> [f,s|issuerAuth], "nameSpaces"=> nameSpaces}) do
+      [{name,ns}] = :maps.to_list(nameSpaces)
+      [
         header: parseTag(f),
-        certificate: parseTag(s),
+        certificates: parseTag(s),
         issuerAuth: :lists.map(fn x -> parseTag(x) end, issuerAuth),
-        nameSpaces: :lists.map(fn x -> parseTag(x) end, nameSpacesList),
+        nameSpaces: :lists.map(fn x -> parseTag(x) end, :lists.flatten([ns])),
+        docType: name,
+      ]
+  end
+
+  def parseMDoc(%{"issuerSigned"=> issuerSigned, "deviceSigned"=> deviceSigned, "docType" => docType}) do
+      [
+        issuerSigned: parseMDoc(issuerSigned),
+        deviceSigned: parseMDoc(deviceSigned),
+        docType: docType
       ]
   end
 
