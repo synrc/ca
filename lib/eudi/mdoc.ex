@@ -2,7 +2,8 @@ defmodule CA.MDoc do
   require CBOR
   @moduledoc "CA/MDOC MSO mDOC library."
 
-# https://mobiledl-e5018.web.app/ISO_18013-5_E_draft.pdf
+# [1]. https://mobiledl-e5018.web.app/ISO_18013-5_E_draft.pdf
+# [2]. https://learn.mattr.global/docs/mdocs
 
   def decode(nil) do nil end
   def decode(bin) do CBOR.decode(bin) end
