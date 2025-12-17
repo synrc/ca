@@ -157,11 +157,9 @@ defmodule CA.CMP do
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.encodeAttrs(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
-      reply = case Keyword.get(CA.RDN.rdn(subject), :cn) do
-        nil -> storeReply(csr,cert,ref(),profile)
-        cn -> case :filelib.is_regular("#{CA.CSR.dir(profile)}/#{cn}.csr") do
-                   false -> storeReply(csr,cert,cn,profile)
-                   true -> [] end end
+       reply = case Keyword.get(CA.RDN.rdn(subject), :cn) do
+         nil -> storeReply(csr,cert,ref(),profile)
+         cn -> storeReply(csr,cert,cn,profile) end
 
       pkibody = {:cp, CA.CMP.Scheme."CertRepMessage"(response: reply)}
       pkiheader = CA.CMP.Scheme."PKIHeader"(sender: to, recipient: from,
