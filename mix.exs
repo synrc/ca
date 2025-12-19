@@ -1,6 +1,6 @@
 defmodule CA.Mixfile do
   use Mix.Project
-  def application(), do: [ mod: {CA, []}, extra_applications: [:syntax_tools, :bandit, :plug, :logger]]
+  def application(), do: [ mod: {CA, []}, extra_applications: [:x509, :bandit, :plug, :logger]]
   def project() do
     [
       app: :ca,
@@ -19,7 +19,8 @@ defmodule CA.Mixfile do
         {:jason, "~> 1.2"},
         {:plug, "~> 1.15.3"},
         {:bandit, "~> 1.0"},
-        {:ex_doc, ">= 0.0.0", only: :dev}
+        {:ex_doc, ">= 0.0.0", only: :dev},
+        {:x509, "~> 0.9.0"}
       ]
     ]
   end
