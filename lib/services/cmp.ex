@@ -81,9 +81,8 @@ defmodule CA.CMP do
       case CA.ALG.lookup(oid) do
            {:'id-PasswordBasedMac', _ } ->
                 incomingProtection = CA.CMP.Scheme."ProtectedPart"(header: header, body: body)
-                bin = ""
-                :logger.info "protection: ~p", [incomingProtection]
-#                {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
+                {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
+                :logger.info "protection: ~tp", [incomingProtection]
                 {owf,_} = CA.ALG.lookup(owfoid) # SHA-2
                 pbm = :application.get_env(:ca, :pbm, "0000") # DH shared secret
                 verifyKey  = baseKey(pbm, salt, counter, owf)
@@ -99,7 +98,6 @@ defmodule CA.CMP do
 
   def answer(socket, header, body, code) do
       message = CA.CMP.Scheme."PKIMessage"(header: header, body: body, protection: code)
-      :logger.info "try encode PKIMessahe: ~p", [message]
       {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
       res =  "HTTP/1.0 200 OK\r\n"
           <> "Server: SYNRC CA/CMP\r\n"
@@ -112,16 +110,14 @@ defmodule CA.CMP do
       {:ok, _} = :"PKCS-10".encode(:CertificationRequest, csr)
 
       :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.csr",
-#          X509.CSR.to_pem(CA.RDN.encodeAttrsCSR(csr)))
-          X509.CSR.to_pem(csr))
+          X509.CSR.to_pem(CA.RDN.encodeAttrsCSR(csr)))
 
       :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer",
           X509.Certificate.to_pem(cert))
 
       [ CA.CMP.Scheme."CertResponse"(certReqId: 0,
           certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert:
-#             {:certificate, {:x509v3PKCert, CA.RDN.decodeAttrsCert(cert)}}),
-             {:certificate, {:x509v3PKCert, cert}}),
+             {:certificate, {:x509v3PKCert, CA.RDN.decodeAttrsCert(cert)}}),
                  status: CA.CMP.Scheme."PKIStatusInfo"(status: 0))
       ]
   end
@@ -139,37 +135,15 @@ defmodule CA.CMP do
   def message(socket, header, {:p10cr, csr} = body, code) do
       {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID,
          transactionID, senderNonce, _recipNonce, _freeText, _generalInfo} = header
-#      true = code == validateProtection(header, body, code)
+      true = code == validateProtection(header, body, code)
 
       profile = CA.RDN.profile(csr)
       {ca_key, ca} = CA.CSR.read_ca(profile)
-
-subject = {:rdnSequence,
- [
-#   [{:SingleAttribute, {2, 5, 4, 6}, :asn1rt_nif.encode_ber_tlv({19, "6"})}],
-#   [{:SingleAttribute, {2, 5, 4, 8}, :asn1rt_nif.encode_ber_tlv({19, "8"})}],
-#   [{:SingleAttribute, {2, 5, 4, 10}, :asn1rt_nif.encode_ber_tlv({19, "10"})}],
-#   [{:SingleAttribute, {2, 5, 4, 3}, {:printableString,"1234"}}]
- ]}
-
-#      subject = X509.CSR.subject(csr)
-
+      subject = X509.CSR.subject(csr)
       :logger.info 'TCP P10CR from ~tp~n', [CA.RDN.rdn(subject)]
-      true = X509.CSR.valid?(csr)
-
-      public_key = X509.CSR.public_key(csr)
-      {{:ECPoint,bin}, {:namedCurve, _oid}} = public_key
- 
-      :logger.info 'X509 Key ~tp~n', [public_key]
-      :logger.info 'X509 Subj ~tp~n', [subject]
-      :logger.info 'X509 CA ~tp~n', [ca]
-      :logger.info 'X509 CA Key ~tp~n', [ca_key]
-      :logger.info 'X509 Extensions ~tp~n', [[subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ]]
-
-      cert = X509.Certificate.new(public_key, subject, ca, ca_key,
+      true = X509.CSR.valid?(CA.RDN.encodeAttrsCSR(csr))
+      cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.encodeAttrs(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
-
-      :logger.info 'X509 Client Certificate Generated ~tp~n', [cert]
 
       reply = case Keyword.get(CA.RDN.rdn(subject), :cn) do
         nil -> storeReply(csr,cert,ref(),profile)

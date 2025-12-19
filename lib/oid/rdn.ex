@@ -10,19 +10,14 @@ defmodule CA.RDN do
 
   def decodeAttrs({:rdnSequence, attrs}) do
       {:rdnSequence, :lists.map(fn
-           [{t,oid,x}] when is_list(x)   -> [{t,oid,:erlang.list_to_binary(x)}]
            [{t,oid,x}] when is_binary(x) -> decodeString(t,oid,x)
                                        x -> x end, attrs)}
   end
 
   def decodeString(t,oid,x) do
-      :logger.info "decodeString ~p", [{t,oid,x}]
-      try do case :asn1rt_nif.decode_ber_tlv(x) do
+      case :asn1rt_nif.decode_ber_tlv(x) do
            {{12,a},_} -> [{t,oid,{:uTF8String,a}}]
-           {{19,a},_} -> [{t,oid,{:printableString,a}}]
-          end
-      catch _ ->
-        [{t,oid,x}]
+           {{19,a},_} -> [{t,oid,:erlang.binary_to_list(a)}]
       end
   end
 
@@ -49,16 +44,16 @@ defmodule CA.RDN do
   end
 
   def decodeAttrsCert(cert) do
-      {cCertificate,{tTBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,_pki},p3},b,c,ext},ai,code} =
+      {:Certificate,{:TBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,_pki},p3},b,c,ext},ai,code} =
          :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
-      {cCertificate,{tTBSCertificate,:v3,a,ai,decodeAttrs(rdn1),v,decodeAttrs(rdn2),
+      {:Certificate,{:TBSCertificate,:v3,a,ai,decodeAttrs(rdn1),v,decodeAttrs(rdn2),
            {p1,{p21,p22,{:namedCurve,{1,3,132,0,34}}},p3},b,c,ext},ai,code}
   end
 
   def encodeAttrsCert(cert) do
-      {cCertificate,{tTBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,pki},p3},b,c,ext},ai,code} =
+      {:Certificate,{:TBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,pki},p3},b,c,ext},ai,code} =
          :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
-      {cCertificate,{tTBSCertificate,:v3,a,ai,encodeAttrs(rdn1),v,encodeAttrs(rdn2),
+      {:Certificate,{:TBSCertificate,:v3,a,ai,encodeAttrs(rdn1),v,encodeAttrs(rdn2),
            {p1,{p21,p22,pki},p3},b,c,ext},ai,code}
   end
 
