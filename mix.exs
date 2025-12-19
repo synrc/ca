@@ -20,7 +20,7 @@ defmodule CA.Mixfile do
         {:plug, "~> 1.15.3"},
         {:bandit, "~> 1.0"},
         {:ex_doc, ">= 0.0.0", only: :dev},
-        {:x509, "~> 0.8.7"}
+        {:x509, "~> 0.9.0"}
       ]
     ]
   end
