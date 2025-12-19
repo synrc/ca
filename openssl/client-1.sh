@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export CLIENT=maxim39
+export CLIENT=maxim
 openssl req -passout pass:0 \
             -new -newkey ec:<(openssl ecparam -name secp384r1) \
             -keyout ecc/$CLIENT.key.enc -out ecc/$CLIENT.csr \
