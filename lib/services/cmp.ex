@@ -29,6 +29,7 @@ defmodule CA.CMP do
 
   def accept(socket) do
       {:ok, fd} = :gen_tcp.accept(socket)
+      :logger.debug 'CMP accepted socket ~p', [fd]
       :erlang.spawn(fn ->
             # Read CA here
             ca = []
@@ -39,7 +40,9 @@ defmodule CA.CMP do
 
   def loop(socket,ca) do
       case :gen_tcp.recv(socket, 0) do
-           {:error, _} -> :exit
+           {:error, reason} ->
+               :logger.warning 'CMP socket recv error: ~p', [reason]
+               :exit
            {:ok, stage1} ->
                try do
                  [_headers|body] = :string.split stage1, "\r\n\r\n", :all
@@ -47,18 +50,23 @@ defmodule CA.CMP do
                     [""] -> case :gen_tcp.recv(socket, 0) do
                                  {:error, _} -> :exit
                                  {:ok, stage2} -> handleMessage(socket,stage2) end
-                       _ -> handleMessage(socket,body)
+                       _ ->
+                          :logger.debug 'CMP received staged body of size ~p', [:erlang.iolist_size(body)]
+                          handleMessage(socket,body)
                  end
                  __MODULE__.loop(socket,ca)
-               catch _ ->
+               catch kind, error ->
+                 :logger.error 'CMP recv parse failure ~p:~p', [kind,error]
                  __MODULE__.loop(socket,ca)
                end
       end
   end
 
   def handleMessage(socket,body) do
+      :logger.debug 'CMP handling message of ~p bytes', [:erlang.iolist_size(body)]
       {:ok,dec} = :'PKIXCMP-2009'.decode(:'PKIMessage', body)
       {:PKIMessage, header, body, code, _extra} = dec
+      :logger.debug 'CMP decoded header ~p body tag ~p', [header |> elem(0), body |> elem(0)]
       __MODULE__.message(socket, header, body, code)
   end
 
@@ -98,10 +106,12 @@ defmodule CA.CMP do
   def answer(socket, header, body, code) do
       message = CA.CMP.Scheme."PKIMessage"(header: header, body: body, protection: code)
       {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
+      bin = :erlang.iolist_to_binary(bytes)
       res =  "HTTP/1.0 200 OK\r\n"
           <> "Server: SYNRC CA/CMP\r\n"
+          <> "Content-Length: #{byte_size(bin)}\r\n"
           <> "Content-Type: application/pkixcmp\r\n\r\n"
-          <> :erlang.iolist_to_binary(bytes)
+          <> bin
       :gen_tcp.send(socket, res)
   end
 
@@ -133,22 +143,23 @@ defmodule CA.CMP do
 
   def message(socket, header, {:p10cr, csr} = body, code) do
       {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID,
-         transactionID, senderNonce, _recipNonce, _freeText, _generalInfo} = header
+         transactionID, senderNonce, recipNonce, _freeText, generalInfo} = header
       true = code == validateProtection(header, body, code)
 
       profile = CA.RDN.profile(csr)
       {ca_key, ca} = CA.CSR.read_ca(profile)
       subject = X509.CSR.subject(csr)
       :logger.info 'TCP P10CR from ~tp~n', [CA.RDN.rdn(subject)]
+      :logger.debug 'P10CR header pvno:~p txID:~p senderNonce:~p recipNonce:~p info:~p', [
+          pvno, transactionID, senderNonce, recipNonce, generalInfo]
+      :logger.debug 'P10CR protection alg: ~p', [protectionAlg]
       true = X509.CSR.valid?(CA.RDN.encodeAttrsCSR(csr))
       cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.encodeAttrs(subject), ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
 
-      reply = case Keyword.get(CA.RDN.rdn(subject), :cn) do
-        nil -> storeReply(csr,cert,ref(),profile)
-        cn -> case :filelib.is_regular("#{CA.CSR.dir(profile)}/#{cn}.csr") do
-                   false -> storeReply(csr,cert,cn,profile)
-                   true -> [] end end
+       reply = case Keyword.get(CA.RDN.rdn(subject), :cn) do
+         nil -> storeReply(csr,cert,ref(),profile)
+         cn -> storeReply(csr,cert,cn,profile) end
 
       pkibody = {:cp, CA.CMP.Scheme."CertRepMessage"(response: reply)}
       pkiheader = CA.CMP.Scheme."PKIHeader"(sender: to, recipient: from,
@@ -156,6 +167,7 @@ defmodule CA.CMP do
           transactionID: transactionID, protectionAlg: protectionAlg,
           messageTime: messageTime)
 
+      :logger.debug 'CMP sending cp response for txID ~p profile ~p cn ~p', [transactionID, profile, Keyword.get(CA.RDN.rdn(subject), :cn)]
       :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
   end
 
@@ -168,6 +180,7 @@ defmodule CA.CMP do
 
       pkibody = {:pkiconf, :asn1_NOVALUE}
       pkiheader = CA.CMP.Scheme."PKIHeader"(header, sender: to, recipient: from, recipNonce: senderNonce)
+      :logger.debug 'CMP sending pkiconf response for ~p statuses', [length(statuses)]
       :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
   end
 
