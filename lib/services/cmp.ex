@@ -82,15 +82,17 @@ defmodule CA.CMP do
            {:'id-PasswordBasedMac', _ } ->
                 incomingProtection = CA.CMP.Scheme."ProtectedPart"(header: header, body: body)
                 {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
-                :logger.info "protection: ~tp", [incomingProtection]
                 {owf,_} = CA.ALG.lookup(owfoid) # SHA-2
                 pbm = :application.get_env(:ca, :pbm, "0000") # DH shared secret
                 verifyKey  = baseKey(pbm, salt, counter, owf)
+                :logger.info 'TCP counter ~p~n', [counter]
                 hash = CA.KDF.hs(:erlang.size(code))
-                case CA.ALG.lookup(macoid) do
+                res = case CA.ALG.lookup(macoid) do
                      {:'hMAC-SHA1',_} -> :crypto.mac(:hmac, hash, verifyKey, bin)
                      _ -> :crypto.mac(:hmac, hash, verifyKey, bin)
                 end
+                :logger.info 'TCP validateProtection ~p~n', [res]
+                res
            {_, _ } ->
                 ""
       end
@@ -99,6 +101,7 @@ defmodule CA.CMP do
   def answer(socket, header, body, code) do
       message = CA.CMP.Scheme."PKIMessage"(header: header, body: body, protection: code)
       {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
+      :logger.info 'TCP answer ~p~n', [message]
       res =  "HTTP/1.0 200 OK\r\n"
           <> "Server: SYNRC CA/CMP\r\n"
           <> "Content-Type: application/pkixcmp\r\n\r\n"
@@ -108,16 +111,12 @@ defmodule CA.CMP do
 
   def storeReply(csr, cert, cn, profile) do
       {:ok, _} = :"PKCS-10".encode(:CertificationRequest, csr)
-
-      :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.csr",
-          X509.CSR.to_pem(CA.RDN.encodeAttrsCSR(csr)))
-
-      :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer",
-          X509.Certificate.to_pem(cert))
-
+      :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.csr", X509.CSR.to_pem(csr))
+      :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer", X509.Certificate.to_pem(cert))
+      cert = :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
       [ CA.CMP.Scheme."CertResponse"(certReqId: 0,
           certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert:
-             {:certificate, {:x509v3PKCert, CA.RDN.decodeAttrsCert(cert)}}),
+             {:certificate, {:x509v3PKCert, cert}}),
                  status: CA.CMP.Scheme."PKIStatusInfo"(status: 0))
       ]
   end
@@ -136,26 +135,33 @@ defmodule CA.CMP do
       {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID,
          transactionID, senderNonce, _recipNonce, _freeText, _generalInfo} = header
       true = code == validateProtection(header, body, code)
-
       profile = CA.RDN.profile(csr)
       {ca_key, ca} = CA.CSR.read_ca(profile)
-      subject = X509.CSR.subject(csr)
-      :logger.info 'TCP P10CR from ~tp~n', [CA.RDN.rdn(subject)]
-      true = X509.CSR.valid?(CA.RDN.encodeAttrsCSR(csr))
-      cert = X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.encodeAttrs(subject), ca, ca_key,
+      subject = CA.RDN.decodeAttrs(X509.CSR.subject(csr))
+      true = X509.CSR.valid?(csr)
+      public_key = X509.CSR.public_key(csr)
+      cert = X509.Certificate.new(public_key, subject, ca, ca_key,
          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ])
+
+#      :io.format 'X509 Subj ~tw~n', [subject]
+#      :io.format 'X509 Key ~tw~n', [public_key]
+#      :io.format 'X509 CA ~tw~n', [ca]
+#      :io.format 'X509 CA Key ~tw~n', [ca_key]
+#      :io.format 'X509 Extensions ~tw~n', [[subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"]) ]]
+#      :io.format 'X509 Client Certificate Generated ~tw~n', [cert]
 
       reply = case Keyword.get(CA.RDN.rdn(subject), :cn) do
         nil -> storeReply(csr,cert,ref(),profile)
         cn -> case :filelib.is_regular("#{CA.CSR.dir(profile)}/#{cn}.csr") do
                    false -> storeReply(csr,cert,cn,profile)
-                   true -> storeReply(csr,cert,cn,profile) end end
+                   true -> storeReply(csr,cert,cn,profile) end end # in prod return [] # no user
 
       pkibody = {:cp, CA.CMP.Scheme."CertRepMessage"(response: reply)}
       pkiheader = CA.CMP.Scheme."PKIHeader"(sender: to, recipient: from,
           pvno: pvno, recipNonce: senderNonce,
           transactionID: transactionID, protectionAlg: protectionAlg,
           messageTime: messageTime)
+      :logger.info 'TCP P10CR request ~p~n', [csr]
 
       :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
   end
