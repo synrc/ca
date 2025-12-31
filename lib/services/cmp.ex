@@ -102,10 +102,12 @@ defmodule CA.CMP do
       message = CA.CMP.Scheme."PKIMessage"(header: header, body: body, protection: code)
       {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
       :logger.info 'TCP answer ~p~n', [message]
+      bin = :erlang.iolist_to_binary(bytes)
       res =  "HTTP/1.0 200 OK\r\n"
           <> "Server: SYNRC CA/CMP\r\n"
+          <> "Content-Length: #{byte_size(bin)}\r\n"
           <> "Content-Type: application/pkixcmp\r\n\r\n"
-          <> :erlang.iolist_to_binary(bytes)
+          <> bin
       :gen_tcp.send(socket, res)
   end
 
@@ -134,7 +136,10 @@ defmodule CA.CMP do
   def message(socket, header, {:p10cr, csr} = body, code) do
       {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID,
          transactionID, senderNonce, _recipNonce, _freeText, _generalInfo} = header
-      true = code == validateProtection(header, body, code)
+      val_prot = validateProtection(header, body, code)
+      :io.format 'DEBUG: Code size: ~p, ValProt size: ~p~n', [:erlang.size(code), :erlang.size(val_prot)]
+      :io.format 'DEBUG: Code: ~p~nValProt: ~p~n', [code, val_prot]
+      true = code == val_prot
       profile = CA.RDN.profile(csr)
       {ca_key, ca} = CA.CSR.read_ca(profile)
       subject = CA.RDN.decodeAttrs(X509.CSR.subject(csr))
