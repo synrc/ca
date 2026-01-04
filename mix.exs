@@ -17,7 +17,7 @@ defmodule CA.Mixfile do
         {:base85, "~> 0.2.0"},
         {:cose, "~> 0.11.20"},
         {:jason, "~> 1.2"},
-        {:plug, "~> 1.15.3"},
+        {:plug, "~> 1.19.1"},
         {:bandit, "~> 1.0"},
         {:ex_doc, ">= 0.0.0", only: :dev},
         {:x509, "~> 0.9.0"}
