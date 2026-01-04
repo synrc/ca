@@ -1,8 +1,8 @@
 defmodule CA.EUDI.Wallet do
   @moduledoc "EUDI/OID4VC Wallet web application server."
-  @profiles  [ "secp256k1", "secp384r1", "secp521r1" ]
-  @templates [ "ocsp", "ipsec", "bgp", "eap", "cap", "sip", "cmc", "scvp", "ssh", "tls" ]
-  @classes   [ "ca", "ra", "server", "client", "human", "program" ]
+#  @profiles  [ "secp256k1", "secp384r1", "secp521r1" ]
+#  @templates [ "ocsp", "ipsec", "bgp", "eap", "cap", "sip", "cmc", "scvp", "ssh", "tls" ]
+#  @classes   [ "ca", "ra", "server", "client", "human", "program" ]
 
   use Plug.Router
   plug :match

@@ -28,7 +28,7 @@ defmodule CA.TSP do
     end
 
     def message(_socket, cms) do
-        :logger.info 'Unknown message request ~p', [cms]
+        :logger.info ~c"Unknown message request ~p", [cms]
     end
 
     def answer(socket, res) do
@@ -39,7 +39,7 @@ defmodule CA.TSP do
         case :gen_tcp.recv(socket, 0) do
              {:ok, data} ->
                   {:ok, dec} = :KEP.decode(:TimeStampReq, data)
-                  :io.format 'TimeStampReq:~n~p~n', [dec]
+                  :io.format ~c"TimeStampReq:~n~p~n", [dec]
                   __MODULE__.message(socket, dec)
                   __MODULE__.loop(socket)
              {:error, _} -> :exit

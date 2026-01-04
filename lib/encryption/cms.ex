@@ -108,13 +108,13 @@ defmodule CA.CMS do
 
   def testFolder(folder \\ "CAdES") do
       :lists.map(fn x -> case :filename.extension(x) do
-         '.p7s' -> [cms: byte_size(:erlang.term_to_binary(CA.CMS.parseContentInfoFile(x))), name: x]
-         '.txt' -> [smime: byte_size(:erlang.term_to_binary(CA.CMS.parseContentInfoSMIME(x))), name: x]
-         '.key' -> [key: byte_size(:erlang.term_to_binary(CA.CMS.parseKeyFile(x))), name: x]
-         '.b64' -> [base64: byte_size(:erlang.term_to_binary(CA.CRT.parseCertB64(x))), name: x]
-         '.pem' -> [pem: byte_size(:erlang.term_to_binary(CA.CRT.parseCertPEM(x))), name: x]
-         '.cer' -> [cert: byte_size(:erlang.term_to_binary(CA.CRT.parseCertFile(x))), name: x]
-      end end, :filelib.wildcard ['test/#{folder}/*'])
+         ~c".p7s" -> [cms: byte_size(:erlang.term_to_binary(CA.CMS.parseContentInfoFile(x))), name: x]
+         ~c".txt" -> [smime: byte_size(:erlang.term_to_binary(CA.CMS.parseContentInfoSMIME(x))), name: x]
+         ~c".key" -> [key: byte_size(:erlang.term_to_binary(CA.CMS.parseKeyFile(x))), name: x]
+         ~c".b64" -> [base64: byte_size(:erlang.term_to_binary(CA.CRT.parseCertB64(x))), name: x]
+         ~c".pem" -> [pem: byte_size(:erlang.term_to_binary(CA.CRT.parseCertPEM(x))), name: x]
+         ~c".cer" -> [cert: byte_size(:erlang.term_to_binary(CA.CRT.parseCertFile(x))), name: x]
+      end end, :filelib.wildcard [~c"test/#{folder}/*"])
   end
 
   def testPrivateKeyECC() do

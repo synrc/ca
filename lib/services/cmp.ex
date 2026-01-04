@@ -22,7 +22,7 @@ defmodule CA.CMP do
   end
 
   def listen(port) do
-      :logger.info 'Running CA.CMP with Authority 5.11.15 at 0.0.0.0:~p (tcp)', [port]
+      :logger.info ~c"Running CA.CMP with Authority 5.11.15 at 0.0.0.0:~p (tcp)", [port]
       {:ok, socket} = :gen_tcp.listen(port, [:binary, {:active, false}, {:reuseaddr, true}])
       accept(socket)
   end
@@ -85,13 +85,13 @@ defmodule CA.CMP do
                 {owf,_} = CA.ALG.lookup(owfoid) # SHA-2
                 pbm = :application.get_env(:ca, :pbm, "0000") # DH shared secret
                 verifyKey  = baseKey(pbm, salt, counter, owf)
-                :logger.info 'TCP counter ~p~n', [counter]
+                :logger.info ~c"TCP counter ~p~n", [counter]
                 hash = CA.KDF.hs(:erlang.size(code))
                 res = case CA.ALG.lookup(macoid) do
                      {:'hMAC-SHA1',_} -> :crypto.mac(:hmac, hash, verifyKey, bin)
                      _ -> :crypto.mac(:hmac, hash, verifyKey, bin)
                 end
-                :logger.info 'TCP validateProtection ~p~n', [res]
+                :logger.info ~c"TCP validateProtection ~p~n", [res]
                 res
            {_, _ } ->
                 ""
@@ -101,7 +101,7 @@ defmodule CA.CMP do
   def answer(socket, header, body, code) do
       message = CA.CMP.Scheme."PKIMessage"(header: header, body: body, protection: code)
       {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
-      :logger.info 'TCP answer ~p~n', [message]
+      :logger.info ~c"TCP answer ~p~n", [message]
       bin = :erlang.iolist_to_binary(bytes)
       res =  "HTTP/1.0 200 OK\r\n"
           <> "Server: SYNRC CA/CMP\r\n"
@@ -125,20 +125,20 @@ defmodule CA.CMP do
 
   def message(_socket, _header, {:ir, req}, _) do
       :lists.map(fn {:CertReqMsg, req, sig, code} ->
-         :logger.info 'request: ~p ~p ~p~n', [req,sig,code]
+         :logger.info ~c"request: ~p ~p ~p~n", [req,sig,code]
       end, req)
   end
 
   def message(_socket, _header, {:genm, req} = _body, _code) do
-      :io.format 'generalMessage: ~p~n', [req]
+      :io.format ~c"generalMessage: ~p~n", [req]
   end
 
   def message(socket, header, {:p10cr, csr} = body, code) do
       {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID,
          transactionID, senderNonce, _recipNonce, _freeText, _generalInfo} = header
       val_prot = validateProtection(header, body, code)
-      :io.format 'DEBUG: Code size: ~p, ValProt size: ~p~n', [:erlang.size(code), :erlang.size(val_prot)]
-      :io.format 'DEBUG: Code: ~p~nValProt: ~p~n', [code, val_prot]
+      :io.format ~c"DEBUG: Code size: ~p, ValProt size: ~p~n", [:erlang.size(code), :erlang.size(val_prot)]
+      :io.format ~c"DEBUG: Code: ~p~nValProt: ~p~n", [code, val_prot]
       true = code == val_prot
       profile = CA.RDN.profile(csr)
       {ca_key, ca} = CA.CSR.read_ca(profile)
@@ -166,7 +166,7 @@ defmodule CA.CMP do
           pvno: pvno, recipNonce: senderNonce,
           transactionID: transactionID, protectionAlg: protectionAlg,
           messageTime: messageTime)
-      :logger.info 'TCP P10CR request ~p~n', [csr]
+      :logger.info ~c"TCP P10CR request ~p~n", [csr]
 
       :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
   end
@@ -175,7 +175,7 @@ defmodule CA.CMP do
       {:PKIHeader, _, from, to, _, _, _, _, _, senderNonce, _, _, _} = header
 
       :lists.map(fn {:CertStatus,bin,no,{:PKIStatusInfo, :accepted, _, _}} ->
-          :logger.info 'TCP CERTCONF ~p request ~p~n', [no,:base64.encode(bin)]
+          :logger.info ~c"TCP CERTCONF ~p request ~p~n", [no,:base64.encode(bin)]
       end, statuses)
 
       pkibody = {:pkiconf, :asn1_NOVALUE}
@@ -184,7 +184,7 @@ defmodule CA.CMP do
   end
 
   def message(_socket, _header, body, _code) do
-      :logger.info 'Strange PKIMessage request ~p', [body]
+      :logger.info ~c"Strange PKIMessage request ~p", [body]
   end
 
 # WSL Service

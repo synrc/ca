@@ -41,7 +41,7 @@ defmodule CA.CRT do
            {1,2,840,113549,1,1,1}    -> decodeRSA(agreement, params, publicKey)
            {1,2,840,10045,2,1}       -> decodeECC(agreement, params, publicKey)
            {1,2,804,2,1,1,1,1,3,1,1} -> decodeGFE(agreement, params, publicKey)
-           _ -> :logger.info 'new unknown publicKey agreement scheme detected: ~p~n', [agreement]
+           _ -> :logger.info ~c"new unknown publicKey agreement scheme detected: ~p~n", [agreement]
                 :base64.encode publicKey
       end
   end

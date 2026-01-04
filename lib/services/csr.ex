@@ -9,7 +9,7 @@ defmodule CA.CSR do
   def root(profile, [rdn: rdn]) do
       :filelib.ensure_dir dir(profile)
       ca_key = X509.PrivateKey.new_ec(:erlang.binary_to_atom(profile))
-      :logger.info 'CSR CMP DN ~p~n', [rdn]
+      :logger.info ~c"CSR CMP DN ~p~n", [rdn]
       ca = X509.Certificate.self_signed(ca_key, rdn, template:  %X509.Certificate.Template{
         validity: round(25 * 365.2425), # 25 years
         hash: :sha256,
@@ -34,7 +34,7 @@ defmodule CA.CSR do
       der = :public_key.der_encode(:ECPrivateKey, priv)
       pem = :public_key.pem_encode([{:ECPrivateKey, der, :not_encrypted}])
       :file.write_file("#{dir(profile)}/#{user}.key", pem)
-      :logger.info 'CSR SERVER DN ~p~n', [rdn]
+      :logger.info ~c"CSR SERVER DN ~p~n", [rdn]
       csr = X509.CSR.new(priv, rdn, extension_request: [
             X509.Certificate.Extension.subject_alt_name(["synrc.com"])])
       :file.write_file("#{dir(profile)}/#{user}.csr", X509.CSR.to_pem(csr))
@@ -52,7 +52,7 @@ defmodule CA.CSR do
       der = :public_key.der_encode(:ECPrivateKey, priv)
       pem = :public_key.pem_encode([{:ECPrivateKey, der, :not_encrypted}])
       :file.write_file("#{dir(profile)}/#{user}.key", pem)
-      :logger.info 'CSR CLIENT DN ~p~n', [rdn]
+      :logger.info ~c"CSR CLIENT DN ~p~n", [rdn]
       csr = X509.CSR.new(priv, rdn, extension_request: [
             X509.Certificate.Extension.subject_alt_name(["synrc.com"])])
       :file.write_file("#{dir(profile)}/#{user}.csr", X509.CSR.to_pem(csr))

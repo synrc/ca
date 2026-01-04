@@ -3,9 +3,6 @@ defmodule CA.EST.Get do
   @profiles ["secp256k1","secp384r1","secp521r1"]
   import Plug.Conn
 
-  def get(conn, _, _, _, _) do
-  end
-
   def get(conn, "CA", profile, _, "CA") when profile in @profiles do
       body = :base64.encode(CA.CSR.read_ca_public(profile))
       conn |> put_resp_content_type("application/pkix-cert")
@@ -44,7 +41,7 @@ defmodule CA.EST.Get do
       send_resp(conn, 200, CA.EST.encode([%{"template" => template, "curve" => curve, "operation" => operation}]))
   end
 
-  def get(conn, _, _, _, _) do
+  def get(_conn, _, _, _, _) do
   end
 
 end

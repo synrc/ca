@@ -19,10 +19,10 @@ defmodule CA.MDoc do
       {:ok, bin} = :file.read_file x
       case :filename.extension(x) do
          ".b64" -> [bin: byte_size(:erlang.term_to_binary(:base64.decode(bin))), name: x]
-         ".b64s" -> [bin: :erlang."div"(byte_size(:erlang.term_to_binary(bin)),2), name: x]
+         ".b64s" -> [bin: :erlang.div(byte_size(:erlang.term_to_binary(bin)),2), name: x]
          ".b64u" -> [bin: byte_size(:erlang.term_to_binary(:base64.decode(replace(replace(bin,"_","/"),"-","+")))), name: x]
          ".hex" -> [bin: byte_size(:erlang.term_to_binary(:oid.unhex(bin))), name: x]
-         ".jwt" -> [bin: :erlang."div"(byte_size(:erlang.term_to_binary(bin)),2), name: x]
+         ".jwt" -> [bin: :erlang.div(byte_size(:erlang.term_to_binary(bin)),2), name: x]
          ".hexbin" -> [bin: byte_size(:erlang.term_to_binary(:oid.unhex(bin))), name: x]
       end
   end
@@ -171,7 +171,7 @@ defmodule CA.MDoc do
   end
 
   def test(folder \\ "mdoc") do
-      :lists.map(fn x -> testMDoc(x) end, :filelib.wildcard ['test/#{folder}/*'])
+      :lists.map(fn x -> testMDoc(x) end, :filelib.wildcard [~c"test/#{folder}/*"])
   end
 
 end

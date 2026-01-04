@@ -86,10 +86,10 @@ defmodule CA.CE do
   def mapOidsDecode(list) do
       :lists.map(fn x ->
          :erlang.iolist_to_binary(:string.join(:lists.map(fn y -> :erlang.integer_to_list(y) end,
-         :erlang.tuple_to_list(:oid.decode(x))),'.')) end, list)
+         :erlang.tuple_to_list(:oid.decode(x))),~c".")) end, list)
   end
 
-  def mapOid(x)     do :erlang.iolist_to_binary(:string.join(:lists.map(fn y -> :erlang.integer_to_list(y) end, :erlang.tuple_to_list(x)),'.')) end
+  def mapOid(x)     do :erlang.iolist_to_binary(:string.join(:lists.map(fn y -> :erlang.integer_to_list(y) end, :erlang.tuple_to_list(x)),~c".")) end
   def mapOids(list) do :lists.map(fn x -> mapOid(x) end, list) end
   def isString(bin) do :lists.foldl(fn x, acc when x < 20 -> acc + 1 ; _, acc -> acc end, 0, :erlang.binary_to_list(bin)) <= 0 end
 

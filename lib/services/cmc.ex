@@ -22,7 +22,7 @@ defmodule CA.CMC do
   end
 
   def listen(port) do
-      :logger.info 'Running CA.CMC with Authority 5.11.15 at 0.0.0.0:~p (tcp)', [port]
+      :logger.info ~c"Running CA.CMC with Authority 5.11.15 at 0.0.0.0:~p (tcp)", [port]
       {:ok, socket} = :gen_tcp.listen(port,
         [:binary, {:packet, 0}, {:active, false}, {:reuseaddr, true}])
       accept(socket)
@@ -35,7 +35,7 @@ defmodule CA.CMC do
   end
 
   def message(_socket, cms) do
-      :logger.info 'Unknown message request ~p', [cms]
+      :logger.info ~c"Unknown message request ~p", [cms]
   end
 
   def answer(socket, res) do
@@ -47,7 +47,7 @@ defmodule CA.CMC do
            {:ok, data} ->
                 {:ok, dec} = :'EnrollmentMessageSyntax-2009'.decode(:'PKIData', data)
                 {:PKIData, _controlSequence, _reqSequence, cmsSequence, _otherMsgSequence} = dec
-                :io.format 'PKIData:~n~p~n', [dec]
+                :io.format ~c"PKIData:~n~p~n", [dec]
                 __MODULE__.message(socket, cmsSequence)
                 __MODULE__.loop(socket)
            {:error, _} -> :exit
