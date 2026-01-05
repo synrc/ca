@@ -32,7 +32,6 @@ defmodule CA.CMP do
   def accept(socket) do
       {:ok, fd} = :gen_tcp.accept(socket)
       {:ok, _pid} = Task.Supervisor.start_child(CA.TaskSupervisor, fn -> loop(fd,[]) end, restart: :temporary)
-#      :erlang.spawn(fn -> ca = [] ; __MODULE__.loop(fd,ca) end)
       accept(socket)
   end
 
