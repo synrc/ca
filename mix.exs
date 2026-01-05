@@ -6,7 +6,7 @@ defmodule CA.Mixfile do
       app: :ca,
       version: "7.1.3",
       description: "CA  CXC 138 21 Certificate Authority",
-      releases: [ca: [include_executables_for: [:unix], cookie: "SYNRC:CA"]]
+      releases: [ca: [include_executables_for: [:unix], cookie: "SYNRC:CA"]],
       package: [
         name: :ca,
         files: ~w(config src include priv lib mix.exs LICENSE README.md),
