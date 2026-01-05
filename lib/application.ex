@@ -8,6 +8,7 @@ defmodule CA do
   def start(_type, _args) do
       :logger.add_handlers(:ca)
       Supervisor.start_link([
+         { Task.Supervisor, name: CA.TaskSupervisor},
          { CA.CMP,  port: port(:cmp) },
          { CA.CMC,  port: port(:cmc) },
          { CA.OCSP, port: port(:ocsp) },

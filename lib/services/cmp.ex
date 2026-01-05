@@ -1,7 +1,9 @@
 defmodule CA.CMP do
   @moduledoc "CA/CMP TCP server."
+
   require CA
   require CA.CMP.Scheme
+  require Logger
 
   # Authority PKI X.509 CMP over TCP RFC 4210 9480 9481
 
@@ -29,11 +31,8 @@ defmodule CA.CMP do
 
   def accept(socket) do
       {:ok, fd} = :gen_tcp.accept(socket)
-      :erlang.spawn(fn ->
-            # Read CA here
-            ca = []
-            __MODULE__.loop(fd,ca)
-      end)
+      {:ok, _pid} = Task.Supervisor.start_child(CA.TaskSupervisor, fn -> loop(fd,[]) end, restart: :temporary)
+#      :erlang.spawn(fn -> ca = [] ; __MODULE__.loop(fd,ca) end)
       accept(socket)
   end
 
