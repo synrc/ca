@@ -4,7 +4,7 @@ defmodule CA.Mixfile do
   def project() do
     [
       app: :ca,
-      version: "7.1.3",
+      version: "7.1.2",
       description: "CA  CXC 138 21 Certificate Authority",
       package: [
         name: :ca,
@@ -14,8 +14,8 @@ defmodule CA.Mixfile do
         links: %{"GitHub" => "https://github.com/synrc/ca"}
       ],
       deps: [
-#       {:base85, "~> 0.3.0"},
-#       {:cose, "~> 0.11.20"},
+        {:base85, "~> 0.3.0"},
+        {:cose, "~> 0.11.20"},
         {:jason, "~> 1.2"},
         {:plug, "~> 1.19.1"},
         {:bandit, "~> 1.0"},
