@@ -3,7 +3,7 @@
 [![Actions Status](https://github.com/synrc/ca/workflows/mix/badge.svg)](https://github.com/synrc/ca/actions)
 [![Hex pm](http://img.shields.io/hexpm/v/ca.svg?style=flat)](https://hex.pm/packages/ca)
 
-![ca-shaders](https://authority.erp.uno/priv/design/ca-shaders.png)
+![ca-shaders](https://ca.n2o.dev/priv/design/ca-shaders.png)
 
 ## Features
 
@@ -25,7 +25,7 @@
 
 ## Online Instances
 
-* https://authority.erp.uno
+* https://ca.n2o.dev
 
 ## How to use?
 
