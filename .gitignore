@@ -1,11 +1,9 @@
 .DS_Store
 .applist
 _build/
-cert/
 deps/
 doc/
 ebin/
 .elixir_ls/
 ca.log
 mix.lock
-synrc/ecc/secp384r1/
