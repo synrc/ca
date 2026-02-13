@@ -49,8 +49,8 @@ defmodule CA.CRT do
   def parseCertPEM(file)  do {:ok, bin} = :file.read_file file ; list = :public_key.pem_decode(bin) ; :lists.map(fn x -> parseCert(:public_key.pem_entry_decode(x)) end, list) end
   def parseCertB64(file)  do {:ok, bin} = :file.read_file file ; parseCertBin(:base64.decode(bin)) end
   def parseCertFile(file) do {:ok, bin} = :file.read_file file ; parseCertBin(bin) end
-# def parseCertBin(bin)   do {:ok, cert} = :"AuthenticationFramework".decode(:Certificate, bin) ; parseCert(cert) end
-  def parseCertBin(bin)   do {:ok, cert} = :"PKIX1Explicit88".decode(:Certificate, bin) ; parseCert(cert) end
+  def parseCertBin97(bin) do {:ok, cert} = :"AuthenticationFramework".decode(:Certificate, bin) ; parseCert(cert) end
+  def parseCertBin88(bin) do {:ok, cert} = :"PKIX1Explicit88".decode(:Certificate, bin)         ; parseCert(cert) end
 
   def parseCert(cert, _) do parseCert(cert) end
   def parseCert({:certificate, cert}) do parseCert(cert) end
