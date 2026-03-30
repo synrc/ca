@@ -157,7 +157,7 @@ defmodule CA.CMP do
         nil -> storeReply(csr,cert,ref(),profile)
         cn -> case :filelib.is_regular("#{CA.CSR.dir(profile)}/#{cn}.csr") do
                    false -> storeReply(csr,cert,cn,profile)
-                   true -> storeReply(csr,cert,cn,profile) end end # in prod return [] # no user
+                   true -> [] end end
 
       pkibody = {:cp, CA.CMP.Scheme."CertRepMessage"(response: reply)}
       pkiheader = CA.CMP.Scheme."PKIHeader"(sender: to, recipient: from,

@@ -25,7 +25,8 @@
 
 ## Online Instances
 
-* https://ca.n2o.dev
+* https://ca.n2o.dev/
+* https://erp.uno/ca/
 
 ## How to use?
 
