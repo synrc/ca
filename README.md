@@ -66,6 +66,8 @@ $ openssl cmp -cmd p10cr -server "ca.synrc.com":8829 -secret pass:0000 -ref cmpt
 * <a href="https://tonpa.guru/stream/2024/2024-11-20 CBOR COSE.htm">2024-11-20 CBOR COSE</a><br>
 * <a href="https://tonpa.guru/stream/2024/2024-11-21 MSO MDoc.htm">2024-11-21 MSO MDoc</a><br>
 
-## Author
+## Authors
 
 Максим Сохацький
+Євгеній Гадібіров
+Георгій Мельник-Веттштайн
