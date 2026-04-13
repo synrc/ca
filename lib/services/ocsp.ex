@@ -38,7 +38,7 @@ defmodule CA.OCSP do
     def loop(socket) do
         case :gen_tcp.recv(socket, 0) do
              {:ok, data} ->
-                  {:ok, dec} = :'OCSP'.decode(:OCSPRequest, data)
+                  {:ok, dec} = :"OCSP".decode(:OCSPRequest, data)
                   :io.format ~c"OCSPRequest:~n~p~n", [dec]
                   __MODULE__.message(socket, dec)
                   __MODULE__.loop(socket)

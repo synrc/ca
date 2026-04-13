@@ -5,7 +5,7 @@ defmodule CA.CRT do
   def baseLength(_) do 256 end
 
   def decodeRSA(_, _, publicKey) do # Rivest-Shamir-Adleman schema of Diffie–Hellman key exchange
-      {:ok, key} = :"PKCS-1".decode(:'RSAPublicKey', publicKey)
+      {:ok, key} = :"PKCS-1".decode(:"RSAPublicKey", publicKey)
       [
         key: key,
         scheme: :RSA

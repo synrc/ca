@@ -10,25 +10,25 @@ defmodule CA.CMS do
   def contentInfo(cms) do {:ok, ci} = :"CryptographicMessageSyntax-2010".decode :ContentInfo, cms ; ci end
   def contentInfoFile(file) do {:ok, bin} = :file.read_file file ; contentInfo(bin) end
 
-  def map(:'dhSinglePass-stdDH-sha512kdf-scheme'),   do: {:kdf,  :sha512}
-  def map(:'dhSinglePass-stdDH-sha384kdf-scheme'),   do: {:kdf,  :sha384}
-  def map(:'dhSinglePass-stdDH-sha256kdf-scheme'),   do: {:kdf,  :sha256}
-  def map(:'dhSinglePass-stdDH-hkdf-sha256-scheme'), do: {:hkdf, :sha256}
-  def map(:'dhSinglePass-stdDH-hkdf-sha384-scheme'), do: {:hkdf, :sha384}
-  def map(:'dhSinglePass-stdDH-hkdf-sha512-scheme'), do: {:hkdf, :sha512}
+  def map(:"dhSinglePass-stdDH-sha512kdf-scheme"),   do: {:kdf,  :sha512}
+  def map(:"dhSinglePass-stdDH-sha384kdf-scheme"),   do: {:kdf,  :sha384}
+  def map(:"dhSinglePass-stdDH-sha256kdf-scheme"),   do: {:kdf,  :sha256}
+  def map(:"dhSinglePass-stdDH-hkdf-sha256-scheme"), do: {:hkdf, :sha256}
+  def map(:"dhSinglePass-stdDH-hkdf-sha384-scheme"), do: {:hkdf, :sha384}
+  def map(:"dhSinglePass-stdDH-hkdf-sha512-scheme"), do: {:hkdf, :sha512}
 
-  def sharedInfo(ukm, len), do: {:'ECC-CMS-SharedInfo',
-      {:'KeyWrapAlgorithm',{2,16,840,1,101,3,4,1,45},:asn1_NOVALUE}, ukm, <<len::32>>}
+  def sharedInfo(ukm, len), do: {:"ECC-CMS-SharedInfo",
+      {:"KeyWrapAlgorithm",{2,16,840,1,101,3,4,1,45},:asn1_NOVALUE}, ukm, <<len::32>>}
 
   # CMS Codec KARI: ECC+KDF/ECB+AES/KW+256/CBC
 
   def kari(kari, privateKeyBin, schemeOID, encOID, data, iv) do
-      {:'KeyAgreeRecipientInfo',:v3,{_,{_,_,publicKey}},ukm,{_,kdfOID,_},[{_,_,encryptedKey}]} = kari
+      {:"KeyAgreeRecipientInfo",:v3,{_,{_,_,publicKey}},ukm,{_,kdfOID,_},[{_,_,encryptedKey}]} = kari
       {scheme,_} = CA.ALG.lookup(schemeOID)
       {kdf,_} = CA.ALG.lookup(kdfOID)
       {enc,_} = CA.ALG.lookup(encOID)
       sharedKey = :crypto.compute_key(:ecdh,publicKey,privateKeyBin,scheme)
-      {_,payload} = :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', sharedInfo(ukm,256))
+      {_,payload} = :"CMSECCAlgs-2009-02".encode(:"ECC-CMS-SharedInfo", sharedInfo(ukm,256))
       derived = case map(kdf) do
           {:kdf,hash} -> CA.KDF.derive({:kdf,hash},  sharedKey, 32, payload)
          {:hkdf,hash} -> CA.HKDF.derive({:kdf,hash}, sharedKey, 32, payload)
@@ -41,7 +41,7 @@ defmodule CA.CMS do
   # CMS Codec KTRI: RSA+RSAES-OAEP
 
   def ktri(ktri, privateKeyBin, encOID, data, iv) do
-      {:'KeyTransRecipientInfo',_vsn,_,{_,schemeOID,_},key} = ktri
+      {:"KeyTransRecipientInfo",_vsn,_,{_,schemeOID,_},key} = ktri
       {:rsaEncryption,_} = CA.ALG.lookup schemeOID
       {enc,_} = CA.ALG.lookup(encOID)
       sessionKey = :public_key.decrypt_private(key, privateKeyBin)
@@ -52,7 +52,7 @@ defmodule CA.CMS do
   # CMS Codec KEKRI: KEK+AES-KW+CBC
 
   def kekri(kekri, privateKeyBin, encOID, data, iv) do
-      {:'KEKRecipientInfo',_vsn,_,{_,kea,_},encryptedKey} = kekri
+      {:"KEKRecipientInfo",_vsn,_,{_,kea,_},encryptedKey} = kekri
       _ = CA.ALG.lookup(kea)
       {enc,_} = CA.ALG.lookup(encOID)
       unwrap = CA.AES.keyUnwrap(encryptedKey,privateKeyBin)
@@ -119,7 +119,7 @@ defmodule CA.CMS do
 
   def testPrivateKeyECC() do
       privateKey = :public_key.pem_entry_decode(pem("test/certs/client.key"))
-      {:'ECPrivateKey',_,privateKeyBin,{:namedCurve,schemeOID},_,_} = privateKey
+      {:"ECPrivateKey",_,privateKeyBin,{:namedCurve,schemeOID},_,_} = privateKey
       {schemeOID,privateKeyBin}
   end
 
@@ -132,7 +132,7 @@ defmodule CA.CMS do
       pki = :public_key.pem_decode(bin)
       [{:PrivateKeyInfo,_,_}] = pki
       rsa = :public_key.pem_entry_decode(hd(pki))
-      {:'RSAPrivateKey',:'two-prime',_n,_e,_d,_,_,_,_,_,_} = rsa
+      {:"RSAPrivateKey",:"two-prime",_n,_e,_d,_,_,_,_,_,_} = rsa
       {:rsaEncryption,rsa}
   end
 
@@ -141,12 +141,12 @@ defmodule CA.CMS do
       {:ok,base} = :file.read_file "test/cms/encrypted2.txt"
       [_,s] = :string.split base, "\n\n"
       x = :base64.decode s
-      :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
+      :"CryptographicMessageSyntax-2010".decode(:ContentInfo, x)
   end
 
   def testRSA() do
       {:ok,x} = :file.read_file "test/cms/rsa-cms.p7s"
-      :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
+      :"CryptographicMessageSyntax-2010".decode(:ContentInfo, x)
   end
 
   def testCMS() do
@@ -155,10 +155,10 @@ defmodule CA.CMS do
       {:ok,{:ContentInfo,_,{:EnvelopedData,_,_,x,{_,_,{_,_,{_,<<_::16,iv::binary>>}},data},_}}} = testECC()
       [{:kari,{_,:v3,{_,{_,_,publicKey}},ukm,_,[{_,_,encryptedKey}]}}|_] = x
       sharedKey = :crypto.compute_key(:ecdh,publicKey,privateKey,scheme)
-      {_,content}  =  :'CMSECCAlgs-2009-02'.encode(:'ECC-CMS-SharedInfo', CA.CMS.sharedInfo(ukm,256))
+      {_,content}  =  :"CMSECCAlgs-2009-02".encode(:"ECC-CMS-SharedInfo", CA.CMS.sharedInfo(ukm,256))
       kdf = CA.KDF.derive({:kdf, :sha256}, sharedKey, 32, content)
       unwrap = :aes_kw.unwrap(encryptedKey, kdf)
-      {:ok, CA.AES.decrypt(:'id-aes256-CBC', data, unwrap, iv)}
+      {:ok, CA.AES.decrypt(:"id-aes256-CBC", data, unwrap, iv)}
   end
 
   # ASN.1 DER Parsing Facilities
@@ -249,7 +249,7 @@ defmodule CA.CMS do
       {:ok,base} = :file.read_file "test/cms/encrypted.txt"
       [_,s] = :string.split base, "\n\n"
       x = :base64.decode s
-      :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, x)
+      :"CryptographicMessageSyntax-2010".decode(:ContentInfo, x)
   end
 
   def parseContentInfoSMIME(file) do
@@ -260,7 +260,7 @@ defmodule CA.CMS do
   def parseContentInfoB64(file)    do {:ok, bin} = :file.read_file file ; parseContentInfoBin(:base64.decode(bin)) end
   def parseContentInfoFile(file)   do {:ok, bin} = :file.read_file file ; parseContentInfoBin(bin) end
   def parseContentInfoBinUA(bin)   do {:ok, contentInfo} = :KEP.decode(:ContentInfo, bin) ; parseContentInfo(contentInfo, true)  end
-  def parseContentInfoBinX509(bin) do {:ok, contentInfo} = :'CryptographicMessageSyntax-2010'.decode(:ContentInfo, bin) ; parseContentInfo(contentInfo, false) end
+  def parseContentInfoBinX509(bin) do {:ok, contentInfo} = :"CryptographicMessageSyntax-2010".decode(:ContentInfo, bin) ; parseContentInfo(contentInfo, false) end
 
   def parseContentInfoBin(bin) do
       case :application.get_env(:ca, :ukrainian, :parseContentInfoBinUA) do
