@@ -47,8 +47,8 @@ $ openssl cmp -cmd p10cr -server "ca.synrc.com":8829 -secret pass:0000 -ref cmpt
 
 ## Publications
 
-* [2010-10-18 LDAP]("https://tonpa.guru/stream/2010/2010-10-18 LDAP.htm")
-* [2020-02-03 Кваліфікований Електронний Підпис]("https://tonpa.guru/stream/2020/2020-02-03 Кваліфікований Електронний Підпис.htm")
+* [2010-10-18 LDAP](https://tonpa.guru/stream/2010/2010-10-18 LDAP.htm)
+* [2020-02-03 Кваліфікований Електронний Підпис](https://tonpa.guru/stream/2020/2020-02-03 Кваліфікований Електронний Підпис.htm)
 * [2023-06-22 CMS Месенжер Пітч](https://tonpa.guru/stream/2023/2023-06-22 Месенжер.htm)
 * [2023-06-30 ЧАТ X.509 Домашня сторінка](https://erp.uno/chat/)
 * [2023-07-05 CMS S/MIME](https://tonpa.guru/stream/2023/2023-07-05 CMS SMIME.htm)
