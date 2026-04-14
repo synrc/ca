@@ -20,9 +20,10 @@ defmodule CA.Mixfile do
         {:jason, "~> 1.2"},
         {:plug, "~> 1.19.1"},
         {:bandit, "~> 1.0"},
-        {:ex_doc, ">= 0.0.0", only: :dev},
+        {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
         {:x509, "~> 0.9.0"}
-      ]
+      ],
+      xref: [exclude: [ :makeup_erlang, :makeup_elixir, :ex_doc, :makeup, :nimble_parsec, :earmark_parser ]]
     ]
   end
 end
