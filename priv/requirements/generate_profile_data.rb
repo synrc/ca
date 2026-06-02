@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'json'
 
 files = [
   "/Users/tonpa/depot/synrc/ca/priv/requirements/НД ТЗІ 2.3-025-24_Т1.txt",
@@ -6,6 +7,57 @@ files = [
   "/Users/tonpa/depot/synrc/ca/priv/requirements/НД ТЗІ 2.3-025-24_Т3.txt"
 ]
 
+# 1. Parse Control Descriptions from 3.6-006-24
+desc_text = File.read("/Users/tonpa/depot/synrc/ca/priv/requirements/НД ТЗІ 3.6-006-24.txt")
+descriptions = {}
+current_control = nil
+current_desc = ""
+in_desc = false
+parent_control = nil
+
+desc_text.each_line do |line|
+  stripped = line.strip
+  next if stripped.match?(/^?\d+$/)
+
+  if match = stripped.match(/^([A-Z]{2}-\d+)\s+([А-ЯІЇЄҐ \-]+)/)
+    if current_control && in_desc && !current_desc.strip.empty?
+      descriptions["id-spe-#{current_control.downcase.gsub('-', '_')}"] = current_desc.strip.gsub(/\s+/, ' ')
+    end
+    current_control = match[1]
+    parent_control = current_control
+    current_desc = ""
+    in_desc = false
+  elsif match = stripped.match(/^\((\d+)\)\s+([А-ЯІЇЄҐ \-]+)/)
+    if current_control && in_desc && !current_desc.strip.empty?
+      descriptions["id-spe-#{current_control.downcase.gsub('-', '_').gsub('(', '-').gsub(')', '')}"] = current_desc.strip.gsub(/\s+/, ' ')
+    end
+    if parent_control
+      current_control = "#{parent_control}(#{match[1]})"
+      current_desc = ""
+      in_desc = true 
+    end
+  elsif stripped.match?(/^Заходи захисту:/i)
+    in_desc = true
+    current_desc = ""
+  elsif stripped.match?(/^(Рекомендації з реалізації:|Пов’язані заходи:|Посилення заходів:)/i)
+    if current_control && in_desc
+      # Try to remove leftover uppercase title parts if they leaked into desc
+      cd = current_desc.strip.gsub(/\s+/, ' ')
+      cd = cd.sub(/^[А-ЯІЇЄҐ \-]+\s+/, '') if cd.match?(/^[А-ЯІЇЄҐ \-]{10,}/)
+      
+      atom_name = current_control.downcase.gsub('-', '_').gsub('(', '_').gsub(')', '')
+      atom_name = atom_name.sub(/_0(\d)/, '_\1')
+      
+      descriptions["id-spe-#{atom_name.gsub('_', '-')}"] = cd
+      in_desc = false
+    end
+  elsif in_desc
+    current_desc += " " + stripped unless stripped.empty?
+  end
+end
+
+
+# 2. Parse ODPs from T1, T2, T3
 odps = Hash.new { |h, k| h[k] = {} }
 
 junk_phrases = [
@@ -29,7 +81,6 @@ def clean_description(desc)
   return nil if desc.match?(/^[A-Z]{2}-?\d+(\(\d+\))?_ODP/i)
   return nil if desc.match?(/^ВИБІРКОВЕ/i)
   
-  # Replace <AC-22_ODP частотою> with "частотою"
   desc = desc.gsub(/<[A-Z0-9\-()]+_ODP(?:\[\d+\])?\s+([^>]+)>/i, '\1')
   desc = desc.gsub(/<[A-Z0-9\-()]+_ODP(?:\[\d+\])?>/i, '')
   
@@ -41,7 +92,6 @@ def clean_description(desc)
   desc = desc.gsub(/[>;.]$/, '')
   
   return nil if desc.empty? || desc.length < 3
-  
   return nil if desc.match?(/^[А-ЯІЇЄҐ \-]+$/) && desc.length < 50
   
   desc[0].capitalize + desc[1..-1]
@@ -51,20 +101,42 @@ def infer_type_and_default(control_atom, desc, explicit_defaults)
   type = ':string'
   default = 'nil'
   
-  if desc.match?(/частота|період|час|хвилин|годин/i)
-    type = ':string'
-  end
+  d = desc.downcase
   
-  if desc.match?(/персонал|ролі|умови|критерії|атрибути|список|перелік|визначені особи/i)
+  # Advanced heuristics
+  if d.match?(/персонал|ролі|посадов|особ/i)
+    type = ':list'
+    default = '["admin", "security_officer"]'
+  elsif d.match?(/атрибути|правила|політик/i)
+    type = ':list'
+    default = '["default_deny_rule", "abac_rule_1"]'
+  elsif d.match?(/алгоритм|крипто|шифрув|хеш/i)
+    type = ':string'
+    default = '"AES-256-GCM"'
+  elsif d.match?(/протокол/i)
+    type = ':string'
+    default = '"TLS 1.3"'
+  elsif d.match?(/події|дії/i)
+    type = ':list'
+    default = '["login", "logout", "failed_attempt"]'
+  elsif d.match?(/умови|критерії|список|перелік/i)
     type = ':list'
     default = '[]'
-  end
-  
-  if desc.match?(/кількість/i)
+  elsif d.match?(/частота|періодичність/i)
+    type = ':string'
+    default = '"щорічно"'
+  elsif d.match?(/період|час|хвилин|годин/i)
     type = ':integer'
-    default = '0'
+    default = '30' # e.g. 30 minutes
+  elsif d.match?(/кількість|спроб/i)
+    type = ':integer'
+    default = '3'
+  elsif d.match?(/механізми|засоби|техніки/i)
+    type = ':string'
+    default = '"автоматизований засіб моніторингу"'
   end
 
+  # Fallback to explicit
   if explicit_defaults[control_atom] && desc.match?(explicit_defaults[control_atom][:match])
     type = explicit_defaults[control_atom][:type]
     default = explicit_defaults[control_atom][:default]
@@ -162,9 +234,12 @@ title_map.each do |atom, tuple|
   title = lookup_map[tuple] || atom
   title = title.gsub('"', '\"')
   
+  top_desc = descriptions[atom] || ""
+  top_desc = top_desc.gsub('"', '\"')
+  
   out += "  control :\"#{atom}\" do\n"
   out += "    title \"#{title}\"\n"
-  out += "    desc \"\"\n"
+  out += "    desc \"#{top_desc}\"\n"
   
   params = odps[atom] || {}
   
@@ -180,4 +255,4 @@ end
 out += "end\n"
 
 File.write("/Users/tonpa/depot/synrc/ca/lib/oid/profile_data.ex", out)
-puts "Wrote profile_data.ex with full multiline evaluation objectives"
+puts "Wrote profile_data.ex with top-level descriptions and improved defaults!"
