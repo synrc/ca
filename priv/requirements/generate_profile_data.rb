@@ -225,8 +225,19 @@ end
 
 out = <<~ELIXIR
 defmodule CA.Profile.Data do
-  use CA.Profile.DSL
   @moduledoc "Central registry for all Security Controls and their ODPs"
+
+  def controls do
+    [
+#{title_map.keys.map { |atom| "      CA.SPE.oid(:\"#{atom}\")" }.join(",\n")}
+    ]
+  end
+
+  def specs do
+    [
+#{title_map.keys.map { |atom| "      spec(:\"#{atom}\")" }.join(",\n")}
+    ]
+  end
 
 ELIXIR
 
@@ -237,21 +248,28 @@ title_map.each do |atom, tuple|
   top_desc = descriptions[atom] || ""
   top_desc = top_desc.gsub('"', '\"')
   
-  out += "  control :\"#{atom}\" do\n"
-  out += "    title \"#{title}\"\n"
-  out += "    desc \"#{top_desc}\"\n"
+  out += "  def spec(:\"#{atom}\") do\n"
+  out += "    %{\n"
+  out += "      id: :\"#{atom}\",\n"
+  out += "      description: \"#{top_desc}\",\n"
+  out += "      title: \"#{title}\",\n"
+  out += "      parameters: [\n"
   
   params = odps[atom] || {}
   
-  params.keys.sort.each do |param_key|
+  param_strs = params.keys.sort.map do |param_key|
     desc = params[param_key]
     info = infer_type_and_default(atom, desc, explicit_defaults)
-    out += "    param :#{param_key}, \"#{desc.gsub('"', '\"')}\", type: #{info[:type]}, default: #{info[:default]}\n"
+    "        {:#{param_key},\n         \"#{desc.gsub('"', '\"')}\",\n         [type: #{info[:type]}, default: #{info[:default]}]}"
   end
   
+  out += param_strs.join(",\n")
+  out += "\n      ]\n"
+  out += "    }\n"
   out += "  end\n\n"
 end
 
+out += "  def spec(_), do: nil\n"
 out += "end\n"
 
 File.write("/Users/tonpa/depot/synrc/ca/lib/oid/profile_data.ex", out)
