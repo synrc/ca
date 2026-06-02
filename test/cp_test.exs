@@ -3,8 +3,8 @@ defmodule CA.CPTest do
   
   test "CP module provides correct OIDs for Court Systems" do
     assert CA.CP.oid(:"id-cp-ua-court-basic") == {1, 2, 804, 3, 1, 2, 1}
-    assert CA.CP.oid(:"id-cp-ua-court-supreme") == {1, 2, 804, 3, 1, 2, 3, 1}
-    assert CA.CP.lookup({1, 2, 804, 3, 1, 2, 1}) == "Базовий профіль безпеки"
+    assert CA.CP.oid(:"id-cp-ua-court-supreme") == {1, 2, 804, 3, 1, 2, 3}
+    assert CA.CP.lookup({1, 2, 804, 3, 1, 2, 1}) == "Базовий профіль безпеки (Level 1)"
   end
 
   test "Simulate certificate issuing with certificatePolicies single-liner" do
