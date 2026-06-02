@@ -2,13 +2,13 @@ require 'fileutils'
 require 'json'
 
 files = [
-  "/Users/tonpa/depot/synrc/ca/priv/requirements/НД ТЗІ 2.3-025-24_Т1.txt",
-  "/Users/tonpa/depot/synrc/ca/priv/requirements/НД ТЗІ 2.3-025-24_Т2.txt",
-  "/Users/tonpa/depot/synrc/ca/priv/requirements/НД ТЗІ 2.3-025-24_Т3.txt"
+  "requirements/НД ТЗІ 2.3-025-24_Т1.txt",
+  "requirements/НД ТЗІ 2.3-025-24_Т2.txt",
+  "requirements/НД ТЗІ 2.3-025-24_Т3.txt"
 ]
 
 # 1. Parse Control Descriptions from 3.6-006-24
-desc_text = File.read("/Users/tonpa/depot/synrc/ca/priv/requirements/НД ТЗІ 3.6-006-24.txt")
+desc_text = File.read("requirements/НД ТЗІ 3.6-006-24.txt")
 descriptions = {}
 current_control = nil
 current_desc = ""
