@@ -4,7 +4,7 @@ defmodule CA.L3.Local do
   def controls do
     CA.L2.controls() ++
     [
-      CA.SPE.oid(:"id-spe-pe-3-1")
+      CA.SPE.oid(:"id-spe-pe-3")
     ]
   end
 end
