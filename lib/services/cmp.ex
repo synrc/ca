@@ -55,7 +55,7 @@ defmodule CA.CMP do
   end
 
   def handleMessage(socket,body) do
-      {:ok,dec} = :'PKIXCMP-2009'.decode(:'PKIMessage', body)
+      {:ok,dec} = :"PKIXCMP-2009".decode(:"PKIMessage", body)
       {:PKIMessage, header, body, code, _extra} = dec
       __MODULE__.message(socket, header, body, code)
   end
@@ -68,7 +68,7 @@ defmodule CA.CMP do
   def protection(:asn1_NOVALUE), do: {"","","","",1}
   def protection(protectionAlg) do
       {_,oid,{_,param}} = protectionAlg
-      {:ok, parameters} = :"PKIXCMP-2009".decode(:'PBMParameter', param)
+      {:ok, parameters} = :"PKIXCMP-2009".decode(:"PBMParameter", param)
       {:PBMParameter, salt, {_,owf,_}, counter, {_,mac,_} } = parameters
       {oid, salt, owf, mac, counter}
   end
@@ -77,16 +77,16 @@ defmodule CA.CMP do
       {:PKIHeader, _, _, _, _, protectionAlg, _, _, _, _, _, _, _} = header
       {oid, salt, owfoid, macoid, counter} = protection(protectionAlg)
       case CA.ALG.lookup(oid) do
-           {:'id-PasswordBasedMac', _ } ->
+           {:"id-PasswordBasedMac", _ } ->
                 incomingProtection = CA.CMP.Scheme."ProtectedPart"(header: header, body: body)
-                {:ok, bin} = :"PKIXCMP-2009".encode(:'ProtectedPart', incomingProtection)
+                {:ok, bin} = :"PKIXCMP-2009".encode(:"ProtectedPart", incomingProtection)
                 {owf,_} = CA.ALG.lookup(owfoid) # SHA-2
                 pbm = :application.get_env(:ca, :pbm, "0000") # DH shared secret
                 verifyKey  = baseKey(pbm, salt, counter, owf)
                 :logger.info ~c"TCP counter ~p~n", [counter]
                 hash = CA.KDF.hs(:erlang.size(code))
                 res = case CA.ALG.lookup(macoid) do
-                     {:'hMAC-SHA1',_} -> :crypto.mac(:hmac, hash, verifyKey, bin)
+                     {:"hMAC-SHA1",_} -> :crypto.mac(:hmac, hash, verifyKey, bin)
                      _ -> :crypto.mac(:hmac, hash, verifyKey, bin)
                 end
                 :logger.info ~c"TCP validateProtection ~p~n", [res]
@@ -98,7 +98,7 @@ defmodule CA.CMP do
 
   def answer(socket, header, body, code) do
       message = CA.CMP.Scheme."PKIMessage"(header: header, body: body, protection: code)
-      {:ok, bytes} = :'PKIXCMP-2009'.encode(:'PKIMessage', message)
+      {:ok, bytes} = :"PKIXCMP-2009".encode(:"PKIMessage", message)
       :logger.info ~c"TCP answer ~p~n", [message]
       bin = :erlang.iolist_to_binary(bytes)
       res =  "HTTP/1.0 200 OK\r\n"

@@ -30,7 +30,7 @@ defmodule CA.EST.Post do
                     true -> [] end end
 
 #     {:ok, cert} = :"PKIX1Explicit88".encode(:Certificate, CA.CMP.convertOTPtoPKIX_subj(cert))
-      {:ok, certRepMsg} = :'PKIXCMP-2009'.encode(:CertRepMessage, CA.CMP.Scheme."CertRepMessage"(response: reply))
+      {:ok, certRepMsg} = :"PKIXCMP-2009".encode(:CertRepMessage, CA.CMP.Scheme."CertRepMessage"(response: reply))
 
       body = :base64.encode certRepMsg
       conn |> put_resp_content_type("application/pkix-cert")
