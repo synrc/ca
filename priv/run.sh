@@ -1,0 +1,12 @@
+pdflatex base_profile.tex
+pdflatex industry_profile.tex
+pdflatex security-profiles.tex
+pdflatex target_profile_local.tex
+pdflatex target_profile_orgs.tex
+pdflatex target_profile_specialized.tex
+pdflatex target_profile_supreme.tex
+
+rm -f *.toc
+rm -f *.aux
+rm -f *.log
+rm -f *.out

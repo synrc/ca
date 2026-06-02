@@ -1,0 +1,613 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{eso-pic}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+\usepackage{microtype}
+\usepackage[english, ukrainian]{babel}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{tocloft}
+
+\renewcommand{\cftsecfont}{\small\bfseries}
+\renewcommand{\cftsubsecfont}{\footnotesize}
+\renewcommand{\cftsubsubsecfont}{\scriptsize}
+\renewcommand{\cftsecpagefont}{\small\bfseries}
+\renewcommand{\cftsubsecpagefont}{\footnotesize}
+\renewcommand{\cftsubsubsecpagefont}{\scriptsize}
+
+\definecolor{nato}{HTML}{293757}
+\definecolor{footergray}{gray}{0.65}
+
+\geometry{a4paper,left=3cm,right=3cm,top=3cm,bottom=3cm}
+\renewcommand{\familydefault}{\sfdefault}
+\setcounter{secnumdepth}{3}
+
+\titleformat{\section}
+  {\color{nato}\Huge\bfseries}{\thesection.}{1em}{}
+\titlespacing*{\section}{0pt}{30pt}{12pt}
+
+\titleformat{\subsection}
+  {\color{nato}\LARGE\bfseries}{\thesubsection.}{1em}{}
+\titlespacing*{\subsection}{0pt}{20pt}{8pt}
+
+\titleformat{\subsubsection}
+  {\color{nato}\Large\bfseries}{\thesubsubsection.}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{10pt}{6pt}
+
+\fancyhf{}
+\fancyhead[R]{\small\color{footergray} 2 червня 2026}
+\fancyfoot[L]{\small\color{footergray} Комплексна система захисту інформації. Цільовий профіль безпеки вищих спеціалізованих судів.}
+\fancyfoot[R]{\small\color{footergray}\thepage}
+
+\newcommand\HUGE[1]{\fontsize{40}{40}\selectfont #1}
+
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\footrule}{\color{footergray}\hrule width \textwidth height 0.4pt}
+
+\begin{document}
+
+\pagestyle{fancy}
+
+\begin{titlepage}
+  \AddToShipoutPictureBG*{\AtPageLowerLeft{\color{nato}\rule{\paperwidth}{\paperheight}}}
+  \color{white}\thispagestyle{empty}\vspace*{4cm}\centering
+  {\Huge  \textbf{Комплексна система захисту інформації} \par} \vspace{2cm}
+  {\HUGE  \textbf{Цільовий профіль безпеки вищих спеціалізованих судів} \par} \vspace{2.5cm}
+  \vfill
+  {\large 2026 \copyright\ Інформаційні Судові Системи \par}
+\end{titlepage}
+
+\newpage
+
+\begin{center}
+  {\Huge\color{nato}\bfseries Зміст\par}
+\end{center}
+\vspace{40pt}
+\tableofcontents
+
+\begin{abstract}
+Цільовий профіль безпеки (ЦПБ) — індивідуальний для конкретної системи підприємства. Саме на його основі створюється/модернізується КЗЗІ. Включає лише додаткові вимоги (відмінності) відносно Галузевого профілю.
+\end{abstract}
+
+\section{AU}
+
+\subsection{ПОДІЇ АУДИТУ (AU-2)}
+a. Визначити типи подій, які система може реєструвати для підтримки функції аудиту: [Призначення: типи подій, визначені організацією, які система здатна реєструвати]; b. Координувати функції аудиту безпеки з іншими організаційними підрозділами, які вимагають інформації, пов'язаної з аудитом, для посилення взаємної підтримки та допомоги у виборі типів подій, що перевіряються; c. Визначити, які типи подій підлягають аудиту: [Призначення: визначені організацією події, що підлягають аудиту (підмножина подій, що підлягають аудиту, визначених в AU-2 a.), а також частота (або ситуація, що вимагає) проведення аудиту для кожної ідентифікованої події] d. Обґрунтувати, чому типи подій, що перевіряються, вважаються достатніми для підтримки розслідувань інцидентів (постфактум), пов'язаних з безпекою та приватністю; e. Перегляньте й оновіть типи подій, вибрані для журналювання [Призначення: частота, визначена організацією].
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: au\_2\_a\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Типи подій, які система здатна реєструвати, визначено для підтримки функції аудиту}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: au\_2\_b\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Функція аудиту безпеки координується з іншими підрозділами організації, які вимагають інформації, пов'язаної з аудитом, длдля посилення взаємної підтримки та допомоги у виборі типів подій, що перевіряються}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: au\_2\_c\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Типи подій (підмножина 02\_ODP[01]) визначаються для реєстрації у системі; AU-}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: au\_2\_c\_02\\
+Type: string\\
+Default: \textquotedbl{}щорічно\textquotedbl{}
+}
+
+{\footnotesize Зазначені типи подій реєструються 02\_ODP[03] частота або ситуація>; <AU-}
+
+
+{\footnotesize\bfseries
+No: 5\\
+Name: au\_2\_d\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Надається обґрунтування, чому типи подій, що перевіряються, вважаються достатніми для підтримки розслідувань інцидентів (постфактум), пов'язаних з безпекою та конфіденційністю}
+
+
+{\footnotesize\bfseries
+No: 6\\
+Name: au\_2\_e\\
+Type: string\\
+Default: \textquotedbl{}щорічно\textquotedbl{}
+}
+
+{\footnotesize Переглядаються та оновлюються типи подій, вибрані для реєстрації, частота. у системі}
+
+
+{\footnotesize\bfseries
+No: 7\\
+Name: au\_2\_odp\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено типи подій, які система може реєструвати для підтримки функції аудиту}
+
+
+{\footnotesize\bfseries
+No: 8\\
+Name: au\_2\_odp\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено типи подій (підмножина AU-02\_ODP[01]) що підлягають аудиту у системі}
+
+
+{\footnotesize\bfseries
+No: 9\\
+Name: au\_2\_odp\_03\\
+Type: list\\
+Default: [\textquotedbl{}login\textquotedbl{}, \textquotedbl{}logout\textquotedbl{}, \textquotedbl{}failed\_attempt\textquotedbl{}]
+}
+
+{\footnotesize Визначено частоту або ситуацію, що вимагає проведення аудиту для кожної ідентифікованої події}
+
+
+{\footnotesize\bfseries
+No: 10\\
+Name: au\_2\_odp\_04\\
+Type: string\\
+Default: \textquotedbl{}щорічно\textquotedbl{}
+}
+
+{\footnotesize Частота перегляду та оновлення типів подій, обраних для журналювання}
+
+
+
+
+\subsubsection{УЗАГАЛЬНЕННЯ ЗАПИСІВ ПРО АУДИТ З ДЕКІЛЬКОХ ДЖЕРЕЛ (AU-2(1))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: au\_2\_1\_01\\
+Type: list\\
+Default: [\textquotedbl{}login\textquotedbl{}, \textquotedbl{}logout\textquotedbl{}, \textquotedbl{}failed\_attempt\textquotedbl{}]
+}
+
+{\footnotesize ПОДІЇ АУДИТУ - УЗАГАЛЬНЕННЯ ЗАПИСІВ ПРО АУДИТ З ДЕКІЛЬКОХ ДЖЕРЕЛ [Вилучено: Включено в АU-12]. AU-02(02) ПОДІЇ АУДИТУ - ВИБІР ПОДІЇ АУДИТУ ЗА КОМПОНЕНТАМИ [Вилучено: Включено в АU-12]}
+
+
+
+
+\subsubsection{ВИБІР ПОДІЇ АУДИТУ ЗА КОМПОНЕНТАМИ (AU-2(2))}
+
+
+\vspace{10pt}
+\textit{Немає параметрів для цього контролю.}
+\vspace{10pt}
+
+
+\subsubsection{ПЕРЕГЛЯД ТА ОНОВЛЕННЯ (AU-2(3))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: au\_2\_3\_01\\
+Type: list\\
+Default: [\textquotedbl{}login\textquotedbl{}, \textquotedbl{}logout\textquotedbl{}, \textquotedbl{}failed\_attempt\textquotedbl{}]
+}
+
+{\footnotesize ПОДІЇ АУДИТУ - ПЕРЕГЛЯД ТА ОНОВЛЕННЯ [Вилучено: Включено в АU-02]}
+
+
+
+
+\subsubsection{ПРИВІЛЕЙОВАНІ ФУНКЦІЇ (AU-2(4))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: au\_2\_4\_01\\
+Type: list\\
+Default: [\textquotedbl{}login\textquotedbl{}, \textquotedbl{}logout\textquotedbl{}, \textquotedbl{}failed\_attempt\textquotedbl{}]
+}
+
+{\footnotesize ПОДІЇ АУДИТУ - ПРИВІЛЕЙОВАНІ ФУНКЦІЇ [Вилучено: Включено в AC-06(09)]}
+
+
+
+
+\section{SC}
+
+\subsection{ДОСТУПНІСТЬ РЕСУРСІВ (SC-7)}
+a. Контролювати та управляти зв'язком на зовнішньому периметрі системи та на ключових внутрішніх периметрах всередині системи. b. Реалізувати підмережі для загальнодоступних компонентів системи, які є [Вибір: фізично; логічно] відділені від внутрішніх мереж організації. c. Підключатися до зовнішніх мереж або систем тільки через керовані інтерфейси, що складаються з пристроїв захисту периметру, і розташованих відповідно до архітектури безпеки та приватності організації.
+
+\vspace{10pt}
+\textit{Немає параметрів для цього контролю.}
+\vspace{10pt}
+
+
+\subsubsection{ФІЗИЧНО ВІДДІЛЕНІ ПІДМЕРЕЖІ (SC-7(1))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_7\_1\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize ЗАХИСТ ПЕРИМЕТРА - ФІЗИЧНО ВІДДІЛЕНІ ПІДМЕРЕЖІ [Вилучено: включено до SC-7]]}
+
+
+
+
+\subsubsection{ПУБЛІЧНИЙ ДОСТУП (SC-7(2))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_7\_2\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize ЗАХИСТ ПЕРИМЕТРА - ПУБЛІЧНИЙ ДОСТУП [Вилучено: включено до SC-7]]}
+
+
+
+
+\subsubsection{ТОЧКИ ДОСТУПУ (SC-7(3))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_7\_3\_01\\
+Type: integer\\
+Default: 3
+}
+
+{\footnotesize Обмежена кількість зовнішніх мережевих підключень до системи}
+
+
+
+
+\subsubsection{ЗОВНІШНІ КОМУНІКАЦІЙНІ СЛУЖБИ (SC-7(4))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_7\_4\_a\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Реалізовано керований інтерфейс для кожної зовнішньої телекомунікаційної послуги}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_7\_4\_b\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Встановлена політика потоку трафіку для кожного керованого інтерфейсу}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: sc\_7\_4\_c\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Захищена конфіденційність інформації, що передається через кожен інтерфейс}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: sc\_7\_4\_c\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Захищена цілісність інформації, що передається через кожен інтерфейс}
+
+
+{\footnotesize\bfseries
+No: 5\\
+Name: sc\_7\_4\_d\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Задокументовано кожен виняток з політики управління трафіком з обґрунтуванням місії або бізнес-потреби, а також тривалості такої потреби}
+
+
+{\footnotesize\bfseries
+No: 6\\
+Name: sc\_7\_4\_e\_01\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Переглядаються винятки з політики потоку трафіку частота}
+
+
+{\footnotesize\bfseries
+No: 7\\
+Name: sc\_7\_4\_e\_02\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Потрібно видалити винятки з політики потоку трафіку, які більше не підтримуються чітко визначеною місією або бізнеспотребою}
+
+
+{\footnotesize\bfseries
+No: 8\\
+Name: sc\_7\_4\_f\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Запобігається несанкціонований обмін управління із зовнішніми мережами}
+
+
+{\footnotesize\bfseries
+No: 9\\
+Name: sc\_7\_4\_g\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Публікується інформація, яка дозволяє віддаленим мережам виявляти несанкціонований трафік площини керування з внутрішніх мереж}
+
+
+{\footnotesize\bfseries
+No: 10\\
+Name: sc\_7\_4\_h\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Фільтрується несанкціонований трафік з зовнішніх мереж. трафіком плану}
+
+
+{\footnotesize\bfseries
+No: 11\\
+Name: sc\_7\_4\_odp\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Визначено періодичність перегляду винятків з політики управління інформаційними потоками}
+
+
+
+
+\subsubsection{ВІДМОВА ЗА ЗАМОВЧУВАННЯМ - ДОЗВІЛ ЗА ВИНЯТКОМ (SC-7(5))}
+
+
+\vspace{10pt}
+\textit{Немає параметрів для цього контролю.}
+\vspace{10pt}
+
+
+\subsubsection{ВІДПОВІДЬ НА РОЗПІЗНАНІ ПОМИЛКИ (SC-7(6))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_7\_6\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize ЗАХИСТ ПЕРИМЕТРА - ВІДПОВІДЬ НА РОЗПІЗНАНІ ПОМИЛКИ [Вилучено: включено до SC-7(18)]}
+
+
+
+
+\subsubsection{ЗАПОБІГАННЯ ПОДІЛУ ТУНЕЛЮВАННЯ ДЛЯ ВІДДАЛЕНИХ ПРИСТРОЇВ (SC-7(7))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_7\_7\_01\\
+Type: string\\
+Default: \textquotedbl{}автоматизований засіб моніторингу\textquotedbl{}
+}
+
+{\footnotesize Запобігається розділеному тунелюванню для віддалених пристроїв, що підключаються до систем організації, якщо розділене тунелюванню не захищено за допомогою засоби захисту}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_7\_7\_odp\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначені гарантії безпечного прокладання розділеному тунелюванню}
+
+
+
+
+\subsubsection{ЗАХИСТ ПЕРИМЕТРА -МАРШРУТИЗАЦІЯ АВТЕНТИФІКОВАНИХ ПРОКСІ-СЕРВЕРІВ (SC-7(8))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_7\_8\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize SC-07(08) \_ODP[01] внутрішній комунікаційний трафік> спрямовується до <SC-07(08) \_ODP[02] зовнішніх мереж> через автентифіковані проксі-сервери на керованих інтерфейсах}
+
+
+
+
+\subsubsection{ЗАХИСТ (SC-7(9))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_7\_9\_a\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Виявлено вихідний комунікаційний трафік, що становить загрозу для зовнішніх систем}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_7\_9\_a\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Заборонено вихідний комунікаційний трафік, що становить загрозу для зовнішніх систем}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: sc\_7\_9\_b\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Перевіряється ідентичність внутрішніх пов'язаних з відмовою у зв'язку. користувачів,}
+
+
+
+
+\subsubsection{ІЗОЛЬОВАНІ ВІД ІНШИХ ВНУТРІШНІХ КОМПОНЕНТІВ СИСТЕМИ ШЛЯХОМ ВПРОВАДЖЕННЯ ФІЗИЧНО ВІДОКРЕМЛЕНИХ ПІДМЕРЕЖ З КЕРОВАНИМИ ІНТЕРФЕЙСАМИ ДО ІНШИХ КОМПОНЕНТІВ СИСТЕМИ (SC-7(13))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_7\_13\_01\\
+Type: string\\
+Default: \textquotedbl{}автоматизований засіб моніторингу\textquotedbl{}
+}
+
+{\footnotesize Ізольовані засоби, механізми та компоненти підтримки інформаційної безпеки від інших внутрішніх компонентів системи шляхом впровадження фізично відокремлених підмереж з керованими інтерфейсами до інших компонентів системи}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_7\_13\_odp\\
+Type: string\\
+Default: \textquotedbl{}автоматизований засіб моніторингу\textquotedbl{}
+}
+
+{\footnotesize Визначені інструменти, механізми та компоненти підтримки інформаційної безпеки, які мають бути ізольовані від інших внутрішніх компонентів системи}
+
+
+
+
+\subsection{ВСТАНОВЛЕННЯ КЛЮЧАМИ (SC-12)}
+Встановити та управляти криптографічними ключами для криптографічних засобів, які використовуються в системі відповідно до [Призначення: визначені організацією вимоги до генерації, поширення, зберігання, доступу та знищення ключів].
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_12\_01\\
+Type: string\\
+Default: \textquotedbl{}AES-256-GCM\textquotedbl{}
+}
+
+{\footnotesize Встановлюються криптографічні ключі, коли в системі використовується криптографія відповідно до < SC-12\_ODP вимог >}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_12\_02\\
+Type: string\\
+Default: \textquotedbl{}AES-256-GCM\textquotedbl{}
+}
+
+{\footnotesize Здійснюється управління криптографічними ключами, коли в системі використовується криптографія, відповідно до вимог }
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: sc\_12\_odp\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначені вимоги до генерації, розповсюдження, зберігання, доступу та знищення ключів}
+
+
+
+
+\subsection{ЗАХИСТ ІНФОРМАЦІЇ В СТАНІ СПОКОЮ (SC-28)}
+Забезпечити [Вибір (один або кілька): конфіденційність; цілісність] [Призначення: визначена організацією інформація] в стані спокою.
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_28\_odp\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Вибрано одне або декілька з наступних ЗНАЧЕНЬ ПАРАМЕТРІВ: \{конфіденційність; цілісність\}}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_28\_odp\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Є інформація в стані спокою, яка потребує захисту}
+
+
+
+
+\end{document}
