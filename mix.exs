@@ -1,6 +1,7 @@
 defmodule CA.Mixfile do
   use Mix.Project
-  def application(), do: [ mod: {CA, []}, extra_applications: [:x509, :bandit, :plug, :logger]]
+  def application(), do: [mod: {CA, []}, extra_applications: [:x509, :bandit, :plug, :logger]]
+
   def project() do
     [
       app: :ca,
