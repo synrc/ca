@@ -6,6 +6,9 @@ defmodule CA.Net do
 
   @doc """
   Перелік мережевих сегментів та зон з відповідними контролями.
+
+  Джерело: NIST SP 800-41 (Guidelines on Firewalls and Firewall Policy), концепції Zero Trust Architecture.
+  Завдання: Описати типи зон (DMZ, Air-gapped, Management VLAN).
   """
   def zones do
     %{

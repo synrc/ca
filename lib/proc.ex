@@ -1,12 +1,15 @@
 defmodule CA.Proc do
   @moduledoc """
   Карта бізнес-процесів (Business Process Criticality).
-  Дозволяє визначати вимоги до резервного копіювання (CP) 
+  Дозволяє визначати вимоги до резервного копіювання (CP)
   на основі RTO (Recovery Time Objective) та RPO (Recovery Point Objective).
   """
 
   @doc """
   Перелік критичних процесів та їхніх параметрів доступності.
+
+  Джерело: NIST SP 800-34 (Contingency Planning Guide).
+  Завдання: Формування параметрів RTO/RPO та їх вплив на Availability controls.
   """
   def processes do
     %{
@@ -24,7 +27,8 @@ defmodule CA.Proc do
         name: "Формування OCSP-відповідей",
         desc: "Надання інформації про статус сертифіката в реальному часі.",
         criticality: :critical,
-        rto_hours: 0, # HA cluster
+        # HA cluster
+        rto_hours: 0,
         rpo_hours: 0,
         controls: ["CP", "SC"]
       },

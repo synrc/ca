@@ -6,13 +6,17 @@ defmodule CA.ABAC do
 
   @doc """
   Структурований перелік системних та людських ролей.
+
+  Джерело: NIST SP 800-162 (Guide to Attribute Based Access Control), NIST SP 800-92 (Access Control).
+  Завдання: Сформувати матрицю ABAC/RBAC, включаючи типові ролі ЦСК (Адміністратор безпеки, Аудитор, Оператор реєстрації) та їхні атрибути доступу.
   """
   def roles do
     %{
       admin: %{
         id: "R-ADM",
         name: "Адміністратор безпеки",
-        desc: "Повний контроль над конфігурацією систем захисту, але без доступу до бізнес-даних.",
+        desc:
+          "Повний контроль над конфігурацією систем захисту, але без доступу до бізнес-даних.",
         permissions: ["manage:firewall", "manage:audit", "manage:roles"],
         controls: ["AC", "IA", "AU"]
       },
@@ -46,8 +50,10 @@ defmodule CA.ABAC do
   def policies do
     %{
       "POL-01" => "Багатофакторна автентифікація (MFA) обов'язкова для R-ADM.",
-      "POL-02" => "R-OPR може створювати запити лише в межах своєї локації (Location-based ABAC).",
-      "POL-03" => "Доступ до систем керування ключами вимагає 'Правила двох осіб' (Dual Control / Split Knowledge)."
+      "POL-02" =>
+        "R-OPR може створювати запити лише в межах своєї локації (Location-based ABAC).",
+      "POL-03" =>
+        "Доступ до систем керування ключами вимагає 'Правила двох осіб' (Dual Control / Split Knowledge)."
     }
   end
 end

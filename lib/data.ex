@@ -6,6 +6,10 @@ defmodule CA.Data do
 
   @doc """
   Класифікація інформаційних масивів системи.
+
+  Джерело: FIPS 199 (Standards for Security Categorization of Federal Information), GDPR, Закон України "Про захист персональних даних".
+  Завдання: Розробити матрицю класифікації (Публічна, Внутрішня, Конфіденційна, Таємна, Персональні дані, Ключові дані ЦСК) та рівні впливу (High, Moderate, Low).
+
   """
   def classification do
     %{
@@ -35,7 +39,8 @@ defmodule CA.Data do
         name: "Ключова інформація",
         desc: "Особисті ключі ЦСК, сесійні ключі шифрування, паролі адміністраторів.",
         impact: %{confidentiality: :high, integrity: :high, availability: :high},
-        controls: ["SC", "PE", "MP", "IA"] # Найсуворіший захист
+        # Найсуворіший захист
+        controls: ["SC", "PE", "MP", "IA"]
       }
     }
   end
