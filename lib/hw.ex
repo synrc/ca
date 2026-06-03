@@ -49,6 +49,18 @@ defmodule CA.HW do
           controls: ["PE", "AC", "SI"]
         },
         %{id: "HW-END-02", name: "Мобільні пристрої", controls: ["AC", "SC", "MP"]}
+      ],
+      storage: [
+        %{
+          id: "HW-STG-01",
+          name: "Системи зберігання даних (СЗД, SAN, NAS)",
+          controls: ["PE", "MP", "CP"]
+        },
+        %{
+          id: "HW-STG-02",
+          name: "Стрічкові бібліотеки (Tape Libraries) для офлайн бекапів",
+          controls: ["PE", "MP"]
+        }
       ]
     }
   end

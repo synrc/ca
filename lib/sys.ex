@@ -24,6 +24,9 @@ defmodule CA.Sys do
       app: [
         %{id: "SYS-APP-01", name: "Програмні комплекси ЦСК (Сайфер, ІІТ)", controls: ["SI", "SC", "AU", "CP"]},
         %{id: "SYS-APP-02", name: "Системи моніторингу та логування (SIEM, Zabbix)", controls: ["AU", "IR"]}
+      ],
+      infrastructure: [
+        %{id: "SYS-INF-01", name: "Системи резервного копіювання (Veeam, Bacula)", controls: ["CP", "CM", "SC", "AU"]}
       ]
     }
   end

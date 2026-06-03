@@ -49,6 +49,24 @@ defmodule CA.Proc do
         rto_hours: 72,
         rpo_hours: 0,
         controls: ["PE", "AC", "PS", "AU"]
+      },
+      document_management: %{
+        id: "P-DOC",
+        name: "Електронний документообіг (Судові справи)",
+        desc: "Обробка, зберігання та обіг електронних судових документів, ухвал, рішень.",
+        criticality: :high,
+        rto_hours: 8,
+        rpo_hours: 2,
+        controls: ["SI", "AC", "CP", "AU"]
+      },
+      backup_process: %{
+        id: "P-BKP",
+        name: "Резервне копіювання та відновлення",
+        desc: "Процес створення, верифікації та безпечного зберігання бекапів.",
+        criticality: :critical,
+        rto_hours: 24,
+        rpo_hours: 0,
+        controls: ["CP", "MP", "SI"]
       }
     }
   end

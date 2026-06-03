@@ -41,6 +41,20 @@ defmodule CA.Data do
         impact: %{confidentiality: :high, integrity: :high, availability: :high},
         # Найсуворіший захист
         controls: ["SC", "PE", "MP", "IA"]
+      },
+      court_docs: %{
+        id: "D-CRT",
+        name: "Електронні судові справи",
+        desc: "Матеріали судових проваджень, ухвали, рішення, докази (в т.ч. з обмеженим доступом).",
+        impact: %{confidentiality: :high, integrity: :high, availability: :high},
+        controls: ["AC", "SC", "SI", "CP"]
+      },
+      backups: %{
+        id: "D-BKP",
+        name: "Резервні копії (Backups)",
+        desc: "Снапшоти баз даних, образи ВМ, архіви судових документів.",
+        impact: %{confidentiality: :high, integrity: :high, availability: :high},
+        controls: ["CP", "MP", "PE", "SC"]
       }
     }
   end
