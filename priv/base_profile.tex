@@ -3768,6 +3768,236 @@ Default: [\textquotedbl{}login\textquotedbl{}, \textquotedbl{}logout\textquotedb
 
 
 
+\subsubsection{НАВЧАННЯ З ПІДВИЩЕННЯ ОБІЗНАНОСТІ | НАВЧАННЯ ЩОДО РОЗПІЗНАВАННЯ ВНУТРІШНЬОЇ ЗАГРОЗИ}
+Ввести до програми навчання вправи з розпізнавання та виявлення потенційних індикаторів внутрішніх загроз.
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: at\_2\_2\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Введено до програми навчання вправи з розпізнавання потенційних індикаторів внутрішніх загроз}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: at\_2\_2\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Введено до програми навчання вправи з виявлення потенційних індикаторів внутрішніх загроз}
+
+
+
+
+\subsubsection{НАВЧАННЯ З ПІДВИЩЕННЯ ОБІЗНАНОСТІ | НАВЧАННЯ З ПИТАНЬ СОЦІАЛЬНОЇ ІНЖЕНЕРІЇ}
+Ввести до програми навчання вправи з підвищення обізнаності щодо розпізнавання та повідомлення про потенційні та фактичні атаки, з використанням методів соціальної інженерії та інтелектуального аналізу соціальних даних.
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: at\_2\_3\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize До програми навчання введено вправи з розпізнавання потенційних та фактичних випадків соціального інжинірингу}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: at\_2\_3\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize До програми навчання введено вправи з повідомлення про потенційні та фактичні випадки соціального інжинірингу}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: at\_2\_3\_03\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize До програми навчання введено вправи з розпізнавання потенційних та фактичних випадків інтелектуального аналізу соціальних даних}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: at\_2\_3\_04\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize До програми навчання введено вправи з повідомлення про потенційні та фактичні випадки інтелектуального аналізу соціальних даних}
+
+
+
+
+\subsection{РОЛЬОВЕ НАВЧАННЯ (AT-3)}
+a. Забезпечити проведення навчання з питань безпеки та приватності на основі ролей для працівників з ролями та обов'язками: [Призначення: визначені організацією ролі та обов'язки]: 1. перед авторизацією доступу до системи, інформації або виконанням призначених обов'язків і [Призначення: частота, визначена організацією] після цього; 2. коли цього потребують системні зміни. b. Оновити навчальний контент на основі ролей [Призначення: частота, визначена організацією] і наступні [Призначення: події, визначені організацією]; c. Включіть у рольове навчання, інформацію, отриману з внутрішніх або зовнішніх інцидентів та порушень безпеки.
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: at\_3\_b\_01\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Оновлюється вміст навчання на основі ролей з частотою}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: at\_3\_b\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Оновлюється вміст навчання на основі ролей після подій}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: at\_3\_c\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Інформація отримана з внутрішніх чи зовнішніх інцидентів або порушень безпеки, включається в навчання на основі ролей}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: at\_3\_odp\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначено ролі та обов'язки для тренінгів з безпеки на основі ролей}
+
+
+{\footnotesize\bfseries
+No: 5\\
+Name: at\_3\_odp\_02\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначено ролі та обов'язки для тренінгів з конфіденційності на основі ролей}
+
+
+{\footnotesize\bfseries
+No: 6\\
+Name: at\_3\_odp\_03\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначено частоту проведення тренінгів на основі ролей з безпеки та конфіденційності для призначеного персоналу після початкової підготовки}
+
+
+{\footnotesize\bfseries
+No: 7\\
+Name: at\_3\_odp\_04\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Визначено частоту оновлення змісту навчання на основі ролей}
+
+
+{\footnotesize\bfseries
+No: 8\\
+Name: at\_3\_odp\_05\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначено події, які потребують оновлення змісту навчання на основі ролей; AT-03(a)[01][01] навчання з безпеки на основі ролей проводиться для ролей та обов'язків перед авторизацією доступу до системи, інформації або виконанням призначених обов'язків; AT-03(a)[01][02] навчання з конфіденційності на основі ролей проводиться для ролей та обов'язків перед авторизацією доступу до системи, інформації або виконанням призначених обов'язків; AT-03(a)[01][03] навчання з безпеки на основі ролей проводиться для ролей та обов'язків з частотою після цього; AT-03(a)[01][04] навчання з конфіденційності на основі ролей проводиться для ролей та обов'язків з частотою після цього; AT-03(a)[02][01] навчання з питань безпеки на основі ролей проводиться для персоналу, який виконує певні ролі та обов'язки у сфері безпеки, коли цього вимагають зміни в системі; AT-03(a)[02][02] навчання з питань конфіденційності на основі ролей проводиться для персоналу, який виконує певні ролі та обов'язки у сфері безпеки, коли цього вимагають зміни в системі}
+
+
+
+
+\subsubsection{ЗАБЕЗПЕЧУЄТЬСЯ ПІДВИЩЕННЯМ КВАЛІФІКАЦІЇ В ГАЛУЗІ ЗАЙНЯТОСТІ ТА ФУНКЦІОНУВАННЯ ЗАХОДІВ ЗАХИСТУ РОБОЧОГО СЕРЕДОВИЩА З (AT-3(1))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: at\_3\_1\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Персонал або ролі забезпечується підвищенням кваліфікації в галузі зайнятості та функціонування заходів захисту робочого середовища з частотою}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: at\_3\_1\_odp\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначено персонал або ролі, які мають бути забезпечені початковим навчанням та підвищенням кваліфікації з питань застосування та експлуатації заходів захисту робочого середовища}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: at\_3\_1\_odp\_02\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Визначено частоту проведення підвищення кваліфікації в галузі операцій та функціонування заходів захисту робочого середовища}
+
+
+
+
+\subsubsection{ЗАБЕЗПЕЧУЮТЬСЯ ПІДГОТОВКОЮ З ПИТАНЬ ЗАСТОСУВАННЯ ТА ЕКСПЛУАТАЦІЇ ЗАХОДІВ (AT-3(2))}
+Надати [Призначення: визначеним організацією персоналу чи ролям] з початку роботи та з [Призначення: визначеною організацією частотою] підготовку з питань застосування та експлуатації заходів фізичної безпеки.
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: at\_3\_2\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Персонал або ролі забезпечуються підготовкою з питань застосування та експлуатації заходів фізичної безпеки з частотою}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: at\_3\_2\_odp\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначаено персонал або ролі, які мають бути забезпечені підготовкою з питань застосування та експлуатації заходів фізичної безпеки}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: at\_3\_2\_odp\_02\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Визначаеночастоту проведення підготовки з питань застосування та експлуатації заходів фізичної безпеки}
+
+
+
+
 \section{AU}
 
 \subsection{Політика та процедури аудиту та підзвітності (AU-1)}
@@ -9748,6 +9978,588 @@ Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\
 
 
 
+\subsection{АВТЕНТИФІКАТОР УПРАВЛІННЯ}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_a\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Управління системними автентифікаторами здійснюється шляхом перевірки, як частини початкового розподілу автентифікатора, особи, групи, ролі або пристрою, який отримує автентифікатор}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: ia\_5\_b\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Управління системними автентифікаторами здійснюється шляхом створення вихідного вмісту автентифікатора для будь-яких автентифікаторів, виданих організацією}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: ia\_5\_c\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Управління системними автентифікаторами здійснюється шляхом забезпечення того, щоб автентифікатори мали достатню стійкість механізму для їх використання за призначенням; IA-05(d) управління системними автентифікаторами здійснюється шляхом створення та реалізація адміністративних процедур для первинного розповсюдження автентифікаторів, для втрачених/скомпрометованих або пошкоджених автентифікаторів, а також для відкликання автентифікаторів}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: ia\_5\_e\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Управління системними автентифікаторами здійснюється шляхом зміни типових автентифікаторів перед першим використанням}
+
+
+{\footnotesize\bfseries
+No: 5\\
+Name: ia\_5\_f\\
+Type: list\\
+Default: [\textquotedbl{}login\textquotedbl{}, \textquotedbl{}logout\textquotedbl{}, \textquotedbl{}failed\_attempt\textquotedbl{}]
+}
+
+{\footnotesize Управління системними автентифікаторами здійснюється шляхом зміни/оновлення автентифікаторів у встановлений період часу або коли відбуваються події}
+
+
+{\footnotesize\bfseries
+No: 6\\
+Name: ia\_5\_g\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Управління системними автентифікаторами здійснюється шляхом захисту вмісту автентифікатора від несанкціонованого розкриття та модифікацій}
+
+
+{\footnotesize\bfseries
+No: 7\\
+Name: ia\_5\_h\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Управління системними автентифікаторами здійснюється шляхом вимоги до осіб, які використовують пристрої, використовувати спеціальні заходи безпеки для захисту автентифікаторів}
+
+
+{\footnotesize\bfseries
+No: 8\\
+Name: ia\_5\_i\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Управління системними автентифікаторами здійснюється шляхом вимоги змінювати автентифікатори для облікових записів груп/ролей при зміні членства в цих облікових записах}
+
+
+{\footnotesize\bfseries
+No: 9\\
+Name: ia\_5\_odp\_01\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Визначено період часу для зміни або оновлення автентифікаторів за типом автентифікатора}
+
+
+
+
+\subsubsection{АВТЕНТИФІКАЦІЯ НА ОСНОВІ ПАРОЛЯ (IA-5(1))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_1\_a\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Для автентифікації на основі паролів підтримується та оновлюється список часто використовуваних, очікуваних або скомпрометованих паролів частота, а також коли є підозра, що паролі організації були скомпрометовані прямо чи опосередковано}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: ia\_5\_1\_b\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Для автентифікації на основі паролів, коли паролі створюються або оновлюються користувачами, паролі перевіряються на відсутність у списку загальновживаних, очікуваних або скомпрометованих паролів в IA-05(01)(a)}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: ia\_5\_1\_c\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Для автентифікації на основі паролів, паролі передаються лише криптографічно захищеними каналами}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: ia\_5\_1\_d\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Для автентифікації на основі паролів паролі зберігаються за допомогою затвердженого алгоритму гешування, переважно використовуючи ключову геш-функцію}
+
+
+{\footnotesize\bfseries
+No: 5\\
+Name: ia\_5\_1\_e\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Для автентифікації на основі пароля після відновлення облікового запису потрібно негайно вибрати новий пароль}
+
+
+{\footnotesize\bfseries
+No: 6\\
+Name: ia\_5\_1\_f\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Для автентифікації на основі пароля дозволяється вибір користувачем довгих паролів і фраз, що включають пробіли та всі друковані символи}
+
+
+{\footnotesize\bfseries
+No: 7\\
+Name: ia\_5\_1\_g\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Для автентифікації на основі пароля використовуються автоматизовані інструменти, які допомагають користувачеві у виборі надійних автентифікаторів паролів}
+
+
+{\footnotesize\bfseries
+No: 8\\
+Name: ia\_5\_1\_h\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Для автентифікації на основі пароля застосовуються склад та правила складності}
+
+
+{\footnotesize\bfseries
+No: 9\\
+Name: ia\_5\_1\_odp\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначено частоту оновлення списку часто використовуваних, очікуваних або скомпрометованих паролів}
+
+
+{\footnotesize\bfseries
+No: 10\\
+Name: ia\_5\_1\_odp\_02\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Визначено склад та правила складності автентифікатора}
+
+
+
+
+\subsubsection{АВТЕНТИФІКАЦІЯ НА ОСНОВІ ВІДКРИТОГО КЛЮЧА (IA-5(2))}
+
+
+\vspace{10pt}
+\textit{Немає параметрів для цього контролю.}
+\vspace{10pt}
+
+
+\subsubsection{ОСОБИСТА АБО ДОВІРЧА АВТЕНТИФІКАЦІЯ ЗОВНІШНЬОЇ СТОРОНИ [Виключено: Включено до ІА-12(04)]. (IA-5(3))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_3\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize УПРАВЛІННЯ АВТЕНТИФІКАТОРОМ - ОСОБИСТА АБО ДОВІРЧА АВТЕНТИФІКАЦІЯ ЗОВНІШНЬОЇ СТОРОНИ [Виключено: Включено до ІА-12(04)]}
+
+
+
+
+\subsubsection{АВТОМАТИЗОВАНА ПІДТРИМКА ДЛЯ ВИЗНАЧЕННЯ МІЦНОСТІ ПАРОЛЯ [Виключено: Включено до ІА-05(01)]. (IA-5(4))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_4\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize УПРАВЛІННЯ АВТЕНТИФІКАТОРОМ - АВТОМАТИЗОВАНА ПІДТРИМКА ДЛЯ ВИЗНАЧЕННЯ МІЦНОСТІ ПАРОЛЯ [Виключено: Включено до ІА-05(01)]}
+
+
+
+
+\subsubsection{ЗМІНА АВТЕНТИФІКАТОРІВ ДО ДОСТАВКИ (IA-5(5))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_5\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Розробники та інсталятори компонентів системи зобов'язані надавати унікальні автентифікатори або змінювати автентифікатори за замовчуванням до доставки та встановлення}
+
+
+
+
+\subsubsection{ЗАХИСТ АВТЕНТИФІКАТОРІВ (IA-5(6))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_6\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Автентифікатори захищені відповідно до категорії безпеки інформації, до якої дозволяє доступ використання автентифікатора}
+
+
+
+
+\subsubsection{ВІДСУТНІСТЬ ВБУДОВАНИХ НЕЗАШИФРОВАНИХ СТАТИЧНИХ АВТЕНТИФІКАТОРІВ (IA-5(7))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_7\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Незашифровані статичні автентифікатори не вбудовуються в застосунки або сценарії доступу та не збережені на функціональній клавіші}
+
+
+
+
+\subsubsection{БАГАТОСИСТЕМНІ ОБЛІКОВІ ЗАПИСИ (IA-5(8))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_8\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Заходи захисту впроваджені для управління ризиком компрометації через наявність облікових записів у декількох системах}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: ia\_5\_8\_odp\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено заходи захисту, впроваджені для управління ризиком компрометації через те, що користувачі мають облікові записи в декількох системах}
+
+
+
+
+\subsubsection{УПРАВЛІННЯ ОБ'ЄДНАННЯМ АВТЕНТИФІКАТОРІВ (IA-5(9))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_9\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Зовнішні організації використовуються для об'єднання автентифікаторів}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: ia\_5\_9\_odp\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено зовнішні організації, які будуть використовуватися для об'єднання автентифікаторів}
+
+
+
+
+\subsubsection{ДИНАМІЧНЕ ЗВ'ЯЗУВАННЯ МАНДАТІВ (IA-5(10))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_10\_01\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Ідентифікатори та автентифікатори динамічно зв'язуються за допомогою правила для динамічного зв'язування }
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: ia\_5\_10\_odp\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Визначено правила для динамічного зв'язування ідентифікаторів та автентифікаторів}
+
+
+
+
+\subsubsection{АВТЕНТИФІКАЦІЯ НА ОСНОВІ АПАРАТНИХ ТОКЕНІВ (IA-5(11))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_11\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize УПРАВЛІННЯ АВТЕНТИФІКАТОРОМ - АВТЕНТИФІКАЦІЯ НА ОСНОВІ АПАРАТНИХ ТОКЕНІВ [Вилучено: Включено до ІА-02(01), ІА-02(02)]}
+
+
+
+
+\subsubsection{ЕФЕКТИВНІСТЬ БІОМЕТРИЧНОЇ АВТЕНТИФІКАЦІЇ (IA-5(12))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_12\_odp\\
+Type: string\\
+Default: \textquotedbl{}автоматизований засіб моніторингу\textquotedbl{}
+}
+
+{\footnotesize Визначено вимоги до якості біометрії; для біометричної автентифікації використовувати механізми, які задовольняють вимоги}
+
+
+
+
+\subsubsection{ЗАКІНЧЕННЯ ТЕРМІНУ ШУВАННЯ АВТЕНТИФІКАТОРІВ (IA-5(13))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_13\_odp\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Визначено періоду часу після якого необхідно заборонити використання кешованих автентифікаторів забороняється використання кешованих автентифікаторів після періоду часу}
+
+
+
+
+\subsubsection{УПРАВЛІННЯ ЗМІСТОМ ДОВІРЧИХ СХОВИЩ ІНФРАСТРУКТУРИ ВІДКРИТИХ КЛЮЧІВ (IA-5(14))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_14\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Для автентифікації на основі інфраструктури з відкритим ключем використовується загальноорганізаційна методологія управління вмістом довірених сховищ інфраструктури відкритого ключа, встановлених на всіх платформах, включно з мережами, операційними системами, браузерами та застосунками}
+
+
+
+
+\subsubsection{ПРОДУКТИ ТА ПОСЛУГИ, ЗАТВЕРДЖЕНІ УПОВНОВАЖЕНИМ ОРГАНОМ (IA-5(15))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_15\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Використовуються лише схвалені та затверджені уповноваженим органом продукти та послуги}
+
+
+
+
+\subsubsection{ПЕРЕДАЧА ОСОБИСТОЇ АБО ДОВІРЧОЇ АВТЕНТИФІКАЦІЇ ЗОВНІШНЬОЇ СТОРОНИ (IA-5(16))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_16\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize УПРАВЛІННЯ АВТЕНТИФІКАТОРОМ - ПЕРЕДАЧА ОСОБИСТОЇ АБО ДОВІРЧОЇ АВТЕНТИФІКАЦІЇ ЗОВНІШНЬОЇ СТОРОНИ МЕТА ОЦІНКИ: Визначити, чи:}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: ia\_5\_16\_odp\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено типи та/або конкретні автентифікатори, які будуть передаватися}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: ia\_5\_16\_odp\_02\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Вибрано одне з наступних ЗНАЧЕНЬ ПАРАМЕТРІВ: \{особисто; довіреною зовнішньою стороною\}}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: ia\_5\_16\_odp\_03\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено зареєстрований орган, який приймає автентифікатори}
+
+
+{\footnotesize\bfseries
+No: 5\\
+Name: ia\_5\_16\_odp\_04\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначено персонал або ролі, які уповноважують передачу автентифікаторів}
+
+
+
+
+\subsubsection{АВТОМАТИЗОВАНІ ЗАСОБИ ВИЯВЛЕННЯ АТАК ІЗ ВИКОРИСТАННЯМ БІОМЕТРИЧНИХ АВТЕНТИФІКАТОРІВ (IA-5(17))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_17\_01\\
+Type: string\\
+Default: \textquotedbl{}автоматизований засіб моніторингу\textquotedbl{}
+}
+
+{\footnotesize Використовуються механізми виявлення атак із використанням штучно виготовлених артефактів для біометричних автентифікаторів}
+
+
+
+
+\subsubsection{МЕНЕДЖЕР ПАРОЛІВ (IA-5(18))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_18\_a\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Менеджери паролів використовуються для створення та керування паролями}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: ia\_5\_18\_b\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Паролі захищені за допомогою елементи керування}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: ia\_5\_18\_odp\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначено менеджери паролів, які використовуються для створення та керування паролями}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: ia\_5\_18\_odp\_02\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначено елементи керування для захисту паролів}
+
+
+
+
+\subsection{ПРИХОВУВАННЯ ЗВОРОТНОГО ЗВ'ЯЗКУ АВТЕНТИФІКАТОРА}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_6\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Забезпечино приховану зворотну передачу інформації автентифікації в про- цесі автентифікації для забезпечення захисту інформації від можливої експлуатації та використання неавторизованими особами}
+
+
+
+
 \subsection{ПОВТОРНА АВТЕНТИФІКАЦІЯ (IA-11)}
 
 
@@ -13188,6 +14000,238 @@ Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\
 
 
 
+\subsection{ФІЗИЧНИЙ ДОСТУП ДО СИСТЕМИ}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: pe\_3\_a\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Авторизація фізичного доступу забезпечується в пунктах входу і виходу шляхом перевірки індивідуальних дозволів доступу}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: pe\_3\_b\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Журнали контролю фізичного доступу ведуться для 03\_ODP[04] точок входу або виходу>}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: pe\_3\_c\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Доступ в зони всередині об'єкту, визначені як загальнодоступні, підтримується шляхом впровадження заходів захисту}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: pe\_3\_d\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Відвідувачів супроводжують}
+
+
+{\footnotesize\bfseries
+No: 5\\
+Name: pe\_3\_d\_02\\
+Type: list\\
+Default: []
+}
+
+{\footnotesize Активність відвідувачів контролюється умови}
+
+
+{\footnotesize\bfseries
+No: 6\\
+Name: pe\_3\_e\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Ключі захищені}
+
+
+{\footnotesize\bfseries
+No: 7\\
+Name: pe\_3\_e\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Коди доступу захищені}
+
+
+{\footnotesize\bfseries
+No: 8\\
+Name: pe\_3\_e\_03\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Інші пристрої фізичного доступу захищені}
+
+
+{\footnotesize\bfseries
+No: 9\\
+Name: pe\_3\_f\\
+Type: string\\
+Default: \textquotedbl{}щорічно\textquotedbl{}
+}
+
+{\footnotesize Пристрої фізичного доступу інвентаризуються частота}
+
+
+{\footnotesize\bfseries
+No: 10\\
+Name: pe\_3\_g\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Коди доступу змінюється частота, коли код скомпрометовано, або коли особи, які володіють кодом, переводяться або звільняються; <PE- PE-03(g)[02] ключі змінюються частота, коли ключі втрачено, або коли особи, що володіють ключами, переводяться або звільняються}
+
+
+{\footnotesize\bfseries
+No: 11\\
+Name: pe\_3\_odp\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено точки входу та виходу в об'єкт, в якому знаходиться система}
+
+
+{\footnotesize\bfseries
+No: 12\\
+Name: pe\_3\_odp\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Вибрано одне або декілька з наступних ЗНАЧЕНЬ ПАРАМЕТРІВ: \{системи або пристрої; охоронці\}}
+
+
+{\footnotesize\bfseries
+No: 13\\
+Name: pe\_3\_odp\_03\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено фізичні системи або пристрої контролю доступу, що використовуються для контролю входу та виходу на об'єкт (якщо вибрано); PE-03\_ODP[04] визначено точки входу або виходу, для яких ведуться журнали контролю фізичного доступу}
+
+
+{\footnotesize\bfseries
+No: 14\\
+Name: pe\_3\_odp\_05\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено заходи захисту для контролю доступу в зони всередині об'єкту, позначені як загальнодоступні}
+
+
+{\footnotesize\bfseries
+No: 15\\
+Name: pe\_3\_odp\_06\\
+Type: list\\
+Default: []
+}
+
+{\footnotesize Визначено умови, що вимагають супроводу відвідувачів та моніторингу активності відвідувачів}
+
+
+{\footnotesize\bfseries
+No: 16\\
+Name: pe\_3\_odp\_07\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначені пристрої фізичного доступу, що підлягають інвентаризації}
+
+
+{\footnotesize\bfseries
+No: 17\\
+Name: pe\_3\_odp\_08\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Визначено частоту проведення інвентаризації пристроїв фізичного доступу}
+
+
+{\footnotesize\bfseries
+No: 18\\
+Name: pe\_3\_odp\_09\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Визначено частоту, з якою потрібно змінювати коди доступу}
+
+
+{\footnotesize\bfseries
+No: 19\\
+Name: pe\_3\_odp\_10\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Визначено частоту, з якою потрібно змінювати ключі}
+
+
+
+
+\subsubsection{Керування фізичним доступом --- Захист від злому (PE-3(5))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: pe\_3\_5\_odp\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено заходи захисту від фізичної підробки або підміни}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: pe\_3\_5\_odp\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Вибрано одне або декілька з наступних ЗНАЧЕНЬ ПАРАМЕТРІВ: \{виявлення; запобігання\}}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: pe\_3\_5\_odp\_03\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено апаратні компоненти, які мають захищені від фізичної підробки або підміни}
+
+
+
+
 \subsection{РЕ-4 ліній електроживлення (PE-4)}
 
 
@@ -13220,6 +14264,154 @@ Default: nil
 }
 
 {\footnotesize Визначено заходи захисту, які необхідно впровадити для контролю фізичного доступу до систем розподілу та постачання живлення в межах об'єкту організації}
+
+
+
+
+\subsection{КОНТРОЛЬ ДОСТУПУ В ПРИМІЩЕННЯ ДЛЯ ВІДОБРАЖЕННЯ ІНФОРМАЦІЇ}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: pe\_5\_odp\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено пристрої для виведення інформації над якими необхідний контроль над фізичним доступом до вихідних даних}
+
+
+
+
+\subsection{МОНІТОРИНГ ФІЗИЧНОГО ДОСТУПУ}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: pe\_6\_a\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Фізичний доступ до об'єкту, де знаходиться система, моніториться з метою виявлення та реагування на інциденти фізичної безпеки}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: pe\_6\_b\_01\\
+Type: string\\
+Default: \textquotedbl{}щорічно\textquotedbl{}
+}
+
+{\footnotesize Переглядаються журнали фізичного доступу частота}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: pe\_6\_b\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Журнали фізичного доступу переглядаються при виникненні подій}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: pe\_6\_c\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Результати переглядів узгоджуються з можливостями організації щодо реагування на інциденти}
+
+
+{\footnotesize\bfseries
+No: 5\\
+Name: pe\_6\_c\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Результати розслідувань узгоджуються з можливостями організації щодо реагування на інциденти}
+
+
+{\footnotesize\bfseries
+No: 6\\
+Name: pe\_6\_odp\_01\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Визначено частоту перегляду журналів фізичного доступу}
+
+
+{\footnotesize\bfseries
+No: 7\\
+Name: pe\_6\_odp\_02\\
+Type: list\\
+Default: [\textquotedbl{}login\textquotedbl{}, \textquotedbl{}logout\textquotedbl{}, \textquotedbl{}failed\_attempt\textquotedbl{}]
+}
+
+{\footnotesize Визначено події або потенційні ознаки подій, що вимагають перегляду журналів фізичного доступу}
+
+
+
+
+\subsubsection{Моніторинг фізичного доступу --- Автоматичні розпізнавання вторгнень і відповідна реакція (PE-6(2))}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: pe\_6\_2\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Розпізнаються класи або типи вторгнень}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: pe\_6\_2\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Реакції ініціюються за допомогою автоматизованих механізмів}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: pe\_6\_2\_odp\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено класи або типи вторгнень, які мають розпізнаватися автоматизованими механізмами}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: pe\_6\_2\_odp\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено реакції, які мають ініціюватися автоматизованими механізмами при розпізнаванні визначених організацією класів або типів вторгнень}
+
+
+{\footnotesize\bfseries
+No: 5\\
+Name: pe\_6\_2\_odp\_03\\
+Type: string\\
+Default: \textquotedbl{}автоматизований засіб моніторингу\textquotedbl{}
+}
+
+{\footnotesize Визначено автоматизовані механізми, що використовуються для розпізнавання класів або типів вторгнень та ініціювання дій реагування (визначені в PE06(02)\_ODP)}
 
 
 
@@ -15958,6 +17150,32 @@ Default: nil
 }
 
 {\footnotesize Є інформація в стані спокою, яка потребує захисту}
+
+
+
+
+\subsubsection{ЗАХИСТ ІНФОРМАЦІЇ В СТАНІ СПОКОЮ | КРИПТОГРАФІЧНИЙ ЗАХИСТ}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_28\_1\_01\\
+Type: string\\
+Default: \textquotedbl{}AES-256-GCM\textquotedbl{}
+}
+
+{\footnotesize Реалізовані криптографічні механізми для запобігання несанкціонованому розкриттю інформації, що знаходиться в стані спокою на системних компонентах або носіях}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_28\_1\_02\\
+Type: string\\
+Default: \textquotedbl{}AES-256-GCM\textquotedbl{}
+}
+
+{\footnotesize Реалізовані криптографічні механізми для запобігання несанкціонованій модифікації інформації, що знаходиться в стані спокою на системних компонентах або носіях}
 
 
 

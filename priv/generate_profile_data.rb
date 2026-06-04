@@ -214,7 +214,7 @@ files.each do |f|
       current_idx = match[4]
       current_desc = match[5]
     elsif current_id
-      if line.match?(/^(МЕТА ОЦІНКИ|ПОТЕНЦІЙНІ МЕТОДИ|Співбесіда:|Перевірка:|Дослідження:|Таблиця\s+\d|Рисунок\s+\d|Додаток\s+[А-ЯІЇЄҐ]|\d+\.\d+(\.\d+)?\s+[А-ЯІЇЄҐ])/i) || line.strip.match?(/^[A-Z]{2}-\d+$/)
+      if line.match?(/^(МЕТА ОЦ[ІI]НКИ|ПОТЕНЦ[ІI]ЙН[ІI]\s*МЕТОДИ|Співбесіда:|Перевірка:|Досл[іi]дження:|Таблиця\s+\d|Рисунок\s+\d|Додаток\s+[А-ЯІЇЄҐA-Z]|\d+\.\d+(\.\d+)?\s+[А-ЯІЇЄҐA-Z])/i) || line.strip.match?(/^[A-Z]{2}-\d+$/)
         add_param(odps, current_id, current_odp_flag, current_letter, current_idx, current_desc, junk_phrases)
         current_id = nil
       else
