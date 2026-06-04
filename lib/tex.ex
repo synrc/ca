@@ -218,7 +218,9 @@ defmodule CA.TeX do
     all_specs = CA.Profile.Data.specs()
     oid_to_spec = Map.new(all_specs, fn spec -> {CA.SPE.oid(spec.id), spec} end)
 
-    expanded_controls = expand_controls(controls, all_specs)
+    expanded_controls =
+      expand_controls(controls, all_specs)
+      |> Enum.reject(fn oid -> tuple_size(oid) == 9 end)
 
     {sections, _} =
       Enum.map_reduce(expanded_controls, nil, fn oid, last_fam ->
@@ -247,7 +249,11 @@ defmodule CA.TeX do
           formatted = format_control(spec, params, latex_level)
 
           if family != last_fam do
-            {"\\section{#{family}}\n\n" <> formatted, family}
+            family_atom = String.to_atom("id-spe-#{String.downcase(family)}")
+            family_spec = Map.get(oid_to_spec, CA.SPE.oid(family_atom))
+            family_desc = if family_spec && family_spec.description != "", do: escape_latex(family_spec.description) <> "\n\n", else: ""
+
+            {"\\section{#{family}}\n#{family_desc}" <> formatted, family}
           else
             {formatted, last_fam}
           end

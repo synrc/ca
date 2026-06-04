@@ -3,6 +3,26 @@ defmodule CA.Profile.Data do
 
   def controls do
     [
+      CA.SPE.oid(:"id-spe-ac"),
+      CA.SPE.oid(:"id-spe-at"),
+      CA.SPE.oid(:"id-spe-au"),
+      CA.SPE.oid(:"id-spe-ca"),
+      CA.SPE.oid(:"id-spe-cm"),
+      CA.SPE.oid(:"id-spe-cp"),
+      CA.SPE.oid(:"id-spe-ia"),
+      CA.SPE.oid(:"id-spe-ir"),
+      CA.SPE.oid(:"id-spe-ma"),
+      CA.SPE.oid(:"id-spe-mp"),
+      CA.SPE.oid(:"id-spe-pe"),
+      CA.SPE.oid(:"id-spe-pl"),
+      CA.SPE.oid(:"id-spe-ps"),
+      CA.SPE.oid(:"id-spe-ra"),
+      CA.SPE.oid(:"id-spe-sa"),
+      CA.SPE.oid(:"id-spe-sc"),
+      CA.SPE.oid(:"id-spe-si"),
+      CA.SPE.oid(:"id-spe-sr"),
+      CA.SPE.oid(:"id-spe-pm"),
+      CA.SPE.oid(:"id-spe-pt"),
       CA.SPE.oid(:"id-spe-ac-1"),
       CA.SPE.oid(:"id-spe-ac-2"),
       CA.SPE.oid(:"id-spe-ac-2-1"),
@@ -958,6 +978,26 @@ defmodule CA.Profile.Data do
 
   def specs do
     [
+      spec(:"id-spe-ac"),
+      spec(:"id-spe-at"),
+      spec(:"id-spe-au"),
+      spec(:"id-spe-ca"),
+      spec(:"id-spe-cm"),
+      spec(:"id-spe-cp"),
+      spec(:"id-spe-ia"),
+      spec(:"id-spe-ir"),
+      spec(:"id-spe-ma"),
+      spec(:"id-spe-mp"),
+      spec(:"id-spe-pe"),
+      spec(:"id-spe-pl"),
+      spec(:"id-spe-ps"),
+      spec(:"id-spe-ra"),
+      spec(:"id-spe-sa"),
+      spec(:"id-spe-sc"),
+      spec(:"id-spe-si"),
+      spec(:"id-spe-sr"),
+      spec(:"id-spe-pm"),
+      spec(:"id-spe-pt"),
       spec(:"id-spe-ac-1"),
       spec(:"id-spe-ac-2"),
       spec(:"id-spe-ac-2-1"),
@@ -1909,6 +1949,226 @@ defmodule CA.Profile.Data do
       spec(:"id-spe-pe-6"),
       spec(:"id-spe-sc-28-1")
     ]
+  end
+
+  def spec(:"id-spe-ac") do
+    %{
+      id: :"id-spe-ac",
+      description: "Клас заходів захисту AC — УПРАВЛІННЯ ДОСТУПОМ",
+      title: "УПРАВЛІННЯ ДОСТУПОМ (AC)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-at") do
+    %{
+      id: :"id-spe-at",
+      description: "Клас заходів захисту AT — ОБІЗНАНІСТЬ ТА НАВЧАННЯ",
+      title: "ОБІЗНАНІСТЬ ТА НАВЧАННЯ (AT)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-au") do
+    %{
+      id: :"id-spe-au",
+      description: "Клас заходів захисту AU — АУДИТ ТА ПІДЗВІТНІСТЬ",
+      title: "АУДИТ ТА ПІДЗВІТНІСТЬ (AU)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-ca") do
+    %{
+      id: :"id-spe-ca",
+      description: "Клас заходів захисту CA — ОЦІНЮВАННЯ,",
+      title: "ОЦІНЮВАННЯ, АВТОРИЗАЦІЯ ТА МОНІТОРИНГ (CA)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-cm") do
+    %{
+      id: :"id-spe-cm",
+      description: "Клас заходів захисту CM — УПРАВЛІННЯ КОНФІГУРАЦІЄЮ",
+      title: "УПРАВЛІННЯ КОНФІГУРАЦІЄЮ (CM)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-cp") do
+    %{
+      id: :"id-spe-cp",
+      description: "Клас заходів захисту CP — ПЛАНУВАННЯ БЕЗПЕРЕРВНОЇ РОБОТИ",
+      title: "ПЛАНУВАННЯ БЕЗПЕРЕРВНОЇ РОБОТИ (CP)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-ia") do
+    %{
+      id: :"id-spe-ia",
+      description: "Клас заходів захисту IA — ІДЕНТИФІКАЦІЯ ТА АВТЕНТИФІКАЦІЯ",
+      title: "ІДЕНТИФІКАЦІЯ ТА АВТЕНТИФІКАЦІЯ (IA)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-ir") do
+    %{
+      id: :"id-spe-ir",
+      description: "Клас заходів захисту IR — РЕАГУВАННЯ НА ІНЦИДЕНТИ",
+      title: "РЕАГУВАННЯ НА ІНЦИДЕНТИ (IR)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-ma") do
+    %{
+      id: :"id-spe-ma",
+      description: "Клас заходів захисту MA — ТЕХНІЧНЕ ОБСЛУГОВУВАННЯ",
+      title: "ТЕХНІЧНЕ ОБСЛУГОВУВАННЯ (MA)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-mp") do
+    %{
+      id: :"id-spe-mp",
+      description: "Клас заходів захисту MP — ЗАХИСТ НОСІЇВ ІНФОРМАЦІЇ",
+      title: "ЗАХИСТ НОСІЇВ ІНФОРМАЦІЇ (MP)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-pe") do
+    %{
+      id: :"id-spe-pe",
+      description: "Клас заходів захисту PE — ФІЗИЧНИЙ ЗАХИСТ І ЗАХИСТ РОБОЧОГО",
+      title: "ФІЗИЧНИЙ ЗАХИСТ ТА ЗАХИСТ НАВКОЛИШНЬОГО СЕРЕДОВИЩА (PE)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-pl") do
+    %{
+      id: :"id-spe-pl",
+      description: "Клас заходів захисту PL — ПЛАНУВАННЯ БЕЗПЕКИ",
+      title: "ПЛАНУВАННЯ (PL)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-ps") do
+    %{
+      id: :"id-spe-ps",
+      description: "Клас заходів захисту PS — КАДРОВА БЕЗПЕКА",
+      title: "БЕЗПЕКА ПЕРСОНАЛУ (PS)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-ra") do
+    %{
+      id: :"id-spe-ra",
+      description: "Клас заходів захисту RA — ОЦІНЮВАННЯ РИЗИКУ",
+      title: "ОЦІНКА РИЗИКІВ (RA)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-sa") do
+    %{
+      id: :"id-spe-sa",
+      description: "Клас заходів захисту SA — ПРИДБАННЯ СИСТЕМИ ТА ПОСЛУГ",
+      title: "ПРИДБАННЯ СИСТЕМ ТА ПОСЛУГ (SA)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-sc") do
+    %{
+      id: :"id-spe-sc",
+      description: "Клас заходів захисту SC — ЗАХИСТ ІНФОРМАЦІЙНОЇ СИСТЕМИ ТА",
+      title: "ЗАХИСТ СИСТЕМ ТА КОМУНІКАЦІЙ (SC)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-si") do
+    %{
+      id: :"id-spe-si",
+      description: "Клас заходів захисту SI — ЦІЛІСНІСТЬ СИСТЕМИ ТА ІНФОРМАЦІЇ",
+      title: "ЦІЛІСНІСТЬ СИСТЕМИ ТА ІНФОРМАЦІЇ (SI)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-sr") do
+    %{
+      id: :"id-spe-sr",
+      description: "Клас заходів захисту SR — УПРАВЛІННЯ РИЗИКАМИ ЛАНЦЮГА",
+      title: "УПРАВЛІННЯ РИЗИКАМИ В ЛАНЦЮГУ ПОСТАЧАННЯ (SR)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-pm") do
+    %{
+      id: :"id-spe-pm",
+      description: "Клас заходів захисту PM — МЕНЕДЖМЕНТ ІНФОРМАЦІЙНОЇ БЕЗПЕКИ",
+      title: "УПРАВЛІННЯ ПРОГРАМАМИ (PM)",
+      parameters: [
+
+      ]
+    }
+  end
+
+  def spec(:"id-spe-pt") do
+    %{
+      id: :"id-spe-pt",
+      description: "Клас заходів захисту PT — ПОВНОВАЖЕННЯ",
+      title: "ОБРОБКА ПЕРСОНАЛЬНИХ ДАНИХ ТА ПРОЗОРІСТЬ (PT)",
+      parameters: [
+
+      ]
+    }
   end
 
   def spec(:"id-spe-ac-1") do

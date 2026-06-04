@@ -38,6 +38,11 @@ desc_text.each_line do |line|
       current_desc = ""
       in_desc = true 
     end
+  elsif match = stripped.match(/(?:Клас заходів захисту|КЛАС ЗАХОДІВ ЗАХИСТУ) ([А-ЯІЇЄҐA-Z]{2})\s*[—\–\-]\s*(.*)/i)
+    fam = match[1].upcase
+    fam = fam.gsub('А', 'A').gsub('С', 'C').gsub('Т', 'T').gsub('І', 'I').gsub('Р', 'P').gsub('М', 'M').gsub('Е', 'E').gsub('О', 'O')
+    family_id = "id-spe-#{fam.downcase}"
+    descriptions[family_id] = "Клас заходів захисту #{fam} — #{match[2].strip}"
   elsif match = stripped.match(/^Заходи захисту:\s*(.*)/i)
     in_desc = true
     current_desc = match[1] || ""
