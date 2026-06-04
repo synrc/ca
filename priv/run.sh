@@ -1,3 +1,4 @@
+pdflatex bible_profile.tex
 pdflatex base_profile.tex
 pdflatex industry_profile.tex
 pdflatex security-profiles.tex

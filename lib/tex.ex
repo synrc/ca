@@ -137,13 +137,15 @@ defmodule CA.TeX do
   end
 
   def base_profile(opts \\ []) do
+    {body, count} = generate_body(CA.L1.controls())
+
     opts =
       Keyword.merge(
         [
-          title: "Профіль базових заходів із захисту інформації",
+          title: "Профіль базових заходів із захисту інформації (#{count})",
           subtitle: "Комплексна система захисту інформації",
           abstract: "Базовий профіль — затверджується Адміністрацією Держспецзв’язку (наказом).",
-          body: generate_body(CA.L1.controls())
+          body: body
         ],
         opts
       )
@@ -155,15 +157,16 @@ defmodule CA.TeX do
 
   def industry_profile(opts \\ []) do
     controls = CA.L2.controls() -- CA.L1.controls()
+    {body, count} = generate_body(controls)
 
     opts =
       Keyword.merge(
         [
-          title: "Галузевий профіль заходів із захисту інформації",
+          title: "Галузевий профіль заходів із захисту інформації (#{count})",
           subtitle: "Комплексна система захисту інформації",
           abstract:
             "Галузевий профіль — розробляється галузевим органом, погоджується з Держспецзв’язку та затверджується наказом/рішенням відповідного органу. Включає лише додаткові вимоги (відмінності) відносно Базового профілю.",
-          body: generate_body(controls)
+          body: body
         ],
         opts
       )
@@ -186,14 +189,16 @@ defmodule CA.TeX do
         _ -> "Цільовий профіль безпеки (#{name})"
       end
 
+    {body, count} = generate_body(controls)
+
     opts =
       Keyword.merge(
         [
-          title: title,
+          title: "#{title} (#{count})",
           subtitle: "Комплексна система захисту інформації",
           abstract:
             "Цільовий профіль безпеки (ЦПБ) — індивідуальний для конкретної системи підприємства. Саме на його основі створюється/модернізується КЗЗІ. Включає лише додаткові вимоги (відмінності) відносно Галузевого профілю.",
-          body: generate_body(controls)
+          body: body
         ],
         opts
       )
@@ -214,13 +219,41 @@ defmodule CA.TeX do
     |> Enum.map(&target_profile/1)
   end
 
+  def gen_bible(opts \\ []) do
+    all_oids = Enum.map(CA.Profile.Data.specs(), &CA.SPE.oid(&1.id))
+    {body, count} = generate_body(all_oids)
+
+    opts =
+      Keyword.merge(
+        [
+          title: "Повний каталог заходів із захисту інформації (#{count})",
+          subtitle: "Комплексна система захисту інформації",
+          abstract:
+            "Повний каталог (Bible) — містить абсолютно всі заходи, посилення та субконтролі згідно з повним скоупом НД ТЗІ КСЗІ.",
+          body: body
+        ],
+        opts
+      )
+
+    content = generate(opts)
+    File.write!("priv/bible_profile.tex", content)
+    "priv/bible_profile.tex"
+  end
+
   defp generate_body(controls) do
     all_specs = CA.Profile.Data.specs()
     oid_to_spec = Map.new(all_specs, fn spec -> {CA.SPE.oid(spec.id), spec} end)
 
     expanded_controls =
-      expand_controls(controls, all_specs)
-      |> Enum.reject(fn oid -> tuple_size(oid) == 9 end)
+      controls
+      |> Enum.reject(fn oid -> tuple_size(oid) == 9 end) # exclude family class OIDs if present
+      |> Enum.uniq()
+      |> Enum.sort_by(&Tuple.to_list/1)
+
+    profile_specs = 
+      expanded_controls 
+      |> Enum.map(&Map.get(oid_to_spec, &1)) 
+      |> Enum.reject(&is_nil/1)
 
     {sections, _} =
       Enum.map_reduce(expanded_controls, nil, fn oid, last_fam ->
@@ -251,9 +284,16 @@ defmodule CA.TeX do
           if family != last_fam do
             family_atom = String.to_atom("id-spe-#{String.downcase(family)}")
             family_spec = Map.get(oid_to_spec, CA.SPE.oid(family_atom))
+            
             family_desc = if family_spec && family_spec.description != "", do: escape_latex(family_spec.description) <> "\n\n", else: ""
+            
+            ai_summary = CA.FamilyDescriptions.get_summary(family_atom)
+            ai_text = if ai_summary != "", do: escape_latex(ai_summary) <> "\n\n", else: ""
+            
+            children_text = CA.FamilyDescriptions.get_children_text(family_atom, profile_specs)
+            children_str = if children_text != "", do: "\\textbf{Перелік заходів захисту:} " <> escape_latex(children_text) <> "\n\n", else: ""
 
-            {"\\section{#{family}}\n#{family_desc}" <> formatted, family}
+            {"\\section{#{family}}\n#{family_desc}#{ai_text}#{children_str}" <> formatted, family}
           else
             {formatted, last_fam}
           end
@@ -262,7 +302,7 @@ defmodule CA.TeX do
         end
       end)
 
-    Enum.join(sections, "\n\n")
+    {Enum.join(sections, "\n\n"), length(profile_specs)}
   end
 
   defp format_control(spec, [], latex_level) do
@@ -326,21 +366,6 @@ defmodule CA.TeX do
     |> String.replace("~", "\\textasciitilde{}")
     |> String.replace("^", "\\textasciicircum{}")
     |> String.replace("\"", "\\textquotedbl{}")
-  end
-
-  defp expand_controls(controls, all_specs) do
-    all_oids = Enum.map(all_specs, &CA.SPE.oid(&1.id))
-
-    Enum.flat_map(controls, fn parent_oid ->
-      parent_list = Tuple.to_list(parent_oid)
-
-      all_oids
-      |> Enum.filter(fn child_oid ->
-        child_list = Tuple.to_list(child_oid)
-        List.starts_with?(child_list, parent_list)
-      end)
-    end)
-    |> Enum.uniq()
-    |> Enum.sort_by(&Tuple.to_list/1)
+    |> String.replace("\n", "\\\\ \n")
   end
 end

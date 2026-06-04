@@ -10,10 +10,23 @@ files = [
 # 1. Parse Control Descriptions from 3.6-006-24
 desc_text = File.read("requirements/НД ТЗІ 3.6-006-24.txt")
 descriptions = {}
-current_control = nil
-current_desc = ""
+title_map = {}
+odps = {}
+explicit_defaults = {}
+
 in_desc = false
 parent_control = nil
+current_control = nil
+current_desc = ""
+
+def format_control_description(desc)
+  desc = desc.gsub(/\s+/, ' ').strip
+  desc = desc.gsub(/- ([а-яіїєґa-z])/i, '\1')
+  desc = desc.gsub(/ ([a-z]\.) /, "\n\\1 ")
+  desc = desc.gsub(/ (\d+\.) /, "\n\\1 ")
+  desc = desc.gsub(/ (\([a-z]\)) /, "\n\\1 ")
+  desc
+end
 
 desc_text.each_line do |line|
   stripped = line.strip
@@ -23,7 +36,7 @@ desc_text.each_line do |line|
 
   if match = stripped.match(/^([A-Z]{2}-\d+)\s+([А-ЯІЇЄҐ \-]+)/)
     if current_control && in_desc && !current_desc.strip.empty?
-      descriptions["id-spe-#{current_control.downcase.gsub('-', '_')}"] = current_desc.strip.gsub(/\s+/, ' ')
+      descriptions["id-spe-#{current_control.downcase.gsub('-', '_')}"] = format_control_description(current_desc)
     end
     current_control = match[1]
     parent_control = current_control
@@ -31,7 +44,7 @@ desc_text.each_line do |line|
     in_desc = false
   elsif match = stripped.match(/^\((\d+)\)\s+([А-ЯІЇЄҐ])/)
     if current_control && in_desc && !current_desc.strip.empty?
-      descriptions["id-spe-#{current_control.downcase.gsub('-', '_').gsub('(', '-').gsub(')', '')}"] = current_desc.strip.gsub(/\s+/, ' ')
+      descriptions["id-spe-#{current_control.downcase.gsub('-', '_').gsub('(', '-').gsub(')', '')}"] = format_control_description(current_desc)
     end
     if parent_control
       current_control = "#{parent_control}(#{match[1]})"
@@ -49,12 +62,12 @@ desc_text.each_line do |line|
   elsif stripped.match?(/^(Рекомендації з реалізації:|Пов’язані заходи:|Посилення заходів:)/i)
     if current_control && in_desc
       # Try to remove leftover uppercase title parts if they leaked into desc
-      cd = current_desc.strip.gsub(/\s+/, ' ')
+      cd = format_control_description(current_desc)
       cd = cd.sub(/^[А-ЯІЇЄҐ \-]+\s+/, '') if cd.match?(/^[А-ЯІЇЄҐ \-]{10,}/)
       
       # Fix mangled description for AC-4(5)
-      cd = cd.sub("Впровадити [Призначення: визначені організацією вбудовування типів даних в інші типи даних. обмеження] для", 
-                  "Впровадити [Призначення: визначені організацією обмеження] для вбудовування типів даних в інші типи даних.")
+   #   cd = cd.sub("Впровадити [Призначення: визначені організацією вбудовування типів даних в інші типи даних. обмеження] для", 
+    #              "Впровадити [Призначення: визначені організацією обмеження] для вбудовування типів даних в інші типи даних.")
 
       atom_name = current_control.downcase.gsub('-', '_').gsub('(', '_').gsub(')', '')
       atom_name = atom_name.sub(/_0(\d)/, '_\1')
@@ -268,7 +281,7 @@ title_map.each do |atom, tuple|
   title = title.gsub('"', '\"')
   
   top_desc = descriptions[atom] || ""
-  top_desc = top_desc.gsub('"', '\"')
+  top_desc = top_desc.gsub('"', '\"').gsub("\n", "\\n")
   
   out += "  def spec(:\"#{atom}\") do\n"
   out += "    %{\n"
