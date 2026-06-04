@@ -1,6 +1,7 @@
 pdflatex bible_profile.tex
 pdflatex base_profile.tex
-pdflatex industry_profile.tex
+pdflatex court_profile.tex
+pdflatex chat_profile.tex
 pdflatex security-profiles.tex
 pdflatex target_profile_local.tex
 pdflatex target_profile_orgs.tex

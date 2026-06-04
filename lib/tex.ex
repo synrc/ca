@@ -42,15 +42,15 @@ defmodule CA.TeX do
   \\setcounter{secnumdepth}{3}
 
   \\titleformat{\\section}
-    {\\color{nato}\\Huge\\bfseries}{\\thesection.}{1em}{}
+    {\\color{nato}\\Huge\\bfseries\\raggedright}{\\thesection.}{1em}{}
   \\titlespacing*{\\section}{0pt}{30pt}{12pt}
 
   \\titleformat{\\subsection}
-    {\\color{nato}\\LARGE\\bfseries}{\\thesubsection.}{1em}{}
+    {\\color{nato}\\LARGE\\bfseries\\raggedright}{\\thesubsection.}{1em}{}
   \\titlespacing*{\\subsection}{0pt}{20pt}{8pt}
 
   \\titleformat{\\subsubsection}
-    {\\color{nato}\\Large\\bfseries}{\\thesubsubsection.}{1em}{}
+    {\\color{nato}\\Large\\bfseries\\raggedright}{\\thesubsubsection.}{1em}{}
   \\titlespacing*{\\subsubsection}{0pt}{10pt}{6pt}
 
   \\fancyhf{}
@@ -155,8 +155,8 @@ defmodule CA.TeX do
     "priv/base_profile.tex"
   end
 
-  def industry_profile(opts \\ []) do
-    controls = CA.L2.controls() -- CA.L1.controls()
+  def court_profile(opts \\ []) do
+    controls = CA.L2.Court.controls() -- CA.L1.controls()
     {body, count} = generate_body(controls)
 
     opts =
@@ -172,13 +172,34 @@ defmodule CA.TeX do
       )
 
     content = generate(opts)
-    File.write!("priv/industry_profile.tex", content)
-    "priv/industry_profile.tex"
+    File.write!("priv/court_profile.tex", content)
+    "priv/court_profile.tex"
+  end
+
+  def chat_profile(opts \\ []) do
+    controls = CA.L2.Messenger.controls() -- CA.L1.controls()
+    {body, count} = generate_body(controls)
+
+    opts =
+      Keyword.merge(
+        [
+          title: "Галузевий профіль для месенджера (#{count})",
+          subtitle: "Комплексна система захисту інформації",
+          abstract:
+            "Галузевий профіль — розробляється для забезпечення конфіденційності, цілісності повідомлень та управління сесіями в месенджері.",
+          body: body
+        ],
+        opts
+      )
+
+    content = generate(opts)
+    File.write!("priv/chat_profile.tex", content)
+    "priv/chat_profile.tex"
   end
 
   def target_profile(module, opts \\ []) do
     name = module |> Module.split() |> List.last()
-    controls = module.controls() -- CA.L2.controls()
+    controls = module.controls() -- CA.L2.Court.controls()
 
     title =
       case name do
@@ -220,7 +241,13 @@ defmodule CA.TeX do
   end
 
   def gen do
-      :lists.flatten([gen_bible(),base_profile(),industry_profile(),generate_l3_profiles()])
+    :lists.flatten([
+      gen_bible(),
+      base_profile(),
+      court_profile(),
+      chat_profile(),
+      generate_l3_profiles()
+    ])
   end
 
   def gen_bible(opts \\ []) do
@@ -250,13 +277,14 @@ defmodule CA.TeX do
 
     expanded_controls =
       controls
-      |> Enum.reject(fn oid -> tuple_size(oid) == 9 end) # exclude family class OIDs if present
+      # exclude family class OIDs if present
+      |> Enum.reject(fn oid -> tuple_size(oid) == 9 end)
       |> Enum.uniq()
       |> Enum.sort_by(&Tuple.to_list/1)
 
-    profile_specs = 
-      expanded_controls 
-      |> Enum.map(&Map.get(oid_to_spec, &1)) 
+    profile_specs =
+      expanded_controls
+      |> Enum.map(&Map.get(oid_to_spec, &1))
       |> Enum.reject(&is_nil/1)
 
     {sections, _} =
@@ -288,14 +316,22 @@ defmodule CA.TeX do
           if family != last_fam do
             family_atom = String.to_atom("id-spe-#{String.downcase(family)}")
             family_spec = Map.get(oid_to_spec, CA.SPE.oid(family_atom))
-            
-            family_desc = if family_spec && family_spec.description != "", do: escape_latex(family_spec.description) <> "\n\n", else: ""
-            
+
+            family_desc =
+              if family_spec && family_spec.description != "",
+                do: escape_latex(family_spec.description) <> "\n\n",
+                else: ""
+
             ai_summary = CA.FamilyDescriptions.get_summary(family_atom)
             ai_text = if ai_summary != "", do: escape_latex(ai_summary) <> "\n\n", else: ""
-            
+
             children_text = CA.FamilyDescriptions.get_children_text(family_atom, profile_specs)
-            children_str = if children_text != "", do: "\\textbf{Перелік заходів захисту:} " <> escape_latex(children_text) <> "\n\n", else: ""
+
+            children_str =
+              if children_text != "",
+                do:
+                  "\\textbf{Перелік заходів захисту:} " <> escape_latex(children_text) <> "\n\n",
+                else: ""
 
             {"\\section{#{family}}\n#{family_desc}#{ai_text}#{children_str}" <> formatted, family}
           else

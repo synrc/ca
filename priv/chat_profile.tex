@@ -1,0 +1,643 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{eso-pic}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+\usepackage{microtype}
+\usepackage[english, ukrainian]{babel}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{tocloft}
+
+\renewcommand{\cftsecfont}{\small\bfseries}
+\renewcommand{\cftsubsecfont}{\footnotesize}
+\renewcommand{\cftsubsubsecfont}{\scriptsize}
+\renewcommand{\cftsecpagefont}{\small\bfseries}
+\renewcommand{\cftsubsecpagefont}{\footnotesize}
+\renewcommand{\cftsubsubsecpagefont}{\scriptsize}
+
+\definecolor{nato}{HTML}{293757}
+\definecolor{footergray}{gray}{0.65}
+
+\geometry{a4paper,left=3cm,right=3cm,top=3cm,bottom=3cm}
+\renewcommand{\familydefault}{\sfdefault}
+\setcounter{secnumdepth}{3}
+
+\titleformat{\section}
+  {\color{nato}\Huge\bfseries\raggedright}{\thesection.}{1em}{}
+\titlespacing*{\section}{0pt}{30pt}{12pt}
+
+\titleformat{\subsection}
+  {\color{nato}\LARGE\bfseries\raggedright}{\thesubsection.}{1em}{}
+\titlespacing*{\subsection}{0pt}{20pt}{8pt}
+
+\titleformat{\subsubsection}
+  {\color{nato}\Large\bfseries\raggedright}{\thesubsubsection.}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{10pt}{6pt}
+
+\fancyhf{}
+\fancyhead[R]{\small\color{footergray} 2 червня 2026}
+\fancyfoot[L]{\small\color{footergray} Комплексна система захисту інформації. Галузевий профіль для месенджера (20).}
+\fancyfoot[R]{\small\color{footergray}\thepage}
+
+\newcommand\HUGE[1]{\fontsize{40}{40}\selectfont #1}
+
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\footrule}{\color{footergray}\hrule width \textwidth height 0.4pt}
+
+\begin{document}
+
+\pagestyle{fancy}
+
+\begin{titlepage}
+  \AddToShipoutPictureBG*{\AtPageLowerLeft{\color{nato}\rule{\paperwidth}{\paperheight}}}
+  \color{white}\thispagestyle{empty}\vspace*{4cm}\centering
+  {\Huge  \textbf{Комплексна система захисту інформації} \par} \vspace{2cm}
+  {\HUGE  \textbf{Галузевий профіль для месенджера (20)} \par} \vspace{2.5cm}
+  \vfill
+  {\large 2026 \copyright\ Критпографічні Телесистеми \par}
+\end{titlepage}
+
+\newpage
+
+\begin{center}
+  {\Huge\color{nato}\bfseries Зміст\par}
+\end{center}
+\vspace{40pt}
+\tableofcontents
+
+\begin{abstract}
+Галузевий профіль — розробляється для забезпечення конфіденційності, цілісності повідомлень та управління сесіями в месенджері.
+\end{abstract}
+
+\section{AC}
+Клас заходів захисту AC --- УПРАВЛІННЯ ДОСТУПОМ
+
+Цей клас зосереджується на обмеженні доступу до інформаційних систем, ресурсів та функцій лише для авторизованих користувачів, програм і пристроїв.
+
+\textbf{Перелік заходів захисту:} Управління паралельною сесією (AC-10); Id-spe-ac-19-1; Id-spe-ac-19-5.
+
+\subsection{УПРАВЛІННЯ ПАРАЛЕЛЬНОЮ СЕСІЄЮ (AC-10)}
+Обмежити кількість одночасних сеансів для кожного [Призначення: визначеного організацією облікового запису та/або типу облікового запису] до [Призначення: визначеної організацією кількості].
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ac\_10\_01\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Кількість одночасних сеансів для кожного облікового запису та/або типів облікових записів обмежена кількість}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: ac\_10\_odp\_02\\
+Type: integer\\
+Default: 30
+}
+
+{\footnotesize Визначено кількість одночасних сеансів, дозволених для кожного облікового запису та/або типу облікового запису}
+
+
+
+
+\subsubsection{id-spe-ac-19-1}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ac\_19\_1\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize КОНТРОЛЬ ДОСТУПУ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ - ВИКОРИСТАННЯ ПИСЬМОВИХ ТА ПОРТАТИВНИЙ ПРИСТРОЇВ ДЛЯ ЗБЕРІГАННЯ ДАНИХ [Вилучено: Включено в MP-07]}
+
+
+
+
+\subsubsection{id-spe-ac-19-5}
+
+
+\vspace{10pt}
+\textit{Немає параметрів для цього контролю.}
+\vspace{10pt}
+
+
+\section{AU}
+Клас заходів захисту AU --- АУДИТ ТА ПІДЗВІТНІСТЬ
+
+Цей клас забезпечує можливість відстеження дій у системі, генерування, захист та аналіз записів аудиту для виявлення порушень політики безпеки.
+
+\textbf{Перелік заходів захисту:} Неспростовність (AU-10); Id-spe-au-10-5.
+
+\subsection{НЕСПРОСТОВНІСТЬ (AU-10)}
+Надавайте неспростовні докази того, що особа (або процес, який діє від імені особи) виконала [Призначення: дії, визначені організацією, на які поширюється принцип неспростовності].
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: au\_10\_01\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Надаються неспростовні докази того, що особа (або процес, що діє від імені особи) виконала дії}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: au\_10\_odp\\
+Type: list\\
+Default: [\textquotedbl{}login\textquotedbl{}, \textquotedbl{}logout\textquotedbl{}, \textquotedbl{}failed\_attempt\textquotedbl{}]
+}
+
+{\footnotesize Визначено дії, на які поширюється принцип неспростовності}
+
+
+
+
+\subsubsection{id-spe-au-10-5}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: au\_10\_5\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize НЕСПРОСТОВНІСТЬ - ЦИФРОВІ ПІДПИСИ [Вилучено: Включено до SI-07]}
+
+
+
+
+\section{IA}
+Клас заходів захисту IA --- ІДЕНТИФІКАЦІЯ ТА АВТЕНТИФІКАЦІЯ
+
+Цей клас відповідає за однозначне розпізнавання користувачів або пристроїв та підтвердження їхньої справжності перед наданням доступу до системи.
+
+\textbf{Перелік заходів захисту:} Id-spe-ia-5-12; Id-spe-ia-7.
+
+\subsubsection{id-spe-ia-5-12}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_5\_12\_odp\\
+Type: string\\
+Default: \textquotedbl{}автоматизований засіб моніторингу\textquotedbl{}
+}
+
+{\footnotesize Визначено вимоги до якості біометрії; для біометричної автентифікації використовувати механізми, які задовольняють вимоги}
+
+
+
+
+\subsection{id-spe-ia-7}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: ia\_7\_01\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Впроваджено механізми автентифікації в криптографічний модуль, який відповідає вимогам чинних законів, виконавчих розпоряджень, директив, політик, правил, стандартів та рекомендацій для такої автентифікації}
+
+
+
+
+\section{MP}
+Клас заходів захисту MP --- ЗАХИСТ НОСІЇВ ІНФОРМАЦІЇ
+
+Цей клас спрямований на безпечне зберігання, транспортування, використання та знищення як цифрових, так і паперових носіїв інформації.
+
+\textbf{Перелік заходів захисту:} Id-spe-mp-6.
+
+\subsection{id-spe-mp-6}
+a. Очищувати [Призначення: визначені організацією системні носії] перед утилізацією, випуском за межі організаційного контролю, або перед повторним використанням [Призначення: методами та процедурами очищення, визначеними організацією].\\ 
+b. Використовувати механізми очищення зі стійкістю та цілісністю, що відповідає категорії безпеки або рівню секретності інформації.
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: mp\_6\_a\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Носії інформації системи перед утилізацією піддаються очищенню за допомогою методів та процедур очищення}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: mp\_6\_a\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Носії інформації системи очищаються за допомогою методів та процедур очищення перед випуском за межі контрольованої зони}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: mp\_6\_a\_03\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Носії інформації системи очищуються за допомогою методів і процедур очищення перед повторним використанням}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: mp\_6\_b\\
+Type: string\\
+Default: \textquotedbl{}автоматизований засіб моніторингу\textquotedbl{}
+}
+
+{\footnotesize Застосовуються механізми очищення, надійність і цілісність яких відповідає категорії безпеки або рівню секретності інформації}
+
+
+{\footnotesize\bfseries
+No: 5\\
+Name: mp\_6\_odp\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено носії інформації системи, які підлягають очищенню перед утилізацією}
+
+
+{\footnotesize\bfseries
+No: 6\\
+Name: mp\_6\_odp\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено носії інформації системи, які підлягають очищенню перед випуском за межі контрольованої зони}
+
+
+{\footnotesize\bfseries
+No: 7\\
+Name: mp\_6\_odp\_03\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначені носії інформації системи, що підлягають очищенню перед повторним використанням}
+
+
+{\footnotesize\bfseries
+No: 8\\
+Name: mp\_6\_odp\_04\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено методи та процедури очищення, які слід використовувати для очищення перед утилізацією}
+
+
+{\footnotesize\bfseries
+No: 9\\
+Name: mp\_6\_odp\_05\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено методи та процедури очищення, які слід використовувати для очищення перед випуском за межі контрольованої зони}
+
+
+{\footnotesize\bfseries
+No: 10\\
+Name: mp\_6\_odp\_06\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено методи та процедури очищення, які слід використовувати для очищення перед повторним використанням}
+
+
+
+
+\section{SC}
+Клас заходів захисту SC --- ЗАХИСТ ІНФОРМАЦІЙНОЇ СИСТЕМИ ТА
+
+Цей клас охоплює механізми захисту інформації під час її передачі мережами зв'язку, криптографічний захист та ізоляцію критичних компонентів.
+
+\textbf{Перелік заходів захисту:} Id-spe-sc-5; Id-spe-sc-8-1; Id-spe-sc-8-2; Встановлення ключами (SC-12); Id-spe-sc-17; Id-spe-sc-20; Id-spe-sc-21; Id-spe-sc-22; Автентифікація сесії (SC-23); Id-spe-sc-28-1; Id-spe-sc-49; Апаратний захист (SC-51).
+
+\subsection{id-spe-sc-5}
+a. [Призначення: захистити від; Обмежити] наслідки наступних типів подій відмови в обслуговуванні (DoS): [Призначення: визначені організацією типи подій відмови в обслуговуванні];\\ 
+b. Застосувати наступні заходи захисту для досягнення мети відмови обслуговування [Призначення: заходи захисту визначені організацією, за типом події відмови в обслуговуванні].
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_5\_odp\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначені типи подій відмов в обслуговуванні, від яких потрібно захищати або обмежувати; SC-05\_ODP[02] вибрано одне з наступних ЗНАЧЕНЬ ПАРАМЕТРІВ: \{захистити від; обмежити\}}
+
+
+
+
+\subsubsection{id-spe-sc-8-1}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_8\_1\_odp\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Вибрано одне або декілька з наступних ЗНАЧЕНЬ ПАРАМЕТРІВ: \{запобігти несанкціонованому розголошенню інформації; виявити зміни в інформації\}}
+
+
+
+
+\subsubsection{id-spe-sc-8-2}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_8\_2\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize КОНФІДЕНЦІЙНІСТЬ ТА ЦІЛІСНІСТЬ ПЕРЕДАЧІ - ПОПЕРЕДНЯ І ПОСТОБРОБКА МЕТА ОЦІНКИ: Визначити, чи:}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_8\_2\_odp\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Вибрано одне або декілька з наступних ЗНАЧЕНЬ ПАРАМЕТРІВ: \{конфіденційність; цілісність\}}
+
+
+
+
+\subsection{ВСТАНОВЛЕННЯ КЛЮЧАМИ (SC-12)}
+Встановити та управляти криптографічними ключами для криптографічних засобів, які використовуються в системі відповідно до [Призначення: визначені організацією вимоги до генерації, поширення, зберігання, доступу та знищення ключів].
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_12\_01\\
+Type: string\\
+Default: \textquotedbl{}AES-256-GCM\textquotedbl{}
+}
+
+{\footnotesize Встановлюються криптографічні ключі, коли в системі використовується криптографія відповідно до < SC-12\_ODP вимог >}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_12\_02\\
+Type: string\\
+Default: \textquotedbl{}AES-256-GCM\textquotedbl{}
+}
+
+{\footnotesize Здійснюється управління криптографічними ключами, коли в системі використовується криптографія, відповідно до вимог }
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: sc\_12\_odp\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначені вимоги до генерації, розповсюдження, зберігання, доступу та знищення ключів}
+
+
+
+
+\subsection{id-spe-sc-17}
+a. Випускати сертифікати відкритого ключа відповідно до [Призначення: визначеної організацією політики сертифікації];\\ 
+b. Отримувати сертифікати відкритого ключа від затвердженого постачальника послуг.
+
+\vspace{10pt}
+\textit{Немає параметрів для цього контролю.}
+\vspace{10pt}
+
+
+\subsection{id-spe-sc-20}
+a. Надати додаткові дані автентифікації та перевірки цілісності джерела даних разом з офіційними даними розпізнавання імен, які система повертає у відповідь на запити дозволу імен/адрес.\\ 
+b. Надати засоби для вказання статусу безпеки дочірніх зон і (якщо дочірня зона підтримує служби безпечного дозволу) забезпечити перевірку ланцюга довіри між батьківськими та дочірніми доменами при роботі в складі розподіленого ієрархічного простору імен.
+
+\vspace{10pt}
+\textit{Немає параметрів для цього контролю.}
+\vspace{10pt}
+
+
+\subsection{id-spe-sc-21}
+Зробити запит та виконати перевірку автентичності джерела даних і перевірку цілісності даних у відповідях на дозвіл імен/адрес, які система отримує від уповноважених джерел.
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_21\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Реалізується запит перевірки автентичності джерела даних для відповідей на запит дозволу імен/адрес, які система отримує від авторитетних джерел}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_21\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Реалізується запит автентифікація походження даних на основі відповідей з дозволу імен/адрес, які система отримує від авторитетних джерел}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: sc\_21\_03\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Реалізується запит перевірки цілісності даних для відповідей на запит дозволу імен/адрес, які система отримує від авторитетних джерел}
+
+
+{\footnotesize\bfseries
+No: 4\\
+Name: sc\_21\_04\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Виконується перевірка цілісності даних для відповідей на запит про дозвіл імен/адрес, які система отримує від авторитетних джерел}
+
+
+
+
+\subsection{id-spe-sc-22}
+Переконатися, що системи, які спільно надають послуги розпізнавання імен/адрес для організації, є відмовостійкими та забезпечують поділ внутрішніх і зовнішніх ролей.
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_22\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Є системи, які спільно надають послуги з визначення імен/адрес для організації, відмовостійкими}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_22\_02\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Реалізовано в системах, які спільно надають послуги з вирішення імен/адрес для організації, внутрішній розподіл ролей}
+
+
+{\footnotesize\bfseries
+No: 3\\
+Name: sc\_22\_03\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Реалізовано в системах, які спільно надають послуги з вирішення імен/адрес для організації, зовнішній розподіл ролей}
+
+
+
+
+\subsection{АВТЕНТИФІКАЦІЯ СЕСІЇ (SC-23)}
+Забезпечити автентифікацію сеансів зв'язку.
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_23\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Захищено автентифікацію сеансів зв'язку}
+
+
+
+
+\subsubsection{id-spe-sc-28-1}
+
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_28\_1\_01\\
+Type: string\\
+Default: \textquotedbl{}AES-256-GCM\textquotedbl{}
+}
+
+{\footnotesize Реалізовані криптографічні механізми для запобігання несанкціонованому розкриттю інформації, що знаходиться в стані спокою на системних компонентах або носіях}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_28\_1\_02\\
+Type: string\\
+Default: \textquotedbl{}AES-256-GCM\textquotedbl{}
+}
+
+{\footnotesize Реалізовані криптографічні механізми для запобігання несанкціонованій модифікації інформації, що знаходиться в стані спокою на системних компонентах або носіях}
+
+
+
+
+\subsection{id-spe-sc-49}
+Впровадити механізми апаратного поділу та застосування політики між [Призначення: домени безпеки, визначені організацією].
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_49\_01\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Впроваджено механізми апаратного розділення та застосування політик між доменами безпеки}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_49\_odp\\
+Type: list\\
+Default: [\textquotedbl{}default\_deny\_rule\textquotedbl{}, \textquotedbl{}abac\_rule\_1\textquotedbl{}]
+}
+
+{\footnotesize Визначені домени безпеки, які потребують апаратного розділення та механізмів забезпечення дотримання політики}
+
+
+
+
+\subsection{АПАРАТНИЙ ЗАХИСТ (SC-51)}
+a. Перевіряти правильність роботи [Призначення: визначені організацією функції безпеки та приватності].\\ 
+b. Виконувати перевірку [Вибір (один або кілька): [Призначення: визначені організацією системні перехідні стани]; за командою користувача з відповідними повноваженнями; [Призначення: визначена організацією частота]].\\ 
+c. Повідомляти [Призначення: визначені організацією персонал або посадові особи] про невдалі перевірки безпеки та приватності.\\ 
+d. [Вибір (один або кілька): Вимкнути систему; Перезапустити систему; [Призначення: визначені організацією альтернативні дії]], коли виявляються аномалії.
+
+\vspace{10pt}
+{\footnotesize\bfseries
+No: 1\\
+Name: sc\_51\_odp\_01\\
+Type: string\\
+Default: nil
+}
+
+{\footnotesize Визначено компоненти системної прошивки, потребують апаратного захисту від запису; які}
+
+
+{\footnotesize\bfseries
+No: 2\\
+Name: sc\_51\_odp\_02\\
+Type: list\\
+Default: [\textquotedbl{}admin\textquotedbl{}, \textquotedbl{}security\_officer\textquotedbl{}]
+}
+
+{\footnotesize Визначені уповноважені особи, які повинні виконувати процедури вимкнення та повторного ввімкнення апаратного захисту від запису; SC-51a. використовується апаратний захист від запису для компонентів мікропрограми системи; SC-51b.[01] впроваджено спеціальні процедури для уповноважених осіб для ручного вимкнення апаратного захисту від запису для модифікацій мікропрограми; SC-51b.[02] реалізовано спеціальні процедури для уповноважених осіб для повторного увімкнення захисту від запису перед поверненням до робочого режиму}
+
+
+
+
+\end{document}
