@@ -976,6 +976,18 @@ defmodule CA.Profile.Data do
     ]
   end
 
+  def unfold(oids) do
+    all_specs = specs()
+    oid_to_spec = Map.new(all_specs, fn spec -> {CA.SPE.oid(spec.id), spec} end)
+
+    oids
+    |> Enum.reject(fn oid -> tuple_size(oid) == 9 end)
+    |> Enum.uniq()
+    |> Enum.sort_by(&Tuple.to_list/1)
+    |> Enum.map(&Map.get(oid_to_spec, &1))
+    |> Enum.reject(&is_nil/1)
+  end
+
   def specs do
     [
       spec(:"id-spe-ac"),

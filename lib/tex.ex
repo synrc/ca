@@ -197,6 +197,27 @@ defmodule CA.TeX do
     "priv/chat_profile.tex"
   end
 
+  def vpn_profile(opts \\ []) do
+    controls = CA.L2.VPN.controls() -- CA.L1.controls()
+    {body, count} = generate_body(controls)
+
+    opts =
+      Keyword.merge(
+        [
+          title: "Галузевий профіль безпеки для VPN та PKI (#{count})",
+          subtitle: "Комплексна система захисту інформації",
+          abstract:
+            "Галузевий профіль — розробляється для забезпечення безпеки VPN-продуктів та інфраструктури PKI (CA, OCSP, TSP, LDAP).",
+          body: body
+        ],
+        opts
+      )
+
+    content = generate(opts)
+    File.write!("priv/vpn_profile.tex", content)
+    "priv/vpn_profile.tex"
+  end
+
   def target_profile(module, opts \\ []) do
     name = module |> Module.split() |> List.last()
     controls = module.controls() -- CA.L2.Court.controls()
@@ -246,6 +267,7 @@ defmodule CA.TeX do
       base_profile(),
       court_profile(),
       chat_profile(),
+      vpn_profile(),
       generate_l3_profiles()
     ])
   end
@@ -272,77 +294,72 @@ defmodule CA.TeX do
   end
 
   defp generate_body(controls) do
+    profile_specs = CA.Profile.Data.unfold(controls)
+
     all_specs = CA.Profile.Data.specs()
     oid_to_spec = Map.new(all_specs, fn spec -> {CA.SPE.oid(spec.id), spec} end)
 
-    expanded_controls =
-      controls
-      # exclude family class OIDs if present
-      |> Enum.reject(fn oid -> tuple_size(oid) == 9 end)
-      |> Enum.uniq()
-      |> Enum.sort_by(&Tuple.to_list/1)
-
-    profile_specs =
-      expanded_controls
-      |> Enum.map(&Map.get(oid_to_spec, &1))
-      |> Enum.reject(&is_nil/1)
-
     {sections, _} =
-      Enum.map_reduce(expanded_controls, nil, fn oid, last_fam ->
-        spec = Map.get(oid_to_spec, oid)
+      Enum.map_reduce(profile_specs, nil, fn spec, last_fam ->
+        parts = spec.id |> to_string() |> String.split("-")
+        family = Enum.at(parts, 2) |> String.upcase()
 
-        if spec do
-          parts = spec.id |> to_string() |> String.split("-")
-          family = Enum.at(parts, 2) |> String.upcase()
-
-          latex_level =
-            case length(parts) do
-              4 -> "subsection"
-              5 -> "subsubsection"
-              _ -> "paragraph"
-            end
-
-          spec =
-            if latex_level == "subsubsection" do
-              short_title = String.split(spec.title, " - ", parts: 2) |> List.last()
-              %{spec | title: short_title}
-            else
-              spec
-            end
-
-          params = Map.get(spec, :parameters, [])
-          formatted = format_control(spec, params, latex_level)
-
-          if family != last_fam do
-            family_atom = String.to_atom("id-spe-#{String.downcase(family)}")
-            family_spec = Map.get(oid_to_spec, CA.SPE.oid(family_atom))
-
-            family_desc =
-              if family_spec && family_spec.description != "",
-                do: escape_latex(family_spec.description) <> "\n\n",
-                else: ""
-
-            ai_summary = CA.FamilyDescriptions.get_summary(family_atom)
-            ai_text = if ai_summary != "", do: escape_latex(ai_summary) <> "\n\n", else: ""
-
-            children_text = CA.FamilyDescriptions.get_children_text(family_atom, profile_specs)
-
-            children_str =
-              if children_text != "",
-                do:
-                  "\\textbf{Перелік заходів захисту:} " <> escape_latex(children_text) <> "\n\n",
-                else: ""
-
-            {"\\section{#{family}}\n#{family_desc}#{ai_text}#{children_str}" <> formatted, family}
-          else
-            {formatted, last_fam}
+        latex_level =
+          case length(parts) do
+            4 -> "subsection"
+            5 -> "subsubsection"
+            _ -> "paragraph"
           end
+
+        spec =
+          if latex_level == "subsubsection" do
+            short_title = String.split(spec.title, " - ", parts: 2) |> List.last()
+            %{spec | title: short_title}
+          else
+            spec
+          end
+
+        params = Map.get(spec, :parameters, [])
+        formatted = format_control(spec, params, latex_level)
+
+        if family != last_fam do
+          family_atom = String.to_atom("id-spe-#{String.downcase(family)}")
+          family_spec = Map.get(oid_to_spec, CA.SPE.oid(family_atom))
+
+          family_desc =
+            if family_spec && family_spec.description != "",
+              do: escape_latex(family_spec.description) <> "\n\n",
+              else: ""
+
+          ai_summary = CA.FamilyDescriptions.get_summary(family_atom)
+          ai_text = if ai_summary != "", do: escape_latex(ai_summary) <> "\n\n", else: ""
+
+          children_text = CA.FamilyDescriptions.get_children_text(family_atom, profile_specs)
+
+          children_str =
+            if children_text != "",
+              do: "\\textbf{Перелік заходів захисту:} " <> escape_latex(children_text) <> "\n\n",
+              else: ""
+
+          {"\\section{#{family}}\n#{family_desc}#{ai_text}#{children_str}" <> formatted, family}
         else
-          {"\\subsection{Unknown Control}\\nUnknown OID: #{inspect(oid)}", last_fam}
+          {formatted, last_fam}
         end
       end)
 
     {Enum.join(sections, "\n\n"), length(profile_specs)}
+  end
+
+  def unfold(oids) do
+    all_specs = CA.Profile.Data.specs()
+    oid_to_spec = Map.new(all_specs, fn spec -> {CA.SPE.oid(spec.id), spec} end)
+
+    oids
+    |> Enum.reject(fn oid -> tuple_size(oid) == 9 end)
+    |> Enum.uniq()
+    |> Enum.sort_by(&Tuple.to_list/1)
+    |> Enum.map(&Map.get(oid_to_spec, &1))
+    |> Enum.reject(&is_nil/1)
   end
 
   defp format_control(spec, [], latex_level) do
