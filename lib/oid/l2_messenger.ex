@@ -7,8 +7,6 @@ defmodule CA.L2.Messenger do
   шифрування (E2EE), управління сесіями на кількох пристроях, захисту пуш-повідомлень
   та ефемерних повідомлень. Створено спеціально для проєкту synrc/chat.
 
-  **Специфічні заходи захисту для месенджера:**
-
   1.  synrc/chat (Ядро месенджера)
       Забезпечення конфіденційності, цілісності повідомлень та управління сесіями.
 
@@ -44,31 +42,58 @@ defmodule CA.L2.Messenger do
       * AU-10, AU-10(5): Неспростовність та цифрові підписи (забезпечується X.509 та TSP).
       * SC-49, SC-51: Апаратне забезпечення виконання (використання HSM для підпису сертифікатів та відповідей OCSP/TSP).
       * IA-7: Строга автентифікація криптографічного модуля.
+
+  5. synrc/kvs (Сховище даних Key-Value)
+  Забезпечення цілісності, доступності та захисту даних бази даних у стані спокою.
+
+      * SI-12: Збереження та обробка інформації (Information Handling and Retention).
+      * CP-9: Резервне копіювання інформаційної системи (System Backup).
+      * AU-2: Реєстрація подій (аудит транзакцій доступу до бази даних).
+      * SC-28: Захист інформації у стані спокою (Шифрування БД).
   """
 
   def controls do
     CA.L1.controls() ++
       [
-        CA.SPE.oid(:"id-spe-ia-5-12"),
-        CA.SPE.oid(:"id-spe-ac-10"),
-        CA.SPE.oid(:"id-spe-ac-19-1"),
-        CA.SPE.oid(:"id-spe-ac-19-5"),
-        CA.SPE.oid(:"id-spe-mp-6"),
+        # 1. synrc/chat (Ядро месенджера)
         CA.SPE.oid(:"id-spe-sc-8-1"),
         CA.SPE.oid(:"id-spe-sc-8-2"),
-        CA.SPE.oid(:"id-spe-sc-12"),
-        CA.SPE.oid(:"id-spe-sc-23"),
         CA.SPE.oid(:"id-spe-sc-28-1"),
-        CA.SPE.oid(:"id-spe-sc-5"),
+        CA.SPE.oid(:"id-spe-ac-10"),
+        CA.SPE.oid(:"id-spe-mp-6"),
+        CA.SPE.oid(:"id-spe-ac-19-1"),
+        CA.SPE.oid(:"id-spe-ac-19-5"),
+        CA.SPE.oid(:"id-spe-ia-5-12"),
+        CA.SPE.oid(:"id-spe-sc-23"),
+
+        # 2. synrc/ldap (Служба каталогів та Ідентифікація)
+        CA.SPE.oid(:"id-spe-ia-2"),
+        CA.SPE.oid(:"id-spe-ia-4"),
+        CA.SPE.oid(:"id-spe-ac-2"),
+        CA.SPE.oid(:"id-spe-ac-3"),
+        CA.SPE.oid(:"id-spe-ac-6"),
+
+        # 3. synrc/ns (Сервер імен та доступність)
         CA.SPE.oid(:"id-spe-sc-20"),
         CA.SPE.oid(:"id-spe-sc-21"),
         CA.SPE.oid(:"id-spe-sc-22"),
+        CA.SPE.oid(:"id-spe-sc-5"),
+        CA.SPE.oid(:"id-spe-sc-7"),
+
+        # 4. synrc/ca (PKI: X.509, OCSP, TSP)
         CA.SPE.oid(:"id-spe-sc-17"),
+        CA.SPE.oid(:"id-spe-sc-12"),
         CA.SPE.oid(:"id-spe-au-10"),
         CA.SPE.oid(:"id-spe-au-10-5"),
         CA.SPE.oid(:"id-spe-sc-49"),
         CA.SPE.oid(:"id-spe-sc-51"),
-        CA.SPE.oid(:"id-spe-ia-7")
+        CA.SPE.oid(:"id-spe-ia-7"),
+
+        # 5. synrc/kvs (Key-Value Store)
+        CA.SPE.oid(:"id-spe-si-12"),
+        CA.SPE.oid(:"id-spe-cp-9"),
+        CA.SPE.oid(:"id-spe-au-2"),
+        CA.SPE.oid(:"id-spe-sc-28")
       ]
   end
 end

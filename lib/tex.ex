@@ -197,6 +197,27 @@ defmodule CA.TeX do
     "priv/chat_profile.tex"
   end
 
+  def mail_profile(opts \\ []) do
+    controls = CA.L2.Mail.controls() -- CA.L1.controls()
+    {body, count} = generate_body(controls)
+
+    opts =
+      Keyword.merge(
+        [
+          title: "Галузевий профіль безпеки для військової пошти (#{count})",
+          subtitle: "Комплексна система захисту інформації",
+          abstract:
+            "Галузевий профіль — розробляється для забезпечення конфіденційності, цілісності та гарантованої доставки повідомлень (MHS X.420) з підтримкою грифування.",
+          body: body
+        ],
+        opts
+      )
+
+    content = generate(opts)
+    File.write!("priv/mail_profile.tex", content)
+    "priv/mail_profile.tex"
+  end
+
   def vpn_profile(opts \\ []) do
     controls = CA.L2.VPN.controls() -- CA.L1.controls()
     {body, count} = generate_body(controls)
@@ -267,6 +288,7 @@ defmodule CA.TeX do
       base_profile(),
       court_profile(),
       chat_profile(),
+      mail_profile(),
       vpn_profile(),
       generate_l3_profiles()
     ])
