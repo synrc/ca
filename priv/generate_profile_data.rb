@@ -34,6 +34,14 @@ desc_text.each_line do |line|
   next if stripped.match?(/КЗЗ[IІ]\.\s*Базовий\s*проф[iі]ль\.\s*\d+/i)
   next if stripped.match?(/^\d{1,2}\s+(січня|лютого|березня|квітня|травня|червня|липня|серпня|вересня|жовтня|листопада|грудня)\s+\d{4}$/i)
 
+  if stripped == "Додаток А"
+    if current_control && in_desc && !current_desc.strip.empty?
+      atom_name = current_control.downcase.gsub('-', '_').gsub('(', '-').gsub(')', '')
+      descriptions["id-spe-#{atom_name.gsub('_', '-')}"] = format_control_description(current_desc)
+    end
+    break
+  end
+
   if match = stripped.match(/^([A-Z]{2}-\d+)\s+([А-ЯІЇЄҐ \-]+)/)
     if current_control && in_desc && !current_desc.strip.empty?
       descriptions["id-spe-#{current_control.downcase.gsub('-', '_')}"] = format_control_description(current_desc)
