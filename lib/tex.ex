@@ -101,10 +101,10 @@ defmodule CA.TeX do
 
   ## Options
     * `:date` - document date (default: "31 березня 2026")
-    * `:subtitle` - subtitle on title page and footer (default: "ЄСІКС КЗЗІ")
+    * `:subtitle` - subtitle on title page and footer (default: "ПК КЗІ КЗЗІ")
     * `:title` - title on title page and footer (default: "Профілі безпеки")
     * `:year` - copyright year (default: "2026")
-    * `:copyright` - copyright owner (default: "Інформаційні Судові Системи")
+    * `:copyright` - copyright owner (default: "Криптографічні Телесистеми")
     * `:toc_title` - title for Table of Contents (default: "Зміст")
     * `:abstract` - abstract content
     * `:body` - document body content
@@ -125,7 +125,7 @@ defmodule CA.TeX do
           subtitle: "Комплексна система захисту інформації",
           title: "Профіль безпеки",
           year: "2026",
-          copyright: "Інформаційні Судові Системи",
+          copyright: "Критпографічні Телесистеми",
           toc_title: "Зміст",
           abstract: "",
           body: ""
@@ -217,6 +217,10 @@ defmodule CA.TeX do
       CA.L3.Supreme
     ]
     |> Enum.map(&target_profile/1)
+  end
+
+  def gen do
+      :lists.flatten([gen_bible(),base_profile(),industry_profile(),generate_l3_profiles()])
   end
 
   def gen_bible(opts \\ []) do
