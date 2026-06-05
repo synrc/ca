@@ -262,7 +262,7 @@ spe_content.scan(/def oid\(:"([^"]+)"\), do: (\{[\d, ]+\})/) do |atom, tuple|
 end
 
 lookup_map = {}
-spe_content.scan(/def lookup\((\{[\d, ]+\})\), do: "(.*?)"/) do |tuple, title|
+spe_content.scan(/def lookup\((\{[\d, ]+\})\),\s*do:\s*"(.*?)"/) do |tuple, title|
   lookup_map[tuple.delete(' ')] = title
 end
 

@@ -316,7 +316,7 @@ defmodule CA.TeX do
   end
 
   defp generate_body(controls) do
-    profile_specs = CA.Profile.Data.unfold(controls)
+    profile_specs = unfold(controls)
 
     all_specs = CA.Profile.Data.specs()
     oid_to_spec = Map.new(all_specs, fn spec -> {CA.SPE.oid(spec.id), spec} end)
@@ -570,8 +570,7 @@ defmodule CA.TeX do
   EEx.function_from_string(:def, :render_legal_l2, @legal_template_l2, [:assigns])
   EEx.function_from_string(:def, :render_legal_l3, @legal_template_l3, [:assigns])
 
-  def legal_l1_profile(opts \\ []) do
-    controls = CA.L1.controls()
+  def legal_l1_profile(controls \\ CA.L1.controls(), opts \\ []) do
     {body, _count} = generate_legal_l2_table_body(controls)
 
     opts =
@@ -647,78 +646,128 @@ defmodule CA.TeX do
     filename
   end
 
-  defp generate_legal_l2_table_body(controls) do
+  defp generate_legal_l2_table_body(controls_or_groups) do
     all_specs = CA.Profile.Data.specs()
 
+    is_grouped =
+      Enum.any?(controls_or_groups, fn
+        {group_name, list} when is_binary(group_name) and is_list(list) -> true
+        _ -> false
+      end)
+
     chunked_specs =
-      CA.Profile.Data.unfold(controls)
-      |> Enum.chunk_by(fn spec ->
-        spec.id |> to_string() |> String.split("-") |> Enum.take(4) |> Enum.join("-")
-      end)
+      if is_grouped do
+        # It's already grouped (a list of {name, controls} or {:category, name})
+        Enum.map(controls_or_groups, fn
+          {:category, name} ->
+            {:category, name}
 
-    {rows, _last_fam} =
-      chunked_specs
-      |> Enum.with_index(1)
-      |> Enum.map_reduce(nil, fn {specs, idx}, last_fam ->
-        base_spec = hd(specs)
-        parts = base_spec.id |> to_string() |> String.split("-")
-        family = Enum.at(parts, 2) |> String.upcase()
+          {name, group} ->
+            {name, unfold(group)}
+        end)
+        |> Enum.reject(fn
+          {:category, _} -> false
+          {_, specs} -> specs == []
+        end)
+      else
+        # It's a flat list, use default grouping
+        specs = unfold(controls_or_groups)
 
-        control_ids =
-          specs
-          |> Enum.map(fn spec ->
-            p = spec.id |> to_string() |> String.split("-")
-            fam = Enum.at(p, 2) |> String.upcase()
-            cid = fam <> "-" <> (Enum.at(p, 3) || "")
-            if length(p) > 4, do: cid <> "(" <> Enum.at(p, 4) <> ")", else: cid
+        {policy_specs, other_specs} =
+          Enum.split_with(specs, fn spec ->
+            base_id = spec.id |> to_string() |> String.split("-") |> Enum.take(4) |> Enum.join("-")
+            Regex.match?(~r/^id-spe-[a-z]+-1$/, base_id)
           end)
-          |> Enum.join(", ")
 
-        title = escape_latex(base_spec.title)
-        desc = ""
-
-        params_text =
-          specs
-          |> Enum.flat_map(fn spec ->
-            Map.get(spec, :parameters, [])
-            |> Enum.reject(fn {_name, _pdesc, opts} ->
-              Keyword.get(opts, :default) in [nil, "", "nil"]
-            end)
-            |> Enum.map(fn {_name, pdesc, opts} ->
-              default = Keyword.get(opts, :default, "") |> to_string() |> escape_latex()
-              desc_str = escape_latex(pdesc)
-
-              if desc_str != "",
-                do: "#{desc_str}: \\textbf{#{default}}",
-                else: "\\textbf{#{default}}"
-            end)
+        chunked_others =
+          other_specs
+          |> Enum.chunk_by(fn spec ->
+            spec.id |> to_string() |> String.split("-") |> Enum.take(4) |> Enum.join("-")
           end)
-          |> Enum.join("\\newline ")
+          |> Enum.map(fn sp -> {hd(sp).title, sp} end)
 
-        row_str =
-          "#{idx} & #{title} & #{desc} & #{escape_latex(control_ids)} & #{params_text} \\\\ \\hline\n"
+        policy_chunk = if policy_specs != [], do: [{"Політики та процедури з безпеки", policy_specs}], else: []
+        policy_chunk ++ chunked_others
+      end
 
-        if family != last_fam do
-          family_atom = String.to_atom("id-spe-#{String.downcase(family)}")
-          family_spec = Enum.find(all_specs, &(&1.id == family_atom))
-
-          family_title =
-            if family_spec, do: escape_latex(family_spec.title), else: escape_latex(family)
-
+    {rows, {final_idx, _last_fam}} =
+      Enum.map_reduce(chunked_specs, {1, nil}, fn
+        {:category, name}, {idx, _last_fam} ->
+          # Explicit category provided, don't increment idx
           prefix =
-            "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{14.5cm}|}{\\textbf{#{family_title}}} \\\\ \\hline\n"
+            "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{14.5cm}|}{\\textbf{#{escape_latex(name)}}} \\\\ \\hline\n"
 
-          {prefix <> row_str, family}
-        else
-          {row_str, family}
-        end
+          {prefix, {idx, name}}
+
+        {group_name, specs}, {idx, last_fam} ->
+          is_policy_chunk =
+            Enum.all?(specs, fn s ->
+              base_id = s.id |> to_string() |> String.split("-") |> Enum.take(4) |> Enum.join("-")
+              Regex.match?(~r/^id-spe-[a-z]+-1$/, base_id)
+            end)
+
+          family =
+            if is_policy_chunk do
+              "ПОЛІТИКИ ТА ПРОЦЕДУРИ"
+            else
+              base_spec = hd(specs)
+              parts = base_spec.id |> to_string() |> String.split("-")
+              Enum.at(parts, 2) |> String.upcase()
+            end
+
+          control_ids =
+            specs
+            |> Enum.map(fn spec ->
+              p = spec.id |> to_string() |> String.split("-")
+              fam = Enum.at(p, 2) |> String.upcase()
+              cid = fam <> "-" <> (Enum.at(p, 3) || "")
+              if length(p) > 4, do: cid <> "(" <> Enum.at(p, 4) <> ")", else: cid
+            end)
+            |> Enum.join(", ")
+
+          title = escape_latex(group_name)
+          {desc_list, params_list} =
+            specs
+            |> Enum.flat_map(fn spec ->
+              Map.get(spec, :parameters, [])
+              |> Enum.reject(fn {_name, _pdesc, opts} ->
+                Keyword.get(opts, :default) in [nil, "", "nil"]
+              end)
+              |> Enum.map(fn {_name, pdesc, opts} ->
+                default = Keyword.get(opts, :default, "") |> to_string() |> escape_latex()
+                desc_str = escape_latex(pdesc)
+                {desc_str, "\\textbf{#{default}}"}
+              end)
+            end)
+            |> Enum.unzip()
+
+          desc = Enum.join(desc_list, "\\newline ")
+          params_text = Enum.join(params_list, "\\newline ")
+
+          row_str =
+            "#{idx} & #{title} & #{desc} & #{escape_latex(control_ids)} & #{params_text} \\\\ \\hline\n"
+
+          if !is_grouped and family != last_fam do
+            family_atom = String.to_atom("id-spe-#{String.downcase(family)}")
+            family_spec = Enum.find(all_specs, &(&1.id == family_atom))
+
+            family_title =
+              if family_spec, do: escape_latex(family_spec.title), else: escape_latex(family)
+
+            prefix =
+              "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{14.5cm}|}{\\textbf{#{family_title}}} \\\\ \\hline\n"
+
+            {prefix <> row_str, {idx + 1, family}}
+          else
+            {row_str, {idx + 1, family}}
+          end
       end)
 
-    {Enum.join(rows, ""), length(chunked_specs)}
+    {Enum.join(rows, ""), final_idx - 1}
   end
 
   defp generate_legal_l3_table_body(controls) do
-    profile_specs = CA.Profile.Data.unfold(controls)
+    profile_specs = unfold(controls)
     all_specs = CA.Profile.Data.specs()
 
     {rows, _state} =
@@ -736,9 +785,7 @@ defmodule CA.TeX do
 
         title = escape_latex(spec.title)
         # escape_latex(spec.description)
-        desc = ""
-
-        params_text =
+        {desc_list, params_list} =
           Map.get(spec, :parameters, [])
           |> Enum.reject(fn {_name, _pdesc, opts} ->
             Keyword.get(opts, :default) in [nil, "", "nil"]
@@ -746,12 +793,12 @@ defmodule CA.TeX do
           |> Enum.map(fn {_name, pdesc, opts} ->
             default = Keyword.get(opts, :default, "") |> to_string() |> escape_latex()
             desc_str = escape_latex(pdesc)
-
-            if desc_str != "",
-              do: "#{desc_str} = \\textbf{#{default}}",
-              else: "\\textbf{#{default}}"
+            {desc_str, "\\textbf{#{default}}"}
           end)
-          |> Enum.join("\\newline ")
+          |> Enum.unzip()
+
+        desc = Enum.join(desc_list, "\\newline ")
+        params_text = Enum.join(params_list, "\\newline ")
 
         {fam_idx_new, ctrl_idx_new, prefix} =
           if family != last_fam do
