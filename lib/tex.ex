@@ -441,10 +441,265 @@ defmodule CA.TeX do
     |> String.replace("&", "\\&")
     |> String.replace("%", "\\%")
     |> String.replace("#", "\\#")
-    |> String.replace("_", "\\_")
+    |> String.replace("_", "\\_\\allowbreak{}")
     |> String.replace("~", "\\textasciitilde{}")
     |> String.replace("^", "\\textasciicircum{}")
     |> String.replace("\"", "\\textquotedbl{}")
     |> String.replace("\n", "\\\\ \n")
+  end
+
+  @legal_template_l2 """
+  \\documentclass[10pt]{article}
+  \\usepackage[T1,T2A]{fontenc}
+  \\usepackage[utf8]{inputenc}
+  \\usepackage[english,ukrainian]{babel}
+  \\usepackage{geometry}
+  \\usepackage{longtable}
+  \\usepackage{array}
+  \\usepackage{multirow}
+  \\usepackage{hyperref}
+  \\usepackage{mathptmx}
+  \\renewcommand{\\familydefault}{\\rmdefault}
+  
+  \\geometry{a4paper,left=2cm,right=2cm,top=2cm,bottom=2cm}
+  
+  \\begin{document}
+  
+  \\begin{flushright}
+  ЗАТВЕРДЖЕНО\\\\
+  Наказ <%= @org_name %>\\\\
+  \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ 2026 року №\\_\\_\\_\\_
+  \\end{flushright}
+  
+  \\begin{center}
+  \\textbf{\\large <%= @title %>}
+  \\end{center}
+  
+  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{3.5cm}|>{\\raggedright\\arraybackslash}p{6.2cm}|c|>{\\raggedright\\arraybackslash}p{4cm}|}
+  \\hline
+  \\textbf{№ з/п} & \\textbf{Назва дії з безпеки інформації} & \\textbf{Зміст дії} & \\textbf{Заходи захисту} & \\textbf{Мінімальні необхідні параметри}\\\\
+  \\hline
+  1 & 2 & 3 & 4 & 5 \\\\
+  \\hline
+  \\endfirsthead
+  
+  \\hline
+  \\textbf{№ з/п} & \\textbf{Назва дії з безпеки інформації} & \\textbf{Зміст дії} & \\textbf{Заходи захисту} & \\textbf{Мінімальні необхідні параметри}\\\\
+  \\hline
+  1 & 2 & 3 & 4 & 5 \\\\
+  \\hline
+  \\endhead
+  
+  \\hline
+  \\endfoot
+  
+  \\hline
+  \\endlastfoot
+  
+  <%= @table_body %>
+  
+  \\end{longtable}
+  
+  \\end{document}
+  """
+
+  @legal_template_l3 """
+  \\documentclass[10pt]{article}
+  \\usepackage[T1,T2A]{fontenc}
+  \\usepackage[utf8]{inputenc}
+  \\usepackage[english,ukrainian]{babel}
+  \\usepackage{geometry}
+  \\usepackage{longtable}
+  \\usepackage{array}
+  \\usepackage{multirow}
+  \\usepackage{hyperref}
+  \\usepackage{mathptmx}
+  \\renewcommand{\\familydefault}{\\rmdefault}
+  
+  \\geometry{a4paper,left=2cm,right=2cm,top=2cm,bottom=2cm}
+  
+  \\begin{document}
+  
+  \\begin{flushright}
+  ЗАТВЕРДЖЕНО\\\\
+  Наказом <%= @org_name %>\\\\
+  від \\_\\_ \\_\\_\\_\\_\\_\\_\\_\\_\\_ 2026 р. № \\_\\_\\_\\\\
+  (в редакції наказу <%= @org_name %>\\\\
+  від \\_\\_ \\_\\_\\_\\_\\_\\_\\_\\_\\_ 2026 р. № \\_\\_)
+  \\end{flushright}
+  
+  \\vspace{2cm}
+  
+  \\begin{center}
+  \\textbf{\\Large ІНФОРМАЦІЙНО-КОМУНІКАЦІЙНА СИСТЕМА}\\\\
+  \\textbf{\\Large «<%= @system_name %>»}\\\\
+  \\vspace{1cm}
+  \\textbf{\\Large ЦІЛЬОВИЙ ПРОФІЛЬ БЕЗПЕКИ}\\\\
+  \\vspace{0.5cm}
+  \\large <%= @doc_id %>
+  \\end{center}
+  
+  \\newpage
+  
+  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{2.8cm}|>{\\raggedright\\arraybackslash}p{5.5cm}|c|>{\\raggedright\\arraybackslash}p{4.5cm}|}
+  \\hline
+  \\multirow{2}{*}{\\textbf{№}} & \\multirow{2}{*}{\\textbf{Вимога з безпеки інформації}} & \\multirow{2}{*}{\\textbf{Вимога ГПБ}} & \\multicolumn{2}{c|}{\\textbf{ЦПБ}} \\\\
+  \\cline{4-5}
+  & & & \\textbf{Захід захисту} & \\textbf{Налаштований зміст заходу захисту}\\\\
+  \\hline
+  \\endfirsthead
+  
+  \\hline
+  \\multirow{2}{*}{\\textbf{№}} & \\multirow{2}{*}{\\textbf{Вимога з безпеки інформації}} & \\multirow{2}{*}{\\textbf{Вимога ГПБ}} & \\multicolumn{2}{c|}{\\textbf{ЦПБ}} \\\\
+  \\cline{4-5}
+  & & & \\textbf{Захід захисту} & \\textbf{Налаштований зміст заходу захисту}\\\\
+  \\hline
+  \\endhead
+  
+  \\hline
+  \\endfoot
+  
+  \\hline
+  \\endlastfoot
+  
+  <%= @table_body %>
+  
+  \\end{longtable}
+  
+  \\end{document}
+  """
+
+  EEx.function_from_string(:def, :render_legal_l2, @legal_template_l2, [:assigns])
+  EEx.function_from_string(:def, :render_legal_l3, @legal_template_l3, [:assigns])
+
+  def legal_digital_profile(opts \\ []) do
+    controls = CA.L2.Court.controls() -- CA.L1.controls()
+    {body, _count} = generate_legal_l2_table_body(controls)
+
+    opts = Keyword.merge([
+      org_name: "Міністерства цифрової трансформації України",
+      title: "Галузевий профіль безпеки систем, що використовуються для надання хмарних послуг та/або послуг центру обробки даних публічним користувачам та/або критично важливим об’єктам інфраструктури",
+      table_body: body
+    ], opts)
+
+    content = render_legal_l2(Enum.into(opts, %{}))
+    File.write!("priv/legal_digital_profile.tex", content)
+    "priv/legal_digital_profile.tex"
+  end
+
+  def legal_target_profile(module, opts \\ []) do
+    name = module |> Module.split() |> List.last()
+    controls = module.controls()
+
+    system_name = case name do
+      "Orgs" -> "РЕЄСТР БАЗОВОЇ МЕРЕЖІ ЗАКЛАДІВ КУЛЬТУРИ"
+      "Local" -> "СУДОВІ СИСТЕМИ"
+      _ -> String.upcase(name)
+    end
+
+    org_name = case name do
+      "Orgs" -> "Міністерства культури України"
+      _ -> "Відповідного Органу"
+    end
+
+    doc_id = "UA.43220275.СЗІ.ЦПБ-01"
+
+    {body, _count} = generate_legal_l3_table_body(controls)
+
+    opts = Keyword.merge([
+      org_name: org_name,
+      system_name: system_name,
+      doc_id: doc_id,
+      table_body: body
+    ], opts)
+
+    content = render_legal_l3(Enum.into(opts, %{}))
+    filename = "priv/legal_target_profile_#{String.downcase(name)}.tex"
+    File.write!(filename, content)
+    filename
+  end
+
+  defp generate_legal_l2_table_body(controls) do
+    profile_specs = CA.Profile.Data.unfold(controls)
+    all_specs = CA.Profile.Data.specs()
+    
+    {rows, _last_fam} = profile_specs
+    |> Enum.with_index(1)
+    |> Enum.map_reduce(nil, fn {spec, idx}, last_fam ->
+      parts = spec.id |> to_string() |> String.split("-")
+      family = Enum.at(parts, 2) |> String.upcase()
+      control_id = family <> "-" <> (Enum.at(parts, 3) || "")
+      control_id = if length(parts) > 4, do: control_id <> "(" <> Enum.at(parts, 4) <> ")", else: control_id
+
+      title = escape_latex(spec.title)
+      desc = escape_latex(spec.description)
+      
+      params_text = Map.get(spec, :parameters, [])
+      |> Enum.reject(fn {_name, _pdesc, opts} -> Keyword.get(opts, :default) in [nil, "", "nil"] end)
+      |> Enum.map(fn {_name, pdesc, opts} ->
+         default = Keyword.get(opts, :default, "") |> to_string() |> escape_latex()
+         desc_str = escape_latex(pdesc)
+         if desc_str != "", do: "#{desc_str}: \\textbf{#{default}}", else: "\\textbf{#{default}}"
+      end)
+      |> Enum.join("\\newline ")
+      
+      row_str = "#{idx} & #{title} & #{desc} & #{escape_latex(control_id)} & #{params_text} \\\\ \\hline\n"
+      
+      if family != last_fam do
+         family_atom = String.to_atom("id-spe-#{String.downcase(family)}")
+         family_spec = Enum.find(all_specs, &(&1.id == family_atom))
+         family_title = if family_spec, do: escape_latex(family_spec.title), else: escape_latex(family)
+         prefix = "\\multicolumn{5}{|l|}{\\textbf{#{family_title}}} \\\\ \\hline\n"
+         {prefix <> row_str, family}
+      else
+         {row_str, family}
+      end
+    end)
+    
+    {Enum.join(rows, ""), length(profile_specs)}
+  end
+
+  defp generate_legal_l3_table_body(controls) do
+    profile_specs = CA.Profile.Data.unfold(controls)
+    all_specs = CA.Profile.Data.specs()
+    
+    {rows, _state} = profile_specs
+    |> Enum.map_reduce({nil, 0, 0}, fn spec, {last_fam, fam_idx, ctrl_idx} ->
+      parts = spec.id |> to_string() |> String.split("-")
+      family = Enum.at(parts, 2) |> String.upcase()
+      control_id = family <> "-" <> (Enum.at(parts, 3) || "")
+      control_id = if length(parts) > 4, do: control_id <> "(" <> Enum.at(parts, 4) <> ")", else: control_id
+
+      title = escape_latex(spec.title)
+      desc = escape_latex(spec.description)
+      
+      params_text = Map.get(spec, :parameters, [])
+      |> Enum.reject(fn {_name, _pdesc, opts} -> Keyword.get(opts, :default) in [nil, "", "nil"] end)
+      |> Enum.map(fn {_name, pdesc, opts} ->
+         default = Keyword.get(opts, :default, "") |> to_string() |> escape_latex()
+         desc_str = escape_latex(pdesc)
+         if desc_str != "", do: "#{desc_str} = \\textbf{#{default}}", else: "\\textbf{#{default}}"
+      end)
+      |> Enum.join("\\newline\\newline ")
+      
+      {fam_idx_new, ctrl_idx_new, prefix} = if family != last_fam do
+         family_atom = String.to_atom("id-spe-#{String.downcase(family)}")
+         family_spec = Enum.find(all_specs, &(&1.id == family_atom))
+         family_title = if family_spec, do: escape_latex(family_spec.title), else: escape_latex(family)
+         new_fam_idx = fam_idx + 1
+         pref = "\\multicolumn{5}{|l|}{\\textbf{#{new_fam_idx} #{family_title} (#{family})}} \\\\ \\hline\n"
+         {new_fam_idx, 1, pref}
+      else
+         {fam_idx, ctrl_idx + 1, ""}
+      end
+      
+      hier_number = "#{fam_idx_new}.1.#{ctrl_idx_new}"
+      
+      row_str = "#{hier_number} & #{title} & #{desc} & #{escape_latex(control_id)} & #{params_text} \\\\ \\hline\n"
+      
+      {prefix <> row_str, {family, fam_idx_new, ctrl_idx_new}}
+    end)
+    
+    {Enum.join(rows, ""), length(profile_specs)}
   end
 end
