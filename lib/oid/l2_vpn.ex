@@ -1,6 +1,6 @@
 defmodule CA.L2.VPN do
   @moduledoc """
-  Level 2: VPN & PKI Infrastructure Security Profile (Галузевий профіль безпеки для VPN та PKI)
+  Level 2: VPN & PKI Infrastructure Security Profile (Завдання безпеки для VPN та PKI)
 
   Цей профіль розширює базовий (L1) додатковими вимогами, які адаптовані для
   продуктів VPN (на базі `tunctl` та L2/L3 тунелів), що працюють у тісній інтеграції

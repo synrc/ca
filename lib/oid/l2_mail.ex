@@ -1,6 +1,6 @@
 defmodule CA.L2.Mail do
   @moduledoc """
-  Level 2: Military Mail Security Profile (Галузевий профіль безпеки для військової пошти)
+  Level 2: Military Mail Security Profile (Завдання безпеки для військової пошти)
 
   Цей профіль розширює базовий (L1) додатковими вимогами, специфічними для
   систем обміну повідомленнями високого рівня захисту (MHS X.420 / STANAG 4406),
