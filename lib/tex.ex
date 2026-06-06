@@ -136,46 +136,6 @@ defmodule CA.TeX do
     render(Enum.into(opts, %{}))
   end
 
-  def base_profile(opts \\ []) do
-    {body, count} = generate_body(CA.L1.controls())
-
-    opts =
-      Keyword.merge(
-        [
-          title: "Профіль базових заходів із захисту інформації (#{count})",
-          subtitle: "Комплексна система захисту інформації",
-          abstract: "Базовий профіль — затверджується Адміністрацією Держспецзв’язку (наказом).",
-          body: body
-        ],
-        opts
-      )
-
-    content = generate(opts)
-    File.write!("priv/base_profile.tex", content)
-    "priv/base_profile.tex"
-  end
-
-  def court_profile(opts \\ []) do
-    controls = CA.L2.Court.controls() -- CA.L1.controls()
-    {body, count} = generate_body(controls)
-
-    opts =
-      Keyword.merge(
-        [
-          title: "Галузевий профіль заходів із захисту інформації (#{count})",
-          subtitle: "Комплексна система захисту інформації",
-          abstract:
-            "Галузевий профіль — розробляється галузевим органом, погоджується з Держспецзв’язку та затверджується наказом/рішенням відповідного органу. Включає лише додаткові вимоги (відмінності) відносно Базового профілю.",
-          body: body
-        ],
-        opts
-      )
-
-    content = generate(opts)
-    File.write!("priv/court_profile.tex", content)
-    "priv/court_profile.tex"
-  end
-
   def chat_profile(opts \\ []) do
     controls = CA.L2.Messenger.controls() -- CA.L1.controls()
     {body, count} = generate_body(controls)
@@ -239,39 +199,6 @@ defmodule CA.TeX do
     "priv/vpn_profile.tex"
   end
 
-  def target_profile(module, opts \\ []) do
-    name = module |> Module.split() |> List.last()
-    controls = module.controls() -- CA.L2.Court.controls()
-
-    title =
-      case name do
-        "Orgs" -> "Цільовий профіль безпеки органів та установ в системі правосуддя"
-        "Supreme" -> "Цільовий профіль безпеки вищих судів"
-        "Specialized" -> "Цільовий профіль безпеки вищих спеціалізованих судів"
-        "Local" -> "Цільовий профіль судів"
-        _ -> "Цільовий профіль безпеки (#{name})"
-      end
-
-    {body, count} = generate_body(controls)
-
-    opts =
-      Keyword.merge(
-        [
-          title: "#{title} (#{count})",
-          subtitle: "Комплексна система захисту інформації",
-          abstract:
-            "Цільовий профіль безпеки (ЦПБ) — індивідуальний для конкретної системи підприємства. Саме на його основі створюється/модернізується КЗЗІ. Включає лише додаткові вимоги (відмінності) відносно Галузевого профілю.",
-          body: body
-        ],
-        opts
-      )
-
-    content = generate(opts)
-    filename = "priv/target_profile_#{String.downcase(name)}.tex"
-    File.write!(filename, content)
-    filename
-  end
-
   def generate_l3_profiles do
     [
       CA.L3.Local,
@@ -279,18 +206,22 @@ defmodule CA.TeX do
       CA.L3.Specialized,
       CA.L3.Supreme
     ]
-    |> Enum.map(&target_profile/1)
+    |> Enum.map(&legal_l3_profile/1)
   end
 
   def gen do
     :lists.flatten([
+      # В Шаблоні Держспецзв'язку
+      legal_l1_profile_1(),
+      legal_l1_profile_2(),
+      legal_l2_profile(),
+      legal_l3_profile(CA.CMDB.ERP),
+      generate_l3_profiles(),
+      # В Шаблоні ТОВ "Криптографічні Телесистеми"
       gen_bible(),
-      base_profile(),
-      court_profile(),
       chat_profile(),
       mail_profile(),
-      vpn_profile(),
-      generate_l3_profiles()
+      vpn_profile()
     ])
   end
 
@@ -476,7 +407,7 @@ defmodule CA.TeX do
   \\end{center}
 
   \\footnotesize
-  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{6cm}|>{\\raggedright\\arraybackslash}p{2cm}|>{\\raggedright\\arraybackslash}p{4cm}|}
+  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{6cm}|>{\\raggedright\\arraybackslash}p{2cm}|>{\\raggedright\\arraybackslash}p{3cm}|}
   \\hline
   \\textbf{№ з/п} & \\textbf{Назва дії з безпеки інформації} & \\textbf{Зміст дії} & \\textbf{Заходи захисту} & \\textbf{Мінімальні необхідні параметри}\\\\
   \\hline
@@ -528,7 +459,7 @@ defmodule CA.TeX do
   \\vspace{2cm}
 
   \\begin{center}
-  \\textbf{\\Large ІНФОРМАЦІЙНО-КОМУНІКАЦІЙНА СИСТЕМА}\\\\
+  \\textbf{\\Large <%= @system_desc %>}\\\\
   \\textbf{\\Large «<%= @system_name %>»}\\\\
   \\vspace{1cm}
   \\textbf{\\Large ЦІЛЬОВИЙ ПРОФІЛЬ БЕЗПЕКИ}\\\\
@@ -539,16 +470,16 @@ defmodule CA.TeX do
   \\newpage
 
   \\footnotesize
-  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{6cm}|>{\\raggedright\\arraybackslash}p{2cm}|>{\\raggedright\\arraybackslash}p{4cm}|}
+  \\begin{longtable}{|>{\\centering\\arraybackslash}p{0.5cm}|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{3cm}|>{\\raggedright\\arraybackslash}p{2cm}|>{\\raggedright\\arraybackslash}p{5cm}|}
   \\hline
-  \\multirow{2}{*}{\\textbf{№}} & \\multirow{2}{*}{\\textbf{Вимога з безпеки інформації}} & \\multirow{2}{*}{\\textbf{Вимога ГПБ}} & \\multicolumn{2}{c|}{\\textbf{ЦПБ}} \\\\
+  \\textbf{№} & \\textbf{Вимога з безпеки інформації} & \\textbf{Вимога ГПБ} & \\multicolumn{2}{c|}{\\textbf{ЦПБ}} \\\\
   \\cline{4-5}
   & & & \\textbf{Захід захисту} & \\textbf{Налаштований зміст заходу захисту}\\\\
   \\hline
   \\endfirsthead
 
   \\hline
-  \\multirow{2}{*}{\\textbf{№}} & \\multirow{2}{*}{\\textbf{Вимога з безпеки інформації}} & \\multirow{2}{*}{\\textbf{Вимога ГПБ}} & \\multicolumn{2}{c|}{\\textbf{ЦПБ}} \\\\
+  \\textbf{№} & \\textbf{Вимога з безпеки інформації} & \\textbf{Вимога ГПБ} & \\multicolumn{2}{c|}{\\textbf{ЦПБ}} \\\\
   \\cline{4-5}
   & & & \\textbf{Захід захисту} & \\textbf{Налаштований зміст заходу захисту}\\\\
   \\hline
@@ -585,8 +516,8 @@ defmodule CA.TeX do
       )
 
     content = render_legal_l2(Enum.into(opts, %{}))
-    File.write!("priv/legal_baseline_profile_409.tex", content)
-    "priv/legal_baseline_profile_409.tex"
+    File.write!("priv/legal_l1_profile_409.tex", content)
+    "priv/legal_l1_profile_409.tex"
   end
 
   def legal_l1_profile_2(controls \\ CA.L1.Base97.groups(), opts \\ []) do
@@ -604,8 +535,8 @@ defmodule CA.TeX do
       )
 
     content = render_legal_l2(Enum.into(opts, %{}))
-    File.write!("priv/legal_baseline_profile_419.tex", content)
-    "priv/legal_baseline_profile_419.tex"
+    File.write!("priv/legal_l1_profile_419.tex", content)
+    "priv/legal_l1_profile_419.tex"
   end
 
   def legal_l2_profile(opts \\ []) do
@@ -615,45 +546,40 @@ defmodule CA.TeX do
     opts =
       Keyword.merge(
         [
-          org_name: "Міністерства цифрової трансформації України",
+          org_name: "Державна Судова Адміністрація України",
           title:
-            "Галузевий профіль безпеки систем, що використовуються для надання хмарних послуг та/або послуг центру обробки даних публічним користувачам та/або критично важливим об’єктам інфраструктури",
+            "Галузевий профіль безпеки судової системи, що використовуються для надання хмарних послуг та/або послуг центру обробки даних публічним користувачам та/або критично важливим об’єктам інфраструктури",
           table_body: body
         ],
         opts
       )
 
     content = render_legal_l2(Enum.into(opts, %{}))
-    File.write!("priv/legal_digital_profile.tex", content)
-    "priv/legal_digital_profile.tex"
+    File.write!("priv/legal_l2_court_profile.tex", content)
+    "priv/legal_l2_court_profile.tex"
+  end
+
+  def generate_doc_id(opts \\ []) do
+    base = Keyword.get(opts, :base, "46207985")
+    dept = Keyword.get(opts, :dept, "СЗІ")
+    sub = Keyword.get(opts, :sub, "ЦПБ")
+    seq = Keyword.get_lazy(opts, :seq, fn -> Enum.random(1..99) end)
+
+    "UA.#{base}.#{dept}.#{sub}-#{String.pad_leading(to_string(seq), 2, "0")}"
   end
 
   def legal_l3_profile(module, opts \\ []) do
     name = module |> Module.split() |> List.last()
     controls = module.controls()
-
-    system_name =
-      case name do
-        "Orgs" -> "РЕЄСТР БАЗОВОЇ МЕРЕЖІ ЗАКЛАДІВ КУЛЬТУРИ"
-        "Local" -> "СУДОВІ СИСТЕМИ"
-        _ -> String.upcase(name)
-      end
-
-    org_name =
-      case name do
-        "Orgs" -> "Міністерства культури України"
-        _ -> "Відповідного Органу"
-      end
-
-    doc_id = "UA.43220275.СЗІ.ЦПБ-01"
-
+    doc_id = generate_doc_id()
     {body, _count} = generate_legal_l3_table_body(controls)
 
     opts =
       Keyword.merge(
         [
-          org_name: org_name,
-          system_name: system_name,
+          org_name: "ТОВ \"Криптографічні Телесистеми\"",
+          system_desc: "Система електронного урядування",
+          system_name: "ERP/1",
           doc_id: doc_id,
           table_body: body
         ],
@@ -661,7 +587,7 @@ defmodule CA.TeX do
       )
 
     content = render_legal_l3(Enum.into(opts, %{}))
-    filename = "priv/legal_target_profile_#{String.downcase(name)}.tex"
+    filename = "priv/legal_l3_profile_#{String.downcase(name)}.tex"
     File.write!(filename, content)
     filename
   end
@@ -719,7 +645,7 @@ defmodule CA.TeX do
         {:category, name}, {idx, _last_fam} ->
           # Explicit category provided, don't increment idx
           prefix =
-            "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{16cm}|}{\\textbf{#{escape_latex(name)}}} \\\\ \\hline\n"
+            "\\multicolumn{5}{|l|}{\\textbf{#{escape_latex(name)}}} \\\\ \\hline\n"
 
           {prefix, {idx, name}}
 
@@ -755,8 +681,9 @@ defmodule CA.TeX do
                 |> Enum.reject(fn {_name, _pdesc, opts} ->
                   Keyword.get(opts, :default) in [nil, "", "nil"]
                 end)
-                |> Enum.map(fn {_name, pdesc, opts} ->
+                |> Enum.map(fn {name_atom, pdesc, opts} ->
                   default_val = Keyword.get(opts, :default, "")
+                  type = Keyword.get(opts, :type, "unknown")
 
                   default_str =
                     if is_list(default_val),
@@ -765,7 +692,10 @@ defmodule CA.TeX do
 
                   default = escape_latex(default_str)
                   desc_str = escape_latex(pdesc)
-                  {desc_str, "\\textbf{#{default}}"}
+                  
+                  formatted_param = "Параметр: #{escape_latex(to_string(name_atom))}\\newline Тип: #{escape_latex(to_string(type))}\\newline Значення: \\textbf{#{default}}"
+                  
+                  {desc_str, formatted_param}
                 end)
                 |> Enum.uniq()
                 |> Enum.reduce([], fn {desc1, def1} = item, acc ->
@@ -789,16 +719,44 @@ defmodule CA.TeX do
                 |> Enum.reverse()
                 |> Enum.unzip()
 
-              desc = Enum.join(desc_list, "\\newline ")
-              params_text = Enum.join(params_list, "\\newline ")
-
               col1 = if spec_idx == 0, do: "#{idx}", else: ""
               col2 = if spec_idx == 0, do: "#{title}", else: ""
 
               is_last = spec_idx == length(specs) - 1
               line_cmd = if is_last, do: "\\hline", else: "\\cline{3-5}"
 
-              "#{col1} & #{col2} & #{desc} & #{escape_latex(cid)} & #{params_text} \\\\ #{line_cmd}\n"
+              params = Enum.zip(desc_list, params_list)
+
+              if params == [] do
+                "#{col1} & #{col2} & & #{escape_latex(cid)} & \\\\ #{line_cmd}\n"
+              else
+                params
+                |> Enum.with_index()
+                |> Enum.map(fn {{d, p}, p_idx} ->
+                  c1 = if p_idx == 0, do: col1, else: ""
+                  c2 = if p_idx == 0, do: col2, else: ""
+                  c4 = if p_idx == 0, do: escape_latex(cid), else: ""
+                  lcmd = if p_idx == length(params) - 1, do: line_cmd, else: "\\cline{3-5}"
+
+                  chunks = String.split(d, "; ")
+                  
+                  chunks
+                  |> Enum.with_index()
+                  |> Enum.map(fn {chunk, chunk_idx} ->
+                    cx1 = if chunk_idx == 0, do: c1, else: ""
+                    cx2 = if chunk_idx == 0, do: c2, else: ""
+                    cx4 = if chunk_idx == 0, do: c4, else: ""
+                    cx5 = if chunk_idx == 0, do: p, else: ""
+                    
+                    chunk_text = if chunk_idx == length(chunks) - 1, do: chunk, else: chunk <> ";"
+                    lcmd_inner = if chunk_idx == length(chunks) - 1, do: lcmd, else: ""
+                    
+                    "#{cx1} & #{cx2} & #{chunk_text} & #{cx4} & #{cx5} \\\\ #{lcmd_inner}\n"
+                  end)
+                  |> Enum.join("")
+                end)
+                |> Enum.join("")
+              end
             end)
             |> Enum.join("")
 
@@ -822,7 +780,24 @@ defmodule CA.TeX do
   end
 
   defp generate_legal_l3_table_body(controls) do
-    profile_specs = unfold(controls)
+    profile_specs =
+      case controls do
+        [%{subcontrols: _} | _] ->
+          Enum.flat_map(controls, fn fam ->
+            Enum.map(fam.subcontrols, fn sc ->
+              %{
+                id: String.to_atom("id-spe-" <> String.downcase(sc.id)),
+                title: sc.name,
+                description: sc.text,
+                parameters: Map.get(sc, :parameters, [])
+              }
+            end)
+          end)
+
+        _ ->
+          unfold(controls)
+      end
+
     all_specs = CA.Profile.Data.specs()
 
     {rows, _state} =
@@ -840,47 +815,41 @@ defmodule CA.TeX do
 
         title = escape_latex(spec.title)
         # escape_latex(spec.description)
-        {desc_list, params_list} =
+        desc_list =
           Map.get(spec, :parameters, [])
-          |> Enum.reject(fn {_name, _pdesc, opts} ->
-            Keyword.get(opts, :default) in [nil, "", "nil"]
+          |> Enum.reject(fn
+            %{default: default_val} -> default_val in [nil, "", "nil"]
+            {_name, _desc, opts} -> Keyword.get(opts, :default) in [nil, "", "nil"]
+            _ -> false
           end)
-          |> Enum.map(fn {_name, pdesc, opts} ->
-            default_val = Keyword.get(opts, :default, "")
+          |> Enum.map(fn
+            %{name: name_atom, type: type, default: default_val} ->
+              default_str =
+                if is_list(default_val),
+                  do: Enum.join(default_val, ", "),
+                  else: to_string(default_val)
 
-            default_str =
-              if is_list(default_val),
-                do: Enum.join(default_val, ", "),
-                else: to_string(default_val)
+              default = escape_latex(default_str)
 
-            default = escape_latex(default_str)
-            desc_str = escape_latex(pdesc)
-            {desc_str, "\\textbf{#{default}}"}
+              "Параметр: #{escape_latex(name_atom)}\\newline Тип: #{escape_latex(type)}\\newline Значення: \\textbf{#{default}}"
+
+            {_name_atom, pdesc, opts} ->
+              default_val = Keyword.get(opts, :default, "")
+              type = Keyword.get(opts, :type, "unknown")
+
+              default_str =
+                if is_list(default_val),
+                  do: Enum.join(default_val, ", "),
+                  else: to_string(default_val)
+
+              default = escape_latex(default_str)
+
+              "Параметр: #{escape_latex(pdesc)}\\newline Тип: #{escape_latex(type)}\\newline Значення: \\textbf{#{default}}"
           end)
           |> Enum.uniq()
-          |> Enum.reduce([], fn {desc1, def1} = item, acc ->
-            if Enum.any?(acc, fn {desc2, def2} ->
-                 def1 == def2 and
-                   (String.contains?(desc1, desc2) or String.contains?(desc2, desc1))
-               end) do
-              Enum.map(acc, fn {desc2, def2} = existing ->
-                if def1 == def2 and
-                     (String.contains?(desc1, desc2) or String.contains?(desc2, desc1)) do
-                  if String.length(desc1) < String.length(desc2), do: item, else: existing
-                else
-                  existing
-                end
-              end)
-              |> Enum.uniq()
-            else
-              [item | acc]
-            end
-          end)
-          |> Enum.reverse()
-          |> Enum.unzip()
 
-        desc = Enum.join(desc_list, "\\newline ")
-        params_text = Enum.join(params_list, "\\newline ")
+        desc = Enum.join(desc_list, "\\newline\\newline ")
+        full_params_text = escape_latex(spec.description)
 
         {fam_idx_new, ctrl_idx_new, prefix} =
           if family != last_fam do
@@ -893,7 +862,7 @@ defmodule CA.TeX do
             new_fam_idx = fam_idx + 1
 
             pref =
-              "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{16cm}|}{\\textbf{#{new_fam_idx}. #{family_title} (#{family})}} \\\\ \\hline\n"
+              "\\multicolumn{5}{|l|}{\\textbf{#{new_fam_idx}. #{family_title} (#{family})}} \\\\ \\hline\n"
 
             {new_fam_idx, 1, pref}
           else
@@ -901,7 +870,7 @@ defmodule CA.TeX do
           end
 
         row_str =
-          "#{row_idx} & #{title} & #{desc} & #{escape_latex(control_id)} & #{params_text} \\\\ \\hline\n"
+          "#{row_idx} & #{title} & #{desc} & #{escape_latex(control_id)} & #{full_params_text} \\\\ \\hline\n"
 
         {prefix <> row_str, {family, fam_idx_new, ctrl_idx_new}}
       end)
