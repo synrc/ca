@@ -476,7 +476,7 @@ defmodule CA.TeX do
   \\end{center}
 
   \\footnotesize
-  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{2.5cm}|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{3.5cm}|>{\\raggedright\\arraybackslash}p{5.5cm}|}
+  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{6cm}|>{\\raggedright\\arraybackslash}p{2cm}|>{\\raggedright\\arraybackslash}p{4cm}|}
   \\hline
   \\textbf{№ з/п} & \\textbf{Назва дії з безпеки інформації} & \\textbf{Зміст дії} & \\textbf{Заходи захисту} & \\textbf{Мінімальні необхідні параметри}\\\\
   \\hline
@@ -539,7 +539,7 @@ defmodule CA.TeX do
   \\newpage
 
   \\footnotesize
-  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{2.5cm}|>{\\raggedright\\arraybackslash}p{3.5cm}|>{\\raggedright\\arraybackslash}p{5.5cm}|}
+  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{6cm}|>{\\raggedright\\arraybackslash}p{2cm}|>{\\raggedright\\arraybackslash}p{4cm}|}
   \\hline
   \\multirow{2}{*}{\\textbf{№}} & \\multirow{2}{*}{\\textbf{Вимога з безпеки інформації}} & \\multirow{2}{*}{\\textbf{Вимога ГПБ}} & \\multicolumn{2}{c|}{\\textbf{ЦПБ}} \\\\
   \\cline{4-5}
@@ -570,22 +570,42 @@ defmodule CA.TeX do
   EEx.function_from_string(:def, :render_legal_l2, @legal_template_l2, [:assigns])
   EEx.function_from_string(:def, :render_legal_l3, @legal_template_l3, [:assigns])
 
-  def legal_l1_profile(controls \\ CA.L1.controls(), opts \\ []) do
+  def legal_l1_profile_1(controls \\ CA.L1.Base84.groups(), opts \\ []) do
     {body, _count} = generate_legal_l2_table_body(controls)
 
     opts =
       Keyword.merge(
         [
-          org_name: "Міністерства цифрової трансформації України",
-          title: "Базовий профіль безпеки (L1)",
+          org_name: "Держспецзв’язок України",
+          title:
+            "Базовий профіль безпеки системи, де обробляється відкрита або конфіденційна інформація, затверджений наказом Адміністрації Держспецзв’язку від 30.06.2025 № 409",
           table_body: body
         ],
         opts
       )
 
     content = render_legal_l2(Enum.into(opts, %{}))
-    File.write!("priv/legal_baseline_profile.tex", content)
-    "priv/legal_baseline_profile.tex"
+    File.write!("priv/legal_baseline_profile_409.tex", content)
+    "priv/legal_baseline_profile_409.tex"
+  end
+
+  def legal_l1_profile_2(controls \\ CA.L1.Base97.groups(), opts \\ []) do
+    {body, _count} = generate_legal_l2_table_body(controls)
+
+    opts =
+      Keyword.merge(
+        [
+          org_name: "Держспецзв’язок України",
+          title:
+            "Базовий профіль безпеки системи, де обробляється службова інформація, затверджений наказом Адміністрації Держспецзв’язку від 02.07.2025 № 419",
+          table_body: body
+        ],
+        opts
+      )
+
+    content = render_legal_l2(Enum.into(opts, %{}))
+    File.write!("priv/legal_baseline_profile_419.tex", content)
+    "priv/legal_baseline_profile_419.tex"
   end
 
   def legal_l2_profile(opts \\ []) do
@@ -675,7 +695,9 @@ defmodule CA.TeX do
 
         {policy_specs, other_specs} =
           Enum.split_with(specs, fn spec ->
-            base_id = spec.id |> to_string() |> String.split("-") |> Enum.take(4) |> Enum.join("-")
+            base_id =
+              spec.id |> to_string() |> String.split("-") |> Enum.take(4) |> Enum.join("-")
+
             Regex.match?(~r/^id-spe-[a-z]+-1$/, base_id)
           end)
 
@@ -686,7 +708,9 @@ defmodule CA.TeX do
           end)
           |> Enum.map(fn sp -> {hd(sp).title, sp} end)
 
-        policy_chunk = if policy_specs != [], do: [{"Політики та процедури з безпеки", policy_specs}], else: []
+        policy_chunk =
+          if policy_specs != [], do: [{"Політики та процедури з безпеки", policy_specs}], else: []
+
         policy_chunk ++ chunked_others
       end
 
@@ -695,7 +719,7 @@ defmodule CA.TeX do
         {:category, name}, {idx, _last_fam} ->
           # Explicit category provided, don't increment idx
           prefix =
-            "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{14.5cm}|}{\\textbf{#{escape_latex(name)}}} \\\\ \\hline\n"
+            "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{16cm}|}{\\textbf{#{escape_latex(name)}}} \\\\ \\hline\n"
 
           {prefix, {idx, name}}
 
@@ -715,37 +739,68 @@ defmodule CA.TeX do
               Enum.at(parts, 2) |> String.upcase()
             end
 
-          control_ids =
+          title = escape_latex(group_name)
+
+          row_str =
             specs
-            |> Enum.map(fn spec ->
+            |> Enum.with_index()
+            |> Enum.map(fn {spec, spec_idx} ->
               p = spec.id |> to_string() |> String.split("-")
               fam = Enum.at(p, 2) |> String.upcase()
               cid = fam <> "-" <> (Enum.at(p, 3) || "")
-              if length(p) > 4, do: cid <> "(" <> Enum.at(p, 4) <> ")", else: cid
+              cid = if length(p) > 4, do: cid <> "(" <> Enum.at(p, 4) <> ")", else: cid
+
+              {desc_list, params_list} =
+                Map.get(spec, :parameters, [])
+                |> Enum.reject(fn {_name, _pdesc, opts} ->
+                  Keyword.get(opts, :default) in [nil, "", "nil"]
+                end)
+                |> Enum.map(fn {_name, pdesc, opts} ->
+                  default_val = Keyword.get(opts, :default, "")
+
+                  default_str =
+                    if is_list(default_val),
+                      do: Enum.join(default_val, ", "),
+                      else: to_string(default_val)
+
+                  default = escape_latex(default_str)
+                  desc_str = escape_latex(pdesc)
+                  {desc_str, "\\textbf{#{default}}"}
+                end)
+                |> Enum.uniq()
+                |> Enum.reduce([], fn {desc1, def1} = item, acc ->
+                  if Enum.any?(acc, fn {desc2, def2} ->
+                       def1 == def2 and
+                         (String.contains?(desc1, desc2) or String.contains?(desc2, desc1))
+                     end) do
+                    Enum.map(acc, fn {desc2, def2} = existing ->
+                      if def1 == def2 and
+                           (String.contains?(desc1, desc2) or String.contains?(desc2, desc1)) do
+                        if String.length(desc1) < String.length(desc2), do: item, else: existing
+                      else
+                        existing
+                      end
+                    end)
+                    |> Enum.uniq()
+                  else
+                    [item | acc]
+                  end
+                end)
+                |> Enum.reverse()
+                |> Enum.unzip()
+
+              desc = Enum.join(desc_list, "\\newline ")
+              params_text = Enum.join(params_list, "\\newline ")
+
+              col1 = if spec_idx == 0, do: "#{idx}", else: ""
+              col2 = if spec_idx == 0, do: "#{title}", else: ""
+
+              is_last = spec_idx == length(specs) - 1
+              line_cmd = if is_last, do: "\\hline", else: "\\cline{3-5}"
+
+              "#{col1} & #{col2} & #{desc} & #{escape_latex(cid)} & #{params_text} \\\\ #{line_cmd}\n"
             end)
-            |> Enum.join(", ")
-
-          title = escape_latex(group_name)
-          {desc_list, params_list} =
-            specs
-            |> Enum.flat_map(fn spec ->
-              Map.get(spec, :parameters, [])
-              |> Enum.reject(fn {_name, _pdesc, opts} ->
-                Keyword.get(opts, :default) in [nil, "", "nil"]
-              end)
-              |> Enum.map(fn {_name, pdesc, opts} ->
-                default = Keyword.get(opts, :default, "") |> to_string() |> escape_latex()
-                desc_str = escape_latex(pdesc)
-                {desc_str, "\\textbf{#{default}}"}
-              end)
-            end)
-            |> Enum.unzip()
-
-          desc = Enum.join(desc_list, "\\newline ")
-          params_text = Enum.join(params_list, "\\newline ")
-
-          row_str =
-            "#{idx} & #{title} & #{desc} & #{escape_latex(control_ids)} & #{params_text} \\\\ \\hline\n"
+            |> Enum.join("")
 
           if !is_grouped and family != last_fam do
             family_atom = String.to_atom("id-spe-#{String.downcase(family)}")
@@ -755,7 +810,7 @@ defmodule CA.TeX do
               if family_spec, do: escape_latex(family_spec.title), else: escape_latex(family)
 
             prefix =
-              "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{14.5cm}|}{\\textbf{#{family_title}}} \\\\ \\hline\n"
+              "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{16cm}|}{\\textbf{#{family_title}}} \\\\ \\hline\n"
 
             {prefix <> row_str, {idx + 1, family}}
           else
@@ -791,10 +846,37 @@ defmodule CA.TeX do
             Keyword.get(opts, :default) in [nil, "", "nil"]
           end)
           |> Enum.map(fn {_name, pdesc, opts} ->
-            default = Keyword.get(opts, :default, "") |> to_string() |> escape_latex()
+            default_val = Keyword.get(opts, :default, "")
+
+            default_str =
+              if is_list(default_val),
+                do: Enum.join(default_val, ", "),
+                else: to_string(default_val)
+
+            default = escape_latex(default_str)
             desc_str = escape_latex(pdesc)
             {desc_str, "\\textbf{#{default}}"}
           end)
+          |> Enum.uniq()
+          |> Enum.reduce([], fn {desc1, def1} = item, acc ->
+            if Enum.any?(acc, fn {desc2, def2} ->
+                 def1 == def2 and
+                   (String.contains?(desc1, desc2) or String.contains?(desc2, desc1))
+               end) do
+              Enum.map(acc, fn {desc2, def2} = existing ->
+                if def1 == def2 and
+                     (String.contains?(desc1, desc2) or String.contains?(desc2, desc1)) do
+                  if String.length(desc1) < String.length(desc2), do: item, else: existing
+                else
+                  existing
+                end
+              end)
+              |> Enum.uniq()
+            else
+              [item | acc]
+            end
+          end)
+          |> Enum.reverse()
           |> Enum.unzip()
 
         desc = Enum.join(desc_list, "\\newline ")
@@ -811,7 +893,7 @@ defmodule CA.TeX do
             new_fam_idx = fam_idx + 1
 
             pref =
-              "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{14.5cm}|}{\\textbf{#{new_fam_idx}. #{family_title} (#{family})}} \\\\ \\hline\n"
+              "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{16cm}|}{\\textbf{#{new_fam_idx}. #{family_title} (#{family})}} \\\\ \\hline\n"
 
             {new_fam_idx, 1, pref}
           else
