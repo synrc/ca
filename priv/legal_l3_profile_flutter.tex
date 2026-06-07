@@ -1,0 +1,77 @@
+\documentclass[10pt]{article}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage{geometry}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{mathptmx}
+\renewcommand{\familydefault}{\rmdefault}
+
+\geometry{a4paper,left=2cm,right=2cm,top=2cm,bottom=2cm}
+
+\begin{document}
+
+\begin{flushright}
+ЗАТВЕРДЖЕНО\\
+Наказом ТОВ "Криптографічні Телесистеми"\\
+від \_\_ \_\_\_\_\_\_\_\_\_ 2026 р. № \_\_\_\\
+(в редакції наказу ТОВ "Криптографічні Телесистеми"\\
+від \_\_ \_\_\_\_\_\_\_\_\_ 2026 р. № \_\_)
+\end{flushright}
+
+\vspace{2cm}
+
+\begin{center}
+\textbf{\Large Flutter based X.422.1 Implementation}\\
+\textbf{\Large «Chat X.422.1 (Flutter)»}\\
+\vspace{1cm}
+\textbf{\Large ЦІЛЬОВИЙ ПРОФІЛЬ БЕЗПЕКИ}\\
+\vspace{0.5cm}
+\large UA.47850061.СЗІ.ДП-50
+\end{center}
+
+\newpage
+
+\footnotesize
+\begin{longtable}{|>{\centering\arraybackslash}p{0.5cm}|>{\raggedright\arraybackslash}p{4cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{2cm}|>{\raggedright\arraybackslash}p{3cm}|}
+\hline
+\textbf{№} & \textbf{Вимога з безпеки інформації} & \textbf{Вимога ГПБ} & \multicolumn{2}{c|}{\textbf{ЦПБ}} \\
+\cline{4-5}
+& & & \textbf{Захід захисту} & \textbf{Налаштований зміст заходу захисту}\\
+\hline
+\endfirsthead
+
+\hline
+\textbf{№} & \textbf{Вимога з безпеки інформації} & \textbf{Вимога ГПБ} & \multicolumn{2}{c|}{\textbf{ЦПБ}} \\
+\cline{4-5}
+& & & \textbf{Захід захисту} & \textbf{Налаштований зміст заходу захисту}\\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+\multicolumn{5}{|>{\raggedright\arraybackslash}p{16cm}|}{\textbf{1. ІДЕНТИФІКАЦІЯ ТА АВТЕНТИФІКАЦІЯ (IA)}} \\* \noalign{\hrule height 0.4pt}
+1 & ІДЕНТИФІКАЦІЯ ТА АВТЕНТИФІКАЦІЯ ПРИСТРОЇВ (IA-3) &  & IA-3 & Апаратне збереження ключів (Hardware-backed Keystore / Secure Enclave) та біометрична автентифікація:\newline - Приватні ключі (наприклад, secp384r1 / P256) зберігаються виключно в ізольованому апаратному середовищі: Secure Enclave для iOS/macOS (через CryptoKit) та Hardware-backed Keystore для Android.\newline - Ключовий матеріал генерується з атрибутом неекспортованості та захищається біометричною автентифікацією (TouchID/FaceID/BiometricPrompt).\newline - Dart-шар отримує лише абстрактний дескриптор (alias) та виконує криптографічні операції (наприклад, підпис) через захищений MethodChannel (x509\_\allowbreak{}multicast/keys), не отримуючи прямого доступу до приватного ключа.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
+Параметр: Параметри автентифікації пристроїв\newline Тип: string\newline Значення: \textbf{flutter\_\allowbreak{}v1} \\ \hline
+\multicolumn{5}{|>{\raggedright\arraybackslash}p{16cm}|}{\textbf{2. ЗАХИСТ СИСТЕМ ТА КОМУНІКАЦІЙ (SC)}} \\* \noalign{\hrule height 0.4pt}
+2 & КОНФІДЕНЦІЙНІСТЬ ТА ЦІЛІСНІСТЬ ПЕРЕДАЧІ (SC-8) & Забезпечити [Вибір (один або кілька): конфіденційність; цілісність] інформації, що передається. & SC-8 & Мінімізація витоків пам'яті та транзит даних через Platform Channels:\newline - Забезпечується абсолютно децентралізована P2P UDP Multicast комунікація без посередників/брокерів (Layer 1 Skynet).\newline - Платформні канали функціонують лише як транзит для \textquotedbl{}чорних скриньок\textquotedbl{} (зашифрованих CMS пакетів), унеможливлюючи появу відкритих текстів чи криптографічних ключів у платформо-залежному Swift/Kotlin коді.\newline - UI/Dart-шар (lib/main.dart) використовує метод \_\allowbreak{}sendEncryptedMessage для передачі зашифрованих даних як Uint8List (наприклад, після локального шифрування у CMS через FFI з Rust або C). Для тестування потоку додано кнопку \textquotedbl{}Send CMS Payload\textquotedbl{}.\newline - Нативний iOS шар (ios/Runner/AppDelegate.swift) та macOS шар (macos/Runner/MainFlutterWindow.swift) мають обробник sendEncryptedMessage, який очікує сирі байти (FlutterStandardTypedData) та передає їх безпосередньо у мережевий UDP-шар (MulticastService.shared.send(data:)), уникаючи розшифрування чи зберігання ключів у нативному коді.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
+Параметр: Алгоритми E2EE для комунікацій\newline Тип: string\newline Значення: \textbf{flutter\_\allowbreak{}v1} \\ \hline
+3 & КРИПТОГРАФІЧНИЙ ЗАХИСТ (SC-13) & a. Визначити [Призначення: використання криптографічних засобів, визначених організацією];\newline b. Впровадити [Завдання: визначені організацією види криптографії для кожного визначеного криптографічного використання]. & SC-13 & Локальне криптографічне шифрування та формування CMS-конвертів:\newline - Уся обробка відкритих ключів або секретних даних (наприклад, шифрування ChaCha20-Poly1305 та формування CMS-конвертів) залишається інкапсульованою на обраному боці (наприклад, в Dart FFI модулі на базі Rust або C).\newline - Це усуває вразливість до перехоплення через MethodChannel, оскільки в платформні канали передаються виключно зашифровані пакети.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
+Параметр: Криптографічний провайдер\newline Тип: string\newline Значення: \textbf{flutter\_\allowbreak{}v1} \\ \hline
+4 & АВТЕНТИФІКАЦІЯ СЕСІЇ (SC-23) & Забезпечити автентифікацію сеансів зв'язку. & SC-23 & Автентифікація сесій відбувається через перевірку електронних підписів в повідомленнях. Інфраструктура PKI (X.509) гарантує неспростовність сесій. Зв'язок Dart <-> Native захищений від перехоплення в межах процесу.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
+Параметр: Механізм автентифікації сесії\newline Тип: string\newline Значення: \textbf{flutter\_\allowbreak{}v1} \\ \hline
+\multicolumn{5}{|>{\raggedright\arraybackslash}p{16cm}|}{\textbf{3. ПРИДБАННЯ СИСТЕМ ТА ПОСЛУГ (SA)}} \\* \noalign{\hrule height 0.4pt}
+5 & ТЕСТУВАННЯ ВРАЗЛИВОСТЕЙ (SA-11) & Вимагати від розробника системи, системного компонента або системної служби на всіх етапах проєктування та життєвого циклу розробки системи:\newline a. створити та впровадити план з оцінювання безпеки та приватності;\newline b. виконати [Вибір (один або кілька): одиниця; інтеграція; система; регресія] тестування/оцінювання [Призначення: з визначеною організацією частотою] з [Призначення: визначена організацією глибиною та охопленням];\newline c. надати докази (свідчення) виконання плану оцінювання та результати тестування й оцінювань;\newline d. впровадити перевірку процесу виправлення недоліків;\newline e. виправити дефекти, виявлені під час тестування та оцінювання. & SA-11 & RASP (Runtime Application Self-Protection), виявлення скомпрометованих середовищ та обфускація:\newline - Впроваджено модуль RaspManager (на базі freerasp), який автоматично моніторить та реагує на запуск у Jailbroken/Rooted середовищах, використання емуляторів, підключення фреймворків для хукінгу (Frida, Xposed) та спроби перепакування чи підміни рушія (reFlutter). В разі виявлення загрози процес екстрено завершується.\newline - На рівні конфігурації підтримується Apple App Attest для iOS та Google Play Integrity для Android.\newline - Розроблено скрипт релізної збірки scripts/build\_\allowbreak{}release.sh. Збірка виконується з обов'язковими прапорцями --obfuscate та --split-debug-info, що ускладнює реверс-інжиніринг бізнес-логіки та приховує внутрішні класи і функції застосунку.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
+Параметр: Механізми тестування та самозахисту\newline Тип: string\newline Значення: \textbf{flutter\_\allowbreak{}v1} \\ \hline
+
+
+\end{longtable}
+
+\end{document}

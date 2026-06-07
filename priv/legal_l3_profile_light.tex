@@ -1,0 +1,77 @@
+\documentclass[10pt]{article}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage{geometry}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{mathptmx}
+\renewcommand{\familydefault}{\rmdefault}
+
+\geometry{a4paper,left=2cm,right=2cm,top=2cm,bottom=2cm}
+
+\begin{document}
+
+\begin{flushright}
+ЗАТВЕРДЖЕНО\\
+Наказом ТОВ "Криптографічні Телесистеми"\\
+від \_\_ \_\_\_\_\_\_\_\_\_ 2026 р. № \_\_\_\\
+(в редакції наказу ТОВ "Криптографічні Телесистеми"\\
+від \_\_ \_\_\_\_\_\_\_\_\_ 2026 р. № \_\_)
+\end{flushright}
+
+\vspace{2cm}
+
+\begin{center}
+\textbf{\Large Pure Swift (Zero Deps) X.422.1 Implementation}\\
+\textbf{\Large «Chat X.422.1 (Swift)»}\\
+\vspace{1cm}
+\textbf{\Large ЦІЛЬОВИЙ ПРОФІЛЬ БЕЗПЕКИ}\\
+\vspace{0.5cm}
+\large UA.47850061.СЗІ.ДП-58
+\end{center}
+
+\newpage
+
+\footnotesize
+\begin{longtable}{|>{\centering\arraybackslash}p{0.5cm}|>{\raggedright\arraybackslash}p{4cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{2cm}|>{\raggedright\arraybackslash}p{3cm}|}
+\hline
+\textbf{№} & \textbf{Вимога з безпеки інформації} & \textbf{Вимога ГПБ} & \multicolumn{2}{c|}{\textbf{ЦПБ}} \\
+\cline{4-5}
+& & & \textbf{Захід захисту} & \textbf{Налаштований зміст заходу захисту}\\
+\hline
+\endfirsthead
+
+\hline
+\textbf{№} & \textbf{Вимога з безпеки інформації} & \textbf{Вимога ГПБ} & \multicolumn{2}{c|}{\textbf{ЦПБ}} \\
+\cline{4-5}
+& & & \textbf{Захід захисту} & \textbf{Налаштований зміст заходу захисту}\\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+\multicolumn{5}{|>{\raggedright\arraybackslash}p{16cm}|}{\textbf{1. ІДЕНТИФІКАЦІЯ ТА АВТЕНТИФІКАЦІЯ (IA)}} \\* \noalign{\hrule height 0.4pt}
+1 & ІДЕНТИФІКАЦІЯ ТА АВТЕНТИФІКАЦІЯ ПРИСТРОЇВ (IA-3) &  & IA-3 & Цільова вимога (Hardware-backed Secure Enclave):\newline - Приватні ключі (P-256) мають генеруватися апаратно в Secure Enclave (через SecureEnclave.P256.Signing.PrivateKey) без можливості експорту.\newline - Доступ до ключів повинен захищатися біометричною автентифікацією (TouchID/FaceID) на рівні операційної системи за допомогою SecAccessControl.\newline - ПОТОЧНИЙ СТАН КОДУ (КОНТРОЛЬ НЕ ВИКОНАНО): Приватні ключі генеруються програмно в оперативній пам'яті (RAM) через P256.Signing.PrivateKey() у CertificateManager.swift і зберігаються в Keychain як звичайні паролі (kSecClassGenericPassword) у відкритому вигляді (експортований rawRepresentation) без апаратного захисту та біометрії (SecAccessControl/LAContext).\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
+Параметр: Параметри автентифікації пристроїв\newline Тип: string\newline Значення: \textbf{pure\_\allowbreak{}apple\_\allowbreak{}v1} \\ \hline
+\multicolumn{5}{|>{\raggedright\arraybackslash}p{16cm}|}{\textbf{2. ЗАХИСТ СИСТЕМ ТА КОМУНІКАЦІЙ (SC)}} \\* \noalign{\hrule height 0.4pt}
+2 & КОНФІДЕНЦІЙНІСТЬ ТА ЦІЛІСНІСТЬ ПЕРЕДАЧІ (SC-8) & Забезпечити [Вибір (один або кілька): конфіденційність; цілісність] інформації, що передається. & SC-8 & Мінімізація витоків пам'яті та безпечна native-передача даних:\newline - Забезпечується абсолютно децентралізована P2P UDP Multicast комунікація без посередників/брокерів (Layer 1 Skynet).\newline - Усі дані передаються через мережевий UDP-шар (MulticastService.shared.send(data:)) виключно у вигляді зашифрованих CMS пакетів (\textquotedbl{}чорних скриньок\textquotedbl{}), унеможливлюючи появу відкритих текстів чи криптографічних ключів у транзитній мережевій пам'яті.\newline - Код реалізовано на чистому Swift без проміжних шарів (Platform Channels/MethodChannel), що мінімізує поверхню атаки та виключає витоки пам'яті між різними runtime-середовищами.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
+Параметр: Алгоритми E2EE для комунікацій\newline Тип: string\newline Значення: \textbf{pure\_\allowbreak{}apple\_\allowbreak{}v1} \\ \hline
+3 & КРИПТОГРАФІЧНИЙ ЗАХИСТ (SC-13) & a. Визначити [Призначення: використання криптографічних засобів, визначених організацією];\newline b. Впровадити [Завдання: визначені організацією види криптографії для кожного визначеного криптографічного використання]. & SC-13 & Локальне криптографічне шифрування та формування CMS-конвертів (Zero Deps):\newline - Використовується нативний фреймворк Apple CryptoKit для ChaCha20-Poly1305, ECDH та ECDSA.\newline - Формування пакетів криптографічних повідомлень (CMS) здійснюється безпосередньо у Swift без залучення сторонніх залежностей (Zero Deps).\newline - Уся обробка відкритих ключів або секретних даних виконується в захищених межах пам'яті Swift-додатку, що усуває можливість їх перехоплення через будь-які міжмовні інтерфейси або сторонні бібліотеки.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
+Параметр: Криптографічний провайдер\newline Тип: string\newline Значення: \textbf{pure\_\allowbreak{}apple\_\allowbreak{}v1} \\ \hline
+4 & АВТЕНТИФІКАЦІЯ СЕСІЇ (SC-23) & Забезпечити автентифікацію сеансів зв'язку. & SC-23 & Автентифікація сесій відбувається через перевірку електронних підписів в повідомленнях. Інфраструктура PKI (X.509) гарантує неспростовність сесій за допомогою нативних засобів перевірки сертифікатів.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
+Параметр: Механізм автентифікації сесії\newline Тип: string\newline Значення: \textbf{pure\_\allowbreak{}apple\_\allowbreak{}v1} \\ \hline
+\multicolumn{5}{|>{\raggedright\arraybackslash}p{16cm}|}{\textbf{3. ПРИДБАННЯ СИСТЕМ ТА ПОСЛУГ (SA)}} \\* \noalign{\hrule height 0.4pt}
+5 & ТЕСТУВАННЯ ВРАЗЛИВОСТЕЙ (SA-11) & Вимагати від розробника системи, системного компонента або системної служби на всіх етапах проєктування та життєвого циклу розробки системи:\newline a. створити та впровадити план з оцінювання безпеки та приватності;\newline b. виконати [Вибір (один або кілька): одиниця; інтеграція; система; регресія] тестування/оцінювання [Призначення: з визначеною організацією частотою] з [Призначення: визначена організацією глибиною та охопленням];\newline c. надати докази (свідчення) виконання плану оцінювання та результати тестування й оцінювань;\newline d. впровадити перевірку процесу виправлення недоліків;\newline e. виправити дефекти, виявлені під час тестування та оцінювання. & SA-11 & Цільова вимога (Zero-Dependency RASP):\newline - Для дотримання політики Zero Deps заборонено використовувати сторонні RASP-бібліотеки/SDK.\newline - Механізми самозахисту (anti-debugging, anti-jailbreak, anti-simulator) мають бути реалізовані як власні native перевірки у Swift-коді.\newline - Аудитор повинен перевірити наявність нативного блокування підключення дебагера через системний виклик ptrace(PT\_\allowbreak{}DENY\_\allowbreak{}ATTACH) у релізних конфігураціях.\newline - Аудитор повинен перевірити наявність нативних перевірок джейлбрейку (пошук файлів Cydia, MobileSubstrate, спроби запису поза пісочницею) та виявлення емуляторів.\newline - ПОТОЧНИЙ СТАН КОДУ (КОНТРОЛЬ НЕ ВИКОНАНО): Жодних нативних перевірок самозахисту чи RASP у Swift-коді немає.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
+Параметр: Механізми тестування та самозахисту\newline Тип: string\newline Значення: \textbf{pure\_\allowbreak{}apple\_\allowbreak{}v1} \\ \hline
+
+
+\end{longtable}
+
+\end{document}

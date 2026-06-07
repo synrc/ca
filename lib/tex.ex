@@ -205,8 +205,8 @@ defmodule CA.TeX do
       CA.L3.Orgs,
       CA.L3.Specialized,
       CA.L3.Supreme,
-      CA.L3.X422UDPSwift,
-      CA.L3.X422UDPFlutter
+      CA.L3.X422.Light,
+      CA.L3.X422.Flutter
     ]
     |> Enum.map(&legal_l3_profile/1)
   end

@@ -1,4 +1,4 @@
-defmodule CA.L3.X422UDPSwift do
+defmodule CA.L3.X422.Light do
   @moduledoc """
   Level 3: Target Security Profile for X.422.1 UDP Multicast (Pure Swift / Zero Deps)
   """

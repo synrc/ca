@@ -1,4 +1,4 @@
-defmodule CA.L3.X422UDPFlutter do
+defmodule CA.L3.X422.Flutter do
   @moduledoc """
   Level 3: Target Security Profile for X.422.1 UDP Multicast (Flutter)
   """
