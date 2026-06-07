@@ -315,5 +315,5 @@ end
 out += "  def spec(_), do: nil\n"
 out += "end\n"
 
-File.write("/Users/tonpa/depot/synrc/ca/lib/oid/profile_data.ex", out)
+File.write("/Users/tonpa/depot/synrc/ca/lib/cmdb/profile_data.ex", out)
 puts "Wrote profile_data.ex with top-level descriptions and improved defaults!"

@@ -137,7 +137,7 @@ defmodule CA.TeX do
   end
 
   def chat_profile(opts \\ []) do
-    controls = CA.L2.Messenger.controls() -- CA.L1.controls()
+    controls = CA.L3.Messenger.controls() -- CA.L1.controls()
     {body, count} = generate_body(controls)
 
     opts =
@@ -158,7 +158,7 @@ defmodule CA.TeX do
   end
 
   def mail_profile(opts \\ []) do
-    controls = CA.L2.Mail.controls() -- CA.L1.controls()
+    controls = CA.L3.Mail.controls() -- CA.L1.controls()
     {body, count} = generate_body(controls)
 
     opts =
@@ -179,7 +179,7 @@ defmodule CA.TeX do
   end
 
   def vpn_profile(opts \\ []) do
-    controls = CA.L2.VPN.controls() -- CA.L1.controls()
+    controls = CA.L3.VPN.controls() -- CA.L1.controls()
     {body, count} = generate_body(controls)
 
     opts =
@@ -215,7 +215,7 @@ defmodule CA.TeX do
       legal_l1_profile_1(),
       legal_l1_profile_2(),
       legal_l2_profile(),
-      legal_l3_profile(CA.CMDB.ERP),
+      legal_l3_profile(CA.L3.ERP),
       generate_l3_profiles(),
       # В Шаблоні ТОВ "Криптографічні Телесистеми"
       gen_bible(),
@@ -407,7 +407,7 @@ defmodule CA.TeX do
   \\end{center}
 
   \\footnotesize
-  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{6cm}|>{\\raggedright\\arraybackslash}p{2cm}|>{\\raggedright\\arraybackslash}p{3cm}|}
+  \\begin{longtable}{|c|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{6cm}|>{\\raggedright\\arraybackslash}p{1.5cm}|>{\\raggedright\\arraybackslash}p{3.5cm}|}
   \\hline
   \\textbf{№ з/п} & \\textbf{Назва дії з безпеки інформації} & \\textbf{Зміст дії} & \\textbf{Заходи захисту} & \\textbf{Мінімальні необхідні параметри}\\\\
   \\hline
@@ -470,7 +470,7 @@ defmodule CA.TeX do
   \\newpage
 
   \\footnotesize
-  \\begin{longtable}{|>{\\centering\\arraybackslash}p{0.5cm}|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{3cm}|>{\\raggedright\\arraybackslash}p{2cm}|>{\\raggedright\\arraybackslash}p{5cm}|}
+  \\begin{longtable}{|>{\\centering\\arraybackslash}p{0.5cm}|>{\\raggedright\\arraybackslash}p{4cm}|>{\\raggedright\\arraybackslash}p{5cm}|>{\\raggedright\\arraybackslash}p{2cm}|>{\\raggedright\\arraybackslash}p{3cm}|}
   \\hline
   \\textbf{№} & \\textbf{Вимога з безпеки інформації} & \\textbf{Вимога ГПБ} & \\multicolumn{2}{c|}{\\textbf{ЦПБ}} \\\\
   \\cline{4-5}
@@ -577,9 +577,9 @@ defmodule CA.TeX do
     opts =
       Keyword.merge(
         [
-          org_name: "ТОВ \"Криптографічні Телесистеми\"",
-          system_desc: "Система електронного урядування",
-          system_name: "ERP/1",
+          org_name: module.org_name(),
+          system_desc: module.system_desc(),
+          system_name: module.system_name(),
           doc_id: doc_id,
           table_body: body
         ],
@@ -692,9 +692,10 @@ defmodule CA.TeX do
 
                   default = escape_latex(default_str)
                   desc_str = escape_latex(pdesc)
-                  
-                  formatted_param = "Параметр: #{escape_latex(to_string(name_atom))}\\newline Тип: #{escape_latex(to_string(type))}\\newline Значення: \\textbf{#{default}}"
-                  
+
+                  formatted_param =
+                    "Параметр: #{escape_latex(to_string(name_atom))}\\newline Тип: #{escape_latex(to_string(type))}\\newline Значення: \\textbf{#{default}}"
+
                   {desc_str, formatted_param}
                 end)
                 |> Enum.uniq()
@@ -739,7 +740,7 @@ defmodule CA.TeX do
                   lcmd = if p_idx == length(params) - 1, do: line_cmd, else: "\\cline{3-5}"
 
                   chunks = String.split(d, "; ")
-                  
+
                   chunks
                   |> Enum.with_index()
                   |> Enum.map(fn {chunk, chunk_idx} ->
@@ -747,10 +748,10 @@ defmodule CA.TeX do
                     cx2 = if chunk_idx == 0, do: c2, else: ""
                     cx4 = if chunk_idx == 0, do: c4, else: ""
                     cx5 = if chunk_idx == 0, do: p, else: ""
-                    
+
                     chunk_text = if chunk_idx == length(chunks) - 1, do: chunk, else: chunk <> ";"
                     lcmd_inner = if chunk_idx == length(chunks) - 1, do: lcmd, else: ""
-                    
+
                     "#{cx1} & #{cx2} & #{chunk_text} & #{cx4} & #{cx5} \\\\ #{lcmd_inner}\n"
                   end)
                   |> Enum.join("")
@@ -795,7 +796,26 @@ defmodule CA.TeX do
           end)
 
         _ ->
+          cmdb_lookup =
+            CA.L3.ERP.controls()
+            |> Enum.flat_map(& &1.subcontrols)
+            |> Enum.map(&{String.to_atom("id-spe-" <> String.downcase(&1.id)), &1})
+            |> Enum.into(%{})
+
           unfold(controls)
+          |> Enum.map(fn base_spec ->
+            case Map.get(cmdb_lookup, base_spec.id) do
+              nil ->
+                base_spec
+
+              cmdb_sc ->
+                %{
+                  base_spec
+                  | description: cmdb_sc.text,
+                    parameters: Map.get(cmdb_sc, :parameters, [])
+                }
+            end
+          end)
       end
 
     all_specs = CA.Profile.Data.specs()
@@ -848,8 +868,14 @@ defmodule CA.TeX do
           end)
           |> Enum.uniq()
 
-        desc = Enum.join(desc_list, "\\newline\\newline ")
         full_params_text = escape_latex(spec.description)
+        t_text = String.replace(full_params_text, "\\\\ \n", "\\newline ")
+
+        p_text =
+          Enum.join(
+            desc_list,
+            "\\newline \\vspace{1mm}\\noindent\\rule{\\linewidth}{0.4pt}\\vspace{1mm} \\newline "
+          )
 
         {fam_idx_new, ctrl_idx_new, prefix} =
           if family != last_fam do
@@ -870,7 +896,7 @@ defmodule CA.TeX do
           end
 
         row_str =
-          "#{row_idx} & #{title} & #{desc} & #{escape_latex(control_id)} & #{full_params_text} \\\\ \\hline\n"
+          "#{row_idx} & #{title} & #{t_text} & #{escape_latex(control_id)} & #{p_text} \\\\ \\hline\n"
 
         {prefix <> row_str, {family, fam_idx_new, ctrl_idx_new}}
       end)
