@@ -70,9 +70,9 @@ defmodule CA.TeX do
 
   \\begin{titlepage}
     \\AddToShipoutPictureBG*{\\AtPageLowerLeft{\\color{nato}\\rule{\\paperwidth}{\\paperheight}}}
-    \\color{white}\\thispagestyle{empty}\\vspace*{4cm}\\centering
-    {\\Huge  \\textbf{<%= @subtitle %>} \\par} \\vspace{2cm}
-    {\\HUGE  \\textbf{<%= @title %>} \\par} \\vspace{2.5cm}
+    \\color{white}\\thispagestyle{empty}\\vspace*{2cm}\\centering
+    {\\Huge  \\textbf{<%= @subtitle %>} \\par} \\vspace{1cm}
+    {\\HUGE  \\textbf{<%= @title %>} \\par} \\vspace{1cm}
     \\vfill
     {\\large <%= @year %> \\copyright\\ <%= @copyright %> \\par}
   \\end{titlepage}
@@ -868,14 +868,35 @@ defmodule CA.TeX do
           end)
           |> Enum.uniq()
 
-        full_params_text = escape_latex(spec.description)
-        t_text = String.replace(full_params_text, "\\\\ \n", "\\newline ")
+        original_spec = Enum.find(all_specs, &(&1.id == spec.id))
+        gpb_text = if original_spec, do: escape_latex(original_spec.description), else: ""
+        t_text = String.replace(gpb_text, "\\\\ \n", "\\newline ")
 
-        p_text =
-          Enum.join(
-            desc_list,
-            "\\newline \\vspace{1mm}\\noindent\\rule{\\linewidth}{0.4pt}\\vspace{1mm} \\newline "
-          )
+        custom_text_raw = escape_latex(spec.description) |> String.replace("\\\\ \n", "\\newline ")
+        custom_text = if custom_text_raw == t_text, do: "", else: custom_text_raw
+
+        t_chunks = if t_text == "", do: [""], else: [t_text]
+
+        grouped_params = 
+          Enum.chunk_every(desc_list, 4) 
+          |> Enum.map(fn chunk ->
+            Enum.join(chunk, "\\vspace{1mm}\\newline\\noindent\\rule{\\linewidth}{0.4pt}\\vspace{1mm}\n")
+          end)
+
+        p_chunks = 
+          if custom_text == "" do
+            if grouped_params == [], do: [""], else: grouped_params
+          else
+            case grouped_params do
+              [] -> [custom_text]
+              [first | rest] ->
+                [custom_text <> "\\vspace{1mm}\\newline\\noindent\\rule{\\linewidth}{0.4pt}\\vspace{1mm}\n" <> first | rest]
+            end
+          end
+
+        max_chunks = max(length(t_chunks), length(p_chunks))
+        t_chunks = t_chunks ++ List.duplicate("", max_chunks - length(t_chunks))
+        p_chunks = p_chunks ++ List.duplicate("", max_chunks - length(p_chunks))
 
         {fam_idx_new, ctrl_idx_new, prefix} =
           if family != last_fam do
@@ -888,7 +909,7 @@ defmodule CA.TeX do
             new_fam_idx = fam_idx + 1
 
             pref =
-              "\\multicolumn{5}{|l|}{\\textbf{#{new_fam_idx}. #{family_title} (#{family})}} \\\\ \\hline\n"
+              "\\multicolumn{5}{|l|}{\\textbf{#{new_fam_idx}. #{family_title}}} \\\\ \\hline\n"
 
             {new_fam_idx, 1, pref}
           else
@@ -896,7 +917,18 @@ defmodule CA.TeX do
           end
 
         row_str =
-          "#{row_idx} & #{title} & #{t_text} & #{escape_latex(control_id)} & #{p_text} \\\\ \\hline\n"
+          Enum.zip(t_chunks, p_chunks)
+          |> Enum.with_index()
+          |> Enum.map(fn {{t, p}, chunk_idx} ->
+            c1 = if chunk_idx == 0, do: "#{row_idx}", else: ""
+            c2 = if chunk_idx == 0, do: "#{title}", else: ""
+            c4 = if chunk_idx == 0, do: "#{escape_latex(control_id)}", else: ""
+            
+            line_cmd = if chunk_idx == max_chunks - 1, do: "\\hline\n", else: "\n"
+            
+            "#{c1} & #{c2} & #{t} & #{c4} & #{p} \\\\ #{line_cmd}"
+          end)
+          |> Enum.join("")
 
         {prefix <> row_str, {family, fam_idx_new, ctrl_idx_new}}
       end)
