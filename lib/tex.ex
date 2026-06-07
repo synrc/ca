@@ -560,9 +560,9 @@ defmodule CA.TeX do
   end
 
   def generate_doc_id(opts \\ []) do
-    base = Keyword.get(opts, :base, "46207985")
+    base = Keyword.get(opts, :base, "47850061")
     dept = Keyword.get(opts, :dept, "СЗІ")
-    sub = Keyword.get(opts, :sub, "ЦПБ")
+    sub = Keyword.get(opts, :sub, "ДП")
     seq = Keyword.get_lazy(opts, :seq, fn -> Enum.random(1..99) end)
 
     "UA.#{base}.#{dept}.#{sub}-#{String.pad_leading(to_string(seq), 2, "0")}"
@@ -645,7 +645,7 @@ defmodule CA.TeX do
         {:category, name}, {idx, _last_fam} ->
           # Explicit category provided, don't increment idx
           prefix =
-            "\\multicolumn{5}{|l|}{\\textbf{#{escape_latex(name)}}} \\\\ \\hline\n"
+            "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{16cm}|}{\\textbf{#{escape_latex(name)}}} \\\\* \\noalign{\\hrule height 0.4pt}\n"
 
           {prefix, {idx, name}}
 
@@ -769,7 +769,7 @@ defmodule CA.TeX do
               if family_spec, do: escape_latex(family_spec.title), else: escape_latex(family)
 
             prefix =
-              "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{16cm}|}{\\textbf{#{family_title}}} \\\\ \\hline\n"
+              "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{16cm}|}{\\textbf{#{family_title}}} \\\\* \\noalign{\\hrule height 0.4pt}\n"
 
             {prefix <> row_str, {idx + 1, family}}
           else
@@ -909,7 +909,7 @@ defmodule CA.TeX do
             new_fam_idx = fam_idx + 1
 
             pref =
-              "\\multicolumn{5}{|l|}{\\textbf{#{new_fam_idx}. #{family_title}}} \\\\ \\hline\n"
+              "\\multicolumn{5}{|>{\\raggedright\\arraybackslash}p{16cm}|}{\\textbf{#{new_fam_idx}. #{family_title}}} \\\\* \\noalign{\\hrule height 0.4pt}\n"
 
             {new_fam_idx, 1, pref}
           else
