@@ -560,7 +560,7 @@
 \begin{itemize}
 \item \textbf{SYS-OS-01: Серверні ОС (Linux, Windows Server)}
 \\ Контролі: CM, SI, AC
-\item \textbf{SYS-OS-02: Клієнтські ОС (Windows 11, macOS)}
+\item \textbf{SYS-OS-02: Клієнтські ОС (Windows 11)}
 \\ Контролі: CM, SI, AC
 \end{itemize}
 \subsection{App}
@@ -619,18 +619,6 @@
 \\ Контролі: SI, CM
 \item \textbf{R-OS-L-05: Вразливості PAM} — Некоректна конфігурація Pluggable Authentication Modules, що дозволяє обхід автентифікації.
 \\ Контролі: IA, AC\end{itemize}
-\subsubsection{macOS}
-\begin{itemize}
-\item \textbf{R-OS-M-01: Обхід XProtect / Gatekeeper / SIP} — Запуск шкідливого ПЗ шляхом маніпуляції підписами (Code Signing), обходу System Integrity Protection.
-\\ Контролі: CM, SI
-\item \textbf{R-OS-M-02: Компрометація Keychain} — Екстракція збережених паролів та криптографічного матеріалу з Keychain через вразливості процесів.
-\\ Контролі: IA, SC
-\item \textbf{R-OS-M-03: TCC Bypass \& Spyware} — Обхід Transparency, Consent, and Control для доступу до мікрофона, камери чи даних без згоди користувача.
-\\ Контролі: SI, PE
-\item \textbf{R-OS-M-04: Dyld Hijacking} — Перехоплення динамічного завантаження бібліотек в середовищі macOS.
-\\ Контролі: SI
-\item \textbf{R-OS-M-05: Обхід Pointer Authentication (PAC)} — Специфічні атаки на архітектуру Apple Silicon (ARM64) для підміни вказівників управління пам'яттю.
-\\ Контролі: SI, SA\end{itemize}
 
 \subsection{Інфраструктура}
 \begin{itemize}
