@@ -112,42 +112,6 @@ defmodule CA.Risk do
             controls: ["IA", "AC"]
           }
         ],
-        macos: [
-          %{
-            id: "R-OS-M-01",
-            name: "Обхід XProtect / Gatekeeper / SIP",
-            desc:
-              "Запуск шкідливого ПЗ шляхом маніпуляції підписами (Code Signing), обходу System Integrity Protection.",
-            controls: ["CM", "SI"]
-          },
-          %{
-            id: "R-OS-M-02",
-            name: "Компрометація Keychain",
-            desc:
-              "Екстракція збережених паролів та криптографічного матеріалу з Keychain через вразливості процесів.",
-            controls: ["IA", "SC"]
-          },
-          %{
-            id: "R-OS-M-03",
-            name: "TCC Bypass & Spyware",
-            desc:
-              "Обхід Transparency, Consent, and Control для доступу до мікрофона, камери чи даних без згоди користувача.",
-            controls: ["SI", "PE"]
-          },
-          %{
-            id: "R-OS-M-04",
-            name: "Dyld Hijacking",
-            desc: "Перехоплення динамічного завантаження бібліотек в середовищі macOS.",
-            controls: ["SI"]
-          },
-          %{
-            id: "R-OS-M-05",
-            name: "Обхід Pointer Authentication (PAC)",
-            desc:
-              "Специфічні атаки на архітектуру Apple Silicon (ARM64) для підміни вказівників управління пам'яттю.",
-            controls: ["SI", "SA"]
-          }
-        ]
       },
       cryptography_and_kzi: %{
         general: [
@@ -193,29 +157,6 @@ defmodule CA.Risk do
             desc:
               "Переповнення буфера або DoS при обробці специфічних або зловмисних структур X.509 та CMS інфраструктурою ЦСК.",
             controls: ["SI", "SA"]
-          }
-        ],
-        cipher: [
-          %{
-            id: "R-KZI-CIP-01",
-            name: "Вразливості криптобібліотек (ДСТУ)",
-            desc:
-              "Помилки при програмній реалізації алгоритмів (Калина, Купина), можливість атак типу Padding Oracle.",
-            controls: ["SA", "SI"]
-          },
-          %{
-            id: "R-KZI-CIP-02",
-            name: "Недостатня ентропія ГВЧ",
-            desc:
-              "Генерація передбачуваних ключів через проблеми з апаратним або програмним генератором псевдовипадкових чисел (PRNG).",
-            controls: ["SC"]
-          },
-          %{
-            id: "R-KZI-CIP-03",
-            name: "Втрата або перехоплення PIN-кодів",
-            desc:
-              "Витік аутентифікаційних параметрів адміністраторів HSM через кейлогери або плече-серфінг.",
-            controls: ["IA", "AT", "PE"]
           }
         ],
         author: [
