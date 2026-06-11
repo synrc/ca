@@ -201,10 +201,7 @@ defmodule CA.TeX do
 
   def generate_l3_profiles do
     [
-      CA.L3.Local,
-      CA.L3.Orgs,
-      CA.L3.Specialized,
-      CA.L3.Supreme,
+      CA.L3.Court,
       CA.L3.X422.Light,
       CA.L3.X422.Flutter
     ]
@@ -303,6 +300,19 @@ defmodule CA.TeX do
       end)
 
     {Enum.join(sections, "\n\n"), length(profile_specs)}
+  end
+
+  def unfold([%{subcontrols: _} | _] = controls) do
+    Enum.flat_map(controls, fn fam ->
+      Enum.map(fam.subcontrols, fn sc ->
+        %{
+          id: String.to_atom("id-spe-" <> String.downcase(sc.id)),
+          title: sc.name,
+          description: sc.text,
+          parameters: Map.get(sc, :parameters, [])
+        }
+      end)
+    end)
   end
 
   def unfold(oids) do
