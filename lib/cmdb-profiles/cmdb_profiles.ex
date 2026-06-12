@@ -6,20 +6,16 @@ defmodule CA.PRO do
   """
 
   @inventory_modules [
-    {CA.CmdbProfiles.Cod.HW, :cod, :hw},
-    {CA.CmdbProfiles.Cod.Sys, :cod, :sys},
-    {CA.CmdbProfiles.Vyshhorod.HW, :vyshhorod, :hw},
-    {CA.CmdbProfiles.Vyshhorod.Sys, :vyshhorod, :sys}
+    {CA.HW, :erp, :hw},
+    {CA.Sys, :erp, :sys}
   ]
 
   @process_modules [
-    {CA.CmdbProfiles.Cod.Proc, :cod},
-    {CA.CmdbProfiles.Vyshhorod.Proc, :vyshhorod}
+    {CA.Proc, :erp}
   ]
 
   @data_modules [
-    {CA.CmdbProfiles.Cod.Data, :cod},
-    {CA.CmdbProfiles.Vyshhorod.Data, :vyshhorod}
+    {CA.Data, :erp}
   ]
 
   # --- API ДЛЯ КАТЕГОРІЙ ІНВЕНТАРЯ (HW / SYS) ---
@@ -29,14 +25,81 @@ defmodule CA.PRO do
   Додає метадані: `:court`, `:inventory_type`, `:category_key`.
   """
   def list_categories do
-    for {mod, court, type} <- @inventory_modules,
-        {category_key, items} <- mod.inventory(),
-        item <- items do
-      item
-      |> Map.put(:court, court)
-      |> Map.put(:inventory_type, type)
-      |> Map.put(:category_key, category_key)
-    end
+    # 1. Base Inventory Modules (HW / Sys)
+    inventory_items =
+      for {mod, court, type} <- @inventory_modules,
+          {category_key, items} <- mod.inventory(),
+          item <- items do
+        item
+        |> Map.put(:court, court)
+        |> Map.put(:inventory_type, type)
+        |> Map.put(:category_key, category_key)
+      end
+
+    # 2. Net Modules (zones)
+    net_items =
+      for {mod, court} <- [
+            {CA.Net, :erp}
+          ],
+          {category_key, zones} <- mod.zones(),
+          zone <- zones do
+        zone
+        |> Map.put(:court, court)
+        |> Map.put(:inventory_type, :net)
+        |> Map.put(:category_key, category_key)
+      end
+
+    # 3. Risk Modules (taxonomy)
+    risk_items =
+      for {mod, court} <- [
+            {CA.Risk, :erp}
+          ],
+          {category_key, risks} <- mod.taxonomy(),
+          risk <- risks do
+        risk
+        |> Map.put(:court, court)
+        |> Map.put(:inventory_type, :risk)
+        |> Map.put(:category_key, category_key)
+      end
+
+    # 4. Data Modules (classification)
+    data_items =
+      for {mod, court} <- [
+            {CA.Data, :erp}
+          ],
+          {category_key, classifications} <- mod.classification(),
+          data <- classifications do
+        data
+        |> Map.put(:court, court)
+        |> Map.put(:inventory_type, :data)
+        |> Map.put(:category_key, category_key)
+      end
+
+    # 5. ABAC Modules (roles)
+    abac_items =
+      for {mod, court} <- [
+            {CA.ABAC, :erp}
+          ],
+          {category_key, roles} <- mod.roles(),
+          role <- roles do
+        role
+        |> Map.put(:court, court)
+        |> Map.put(:inventory_type, :abac)
+        |> Map.put(:category_key, category_key)
+      end
+
+    # 6. Process Modules (processes)
+    process_items =
+      for {mod, court} <- @process_modules,
+          {category_key, processes} <- mod.processes(),
+          process <- processes do
+        process
+        |> Map.put(:court, court)
+        |> Map.put(:inventory_type, :process)
+        |> Map.put(:category_key, category_key)
+      end
+
+    inventory_items ++ net_items ++ risk_items ++ data_items ++ abac_items ++ process_items
   end
 
   @doc """
@@ -98,7 +161,8 @@ defmodule CA.PRO do
   """
   def list_processes do
     for {mod, court} <- @process_modules,
-        {process_key, process} <- mod.processes() do
+        {process_key, processes} <- mod.processes(),
+        process <- processes do
       process
       |> Map.put(:court, court)
       |> Map.put(:process_key, process_key)
@@ -128,7 +192,8 @@ defmodule CA.PRO do
   """
   def list_classifications do
     for {mod, court} <- @data_modules,
-        {class_key, class} <- mod.classification() do
+        {class_key, classifications} <- mod.classification(),
+        class <- classifications do
       class
       |> Map.put(:court, court)
       |> Map.put(:classification_key, class_key)
@@ -174,7 +239,8 @@ defmodule CA.PRO do
   end
 
   @doc """
-  Отримати весь інвентар (instances) для COURT або COD у вигляді Erlang-кортежів.
+  Отримати фізичний HW-інвентар (instances) для COURT, COD або ERP.
+  Показує лише апаратні екземпляри з полями: id, inventory_num, model, location, status.
   """
   def inventory(court_str) do
     court = parse_court(court_str)
@@ -183,19 +249,20 @@ defmodule CA.PRO do
     # overhead for print formatting: `{"", "", "", "", ""}` -> ~18 chars
     overhead = 18
 
-    for inst <- search_instances(court: court) do
+    hw_mod = case court do
+      :erp      -> CA.HW
+    end
+
+    for {_key, groups} <- hw_mod.inventory(),
+        group <- groups,
+        inst <- Map.get(group, :instances, []) do
       id = inst.id
-      inv_num = Map.get(inst, :inventory_num) || ""
-      status = Map.get(inst, :status) || ""
-      location = Map.get(inst, :location) || ""
-
-      model_raw = Map.get(inst, :model) || Map.get(inst, :name) || ""
-
-      used_width = String.length(id) + String.length(inv_num) + String.length(status) + String.length(location) + overhead
+      inv_num = Map.get(inst, :inventory_num, "")
+      model_raw = Map.get(inst, :model, Map.get(inst, :name, ""))
+      used_width = String.length(id) + String.length(inv_num) + overhead
       model_width = max(15, width - used_width)
       model = format_string(model_raw, model_width)
-
-      {id, inv_num, model, location, status}
+      {id, inv_num, model}
     end
   end
 
@@ -207,19 +274,22 @@ defmodule CA.PRO do
     width = terminal_width()
 
     risk_mod = case court do
-      :cod -> CA.CmdbProfiles.Cod.Risk
-      :vyshhorod -> CA.CmdbProfiles.Vyshhorod.Risk
+      :erp -> CA.Risk
     end
 
     # overhead for print formatting: `{"", "", []}` -> ~14 chars
     overhead = 14
 
-    for r <- flatten_risks(risk_mod.taxonomy()) do
-      id = r.id
-      controls_str = Enum.join(r.controls, ",")
-      name_width = max(10, width - String.length(id) - String.length(controls_str) - overhead)
-      name = format_string(r.name, name_width)
-      {id, name, r.controls}
+    for {_key, groups} <- risk_mod.taxonomy(),
+        group <- groups,
+        inst <- Map.get(group, :instances, []) do
+      id = inst.id
+      controls_str = Enum.join(Map.get(inst, :controls, []), ",")
+      name_raw = Map.get(inst, :name, "")
+      used_width = String.length(id) + String.length(controls_str) + overhead
+      name_width = max(10, width - used_width)
+      name = format_string(name_raw, name_width)
+      {id, name, Map.get(inst, :controls, [])}
     end
   end
 
@@ -233,108 +303,149 @@ defmodule CA.PRO do
     # overhead for print formatting: `{"", "", []}` -> ~14 chars
     overhead = 14
 
-    for cat <- search_categories(court: court, inventory_type: :sys) do
-      id = cat.id
-      controls_str = Enum.join(cat.controls, ",")
-      name_width = max(10, width - String.length(id) - String.length(controls_str) - overhead)
-      name = format_string(cat.name, name_width)
-      {id, name, cat.controls}
+    sys_mod = case court do
+      :erp -> CA.Sys
+    end
+
+    for {_key, groups} <- sys_mod.inventory(),
+        group <- groups,
+        inst <- Map.get(group, :instances, []) do
+      id = inst.id
+      controls_str = Enum.join(Map.get(inst, :controls, []), ",")
+      version_suffix =
+        case Map.get(inst, :version) do
+          nil -> ""
+          "" -> ""
+          "N/A" -> ""
+          version -> " (" <> version <> ")"
+        end
+      name_raw = Map.get(inst, :name, "") <> version_suffix
+      used_width = String.length(id) + String.length(controls_str) + overhead
+      name_width = max(10, width - used_width)
+      name = format_string(name_raw, name_width)
+      {id, name, Map.get(inst, :controls, [])}
     end
   end
 
   @doc """
-  Отримати мережеве зонування (NET) для COURT або COD у вигляді Erlang-кортежів.
+  Отримати мережеві інстанси (NET) для COURT або COD у вигляді Erlang-кортежів.
+  Розгортає :instances всередині кожної зони (аналогічно до inventory/1).
   """
   def net(court_str) do
     court = parse_court(court_str)
     width = terminal_width()
-    overhead = 14
+
+    # overhead: {id, name, subnet} -> ~16 chars
+    overhead = 16
 
     net_mod = case court do
-      :cod -> CA.CmdbProfiles.Cod.Net
-      :vyshhorod -> CA.CmdbProfiles.Vyshhorod.Net
+      :erp -> CA.Net
     end
 
-    for {_key, zone} <- net_mod.zones() do
-      id = zone.id
-      controls_str = Enum.join(zone.controls, ",")
-      name_width = max(10, width - String.length(id) - String.length(controls_str) - overhead)
-      name = format_string(zone.name, name_width)
-      {id, name, zone.controls}
+    for {_key, zones} <- net_mod.zones(),
+        zone <- zones,
+        inst <- Map.get(zone, :instances, []) do
+      id = inst.id
+      subnet = Map.get(inst, :subnet, "")
+      name_raw = Map.get(inst, :name, "")
+      used_width = String.length(id) + String.length(subnet) + overhead
+      name_width = max(10, width - used_width)
+      name = format_string(name_raw, name_width)
+      {id, name, subnet}
     end
   end
 
   @doc """
-  Отримати бізнес-процеси (PROC) для COURT або COD у вигляді Erlang-кортежів.
+  Отримати бізнес-процеси (PROC) для COURT або COD — розгортає :instances кожної групи.
   """
   def proc(court_str) do
     court = parse_court(court_str)
     width = terminal_width()
-    overhead = 14
+    overhead = 16
 
-    for p <- list_processes(), p.court == court do
-      id = p.id
-      controls_str = Enum.join(p.controls, ",")
-      name_width = max(10, width - String.length(id) - String.length(controls_str) - overhead)
-      name = format_string(p.name, name_width)
-      {id, name, p.controls}
+    proc_mod = case court do
+      :erp -> CA.Proc
+    end
+
+    for {_key, groups} <- proc_mod.processes(),
+        group <- groups,
+        inst <- Map.get(group, :instances, []) do
+      id = inst.id
+      owner = Map.get(inst, :owner, "")
+      name_raw = Map.get(inst, :name, "")
+      used_width = String.length(id) + String.length(owner) + overhead
+      name_width = max(10, width - used_width)
+      name = format_string(name_raw, name_width)
+      {id, name, owner}
     end
   end
 
   @doc """
-  Отримати класифікацію даних (DATA) для COURT або COD у вигляді Erlang-кортежів.
+  Отримати класифікацію даних (DATA) для COURT або COD — розгортає :instances кожної групи.
   """
   def data(court_str) do
     court = parse_court(court_str)
     width = terminal_width()
-    overhead = 14
+    overhead = 16
 
-    for c <- list_classifications(), c.court == court do
-      id = c.id
-      controls_str = Enum.join(c.controls, ",")
-      name_width = max(10, width - String.length(id) - String.length(controls_str) - overhead)
-      name = format_string(c.name, name_width)
-      {id, name, c.controls}
+    data_mod = case court do
+      :erp -> CA.Data
+    end
+
+    for {_key, groups} <- data_mod.classification(),
+        group <- groups,
+        inst <- Map.get(group, :instances, []) do
+      id = inst.id
+      storage = Map.get(inst, :storage, "")
+      name_raw = Map.get(inst, :name, "")
+      used_width = String.length(id) + String.length(storage) + overhead
+      name_width = max(10, width - used_width)
+      name = format_string(name_raw, name_width)
+      {id, name, storage}
     end
   end
 
   @doc """
-  Отримати ролі доступу (ROLES) для COURT або COD у вигляді Erlang-кортежів.
+  Отримати ролі доступу (ROLES) для COURT або COD — розгортає :instances кожної групи.
   """
   def roles(court_str) do
     court = parse_court(court_str)
     width = terminal_width()
-    overhead = 14
+    overhead = 16
 
     abac_mod = case court do
-      :cod -> CA.CmdbProfiles.Cod.ABAC
-      :vyshhorod -> CA.CmdbProfiles.Vyshhorod.ABAC
+      :erp -> CA.ABAC
     end
 
-    for {_key, role} <- abac_mod.roles() do
-      id = role.id
-      controls_str = Enum.join(role.controls, ",")
-      name_width = max(10, width - String.length(id) - String.length(controls_str) - overhead)
-      name = format_string(role.name, name_width)
-      {id, name, role.controls}
+    for {_key, groups} <- abac_mod.roles(),
+        group <- groups,
+        inst <- Map.get(group, :instances, []) do
+      id = inst.id
+      users_str = Map.get(inst, :users, []) |> Enum.join(", ")
+      name_raw = Map.get(inst, :name, "")
+      used_width = String.length(id) + String.length(users_str) + overhead
+      name_width = max(10, width - used_width)
+      name = format_string(name_raw, name_width)
+      {id, name, Map.get(inst, :users, [])}
     end
   end
 
   # --- ВНУТРІШНІ ДОПОМІЖНІ ФУНКЦІЇ ФОРМАТУВАННЯ ---
 
-  defp parse_court(court) when court in [:cod, :vyshhorod], do: court
+  defp parse_court(court) when court in [:cod, :vyshhorod, :erp], do: court
   defp parse_court(court) when is_binary(court) do
     case String.downcase(court) do
       "cod" -> :cod
       "court" -> :vyshhorod
       "vyshhorod" -> :vyshhorod
-      _ -> raise ArgumentError, "Unknown court: #{inspect(court)}. Expected 'COD' or 'COURT'"
+      "erp" -> :erp
+      _ -> raise ArgumentError, "Unknown court: #{inspect(court)}. Expected 'COD', 'COURT' or 'ERP'"
     end
   end
 
   defp terminal_width do
     width = case :io.columns() do
-      {:ok, w} when w > 0 -> w
+      {:ok, w} when w > 0 -> w + 20
       _ -> 120
     end
 
@@ -366,17 +477,7 @@ defmodule CA.PRO do
     end
   end
 
-  defp flatten_risks(map) when is_map(map) do
-    if Map.has_key?(map, :id) and Map.has_key?(map, :name) do
-      [map]
-    else
-      Enum.flat_map(map, fn {_k, v} -> flatten_risks(v) end)
-    end
-  end
-  defp flatten_risks(list) when is_list(list) do
-    Enum.flat_map(list, &flatten_risks/1)
-  end
-  defp flatten_risks(_), do: []
+
 
   # --- ДОПОМІЖНІ ФУНКЦІЇ ФІЛЬТРАЦІЇ ---
 

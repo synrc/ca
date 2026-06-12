@@ -136,91 +136,16 @@ defmodule CA.TeX do
     render(Enum.into(opts, %{}))
   end
 
-  def chat_profile(opts \\ []) do
-    controls = CA.L3.Messenger.controls() -- CA.L1.controls()
-    {body, count} = generate_body(controls)
-
-    opts =
-      Keyword.merge(
-        [
-          title: "Завдання безпеки для месенджера (#{count})",
-          subtitle: "Комплексна система захисту інформації",
-          abstract:
-            "Завдання з безпеки для забезпечення конфіденційності, цілісності повідомлень та управління сесіями в месенджері.",
-          body: body
-        ],
-        opts
-      )
-
-    content = generate(opts)
-    File.write!("priv/chat_profile.tex", content)
-    "priv/chat_profile.tex"
-  end
-
-  def mail_profile(opts \\ []) do
-    controls = CA.L3.Mail.controls() -- CA.L1.controls()
-    {body, count} = generate_body(controls)
-
-    opts =
-      Keyword.merge(
-        [
-          title: "Завдання безпеки для військової пошти (#{count})",
-          subtitle: "Комплексна система захисту інформації",
-          abstract:
-            "Завдання з безпеки для забезпечення конфіденційності, цілісності та гарантованої доставки повідомлень (MHS X.420) з підтримкою грифування.",
-          body: body
-        ],
-        opts
-      )
-
-    content = generate(opts)
-    File.write!("priv/mail_profile.tex", content)
-    "priv/mail_profile.tex"
-  end
-
-  def vpn_profile(opts \\ []) do
-    controls = CA.L3.VPN.controls() -- CA.L1.controls()
-    {body, count} = generate_body(controls)
-
-    opts =
-      Keyword.merge(
-        [
-          title: "Завдання безпеки для VPN та PKI (#{count})",
-          subtitle: "Комплексна система захисту інформації",
-          abstract:
-            "Завдання з безпеки для забезпечення безпеки VPN-продуктів та інфраструктури PKI (CA, OCSP, TSP, LDAP).",
-          body: body
-        ],
-        opts
-      )
-
-    content = generate(opts)
-    File.write!("priv/vpn_profile.tex", content)
-    "priv/vpn_profile.tex"
-  end
-
-  def generate_l3_profiles do
-    [
-      CA.L3.Court,
-      CA.L3.X422.Light,
-      CA.L3.X422.Flutter
-    ]
-    |> Enum.map(&legal_l3_profile/1)
-  end
-
   def gen do
     :lists.flatten([
       # В Шаблоні Держспецзв'язку
       legal_l1_profile_1(),
       legal_l1_profile_2(),
       legal_l2_profile(),
-      legal_l3_profile(CA.L3.ERP),
-      generate_l3_profiles(),
+      legal_l3_profile(CA.L3.Cod),
+      legal_l3_profile(CA.L3.Court),
       # В Шаблоні ТОВ "Криптографічні Телесистеми"
       gen_bible(),
-      chat_profile(),
-      mail_profile(),
-      vpn_profile()
     ])
   end
 

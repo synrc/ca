@@ -1,0 +1,377 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{a4paper, margin=1cm}
+
+\title{Building a Compliant Security Profile: ND TZI and NIST Certification for ERPUNO LLC}
+\author{ERPUNO Security Team}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\selectlanguage{english}
+
+\begin{abstract}
+This article details the methodology for constructing a Comprehensive Information Security System (KSZI) that complies with Ukrainian state standards (ND TZI) and the international NIST SP 800-53 framework. Using ERPUNO LLC---a private system integrator of high-tech telecommunications products---and its e-government platform as a practical testbed, we demonstrate how to programmatically define, track, and audit a security profile. The approach utilizes Elixir-based Configuration Management Database (CMDB) profiles to maintain strict accountability over hardware, software, networks, data, roles, and risks.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+ERPUNO LLC provides high-tech telecommunication solutions for the automation of commercial and state enterprises. Their platform is architecturally divided into two primary layers:
+\begin{itemize}
+    \item \textbf{Platform (SYS-APP-SYNRC):} The systemic foundation, including the Certificate Authority (CA), L2/L3 VPN tunnels, PKI-aware LDAP, Communicator (CHAT), BPMN process engine, MQTT broker, and KVS storage.
+    \item \textbf{Products (SYS-APP-ERP):} Corporate and state enterprise systems such as Education (Edu), Healthcare (Health), Electronic Documents (Mail), Accounting (Acc), Warehouse Management, and Registries (Cart).
+\end{itemize}
+
+The company's architecture is built to support critical state and defense sector needs. It offers special licensing conditions for government applications, provided there is strict adherence to architectural compatibility and certification requirements (like DSSZZI). The system strictly follows ITU-T X-series, IETF RFC, NIST/FIPS, DSTU, and ISO/IEC standards (e.g., X.509, CMS/S-MIME, AES-GCM, Kyber, DSTU 4145-2002).
+
+In this paper, we demonstrate how to build a unified security profile for this complex architecture. The CMDB system maps operational instances directly to NIST SP 800-53 controls (such as CM-8 for System Component Inventory, PM-5 for System Inventory) and ND TZI requirements (e.g., ND TZI 3.7-003-2023 for inventory and exploitation documentation).
+
+\section{Beyond KSZI: A Continuous Accountability System (CMDB)}
+Traditional KSZI (Comprehensive Information Security Systems) are often treated as static, paper-based compliance artifacts. However, for ERPUNO LLC, we engineered the KSZI as a live, programmable \textbf{Configuration Management Database (CMDB)} and \textbf{Continuous Accountability System}.
+
+This system is inherently built into the source code using Elixir modules (e.g., \texttt{hw.ex}, \texttt{sys.ex}, \texttt{net.ex}). The core Certificate Authority (\texttt{SYS-SYNRC-CA}) acts not only as the PKI infrastructure but also as the central registry for this accountability system. The profile of this system explicitly implements the following security controls:
+
+
+\subsection{Detailed NIST SP 800-53 Rev.5 Control Integrations}
+
+\subsubsection{CM-8: System Component Inventory}
+The CMDB maintains a strict, programmatically queryable registry of all hardware, software, and firmware components across the entire infrastructure. This is not merely a static spreadsheet; it is an active Elixir dataset (\texttt{hw.ex}, \texttt{sys.ex}) that tracks inventory numbers, physical locations, operational status, and cryptographic module certifications. By natively linking every physical switch, server, and HSM to its exact operational context, the system completely eradicates drift between actual infrastructure and security documentation. The inventory control ensures full visibility and reduces the attack surface by identifying rogue or unauthorized devices instantaneously.
+
+\subsubsection{CM-8(1) \& CM-8(2): Inventory Updates \& Tracking}
+The architecture guarantees the automated maintenance and tracking of component updates during all installations, removals, or migrations. Because the CMDB is stored as Elixir source code within a secure Git repository, every single alteration to the infrastructure creates an immutable, cryptographically signed commit. This mechanism automatically fulfills the requirement for strict version control and historical auditing of hardware and software lifecycles. It provides an unbroken chain of custody for all system components, essential for forensic analysis and compliance verification.
+
+\subsubsection{CM-9: Configuration Management Plan}
+Rather than maintaining a separate textual document that inevitably becomes obsolete, the entire Configuration Management Plan is directly codified within the repository itself, treating policy strictly as code. The build, deployment, and auditing pipelines are governed by these exact declarative profiles. Any deviation in production from the CMDB profile immediately triggers a compliance alert, ensuring the configuration management plan is actively enforced at all times. This shift from prescriptive documentation to declarative code enforces continuous compliance inherently.
+
+\subsubsection{PM-5 \& PM-6: System Inventory \& Measures of Performance}
+The \texttt{CA.PRO} API delivers real-time, system-wide inventory tracking and verifiable measures of performance to organizational stakeholders. Instead of relying on manual quarterly audits, security officers can execute programmatic queries against the CMDB to instantly extract precise metrics, asset valuations, and compliance coverage ratios, significantly reducing administrative overhead and human error. This control effectively shifts the compliance burden from human operators to automated, highly reliable programmatic interfaces.
+
+\subsubsection{CA-7: Continuous Monitoring}
+The security architecture integrates natively with SIEM/XDR solutions (such as Wazuh) to provide a constant, real-time status feed of all critical security controls and operational events. This continuous monitoring pipeline digests syslog, eBPF telemetry, and application logs, correlating them directly against the risk taxonomies and compliance profiles defined in the CMDB. This ensures that any degradation in security posture is immediately detected and addressed, shifting the paradigm from point-in-time assessment to perpetual situational awareness.
+
+\subsubsection{PL-2, RA-2, RA-3: Security Plans \& Risk Assessments}
+The system implements automated system security plans, data categorization matrices, and risk taxonomies directly through the \texttt{CA.Data} and \texttt{CA.Risk} modules. Risks are not just listed; they are systematically mapped to the exact software vulnerabilities, network segments, and data stores they impact. This programmatic risk assessment allows for dynamic recalculation of the system's risk profile whenever new infrastructure is introduced. It provides a living threat model that continuously aligns security mitigations with actual business risks.
+
+\subsubsection{AC-2, AC-3 \& AC-25: Access Control Enforcement \& Reference Monitor}
+Role-based (RBAC) and Attribute-based (ABAC) access control mechanisms are centrally defined within the \texttt{roles.ex} hierarchy. These policies dictate precise permissions across all environments and are strictly enforced at the application boundary via a unified Reference Monitor (\texttt{AC-25}). This guarantees that all access decisions---whether for a standard user or a global administrator---are verified against the immutable policy engine before any action is permitted. Centralizing access control logically prevents bypasses and privilege escalation across disparate subsystems.
+
+\subsubsection{SC-8 \& SC-28: Transmission Confidentiality \& Data at Rest}
+Mandatory cryptographic controls are bound directly to the hardware and network profiles. For data in transit, the CMDB mandates IPsec/MACsec tunnels across all core switches and border gateways, explicitly defining the cryptographic suites. For data at rest, Transparent Data Encryption (TDE) and hardware-level SAN encryption are mandated for all storage arrays, ensuring that physical theft or unauthorized access to drives yields zero intelligible data. These controls provide an impenetrable cryptographic envelope protecting the state's most sensitive data assets.
+
+\subsubsection{SC-12: Cryptographic Key Establishment and Management}
+The \texttt{SYS-SYNRC-CA} core functions as the centralized Public Key Infrastructure (PKI), managing the entire lifecycle of all symmetric and asymmetric keys. Backed by certified Hardware Security Modules (HSMs, e.g., IIT Gryada-301), the system ensures secure key generation, escrow, rotation, and revocation. This provides an unassailable cryptographic foundation for the entire e-government platform. The rigorous key management protocol eliminates the risk of key compromise or weak cryptography being introduced ad-hoc by system administrators.
+
+\subsubsection{AU-2 \& AU-6: Audit Events \& Analysis}
+The platform defines its auditable events explicitly within the CMDB outputs, ensuring that all security-relevant activities (logons, privilege escalations, key accesses) are definitively logged. Automated mechanisms and SIEM integrations are deployed to continuously analyze these audit records for anomalous behavior, satisfying the requirement for proactive threat detection and non-repudiation of user actions. This closed-loop auditing ensures that incidents are not merely logged, but actively responded to in near real-time.
+
+\subsubsection{IA-2: Identification and Authentication}
+Organizational users, administrators, and automated service accounts are uniquely identified and authenticated using strict multi-factor authentication (MFA) protocols, including PKI smart cards and OTP tokens. These identities are irrevocably tied to the \texttt{roles.ex} taxonomy, preventing identity spoofing and ensuring that every session is cryptographically bound to an authorized entity. The rigorous identity management protocol establishes a zero-trust foundation where no user is trusted inherently without verifiable cryptographic proof.
+
+\subsubsection{CP-9 \& CP-10: Information System Backup \& Recovery}
+The categorization of data assets within the CMDB directly governs the automated backup schedules. Critical databases and file stores are subjected to continuous replication, while sensitive offline archives are routed to air-gapped tape libraries (e.g., HPE StoreEver). This guarantees robust disaster recovery capabilities and strict protection against ransomware or catastrophic hardware failures. The recovery protocols ensure minimal recovery point objectives (RPO) and recovery time objectives (RTO), crucial for high-availability enterprise services.
+
+\subsection{Detailed ND TZI (State Standard) \& ISO Compliance}
+
+\subsubsection{ND TZI 3.7-003-2023 \S4.2 \& \S5: Exploitation Documentation}
+According to Ukrainian state standards, the accountability of protected objects and the generation of exploitation documentation are critical for state expertise. This system automatically generates all required technical passports, inventory logs, and component registries directly from the \texttt{inventory\_num} and \texttt{serial} fields within the CMDB. This completely eliminates manual paperwork and ensures absolute accuracy during DSSZZI audits. This automation accelerates the certification process and removes the human error typically associated with maintaining extensive paper-based documentation.
+
+\subsubsection{ND TZI 1.6-005-22 \& 2.6-001-11: State Expertise Audit Trails}
+Security requirements and audit trails required for the State Expertise of the KSZI are dynamically extracted from the \texttt{controls} field embedded within each profile. The system can instantly produce a complete mapping of implemented controls against the regulatory requirements, providing auditors with transparent, code-backed evidence of compliance rather than unverifiable assertions. This verifiable link between state regulation and physical implementation provides unparalleled assurance during regulatory inspections.
+
+\subsubsection{ND TZI 2.5-004-99 \& 2.5-005-99: System Classification \& Evaluation}
+The automated system classification and security evaluation criteria are continuously verified against the defined target profile. Instead of periodic manual assessments, the CMDB mechanism ensures that any architectural change triggers a re-evaluation of the system class (e.g., Class 2 or 3), ensuring that the protection profile remains consistently aligned with the nature of the processed data. This continuous classification guarantees that the system never inadvertently drifts into a non-compliant state due to infrastructure modifications.
+
+\subsubsection{ND TZI 3.6-006-24: Critical State Registries}
+The architecture fully supports the strict baseline requirements for critical state registries and judicial systems. It guarantees exceptional high availability (HA) across all nodes and mandates deep cryptographic integrity of evidentiary data utilizing national cryptographic algorithms (DSTU 4145-2002 for digital signatures, DSTU 7564-2014 for hashing), fulfilling the most stringent requirements for electronic governance. Compliance with this standard ensures the legal validity of electronic documents processed within the ERP system.
+
+\subsubsection{ND TZI 2.5-008-02: Confidential Information Protection}
+The system strictly adheres to the requirements for protecting confidential and restricted state information. The dynamic categorization mechanism evaluates the sensitivity of each data asset and dictates the requisite level of cryptographic segregation and physical protection (e.g., mandating air-gapped environments or specific HSM usage) required to legally process that data. The classification matrix automatically enforces the principle of least privilege, isolating highly sensitive segments away from standard user workflows.
+
+\subsubsection{ND TZI 2.5-010-03: Web Application Protection}
+Protection of web-facing applications from unauthorized access and malicious exploitation is handled proactively. The network profiles (\texttt{net.ex}) explicitly declare the placement and configuration of Web Application Firewalls (WAF) and deep packet inspection (DPI) mechanisms. Coupled with the ABAC filters, this ensures that web vulnerabilities are mitigated at the network boundary before reaching the application logic. The defense-in-depth approach nullifies common web exploitation vectors prior to authentication.
+
+\subsubsection{ISO/IEC 27001:2022 \& DSTU ISO/IEC 27001:2015: ISMS Alignment}
+The entire CMDB-driven approach aligns perfectly with the core tenets of an Information Security Management System (ISMS). By treating the inventory, risk assessment, and access control matrices as live code, the system intrinsically supports the ISO requirements for continuous improvement (Clause 10), comprehensive asset management (Annex A.8), and stringent logical access controls (Annex A.9). This programmatic integration effectively transforms the ISMS from a theoretical framework into an operational enforcement mechanism.
+
+
+By transforming compliance into code, the CMDB guarantees that the operational reality of the infrastructure is continuously synchronized with the certified KSZI documentation.
+
+\section{Hierarchical Security Profiles (L1, L2, L3)}
+The system supports the automated construction of KSZI security profiles based on the regulatory and legal acts in the field of technical protection of information (TZI NPA). This automates documentation generation and the mapping of legislative requirements to technical settings. All certificates are issued with OID imprints of their respective security profiles.
+
+The architecture is divided into three levels of profiles:
+
+\subsection{L1: Basic Security Profiles}
+These profiles define the fundamental sets of controls required by the regulations.
+\begin{itemize}
+    \item \textbf{SECURITY POLICIES}\footnote{\url{https://ca.n2o.dev/priv/security-profiles.pdf}}
+    \item \textbf{FULL DIRECTORY (950)}\footnote{\url{https://ca.n2o.dev/priv/bible_profile.pdf}}
+    \item \textbf{OPEN CONFIDENTIAL (126)}\footnote{\url{https://ca.n2o.dev/priv/legal_l1_profile_409.pdf}}
+    \item \textbf{OFFICIAL (155)}\footnote{\url{https://ca.n2o.dev/priv/legal_l1_profile_419.pdf}}
+\end{itemize}
+
+\subsection{L2: Industry Profiles}
+Industry-specific adaptations that expand upon the baseline controls to meet the requirements of specific sectors.
+\begin{itemize}
+    \item \textbf{COURT INDUSTRY PROFILE}\footnote{\url{https://ca.n2o.dev/priv/legal_l2_court_profile.pdf}}: Industry security profile for the judicial system. It describes an extended set of baseline controls for processing sensitive information in state registries and courts, taking into account the requirements for high availability and data integrity based on ND TZI 3.6-006-24.
+    \item \textbf{THE DIGITAL UKRAINIAN GOVERNMENT INDUSTRY PROFILE}\footnote{\url{https://ca.n2o.dev/priv/digital-profile.pdf}}: Industry security profile for the Ministry of Digital Transformation of Ukraine.
+\end{itemize}
+
+\subsection{L3: Target Security Profiles}
+Specific implementation targets for individual systems and components.
+\begin{itemize}
+    \item \textbf{ERP/1 SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/legal_l3_profile_erp.pdf}}: Target profile for the ERP/1 telecommunications system. Describes the implementation of Attribute-Based Access Control (ABAC), information flow management (BPE), Public Key Infrastructure (PKI), and reliable auditing (KVS) for securing critical business processes.
+    \item \textbf{X.509 CMS MESSAGING SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/chat_profile.pdf}}: Target profile for corporate messenger systems. Based on X.509 and CMS (Cryptographic Message Syntax) cryptographic protocols, providing end-to-end encryption (E2EE), strict authentication, and non-repudiation for legally significant communications.
+    \item \textbf{VPN SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/vpn_profile.pdf}}: Target profile for Virtual Private Network (VPN) and PKI infrastructures. Defines mechanisms for tunneling, node authentication (SC-8), and network traffic protection at the transport layer to secure communication channels against interception and modification.
+\end{itemize}
+
+\section{Segregation of Duties: The Two-Stage KSZI Certification Process}
+According to the regulatory framework of Ukraine (e.g., ND TZI 2.6-001-11) and best global practices (the \textit{Maker/Checker} principle), building and certifying a Comprehensive Information Security System (KSZI) is strictly a \textbf{two-stage procedure}. It requires the involvement of two completely independent licensed providers to eliminate any conflict of interest.
+
+\begin{itemize}
+    \item \textbf{Stage 1: The Developer (Provider 1).} The first provider performs the risk assessment, inspects the environment, and creates the "technical instructions" --- the \textbf{Target Security Profile (Technical Specification)}. This provider is also responsible for the physical implementation of the security architecture: configuring cryptography, setting up the Reference Monitor (AC-25), installing certificates, and delivering the system into trial operation.
+    \item \textbf{Stage 2: The Expertise Organizer (Provider 2).} The second provider receives the Technical Specification from the Developer and designs the \textbf{Expertise Program}. This provider conducts an independent technical audit, instrumental testing, and live verification of all implemented controls. Upon successful verification, they issue the Expert Conclusion for the State Service of Special Communications and Information Protection (DSSZZI).
+\end{itemize}
+
+This segregation guarantees that the organization creating the security profiles and writing the Elixir CMDB structures is legally and practically distinct from the organization auditing and approving them.
+
+\section{Programmatic Security Profiles}
+
+The following sections provide the complete execution traces of the CMDB profile extraction for the "ERP" system. These outputs demonstrate how the infrastructure is documented, maintained, and continuously monitored.
+
+\subsection{Risk Assessment (CA.PRO.risk)}
+The risk taxonomy enumerates the identified threats and binds them to the corresponding security control families.
+{\scriptsize
+\selectlanguage{ukrainian}
+\begin{verbatim}
+iex> CA.PRO.risk("ERP")
+[
+  {"RISK-OS-01", "Вразливості Active Directory (Kerberoasting, Pass-the-Hash, Golden Ticket)", ["AC", "IA", "SC"]},
+  {"RISK-OS-02", "Зловживання WMI та PowerShell (Fileless-методи)", ["SI", "SC", "CM"]},
+  {"RISK-OS-03", "Вразливості на рівні ядра (BYOVD, Ring 0)", ["SI", "CM"]},
+  {"RISK-OS-04", "Маніпуляція маркерами доступу (Token Stealing)", ["AC", "AU"]},
+  {"RISK-OS-05", "Некоректні дозволи NTFS / Share (Orphaned SIDs)", ["AC", "CM"]},
+  {"RISK-OS-06", "Підвищення привілеїв Linux (Kernel, SUID, Dirty COW)", ["AC", "SI"]},
+  {"RISK-OS-07", "Втеча з контейнерів Docker/Kubernetes", ["SC", "CM"]},
+  {"RISK-OS-08", "Зловживання eBPF (прихований моніторинг)", ["AU", "SI"]},
+  {"RISK-OS-09", "Ін'єкції динамічних бібліотек (LD_PRELOAD)", ["SI", "CM"]},
+  {"RISK-OS-10", "Вразливості PAM (обхід автентифікації)", ["IA", "AC"]},
+  {"RISK-OS-11", "Обхід XProtect / Gatekeeper / SIP (macOS)", ["CM", "SI"]},
+  {"RISK-OS-12", "Компрометація macOS Keychain", ["IA", "SC"]},
+  {"RISK-OS-13", "TCC Bypass & Spyware (macOS)", ["SI", "PE"]},
+  {"RISK-OS-14", "Dyld Hijacking (macOS)", ["SI"]},
+  {"RISK-OS-15", "Обхід Pointer Authentication PAC (Apple Silicon)", ["SI", "SA"]},
+  {"RISK-CRY-01", "Пост-квантові загрози SNDL (Store Now, Decrypt Later)", ["SC", "RA", "SA"]},
+  {"RISK-CRY-02", "Атаки сторонніми каналами (DPA, таймінг, EM)", ["SC", "PE", "SA"]},
+  {"RISK-CRY-03", "Fault Injection (Glitching, Voltage Drop)", ["PE", "SI", "SC"]},
+  {"RISK-CRY-04", "Компрометація ПАК «Гряда» (ІІТ HSM)", ["PE", "SC", "AC"]},
+  {"RISK-CRY-05", "Екстракція ключів з НКІ е-Токен (ІІТ)", ["PE", "SC"]},
+  {"RISK-CRY-06", "Вразливості ASN.1 парсерів X.509 / CMS", ["SI", "SA"]},
+  {"RISK-CRY-07", "Вразливості криптобібліотек ДСТУ (Калина, Купина, Padding Oracle)", ["SA", "SI"]},
+  {"RISK-CRY-08", "Недостатня ентропія генератора псевдовипадкових чисел (PRNG)", ["SC"]},
+  {"RISK-CRY-09", "Втрата або перехоплення PIN-кодів HSM (кейлогери)", ["IA", "AT", "PE"]},
+  {"RISK-CRY-10", "Фізична деструкція носіїв «Автор» (CryptoCard)", ["PE", "MP"]},
+  {"RISK-CRY-11", "Вразливості CCID драйверів токенів (ескалація привілеїв)", ["SI", "CM"]},
+  {"RISK-CRY-12", "Підміна сесій PKCS#11 (MitM між ПЗ ЦСК та HSM)", ["SC", "SI"]},
+  {"RISK-NET-01", "BGP Hijacking & Route Leaks (підміна анонсів AS)", ["SC", "SI"]},
+  {"RISK-NET-02", "Атаки L2 (VLAN Hopping, ARP Spoofing, STP атаки)", ["SC", "AC"]},
+  {"RISK-NET-03", "Вразливості IPSec / VPN (IKE downgrade, PSK витік)", ["SC", "IA"]},
+  {"RISK-NET-04", "DDoS (Slowloris, SYN Flood, ампліфікація DNS/NTP)", ["SC", "IR"]},
+  {"RISK-NET-05", "Компрометація Wi-Fi (KRACK, PMKID, Evil Twin)", ["SC", "IA"]},
+  {"RISK-NET-06", "Вразливості DNSSEC (DNS Spoofing, помилки конфігурації)", ["SC", "SI"]},
+  {"RISK-NET-07", "Відкриті інтерфейси управління (SNMPv1/v2, Telnet, REST API)", ["CM", "AC", "SC"]},
+  {"RISK-INF-01", "Компрометація BMC (IPMI, iDRAC, iLO)", ["AC", "SC"]},
+  {"RISK-INF-02", "Вразливості Firmware / UEFI Bootkits", ["SI", "SA"]},
+  {"RISK-INF-03", "Атаки на мікроархітектуру CPU (Spectre, Meltdown)", ["SI", "SC"]},
+  {"RISK-INF-04", "Cold Boot & Rowhammer атаки на пам'ять", ["PE", "SI"]},
+  {"RISK-INF-05", "Відмова дискових масивів SAN/NAS (Split-brain)", ["CP", "SI"]},
+  {"RISK-INF-06", "Електромагнітне випромінювання TEMPEST", ["PE", "SC"]},
+  {"RISK-INF-07", "Відмова інженерних систем (UPS, дизель, чиллер, пожежогасіння)", ["PE", "CP"]},
+  {"RISK-PER-01", "Spear Phishing & Whaling (цільовий фішинг адміністраторів)", ["AT", "IR", "SI"]},
+  {"RISK-PER-02", "Watering Hole Attacks (компрометація профільних ресурсів)", ["SI", "AT"]},
+  {"RISK-PER-03", "Інсайдерський саботаж та ексфільтрація (логічні бомби)", ["PS", "AU", "AC"]},
+  {"RISK-PER-04", "Pretexting / Baiting / Tailgating (фізичний доступ)", ["AT", "PE", "PS"]},
+  {"RISK-PER-05", "Credential Stuffing (словники та бази паролів)", ["IA", "AT"]},
+  {"RISK-SYNC-01", "Race Condition (стан гонитви у спільних ресурсах)", ["SI", "SA"]},
+  {"RISK-SYNC-02", "TOCTOU (Time-of-Check to Time-of-Use)", ["SI", "AC"]},
+  {"RISK-SYNC-03", "NTP Spoofing (десинхронізація часу)", ["SC", "AU", "SI"]},
+  {"RISK-SYNC-04", "Split-Brain у кластерах СУБД", ["CP", "SI"]},
+  {"RISK-SYNC-05", "Replication Lag (вікно доступу до застарілих даних)", ["SI", "SC"]},
+  {"RISK-DAT-01", "Втрата резервних копій (Ransomware, Backup Corruption)", ["CP", "MP", "SI"]},
+  {"RISK-DAT-02", "Витік електронних судових справ (несанкціонований доступ)", ["AC", "SC", "PE"]}
+]
+\end{verbatim}
+\selectlanguage{english}
+}
+
+\subsection{System Software Components (CA.PRO.sys)}
+The system inventory documents all OS, middleware, platform, and application-level software components running in the environment, satisfying NIST CM-8 and PM-5.
+{\scriptsize
+\selectlanguage{ukrainian}
+\begin{verbatim}
+iex> CA.PRO.sys("ERP")
+[
+  {"SYS-OS-01-UAL", "UA Linux 24.04 LTS (ДСТУ-hardened, SELINUX Enforcing) (24.04 LTS)", []},
+  {"SYS-OS-01-WIN", "Windows Server 2025 Datacenter (NATO STIG + DISA hardened) (2025 Datacenter)", []},
+  {"SYS-OS-01-ESX", "VMware ESXi 8.0 Update 3 (vSphere Foundation) (8.0 U3)", []},
+  {"SYS-OS-02-W11", "Windows 11 Pro 24H2 (DISA STIG + Windows Defender Credential Guard) (24H2 (Build 26100))", []},
+  {"SYS-OS-02-UAL", "UA Linux Desktop 24.04 LTS (ДСТУ, GNOME Hardened) (24.04 LTS Desktop)", []},
+  {"SYS-APP-00-ERL", "Erlang/OTP 27.3 (SMP, BEAM VM, distribution TLS) (27.3)", []},
+  {"SYS-APP-00-ELX", "Elixir 1.18.3 (N2O, NITRO, FORM, Bandit) (1.18.3)", []},
+  {"SYS-APP-00-EMQ", "EMQ X 2.12 (MQTT 5.0 / MQTT-SN, Erlang/OTP cluster) (2.12)", []},
+  {"SYS-SYNRC-CA", "Сертифікати (7.4)", []},
+  {"SYS-SYNRC-VPN", "Тунелі (1.0)", []},
+  {"SYS-SYNRC-LDAP", "Директорія (1.0)", []},
+  {"SYS-SYNRC-CHAT", "Комунікатор (4.2)", []},
+  {"SYS-SYNRC-BPMN", "Процеси (6.11)", []},
+  {"SYS-SYNRC-MQTT", "Брокер (2.12)", []},
+  {"SYS-SYNRC-KVS", "Сховище (10.0)", []},
+  {"SYS-SYNRC-WS", "Фреймворк (11.0)", []},
+  {"SYS-SYNRC-FORM", "Форми (1.3)", []},
+  {"SYS-SYNRC-ASN1", "Компілятор (1.0)", []},
+  {"SYS-SYNRC-ABAC", "Контроль (1.0)", []},
+  {"SYS-ERP-EDU", "Освіта (1.0)", []},
+  {"SYS-ERP-HEALTH", "Здоров'я (1.0)", []},
+  {"SYS-ERP-MAIL", "Документи (1.0)", []},
+  {"SYS-ERP-ACC", "Облік (1.0)", []},
+  {"SYS-ERP-WAREHOUSE", "Склад (1.0)", []},
+  {"SYS-ERP-CART", "Реєстри (1.0)", []},
+  {"SYS-APP-01-IIT", "ІІТ Користувач ЦСК-1 (бібліотека «IIT Gryada-301») (3.0.1)", []},
+  {"SYS-APP-01-CIP", "Сайфер HSM Middleware (PKCS#11 + CMS + TSP клієнт) (2.8)", []},
+  {"SYS-APP-01-SIGN", "Автор Е-Підпис Сервер (batch signing, LTV, XAdES-BES) (5.2)", []},
+  {"SYS-APP-02-WZ", "Wazuh 4.9 SIEM/XDR (OSSEC-based, FIM, compliance CIS/NIST) (4.9)", []},
+  {"SYS-APP-02-ZBX", "Zabbix 7.2 (active agents, encrypted PSK transport, alerting) (7.2 LTS)", []},
+  {"SYS-DB-01-PG", "PostgreSQL 17.2 (TDE + pgAudit + pg_partman) (17.2)", []},
+  {"SYS-DB-01-ORA", "Oracle Database 23ai (Advanced Security Option, TDE, Vault) (23ai (23.5))", []},
+  {"SYS-DB-02-RDS", "Redis 7.4 (TLS 1.3, ACL, persistence RDB+AOF) (7.4)", []},
+  {"SYS-INF-01-VBR", "Veeam Backup & Replication 12.3 (immutable backups, SureBackup) (12.3)", []},
+  {"SYS-INF-01-BCL", "Bacula Community 15.0 (offline tape + air-gapped archive) (15.0)", []},
+  {"SYS-MW-01-NGX", "Nginx 1.27 (TLS 1.3 only, OCSP Stapling, CT Logs, HSTS) (1.27)", []},
+  {"SYS-MW-01-HAP", "HAProxy 3.0 (HA pair, health checks, rate limiting) (3.0 LTS)", []},
+  {"SYS-MW-02-AD", "Active Directory Domain Services 2025 (LAPS v2, Protected Users, Tiering) (Windows Server 2...", []},
+  {"SYS-MW-02-IPA", "FreeIPA 4.12 (Kerberos V, OTP, CA sub-ідентифікатор) (4.12)", []}
+]
+\end{verbatim}
+\selectlanguage{english}
+}
+
+\subsection{Hardware Inventory (CA.PRO.inventory)}
+The hardware inventory explicitly tracks physical assets, cryptographic modules (HSMs), network appliances, and storage arrays.
+{\scriptsize
+\selectlanguage{ukrainian}
+\begin{verbatim}
+iex> CA.PRO.inventory("ERP")
+[
+  {"ERP-STG-01", "ERP-STG-2025-001", "5HT Technology AllFlash NVMe Array (Sapphire Rapids Storage Controller)"},
+  {"ERP-STG-02", "ERP-STG-2025-002", "5HT Technology AllFlash NVMe Array"},
+  {"ERP-TAPE-01", "ERP-STG-2025-003", "HPE StoreEver MSL3040 Tape Library"},
+  {"ERP-WS-01", "ERP-WS-2025-001", "5HT Technology Workstation Compact (Sapphire Rapids)"},
+  {"ERP-WS-02", "ERP-WS-2025-002", "5HT Technology Workstation Compact (Sapphire Rapids)"},
+  {"ERP-KZI-01", "ERP-KZI-2025-001", "IIT Gryada-301 PCIe HSM"},
+  {"ERP-KZI-02", "ERP-KZI-2025-002", "IIT Gryada-301 PCIe HSM"},
+  {"ERP-KZI-03", "ERP-KZI-2025-003", "Автор CryptoCard Smart-01 (е-Токен, Смарт-карта)"},
+  {"ERP-NET-01", "ERP-NET-2025-001", "Cisco Catalyst 9500-48Y4C"},
+  {"ERP-NET-02", "ERP-NET-2025-002", "Cisco Catalyst 9500-48Y4C"},
+  {"ERP-NET-03", "ERP-NET-2025-003", "Cisco ASR 1002-HX Router"},
+  {"ERP-FW-01", "ERP-NET-2025-004", "Cisco Firepower 4145 NGFW (FTD 7.6)"},
+  {"ERP-FW-02", "ERP-NET-2025-005", "Cisco Firepower 4145 NGFW (FTD 7.6)"},
+  {"ERP-SRV-01", "ERP-2025-001", "5HT Technology Tristellar 3U"},
+  {"ERP-SRV-02", "ERP-2025-002", "5HT Technology Tristellar 3U"},
+  {"ERP-SRV-03", "ERP-2025-003", "5HT Technology Quadstellar 4U"},
+  {"ERP-SRV-04", "ERP-2025-004", "5HT Technology Quadstellar 4U"},
+  {"ERP-SRV-05", "ERP-2025-005", "5HT Technology Tristellar 3U"},
+  {"ERP-SRV-06", "ERP-2025-006", "5HT Technology Tristellar 3U"},
+  {"ERP-SRV-07", "ERP-2025-007", "5HT Technology Tristellar 3U"},
+  {"ERP-SRV-08", "ERP-2025-008", "5HT Technology Tristellar 3U"}
+]
+\end{verbatim}
+\selectlanguage{english}
+}
+
+\subsection{Role-Based Access Control (CA.PRO.roles)}
+The defined roles establish the baseline for the Attribute-Based Access Control (ABAC) and Role-Based Access Control (RBAC) mechanisms.
+{\scriptsize
+\selectlanguage{ukrainian}
+\begin{verbatim}
+iex> CA.PRO.roles("ERP")
+[
+  {"ROLE-ADM-01", "Адміністратор безпеки", ["security_admin"]},
+  {"ROLE-AUD-01", "Аудитор", ["auditor"]},
+  {"ROLE-OPR-01", "Оператор реєстрації", ["reg_operator"]},
+  {"ROLE-SYS-01", "Системний процес (Machine-to-Machine)", ["ocsp_service", "crl_generator"]},
+  {"ROLE-SADM-01", "Глобальний суперадміністратор (root/administrator)", ["global_root_admin", "infra_super_user"]}
+]
+\end{verbatim}
+\selectlanguage{english}
+}
+
+\subsection{Data Categorization (CA.PRO.data)}
+Data categorization ensures that sensitive information (e.g., PII, keys) is stored in the appropriate encypted and access-controlled repositories.
+{\scriptsize
+\selectlanguage{ukrainian}
+\begin{verbatim}
+iex> CA.PRO.data("ERP")
+[
+  {"DATA-PUB-01", "Публічні сертифікати та CRL", "Public CDN / web server"},
+  {"DATA-PUB-02", "Політики ЦСК (CPS, CP)", "Public web server"},
+  {"DATA-PII-01", "Реєстр підписників (паспорти, РНОКПП)", "Encrypted DB (PostgreSQL)"},
+  {"DATA-PII-02", "Адресні та контактні дані підписників", "Encrypted DB (PostgreSQL)"},
+  {"DATA-INT-01", "Внутрішні накази та регламенти", "Internal file server"},
+  {"DATA-INT-02", "Журнали аудиту (SIEM logs)", "SIEM (Elasticsearch)"},
+  {"DATA-KEY-01", "Кореневі та підпорядковані ключі ЦСК", "HSM (Гряда / IIT)"},
+  {"DATA-KEY-02", "Паролі та секрети адміністраторів", "Password Manager (Vault)"},
+  {"DATA-CRT-01", "Матеріали судових проваджень та ухвали", "Encrypted DB (Oracle / PostgreSQL)"},
+  {"DATA-CRT-02", "Електронні докази (обмежений доступ)", "Encrypted storage (Scality RING)"},
+  {"DATA-BKP-01", "Снапшоти БД та образи ВМ", "Tape Library (MSL3040)"},
+  {"DATA-BKP-02", "Офлайн-архіви судових документів", "Air-gapped Tape (offline)"}
+]
+\end{verbatim}
+\selectlanguage{english}
+}
+
+\subsection{Business Processes (CA.PRO.proc)}
+The documentation of business processes connects operational workflows with their responsible actors, ensuring accountability.
+{\scriptsize
+\selectlanguage{ukrainian}
+\begin{verbatim}
+iex> CA.PRO.proc("ERP")
+[
+  {"PROC-CERT-01", "Видача кваліфікованих сертифікатів", "Оператор реєстрації ЦСК"},
+  {"PROC-OCSP-01", "Формування OCSP-відповідей (24/7)", "Автоматичний сервіс ЦСК"},
+  {"PROC-AUDIT-01", "Логування та моніторинг подій безпеки", "Адміністратор безпеки / SIEM"},
+  {"PROC-ROOT-01", "Церемонія генерації кореневого ключа", "Комісія ЦСК (Dual Control)"},
+  {"PROC-DOC-01", "Реєстрація та розгляд судових справ", "Судова влада України / ДП ІСС"},
+  {"PROC-BKP-01", "Резервне копіювання та відновлення", "Адміністратор резервного копіювання"}
+]
+\end{verbatim}
+\selectlanguage{english}
+}
+
+\subsection{Network Architecture (CA.PRO.net)}
+The network segmentation profile details the logical separation of DMZ, internal, management, and air-gapped zones to prevent lateral movement.
+{\scriptsize
+\selectlanguage{ukrainian}
+\begin{verbatim}
+iex> CA.PRO.net("ERP")
+[
+  {"NET-DMZ-01", "OCSP / CRL публічний ендпоінт", "публічна підмережа"},
+  {"NET-DMZ-02", "Веб-портал ЦСК", "публічна підмережа"},
+  {"NET-INT-01", "Сегмент серверів БД", "внутрішня підмережа БД"},
+  {"NET-INT-02", "Сегмент робочих станцій операторів", "внутрішня підмережа АРМ"},
+  {"NET-MGT-01", "VLAN IPMI / iLO адміністрування", "management VLAN"},
+  {"NET-AIR-01", "Кореневий ЦСК (офлайн вузол)", "N/A"}
+]
+\end{verbatim}
+\selectlanguage{english}
+}
+
+\section{Conclusion}
+By treating the Information Security Management System (ISMS) and the KSZI documentation as "Infrastructure as Code" (IaC) via Elixir maps, ERPUNO LLC achieves a continuous, verifiable, and strictly compliant security posture. This approach significantly reduces the friction typically associated with DSSZZI and NIST audits by ensuring that the actual state of the system is always perfectly synchronized with its certified documentation.
+
+\end{document}
