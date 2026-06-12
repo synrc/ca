@@ -1,10 +1,8 @@
-\documentclass[12pt,a4paper]{article}
+\documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T2A,T1]{fontenc}
 \usepackage[english,ukrainian]{babel}
 \usepackage{hyperref}
-\usepackage{geometry}
-\geometry{a4paper, margin=1cm}
 
 \title{Building a Compliant Security Profile: ND TZI and NIST Certification for ERPUNO LLC}
 \author{ERPUNO Security Team}
@@ -19,8 +17,10 @@
 This article details the methodology for constructing a Comprehensive Information Security System (KSZI) that complies with Ukrainian state standards (ND TZI) and the international NIST SP 800-53 framework. Using ERPUNO LLC---a private system integrator of high-tech telecommunications products---and its e-government platform as a practical testbed, we demonstrate how to programmatically define, track, and audit a security profile. The approach utilizes Elixir-based Configuration Management Database (CMDB) profiles to maintain strict accountability over hardware, software, networks, data, roles, and risks.
 \end{abstract}
 
+\newpage
 \tableofcontents
 
+\newpage
 \section{Introduction}
 ERPUNO LLC provides high-tech telecommunication solutions for the automation of commercial and state enterprises. Their platform is architecturally divided into two primary layers:
 \begin{itemize}
@@ -32,6 +32,8 @@ The company's architecture is built to support critical state and defense sector
 
 In this paper, we demonstrate how to build a unified security profile for this complex architecture. The CMDB system maps operational instances directly to NIST SP 800-53 controls (such as CM-8 for System Component Inventory, PM-5 for System Inventory) and ND TZI requirements (e.g., ND TZI 3.7-003-2023 for inventory and exploitation documentation).
 
+
+\newpage
 \section{Beyond KSZI: A Continuous Accountability System (CMDB)}
 Traditional KSZI (Comprehensive Information Security Systems) are often treated as static, paper-based compliance artifacts. However, for ERPUNO LLC, we engineered the KSZI as a live, programmable \textbf{Configuration Management Database (CMDB)} and \textbf{Continuous Accountability System}.
 
@@ -73,6 +75,9 @@ The platform defines its auditable events explicitly within the CMDB outputs, en
 \subsubsection{IA-2: Identification and Authentication}
 Organizational users, administrators, and automated service accounts are uniquely identified and authenticated using strict multi-factor authentication (MFA) protocols, including PKI smart cards and OTP tokens. These identities are irrevocably tied to the \texttt{roles.ex} taxonomy, preventing identity spoofing and ensuring that every session is cryptographically bound to an authorized entity. The rigorous identity management protocol establishes a zero-trust foundation where no user is trusted inherently without verifiable cryptographic proof.
 
+\subsubsection{SA-5 \& PL-2: Automated System Documentation \& Security Plans}
+The most innovative aspect of the CMDB architecture is the fulfillment of SA-5 (System Documentation) and PL-2 (System Security Plan). Instead of maintaining static text documents, the entirety of the KSZI documentation---including the overarching security plans, asset registries, risk matrices, and this very PDF report---is automatically generated directly from the live Elixir source code. By compiling the current system state into documentation on demand via a "Documentation as Code" (DaC) paradigm, the organization completely eliminates the phenomenon of "documentation drift." This guarantees that auditors and state regulators always evaluate a 100\% accurate reflection of the deployed system, significantly reducing the cost and friction of DSSZZI and NIST compliance audits.
+
 \subsubsection{CP-9 \& CP-10: Information System Backup \& Recovery}
 The categorization of data assets within the CMDB directly governs the automated backup schedules. Critical databases and file stores are subjected to continuous replication, while sensitive offline archives are routed to air-gapped tape libraries (e.g., HPE StoreEver). This guarantees robust disaster recovery capabilities and strict protection against ransomware or catastrophic hardware failures. The recovery protocols ensure minimal recovery point objectives (RPO) and recovery time objectives (RTO), crucial for high-availability enterprise services.
 
@@ -102,6 +107,7 @@ The entire CMDB-driven approach aligns perfectly with the core tenets of an Info
 
 By transforming compliance into code, the CMDB guarantees that the operational reality of the infrastructure is continuously synchronized with the certified KSZI documentation.
 
+\newpage
 \section{Hierarchical Security Profiles (L1, L2, L3)}
 The system supports the automated construction of KSZI security profiles based on the regulatory and legal acts in the field of technical protection of information (TZI NPA). This automates documentation generation and the mapping of legislative requirements to technical settings. All certificates are issued with OID imprints of their respective security profiles.
 
@@ -141,6 +147,7 @@ According to the regulatory framework of Ukraine (e.g., ND TZI 2.6-001-11) and b
 
 This segregation guarantees that the organization creating the security profiles and writing the Elixir CMDB structures is legally and practically distinct from the organization auditing and approving them.
 
+\newpage
 \section{Programmatic Security Profiles}
 
 The following sections provide the complete execution traces of the CMDB profile extraction for the "ERP" system. These outputs demonstrate how the infrastructure is documented, maintained, and continuously monitored.
@@ -371,6 +378,7 @@ iex> CA.PRO.net("ERP")
 \selectlanguage{english}
 }
 
+\newpage
 \section{Conclusion}
 By treating the Information Security Management System (ISMS) and the KSZI documentation as "Infrastructure as Code" (IaC) via Elixir maps, ERPUNO LLC achieves a continuous, verifiable, and strictly compliant security posture. This approach significantly reduces the friction typically associated with DSSZZI and NIST audits by ensuring that the actual state of the system is always perfectly synchronized with its certified documentation.
 
