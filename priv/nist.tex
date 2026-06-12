@@ -4,7 +4,7 @@
 \usepackage[english,ukrainian]{babel}
 \usepackage{hyperref}
 
-\title{Building a Compliant Security Profile: ND TZI and NIST Certification for ERPUNO LLC}
+\title{Building a Compliant Security Profile: ND TZI and NIST Certification for ERPUNO, COURT and COD security profiles}
 \author{ERPUNO Security Team}
 \date{\today}
 
@@ -14,7 +14,11 @@
 \selectlanguage{english}
 
 \begin{abstract}
-This article details the methodology for constructing a Comprehensive Information Security System (KSZI) that complies with Ukrainian state standards (ND TZI) and the international NIST SP 800-53 framework. Using ERPUNO LLC---a private system integrator of high-tech telecommunications products---and its e-government platform as a practical testbed, we demonstrate how to programmatically define, track, and audit a security profile. The approach utilizes Elixir-based Configuration Management Database (CMDB) profiles to maintain strict accountability over hardware, software, networks, data, roles, and risks.
+This article details the methodology for constructing a Comprehensive Information Security System (KSZI) that complies with
+Ukrainian state standards (ND TZI) and the international NIST SP 800-53 framework. Using SYNRC/CA --- an open source CMDB
+we demonstrate how to programmatically define, track, and audit a security profile. The approach utilizes Elixir-based Configuration
+Management Database (CMDB) profiles to maintain strict accountability over hardware, software, networks, data, roles, and risks.
+For security reasons we can only demo/showcase of ERPUNO security (sample) profile.
 \end{abstract}
 
 \newpage
@@ -382,4 +386,38 @@ iex> CA.PRO.net("ERP")
 \section{Conclusion}
 By treating the Information Security Management System (ISMS) and the KSZI documentation as "Infrastructure as Code" (IaC) via Elixir maps, ERPUNO LLC achieves a continuous, verifiable, and strictly compliant security posture. This approach significantly reduces the friction typically associated with DSSZZI and NIST audits by ensuring that the actual state of the system is always perfectly synchronized with its certified documentation.
 
+
+\newpage
+\section{Codebase Overview for Copyright Registration}
+The entire Configuration Management Database (CMDB), Continuous Accountability System, and PKI Certificate Authority components discussed in this document are implemented as a cohesive software suite. This software suite forms the basis for the formal registration of the copyright work.
+
+The core architectural blocks of the codebase include:
+\begin{itemize}
+    \item \textbf{SYS-SYNRC-CA}: The central Certificate Authority and HSM backend responsible for issuing X.509 certificates, OCSP, CRLs, and managing the entire PKI lifecycle via ACME and EST protocols.
+    \item \textbf{CMDB Profiles}: The declarative Elixir modules defining the precise state of hardware (\texttt{hw.ex}), network topology (\texttt{net.ex}), and system applications (\texttt{sys.ex}).
+    \item \textbf{Policy and Risk Engines}: Modules responsible for automated data categorization (\texttt{data.ex}), dynamic risk taxonomies (\texttt{risk.ex}), and strict role-based/attribute-based access controls (\texttt{roles.ex}, \texttt{abac.ex}).
+\end{itemize}
+
+The software is continuously developed, documented, and published at the following official resources:
+\begin{itemize}
+    \item \textbf{Source Code Repository}: \url{https://github.com/synrc/ca}
+    \item \textbf{Official Product Portal}: \url{https://erp.uno/ca/}
+    \item \textbf{Developer Documentation}: \url{https://ca.n2o.dev}
+\end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{nist53} 
+National Institute of Standards and Technology. \textit{Security and Privacy Controls for Information Systems and Organizations}. NIST Special Publication 800-53, Revision 5.
+
+\bibitem{ndtzi37} 
+\foreignlanguage{ukrainian}{Державна служба спеціального зв'язку та захисту інформації України. \textit{НД ТЗІ 3.7-003-2023. Порядок проведення державної експертизи в сфері технічного захисту інформації}.}
+
+\bibitem{ndtzi25} 
+\foreignlanguage{ukrainian}{Державна служба спеціального зв'язку та захисту інформації України. \textit{НД ТЗІ 2.5-004-99. Критерії оцінки захищеності інформації в комп'ютерних системах від несанкціонованого доступу}.}
+
+\bibitem{iso27001} 
+International Organization for Standardization. \textit{ISO/IEC 27001:2022. Information security, cybersecurity and privacy protection — Information security management systems — Requirements}.
+\end{thebibliography}
+
 \end{document}
+
