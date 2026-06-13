@@ -3,9 +3,22 @@ defmodule CA.SPE do
 
   # --- TOP-LEVEL: ERP.UNO, N2O.DEV, SYNRC.COM ---
 
+  # {24, "ПОЛІТИКА ТА ПРОЦЕДУРИ УПРАВЛІННЯ ДОСТУПОМ (AC-1)"},
+  # {36, "УПРАВЛІННЯ ОБЛІКОВИМИ ЗАПИСАМИ (AC-2)"},
+  # {2,  "УПРАВЛІННЯ ОБЛІКОВИМИ ЗАПИСАМИ - АВТОМАТИЗОВАНЕ УПРАВЛІННЯ ОБЛІКОВИМИ ЗАПИСАМИ СИСТЕМИ (AC-2(1))"},
+
   def controls do
       CA.PRO.terminal_width()
-      :lists.map(fn x -> case :erlang.length(:erlang.tuple_to_list(x)) do 9 -> {1,CA.SPE.lookup(x)} ; 10 -> {2,CA.SPE.lookup(x)} ; 11 -> {3,CA.SPE.lookup(x)} end end, CA.Profile.Data.controls)
+      :lists.map(fn y ->
+        x = y.id
+        p = :erlang.length(y.parameters)
+        s = oid(x)
+        case :erlang.length(:erlang.tuple_to_list(s)) do
+              9 -> {p,CA.SPE.lookup(s)}
+             10 -> {p,CA.SPE.lookup(s)}
+             11 -> {p,CA.SPE.lookup(s)}
+        end
+      end, CA.Profile.Data.specs)
   end
 
   def lookup({1, 2, 804, 3, 1, 2, 1, 100, 1}),         do: "УПРАВЛІННЯ ДОСТУПОМ (AC)"
