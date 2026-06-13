@@ -690,7 +690,7 @@ defmodule CA.SPE do
   def lookup({1, 2, 804, 3, 1, 2, 1, 100, 11, 22}),    do: "МАРКУВАННЯ КОМПОНЕНТІВ (PE-22)"
   def lookup({1, 2, 804, 3, 1, 2, 1, 100, 11, 23}),    do: "РОЗТАШУВАННЯ ОБʼЄКТА (PE-23)"
 
-  # --- PL Block Descriptions ---
+  # --- PL Block Descriptions --- Volume III.
 
   # --- synrc/ca ---
 
