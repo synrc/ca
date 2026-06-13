@@ -443,10 +443,10 @@ defmodule CA.PRO do
     end
   end
 
-  defp terminal_width do
+  def terminal_width do
     width = case :io.columns() do
-      {:ok, w} when w > 0 -> w + 20
-      _ -> 120
+      {:ok, w} when w > 0 -> w + 50
+      _ -> 200
     end
 
     if Process.whereis(IEx.Config) do
