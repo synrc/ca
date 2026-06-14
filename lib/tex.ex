@@ -672,36 +672,36 @@ defmodule CA.TeX do
 
               params = Enum.zip(desc_list, params_list)
 
+              safe_desc = spec.description |> escape_latex() |> String.replace("\\\\ \n", "\\newline ")
+
               if params == [] do
-                safe_desc = spec.description |> escape_latex() |> String.replace("\\\\ \n", "\\newline ")
                 "#{col1} & #{col2} & #{safe_desc} & #{escape_latex(cid)} & \\\\ #{line_cmd}\n"
               else
-                params
-                |> Enum.with_index()
-                |> Enum.map(fn {{d, p}, p_idx} ->
-                  c1 = if p_idx == 0, do: col1, else: ""
-                  c2 = if p_idx == 0, do: col2, else: ""
-                  c4 = if p_idx == 0, do: escape_latex(cid), else: ""
-                  lcmd = if p_idx == length(params) - 1, do: line_cmd, else: "\\cline{3-5}"
+                control_row = "#{col1} & #{col2} & #{safe_desc} & #{escape_latex(cid)} & \\\\ \\cline{3-5}\n"
 
-                  chunks = String.split(d, "; ")
-
-                  chunks
+                param_rows =
+                  params
                   |> Enum.with_index()
-                  |> Enum.map(fn {chunk, chunk_idx} ->
-                    cx1 = if chunk_idx == 0, do: c1, else: ""
-                    cx2 = if chunk_idx == 0, do: c2, else: ""
-                    cx4 = if chunk_idx == 0, do: c4, else: ""
-                    cx5 = if chunk_idx == 0, do: p, else: ""
+                  |> Enum.map(fn {{d, p}, p_idx} ->
+                    lcmd = if p_idx == length(params) - 1, do: line_cmd, else: "\\cline{3-5}"
 
-                    chunk_text = if chunk_idx == length(chunks) - 1, do: chunk, else: chunk <> ";"
-                    lcmd_inner = if chunk_idx == length(chunks) - 1, do: lcmd, else: ""
+                    chunks = String.split(d, "; ")
 
-                    "#{cx1} & #{cx2} & #{chunk_text} & #{cx4} & #{cx5} \\\\ #{lcmd_inner}\n"
+                    chunks
+                    |> Enum.with_index()
+                    |> Enum.map(fn {chunk, chunk_idx} ->
+                      cx5 = if chunk_idx == 0, do: p, else: ""
+
+                      chunk_text = if chunk_idx == length(chunks) - 1, do: chunk, else: chunk <> ";"
+                      lcmd_inner = if chunk_idx == length(chunks) - 1, do: lcmd, else: ""
+
+                      " &  & #{chunk_text} &  & #{cx5} \\\\ #{lcmd_inner}\n"
+                    end)
+                    |> Enum.join("")
                   end)
                   |> Enum.join("")
-                end)
-                |> Enum.join("")
+
+                control_row <> param_rows
               end
             end)
             |> Enum.join("")
