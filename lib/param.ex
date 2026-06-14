@@ -20,7 +20,7 @@ defmodule Param do
           {name, _} -> name
           _ -> nil
         end) |> Enum.reject(&is_nil/1)
-        
+
         dups = keys -- Enum.uniq(keys) |> Enum.uniq()
         if length(dups) > 0 do
           Enum.map(dups, fn dup -> {spec.id, dup} end)

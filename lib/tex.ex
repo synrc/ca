@@ -208,13 +208,15 @@ defmodule CA.TeX do
               else: ""
 
           ai_summary = CA.FamilyDescriptions.get_summary(family_atom)
-          ai_text = if ai_summary != "", do: escape_latex(ai_summary) <> "\n\n", else: ""
+          ai_text = if ai_summary != "", do: "\\paragraph{Опис}
+" <> escape_latex(ai_summary) <> "\n\n", else: ""
 
           children_text = CA.FamilyDescriptions.get_children_text(family_atom, profile_specs)
 
           children_str =
             if children_text != "",
-              do: "\\textbf{Перелік заходів захисту:} " <> escape_latex(children_text) <> "\n\n",
+              do: "\\paragraph{Перелік заходів захисту}
+" <> escape_latex(children_text) <> "\n\n",
               else: ""
 
           {"\\section{#{family}}\n#{family_desc}#{ai_text}#{children_str}" <> formatted, family}
