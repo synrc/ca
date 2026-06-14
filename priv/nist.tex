@@ -21,6 +21,7 @@ Management Database (CMDB) profiles to maintain strict accountability over hardw
 For security reasons we can only demo/showcase of ERPUNO security (sample) profile.
 \end{abstract}
 
+\setcounter{tocdepth}{2}
 \newpage
 \tableofcontents
 
@@ -36,13 +37,50 @@ The company's architecture is built to support critical state and defense sector
 
 In this paper, we demonstrate how to build a unified security profile for this complex architecture. The CMDB system maps operational instances directly to NIST SP 800-53 controls (such as CM-8 for System Component Inventory, PM-5 for System Inventory) and ND TZI requirements (e.g., ND TZI 3.7-003-2023 for inventory and exploitation documentation).
 
+\subsection{Hierarchical Security Profiles (L1, L2, L3)}
+The system supports the automated construction of KSZI security profiles based on the regulatory and legal acts in the field of technical protection of information (TZI NPA). This automates documentation generation and the mapping of legislative requirements to technical settings. All certificates are issued with OID imprints of their respective security profiles.
+
+The architecture is divided into three levels of profiles:
+
+\subsubsection{L1: Basic Security Profiles}
+These profiles define the fundamental sets of controls required by the regulations.
+\begin{itemize}
+    \item \textbf{SECURITY POLICIES}\footnote{\url{https://ca.n2o.dev/priv/security-profiles.pdf}}
+    \item \textbf{FULL DIRECTORY (1123)}\footnote{\url{https://ca.n2o.dev/priv/bible_profile.pdf}}
+    \item \textbf{OPEN CONFIDENTIAL (126)}\footnote{\url{https://ca.n2o.dev/priv/legal_l1_profile_409.pdf}}
+    \item \textbf{OFFICIAL (155)}\footnote{\url{https://ca.n2o.dev/priv/legal_l1_profile_419.pdf}}
+\end{itemize}
+
+\subsubsection{L2: Industry Profiles}
+Industry-specific adaptations that expand upon the baseline controls to meet the requirements of specific sectors.
+\begin{itemize}
+    \item \textbf{COURT INDUSTRY PROFILE}\footnote{\url{https://ca.n2o.dev/priv/legal_l2_court_profile.pdf}}: Industry security profile for the judicial system. It describes an extended set of baseline controls for processing sensitive information in state registries and courts, taking into account the requirements for high availability and data integrity based on ND TZI 3.6-006-24.
+    \item \textbf{THE DIGITAL UKRAINIAN GOVERNMENT INDUSTRY PROFILE}\footnote{\url{https://ca.n2o.dev/priv/digital-profile.pdf}}: Industry security profile for the Ministry of Digital Transformation of Ukraine.
+\end{itemize}
+
+\subsubsection{L3: Target Security Profiles}
+Specific implementation targets for individual systems and components.
+\begin{itemize}
+    \item \textbf{ERP/1 SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/legal_l3_profile_erp.pdf}}: Target profile for the ERP/1 telecommunications system. Describes the implementation of Attribute-Based Access Control (ABAC), information flow management (BPE), Public Key Infrastructure (PKI), and reliable auditing (KVS) for securing critical business processes.
+    \item \textbf{X.509 CMS MESSAGING SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/chat_profile.pdf}}: Target profile for corporate messenger systems. Based on X.509 and CMS (Cryptographic Message Syntax) cryptographic protocols, providing end-to-end encryption (E2EE), strict authentication, and non-repudiation for legally significant communications.
+    \item \textbf{VPN SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/vpn_profile.pdf}}: Target profile for Virtual Private Network (VPN) and PKI infrastructures. Defines mechanisms for tunneling, node authentication (SC-8), and network traffic protection at the transport layer to secure communication channels against interception and modification.
+\end{itemize}
+
+\subsection{Segregation of Duties: The Two-Stage KSZI Certification Process}
+According to the regulatory framework of Ukraine (e.g., ND TZI 2.6-001-11) and best global practices (the \textit{Maker/Checker} principle), building and certifying a Comprehensive Information Security System (KSZI) is strictly a \textbf{two-stage procedure}. It requires the involvement of two completely independent licensed providers to eliminate any conflict of interest.
+
+\begin{itemize}
+    \item \textbf{Stage 1: The Developer (Provider 1).} The first provider performs the risk assessment, inspects the environment, and creates the "technical instructions" --- the \textbf{Target Security Profile (Technical Specification)}. This provider is also responsible for the physical implementation of the security architecture: configuring cryptography, setting up the Reference Monitor (AC-25), installing certificates, and delivering the system into trial operation.
+    \item \textbf{Stage 2: The Expertise Organizer (Provider 2).} The second provider receives the Technical Specification from the Developer and designs the \textbf{Expertise Program}. This provider conducts an independent technical audit, instrumental testing, and live verification of all implemented controls. Upon successful verification, they issue the Expert Conclusion for the State Service of Special Communications and Information Protection (DSSZZI).
+\end{itemize}
+
+This segregation guarantees that the organization creating the security profiles and writing the Elixir CMDB structures is legally and practically distinct from the organization auditing and approving them.
 
 \newpage
-\section{Beyond KSZI: A Continuous Accountability System (CMDB)}
+\section{Metainformational Security Profile (CMDB)}
 Traditional KSZI (Comprehensive Information Security Systems) are often treated as static, paper-based compliance artifacts. However, for ERPUNO LLC, we engineered the KSZI as a live, programmable \textbf{Configuration Management Database (CMDB)} and \textbf{Continuous Accountability System}.
 
 This system is inherently built into the source code using Elixir modules (e.g., \texttt{hw.ex}, \texttt{sys.ex}, \texttt{net.ex}). The core Certificate Authority (\texttt{SYS-SYNRC-CA}) acts not only as the PKI infrastructure but also as the central registry for this accountability system. The profile of this system explicitly implements the following security controls:
-
 
 \subsection{Detailed NIST SP 800-53 Rev.5 Control Integrations}
 
@@ -112,51 +150,11 @@ The entire CMDB-driven approach aligns perfectly with the core tenets of an Info
 By transforming compliance into code, the CMDB guarantees that the operational reality of the infrastructure is continuously synchronized with the certified KSZI documentation.
 
 \newpage
-\section{Hierarchical Security Profiles (L1, L2, L3)}
-The system supports the automated construction of KSZI security profiles based on the regulatory and legal acts in the field of technical protection of information (TZI NPA). This automates documentation generation and the mapping of legislative requirements to technical settings. All certificates are issued with OID imprints of their respective security profiles.
-
-The architecture is divided into three levels of profiles:
-
-\subsection{L1: Basic Security Profiles}
-These profiles define the fundamental sets of controls required by the regulations.
-\begin{itemize}
-    \item \textbf{SECURITY POLICIES}\footnote{\url{https://ca.n2o.dev/priv/security-profiles.pdf}}
-    \item \textbf{FULL DIRECTORY (950)}\footnote{\url{https://ca.n2o.dev/priv/bible_profile.pdf}}
-    \item \textbf{OPEN CONFIDENTIAL (126)}\footnote{\url{https://ca.n2o.dev/priv/legal_l1_profile_409.pdf}}
-    \item \textbf{OFFICIAL (155)}\footnote{\url{https://ca.n2o.dev/priv/legal_l1_profile_419.pdf}}
-\end{itemize}
-
-\subsection{L2: Industry Profiles}
-Industry-specific adaptations that expand upon the baseline controls to meet the requirements of specific sectors.
-\begin{itemize}
-    \item \textbf{COURT INDUSTRY PROFILE}\footnote{\url{https://ca.n2o.dev/priv/legal_l2_court_profile.pdf}}: Industry security profile for the judicial system. It describes an extended set of baseline controls for processing sensitive information in state registries and courts, taking into account the requirements for high availability and data integrity based on ND TZI 3.6-006-24.
-    \item \textbf{THE DIGITAL UKRAINIAN GOVERNMENT INDUSTRY PROFILE}\footnote{\url{https://ca.n2o.dev/priv/digital-profile.pdf}}: Industry security profile for the Ministry of Digital Transformation of Ukraine.
-\end{itemize}
-
-\subsection{L3: Target Security Profiles}
-Specific implementation targets for individual systems and components.
-\begin{itemize}
-    \item \textbf{ERP/1 SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/legal_l3_profile_erp.pdf}}: Target profile for the ERP/1 telecommunications system. Describes the implementation of Attribute-Based Access Control (ABAC), information flow management (BPE), Public Key Infrastructure (PKI), and reliable auditing (KVS) for securing critical business processes.
-    \item \textbf{X.509 CMS MESSAGING SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/chat_profile.pdf}}: Target profile for corporate messenger systems. Based on X.509 and CMS (Cryptographic Message Syntax) cryptographic protocols, providing end-to-end encryption (E2EE), strict authentication, and non-repudiation for legally significant communications.
-    \item \textbf{VPN SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/vpn_profile.pdf}}: Target profile for Virtual Private Network (VPN) and PKI infrastructures. Defines mechanisms for tunneling, node authentication (SC-8), and network traffic protection at the transport layer to secure communication channels against interception and modification.
-\end{itemize}
-
-\section{Segregation of Duties: The Two-Stage KSZI Certification Process}
-According to the regulatory framework of Ukraine (e.g., ND TZI 2.6-001-11) and best global practices (the \textit{Maker/Checker} principle), building and certifying a Comprehensive Information Security System (KSZI) is strictly a \textbf{two-stage procedure}. It requires the involvement of two completely independent licensed providers to eliminate any conflict of interest.
-
-\begin{itemize}
-    \item \textbf{Stage 1: The Developer (Provider 1).} The first provider performs the risk assessment, inspects the environment, and creates the "technical instructions" --- the \textbf{Target Security Profile (Technical Specification)}. This provider is also responsible for the physical implementation of the security architecture: configuring cryptography, setting up the Reference Monitor (AC-25), installing certificates, and delivering the system into trial operation.
-    \item \textbf{Stage 2: The Expertise Organizer (Provider 2).} The second provider receives the Technical Specification from the Developer and designs the \textbf{Expertise Program}. This provider conducts an independent technical audit, instrumental testing, and live verification of all implemented controls. Upon successful verification, they issue the Expert Conclusion for the State Service of Special Communications and Information Protection (DSSZZI).
-\end{itemize}
-
-This segregation guarantees that the organization creating the security profiles and writing the Elixir CMDB structures is legally and practically distinct from the organization auditing and approving them.
-
-\newpage
-\section{Programmatic Security Profiles}
+\subsection{Security Evaluation Framework}
 
 The following sections provide the complete execution traces of the CMDB profile extraction for the "ERP" system. These outputs demonstrate how the infrastructure is documented, maintained, and continuously monitored.
 
-\subsection{Risk Assessment (CA.PRO.risk)}
+\subsubsection{Risk Assessment (CA.PRO.risk)}
 The risk taxonomy enumerates the identified threats and binds them to the corresponding security control families.
 {\scriptsize
 \selectlanguage{ukrainian}
@@ -221,7 +219,7 @@ iex> CA.PRO.risk("ERP")
 \selectlanguage{english}
 }
 
-\subsection{System Software Components (CA.PRO.sys)}
+\subsubsection{System Software Components (CA.PRO.sys)}
 The system inventory documents all OS, middleware, platform, and application-level software components running in the environment, satisfying NIST CM-8 and PM-5.
 {\scriptsize
 \selectlanguage{ukrainian}
@@ -272,7 +270,7 @@ iex> CA.PRO.sys("ERP")
 \selectlanguage{english}
 }
 
-\subsection{Hardware Inventory (CA.PRO.inventory)}
+\subsubsection{Hardware Inventory (CA.PRO.inventory)}
 The hardware inventory explicitly tracks physical assets, cryptographic modules (HSMs), network appliances, and storage arrays.
 {\scriptsize
 \selectlanguage{ukrainian}
@@ -305,7 +303,7 @@ iex> CA.PRO.inventory("ERP")
 \selectlanguage{english}
 }
 
-\subsection{Role-Based Access Control (CA.PRO.roles)}
+\subsubsection{Role-Based Access Control (CA.PRO.roles)}
 The defined roles establish the baseline for the Attribute-Based Access Control (ABAC) and Role-Based Access Control (RBAC) mechanisms.
 {\scriptsize
 \selectlanguage{ukrainian}
@@ -322,7 +320,7 @@ iex> CA.PRO.roles("ERP")
 \selectlanguage{english}
 }
 
-\subsection{Data Categorization (CA.PRO.data)}
+\subsubsection{Data Categorization (CA.PRO.data)}
 Data categorization ensures that sensitive information (e.g., PII, keys) is stored in the appropriate encypted and access-controlled repositories.
 {\scriptsize
 \selectlanguage{ukrainian}
@@ -346,7 +344,7 @@ iex> CA.PRO.data("ERP")
 \selectlanguage{english}
 }
 
-\subsection{Business Processes (CA.PRO.proc)}
+\subsubsection{Business Processes (CA.PRO.proc)}
 The documentation of business processes connects operational workflows with their responsible actors, ensuring accountability.
 {\scriptsize
 \selectlanguage{ukrainian}
@@ -364,7 +362,7 @@ iex> CA.PRO.proc("ERP")
 \selectlanguage{english}
 }
 
-\subsection{Network Architecture (CA.PRO.net)}
+\subsubsection{Network Architecture (CA.PRO.net)}
 The network segmentation profile details the logical separation of DMZ, internal, management, and air-gapped zones to prevent lateral movement.
 {\scriptsize
 \selectlanguage{ukrainian}
@@ -383,393 +381,394 @@ iex> CA.PRO.net("ERP")
 }
 
 
-
 \newpage
-\selectlanguage{ukrainian}
 \newpage
-\section{ERP/1: Відповідність повному стеку контролів NIST SP 800-53}
+\section{Technical Security Profile: ERP/1 Control-by-Control NIST SP 800-53 Compliance}
 
-Наступний розділ є повним поконтрольним науковим аналізом того, яким чином компоненти платформи ERP/1 (екосистема \texttt{ERP.UNO}, \texttt{N2O.DEV}, \texttt{SYNRC.COM}) природно та архітектурно закривають вимоги NIST SP 800-53 Rev.5 та НД ТЗІ 2.3-025-24.
-Кожен продукт платформи є цільовим рішенням для конкретного домену безпеки, що забезпечує максимально органічне, без "натяжок", виконання стандарту. Аналіз охоплює всі 20 сімейств контролів: AC, AT, AU, CA, CM, CP, IA, IR, MA, MP, PE, PL, PM, PS, PT, RA, SA, SC, SI, SR.
-
-% =========================================================
-\subsection{Клас AC: Управління доступом}
-% =========================================================
-\subsubsection{\texttt{zencrypted/ias}: AC-2 — Управління обліковими записами}
-
-Сервер \texttt{ias} (Identity and Access Server) є центральним Identity Provider (IdP) платформи, який реалізує весь життєвий цикл облікових записів через єдиний програмний інтерфейс. На відміну від розрізнених LDAP-директорій, \texttt{ias} оперує декларативними профілями користувачів, безпосередньо пов'язаними з реєстром ролей \texttt{roles.ex}.
-
-\textbf{AC-2(1) — Автоматизоване управління обліковими записами системи.}
-\texttt{ias} підтримує SCIM 2.0 (System for Cross-domain Identity Management) для автоматичної синхронізації стану облікових записів між підсистемами. При надходженні події від HR-модуля (наприклад, ERP/EDU або ERP/HEALTH), \texttt{ias} автоматично виконує provisioning або de-provisioning без ручного втручання, гарантуючи відповідність вимогам Joiner-Mover-Leaver (JML).
-
-\textbf{AC-2(2) — Видалення тимчасових та екстрених облікових записів.}
-Тимчасові облікові записи у \texttt{ias} мають обов'язкові поля \texttt{expires\_at} та \texttt{account\_type: :temporary}. Фоновий планувальник (реалізований засобами Erlang/OTP \texttt{:timer}) щогодини інспектує базу та автоматично деактивує протерміновані записи. Встановлення часу існування є обов'язковим параметром при створенні тимчасового запису.
-
-\textbf{AC-2(3) — Деактивація неактивних облікових записів.}
-Сервер \texttt{ias} зберігає мітку \texttt{last\_seen\_at} для кожного сеансу. Якщо значення перевищує конфігурований поріг (за замовчуванням 90 днів), запис переводиться у стан \texttt{:inactive} з автоматичним відправленням сповіщення адміністратору безпеки.
-
-\textbf{AC-2(4) — Дії при автоматизованому аудиті.}
-Будь-яка зміна стану облікового запису (створення, зміна привілеїв, деактивація, видалення) генерує підписаний запис у журналі аудиту \texttt{kvs} через event sourcing. Це забезпечує незмінний, криптографічно захищений слід усіх адміністративних дій.
-
-\textbf{AC-2(5) — Вихід із системи за відсутності активності.}
-\texttt{ias} централізовано керує тривалістю сесій. Налаштування \texttt{session\_idle\_timeout} є глобальним параметром і може бути перевизначений на рівні ролі (наприклад, для адміністраторів — жорсткіший ліміт 15 хвилин).
-
-\textbf{AC-2(6) — Динамічне управління привілеями.}
-Оскільки \texttt{ias} інтегрований з \texttt{erpuno/abac}, привілеї є не статичними атрибутами профілю, а динамічно обчислюваними рішеннями Policy Decision Point. Це означає, що підвищені привілеї (наприклад, режим адміністратора для критичних операцій) активуються тільки на час конкретного сеансу та для конкретного ресурсу.
-
-\textbf{AC-2(7) — Схеми, засновані на ролях.}
-Інтеграція \texttt{ias} з \texttt{roles.ex} дозволяє ієрархічно організовувати ролі (RBAC). Рольові шаблони наслідуються: роль \texttt{auditor} автоматично отримує всі права батьківської ролі \texttt{read\_only}, не потребуючи дублювання правил.
-
-\textbf{AC-2(8) — Динамічне управління обліковими записами.}
-Для сервісних облікових записів (machine-to-machine) \texttt{ias} підтримує OAuth 2.0 Client Credentials з короткоживучими токенами (TTL 15 хвилин). Сервіси не мають постійного пароля, що унеможливлює витік довгострокових секретів.
-
-\textbf{AC-2(9) — Обмеження на використання спільних облікових записів.}
-Архітектура \texttt{ias} не дозволяє створення "спільних" (shared) облікових записів за замовчуванням. Кожен суб'єкт — особа або сервіс — має унікальний криптографічний ідентифікатор, що зв'язаний з сертифікатом X.509, виданим \texttt{synrc/ca}.
-
-\textbf{AC-2(10) — Зміна даних спільних та групових облікових записів.}
-Для технічних групових записів (наприклад, \texttt{ocsp\_service}) \texttt{ias} реалізує механізм "ротації секрету" через кожну зміну складу групи, автоматично генеруючи нову пару ключів через \texttt{synrc/ca}.
-
-\textbf{AC-2(11) — Умови використання.}
-При вході в систему \texttt{ias} перевіряє актуальність прийнятих правил використання. Якщо версія \texttt{terms\_of\_service\_version} у профілі не збігається з поточною, доступ блокується до підтвердження нових умов.
-
-\textbf{AC-2(12) — Моніторинг нетипового використання облікових записів.}
-Поведінкові метрики (частота запитів, географія, нетипові години) агрегуються \texttt{ias} та передаються до SIEM (Wazuh). При перевищенні поведінкового базового рівня автоматично створюється інцидент в \texttt{erpuno/itsm}.
-
-\textbf{AC-2(13) — Деактивація облікових записів осіб з високим рівнем ризику.}
-Інтеграція з SIEM дозволяє \texttt{ias} отримувати webhook-сигнали про компрометацію. При отриманні сигналу \texttt{high\_risk\_account\_detected} відповідний профіль переводиться у \texttt{:suspended} протягом секунди, незалежно від поточних активних сесій.
-
-\subsubsection{\texttt{zencrypted/ias}: AC-7 — Невдалі спроби входу}
-\textbf{AC-7 (базовий контроль).}
-\texttt{ias} веде лічильник невдалих спроб автентифікації з прив'язкою до суб'єкта та IP-адреси. Після конфігурованого порогу (за замовчуванням 5 спроб за 10 хвилин) обліковий запис тимчасово блокується (account lockout) з автоматичним сповіщенням адміністратора.
-
-\textbf{AC-7(2) — Очищення або стирання мобільного пристрою.}
-При отриманні сигналу від MDM-системи (Mobile Device Management) про крадіжку або компрометацію пристрою, \texttt{ias} негайно відкликає всі токени та сертифікати, асоційовані з цим пристроєм, через механізм OCSP revocation у \texttt{synrc/ca}.
-
-\subsubsection{\texttt{synrc/ca}: AC-3 — Забезпечення доступу}
-
-Модуль \texttt{synrc/ca} реалізує Reference Monitor (AC-25) — централізований контрольний механізм, який верифікує кожне звернення до захищеного ресурсу на основі X.509-сертифікатів та ABAC-політик.
-
-\textbf{AC-3(3) — Мандатне управління доступом.}
-\texttt{synrc/ca} підтримує мітки класифікації даних (Data Labels) у розширеннях X.509-сертифікатів. Це дозволяє реалізувати мандатний (Mandatory Access Control) принцип: сертифікат із рівнем допуску \texttt{confidential} не може отримати доступ до ресурсу, позначеного \texttt{secret}, навіть якщо RBAC-правило це формально дозволяє.
-
-\textbf{AC-3(4) — Дискреційне управління доступом.}
-Власники ресурсів можуть делегувати права доступу через механізм атрибутованих токенів \texttt{ias}, що реалізує класичну модель DAC (Discretionary Access Control). Делегування завжди обмежене рамками власних повноважень делегуючого суб'єкта.
-
-\textbf{AC-3(7) — Управління доступом на основі ролей.}
-RBAC реалізований на рівні розширень X.509, де поле \texttt{SubjectAlternativeName} містить URN ролей. Це означає, що роль криптографічно прив'язана до особи та підтверджена цифровим підписом кореневого ЦСК, унеможливлюючи підробку або підміну ролі.
-
-\textbf{AC-3(10) — Перевірка доступу на основі заявок.}
-Для сервісів, що використовують JWT або SAML, \texttt{ias} генерує підписані заявки (claims) з терміном дії. \texttt{synrc/ca} виступає Authority, що видає короткострокові assertion-токени, верифікація яких не потребує запиту до IdP (stateless verification).
-
-\textbf{AC-3(11) — Вимоги до ізоляції програм.}
-Ізоляція між тенантами ERP/1 (наприклад, між різними судами або відомствами) реалізована на рівні namespace у Kubernetes та унікальних кореневих сертифікатів для кожного тенанта, виданих \texttt{synrc/ca}.
-
-\textbf{AC-3(12) — Атрибути доступу.}
-Рішення про доступ \texttt{abac} враховує набір атрибутів: \texttt{subject.role}, \texttt{subject.clearance}, \texttt{resource.classification}, \texttt{action.type}, \texttt{environment.time}, \texttt{environment.network\_zone}. Це забезпечує контекстно-залежний доступ відповідно до принципу Zero Trust.
-
-\textbf{AC-3(13) — Атрибути суб'єкта та об'єкта.}
-Атрибути суб'єктів зберігаються у \texttt{ias} та \texttt{synrc/ca}, атрибути ресурсів — у метаданих KVS. \texttt{abac} отримує їх у момент прийняття рішення, що гарантує актуальність атрибутів навіть при частих змінах контексту.
-
-\textbf{AC-3(15) — Дискреційний та обов'язковий доступ.}
-Система підтримує одночасну дію двох моделей: MAC (на основі класифікаційних міток у X.509) та DAC (делегування через \texttt{ias}). Пріоритет завжди за MAC: якщо мандатна мітка забороняє доступ, DAC-правило не може його відкрити.
-
-\subsubsection{\texttt{synrc/bpmn}: AC-4 — Управління інформаційними потоками}
-
-BPMN-рушій \texttt{synrc/bpmn} є центральним оркестратором бізнес-процесів, і саме через нього проходять всі інформаційні потоки між компонентами платформи.
-
-\textbf{AC-4 (базовий).}
-Кожен перехід даних між задачами бізнес-процесу (BPMN Task) є підконтрольним подією. \texttt{bpmn} реалізує "інформаційні шлюзи" — вузли процесу, що перевіряють класифікацію даних перед передачею між сегментами мережі або між тенантами.
-
-\textbf{AC-4(1) — Атрибути безпеки об'єкту.}
-Артефакти (документи, справи), що передаються між задачами, мають обов'язковий атрибут \texttt{data\_classification}. BPMN-шлюз відхиляє передачу, якщо класифікація артефакту не збігається з дозволеним рівнем цільового сегменту процесу.
-
-\textbf{AC-4(4) — Перевірка вмісту даних.}
-На межах між організаційними одиницями \texttt{bpmn} виконує схемну валідацію переданих документів (JSON Schema, XSD) та верифікацію підписів CMS/XAdES перед продовженням процесу.
-
-\subsubsection{\texttt{erpuno/abac}: AC-5 та AC-6 — Розмежування та мінімізація повноважень}
-
-\textbf{AC-5 — Розмежування обов'язків.}
-\texttt{abac} реалізує Separation of Duties (SoD) через декларативні XACML-подібні правила, що вказують множини взаємовиключних ролей (SSD: Static Separation of Duties). Наприклад, одна й та сама особа не може мати ролі \texttt{initiator} та \texttt{approver} для фінансових транзакцій. Правила SoD верифікуються не лише при виконанні дії, але й при призначенні ролі — система відхиляє призначення, що призвело б до конфлікту.
-
-\textbf{AC-6 — Мінімізація повноважень.}
-Базовий принцип \texttt{abac}: за замовчуванням доступ заборонений (Default Deny). Дозвіл видається лише за наявності явного, позитивного відповідного правила. Правила мають мінімально необхідну область застосування (scope) — вони прив'язані до конкретного ресурсу, дії та контексту.
-
-\textbf{AC-6(1) — Надання привілеїв на основі атрибутів.}
-Замість статичного надання прав, \texttt{abac} обчислює привілеї динамічно на основі поточних атрибутів суб'єкта та контексту. Підвищені права (наприклад, операції в режимі BreakGlass) є тимчасовими та автоматично відкликаються після завершення критичної операції.
-
-\textbf{AC-6(2) — Non-Privileged Access for Non-Security Functions.}
-\texttt{abac} забезпечує, що адміністративні ролі (наприклад, \texttt{security\_admin}) за замовчуванням не мають доступу до бізнес-функцій (судові справи, медичні дані). Адміністратор безпеки адмініструє \textit{систему}, а не \textit{дані} системи.
-
-\textbf{AC-6(3) — Мережевий доступ до привілейованих команд.}
-Привілейовані команди (перезапуск сервісів, зміна конфігурації) доступні лише через виділений Management VLAN, а не через загальний мережевий інтерфейс. \texttt{abac} перевіряє атрибут \texttt{environment.network\_zone} у кожному запиті.
-
-\textbf{AC-6(4) — Розмежування функцій між суб'єктами.}
-Наприклад, оператор реєстрації ЦСК може \textit{подати} запит на сертифікат, але лише адміністратор ЦСК може його \textit{підписати}. Це двоетапне затвердження (Maker/Checker) жорстко закодовано у BPMN-процесі та ABAC-правилах.
-
-\textbf{AC-6(5) — Привілейовані облікові записи.}
-Список привілейованих облікових записів (наприклад, \texttt{global\_root\_admin}) визначений у \texttt{roles.ex} та підлягає щомісячному аудиту (контроль AC-2(12)). Кількість суб'єктів у цій групі мінімізована та задокументована.
-
-\textbf{AC-6(7) — Перегляд привілейованих ролей.}
-Раз на квартал \texttt{ias} автоматично генерує звіт \texttt{privileged\_access\_review\_report} із переліком усіх суб'єктів, що мають підвищені права, датами останнього входу та аномаліями. Звіт надсилається CISO.
-
-\textbf{AC-6(9) — Аудит використання привілейованих функцій.}
-Кожне виконання привілейованої дії логується окремим записом у \texttt{kvs} з повним контекстом: суб'єкт, роль, дія, час, IP, хеш виконаної команди. Ці записи є \textit{незмінними} завдяки append-only природі KVS.
-
-\textbf{AC-6(10) — Заборона непривілейованим користувачам виконувати привілейовані функції.}
-Технічно реалізується через поєднання ABAC-правил та криптографічних мандатів X.509: привілейовані API-ендпоінти вимагають наявності конкретного OID розширення у сертифікаті, яке видається лише при явному призначенні привілейованої ролі.
+The following section is a comprehensive, control-by-control scientific analysis of how the components of the ERP/1 platform (ecosystem \texttt{ERP.UNO}, \texttt{N2O.DEV}, \texttt{SYNRC.COM}) naturally and architecturally satisfy the requirements of NIST SP 800-53 Rev.5 and ND TZI 2.3-025-24.
+Each platform product is a purpose-built solution for a specific security domain, enabling maximally organic --- without artificial mappings --- standard compliance. The analysis covers all 20 control families: AC, AT, AU, CA, CM, CP, IA, IR, MA, MP, PE, PL, PM, PS, PT, RA, SA, SC, SI, SR.
 
 % =========================================================
-\subsection{Клас AT: Навчання та обізнаність}
+\subsection{Access Control (AC)}
+% =========================================================
+\subsubsection{\texttt{zencrypted/ias}: AC-2 --- Account Management}
+
+The \texttt{ias} server (Identity and Access Server) is the platform's central Identity Provider (IdP), implementing the full account lifecycle through a single programmatic interface. Unlike fragmented LDAP directories, \texttt{ias} operates with declarative user profiles directly bound to the role registry in \texttt{roles.ex}.
+
+\textbf{AC-2(1) --- Automated System Account Management.}
+\texttt{ias} supports SCIM 2.0 (System for Cross-domain Identity Management) for automatic synchronization of account state across subsystems. When an event arrives from an HR module (e.g., ERP/EDU or ERP/HEALTH), \texttt{ias} automatically performs provisioning or de-provisioning without manual intervention, guaranteeing compliance with the Joiner-Mover-Leaver (JML) requirements.
+
+\textbf{AC-2(2) --- Removal of Temporary and Emergency Accounts.}
+Temporary accounts in \texttt{ias} have mandatory fields \texttt{expires\_at} and \texttt{account\_type: :temporary}. A background scheduler (implemented via Erlang/OTP \texttt{:timer}) inspects the database hourly and automatically deactivates expired records. Setting an expiration time is a required parameter when creating a temporary account.
+
+\textbf{AC-2(3) --- Disable Inactive Accounts.}
+The \texttt{ias} server stores a \texttt{last\_seen\_at} timestamp for each session. If the value exceeds a configurable threshold (default: 90 days), the account is transitioned to the \texttt{:inactive} state, with an automatic notification sent to the security administrator.
+
+\textbf{AC-2(4) --- Automated Audit Actions.}
+Any change in account state (creation, privilege modification, deactivation, deletion) generates a signed record in the \texttt{kvs} audit log via event sourcing. This provides an immutable, cryptographically protected trail of all administrative actions.
+
+\textbf{AC-2(5) --- Inactivity Logout.}
+\texttt{ias} centrally manages session duration. The \texttt{session\_idle\_timeout} setting is a global parameter and can be overridden at the role level (e.g., a stricter 15-minute limit for administrators).
+
+\textbf{AC-2(6) --- Dynamic Privilege Management.}
+Since \texttt{ias} is integrated with \texttt{erpuno/abac}, privileges are not static profile attributes but dynamically computed decisions from the Policy Decision Point. This means elevated privileges (e.g., administrator mode for critical operations) are activated only for the duration of a specific session and for a specific resource.
+
+\textbf{AC-2(7) --- Role-Based Schemes.}
+The integration of \texttt{ias} with \texttt{roles.ex} allows roles to be organized hierarchically (RBAC). Role templates are inherited: the \texttt{auditor} role automatically receives all rights of the parent \texttt{read\_only} role, without requiring duplication of rules.
+
+\textbf{AC-2(8) --- Dynamic Account Management.}
+For service accounts (machine-to-machine), \texttt{ias} supports OAuth 2.0 Client Credentials with short-lived tokens (TTL: 15 minutes). Services have no permanent password, eliminating the risk of long-term secret leakage.
+
+\textbf{AC-2(9) --- Restrictions on Use of Shared and Group Accounts.}
+The \texttt{ias} architecture does not allow creating "shared" accounts by default. Every subject --- person or service --- has a unique cryptographic identifier bound to an X.509 certificate issued by \texttt{synrc/ca}.
+
+\textbf{AC-2(10) --- Shared and Group Account Credential Change.}
+For technical group accounts (e.g., \texttt{ocsp\_service}), \texttt{ias} implements a "secret rotation" mechanism triggered by every change in group membership, automatically generating a new key pair via \texttt{synrc/ca}.
+
+\textbf{AC-2(11) --- Usage Conditions.}
+Upon login, \texttt{ias} checks the currency of accepted terms of use. If the \texttt{terms\_of\_service\_version} in the profile does not match the current version, access is blocked until the new terms are accepted.
+
+\textbf{AC-2(12) --- Account Monitoring for Atypical Usage.}
+Behavioral metrics (request frequency, geography, unusual hours) are aggregated by \texttt{ias} and forwarded to SIEM (Wazuh). When the behavioral baseline is exceeded, an incident is automatically created in \texttt{erpuno/itsm}.
+
+\textbf{AC-2(13) --- Disable Accounts of High-Risk Individuals.}
+SIEM integration allows \texttt{ias} to receive webhook signals about compromise. Upon receiving a \texttt{high\_risk\_account\_detected} signal, the corresponding profile is transitioned to \texttt{:suspended} within one second, regardless of any currently active sessions.
+
+\subsubsection{\texttt{zencrypted/ias}: AC-7 --- Unsuccessful Logon Attempts}
+\textbf{AC-7 (Base Control).}
+\texttt{ias} maintains a counter of failed authentication attempts bound to the subject and IP address. After a configurable threshold (default: 5 attempts in 10 minutes), the account is temporarily locked (account lockout) with an automatic notification to the administrator.
+
+\textbf{AC-7(2) --- Purge or Wipe Mobile Device.}
+Upon receiving a signal from a Mobile Device Management (MDM) system about device theft or compromise, \texttt{ias} immediately revokes all tokens and certificates associated with that device via the OCSP revocation mechanism in \texttt{synrc/ca}.
+
+\subsubsection{\texttt{synrc/ca}: AC-3 --- Access Enforcement}
+
+The \texttt{synrc/ca} module implements the Reference Monitor (AC-25) --- a centralized control mechanism that verifies every request to a protected resource based on X.509 certificates and ABAC policies.
+
+\textbf{AC-3(3) --- Mandatory Access Control.}
+\texttt{synrc/ca} supports data classification labels (Data Labels) in X.509 certificate extensions. This enables enforcement of the Mandatory Access Control (MAC) principle: a certificate with a \texttt{confidential} clearance level cannot access a resource labeled \texttt{secret}, even if an RBAC rule formally permits it.
+
+\textbf{AC-3(4) --- Discretionary Access Control.}
+Resource owners can delegate access rights via the attributed token mechanism of \texttt{ias}, implementing the classic DAC (Discretionary Access Control) model. Delegation is always bounded by the delegating subject's own permissions.
+
+\textbf{AC-3(7) --- Role-Based Access Control.}
+RBAC is implemented at the X.509 extension level, where the \texttt{SubjectAlternativeName} field contains role URNs. This means a role is cryptographically bound to a person and confirmed by the digital signature of the root CA, making forgery or substitution of a role technically impossible.
+
+\textbf{AC-3(10) --- Audited Override of Access Control Mechanisms.}
+For services using JWT or SAML, \texttt{ias} generates signed claims with a time-limited validity. \texttt{synrc/ca} acts as the authority issuing short-lived assertion tokens whose verification requires no query to the IdP (stateless verification).
+
+\textbf{AC-3(11) --- Restrict Access to Specific Information Types.}
+Isolation between ERP/1 tenants (e.g., between different courts or agencies) is implemented at the Kubernetes namespace level and through unique root certificates for each tenant, issued by \texttt{synrc/ca}.
+
+\textbf{AC-3(12) --- Assert and Enforce Application Access.}
+The \texttt{abac} access decision incorporates a set of attributes: \texttt{subject.role}, \texttt{subject.clearance}, \texttt{resource.classification}, \texttt{action.type}, \texttt{environment.time}, \texttt{environment.network\_zone}. This ensures context-aware access in accordance with the Zero Trust principle.
+
+\textbf{AC-3(13) --- Attribute-Based Access Control.}
+Subject attributes are stored in \texttt{ias} and \texttt{synrc/ca}; resource attributes in KVS metadata. \texttt{abac} retrieves them at decision time, guaranteeing attribute freshness even under frequent context changes.
+
+\textbf{AC-3(15) --- Discretionary and Mandatory Access Control.}
+The system supports the simultaneous operation of two models: MAC (based on classification labels in X.509) and DAC (delegation via \texttt{ias}). MAC always takes priority: if a mandatory label denies access, a DAC rule cannot override it.
+
+\subsubsection{\texttt{synrc/bpmn}: AC-4 --- Information Flow Enforcement}
+
+The BPMN engine \texttt{synrc/bpmn} is the central orchestrator of business processes, and all information flows between platform components pass through it.
+
+\textbf{AC-4 (Base Control).}
+Every data transition between business process tasks (BPMN Tasks) is a controlled event. \texttt{bpmn} implements "information gateways" --- process nodes that verify data classification before transfer between network segments or tenants.
+
+\textbf{AC-4(1) --- Object Security and Privacy Attributes.}
+Artifacts (documents, case files) passed between tasks carry a mandatory \texttt{data\_classification} attribute. The BPMN gateway rejects the transfer if the artifact's classification does not match the permitted level of the target process segment.
+
+\textbf{AC-4(4) --- Flow Control of Encrypted Information.}
+At boundaries between organizational units, \texttt{bpmn} performs schema validation of transferred documents (JSON Schema, XSD) and verification of CMS/XAdES signatures before continuing the process.
+
+\subsubsection{\texttt{erpuno/abac}: AC-5 and AC-6 --- Separation of Duties and Least Privilege}
+
+\textbf{AC-5 --- Separation of Duties.}
+\texttt{abac} implements Separation of Duties (SoD) via declarative XACML-like rules specifying sets of mutually exclusive roles (SSD: Static Separation of Duties). For example, the same individual cannot hold both the \texttt{initiator} and \texttt{approver} roles for financial transactions. SoD rules are verified not only at action execution but also at role assignment --- the system rejects an assignment that would create a conflict.
+
+\textbf{AC-6 --- Least Privilege.}
+The fundamental principle of \texttt{abac}: access is denied by default (Default Deny). Permission is granted only when an explicit, positive matching rule exists. Rules have the minimum necessary scope --- bound to a specific resource, action, and context.
+
+\textbf{AC-6(1) --- Authorize Access to Security Functions.}
+Instead of static privilege grants, \texttt{abac} computes privileges dynamically based on current subject and context attributes. Elevated rights (e.g., BreakGlass mode operations) are temporary and automatically revoked after the critical operation completes.
+
+\textbf{AC-6(2) --- Non-Privileged Access for Non-Security Functions.}
+\texttt{abac} ensures that administrative roles (e.g., \texttt{security\_admin}) do not have access to business functions (court records, medical data) by default. The security administrator administers \textit{the system}, not \textit{the data} of the system.
+
+\textbf{AC-6(3) --- Network Access to Privileged Commands.}
+Privileged commands (service restarts, configuration changes) are accessible only via a dedicated Management VLAN, not through the general network interface. \texttt{abac} checks the \texttt{environment.network\_zone} attribute in every request.
+
+\textbf{AC-6(4) --- Separate Processing Domains.}
+For example, a CA registration operator may \textit{submit} a certificate request, but only the CA administrator may \textit{sign} it. This two-stage approval (Maker/Checker) is hard-coded in the BPMN process and ABAC rules.
+
+\textbf{AC-6(5) --- Privileged Accounts.}
+The list of privileged accounts (e.g., \texttt{global\_root\_admin}) is defined in \texttt{roles.ex} and subject to monthly audit (control AC-2(12)). The number of subjects in this group is minimized and documented.
+
+\textbf{AC-6(7) --- Review of User Privileges.}
+Quarterly, \texttt{ias} automatically generates a \texttt{privileged\_access\_review\_report} listing all subjects with elevated rights, last-login dates, and anomalies. The report is forwarded to the CISO.
+
+\textbf{AC-6(9) --- Log Use of Privileged Functions.}
+Every execution of a privileged action is logged as a separate record in \texttt{kvs} with full context: subject, role, action, time, IP, hash of the executed command. These records are \textit{immutable} due to the append-only nature of KVS.
+
+\textbf{AC-6(10) --- Prohibit Non-Privileged Users from Executing Privileged Functions.}
+Technically enforced through the combination of ABAC rules and X.509 cryptographic mandates: privileged API endpoints require the presence of a specific OID extension in the certificate, which is issued only upon explicit assignment of a privileged role.
+
+
+% =========================================================
+\subsection{Audit and Accountability (AU)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca}: AT-2, AT-3 — Навчання з питань безпеки}
-\texttt{synrc/ca} виступає як платформа для проведення рольових тренінгів (AT-3). Зокрема, для операторів ЦСК реалізований симуляційний режим, де всі операції підпису відбуваються на тестовому HSM з тестовими ключами. Це дозволяє відпрацьовувати критичні процедури (Церемонія Ключа, OCSP) без ризику для виробничого середовища.
+\subsubsection{\texttt{zencrypted/ias}: AU-2, AU-3, AU-6, AU-9, AU-10, AU-12}
 
-\textbf{AT-2(2) — Фішингові симуляції.}
-Інтеграція \texttt{ias} з поштовим модулем ERP/MAIL дозволяє автоматично відправляти тестові фішингові листи та реєструвати відповідь користувачів. Результати автоматично прив'язуються до профілів у \texttt{ias} та впливають на оцінку ризику суб'єкта.
+\textbf{AU-2 --- Event Logging.}
+\texttt{ias} is the primary source of most security events: login/logout, failed authentications, profile changes, privilege delegation. The event list is defined in configuration and complies with ND TZI 2.3-025-24 mandatory logging requirements.
 
-% =========================================================
-\subsection{Клас AU: Аудит та підзвітність}
-% =========================================================
+\textbf{AU-3 --- Content of Audit Records.}
+Each \texttt{ias} audit record contains: \texttt{timestamp} (millisecond precision, NTP-synchronized), \texttt{subject\_id}, \texttt{event\_type}, \texttt{resource\_id}, \texttt{action}, \texttt{outcome} (success/failure), \texttt{source\_ip}, \texttt{session\_id}, \texttt{signature} (HMAC record signature).
 
-\subsubsection{\texttt{zencrypted/ias}: AU-2, AU-3, AU-6, AU-12}
+\textbf{AU-6 --- Audit Record Review, Analysis, and Reporting.}
+\texttt{ias} logs are automatically forwarded to SIEM (Wazuh) via secured syslog. Wazuh applies NIST and CIS correlation rules to detect anomalies and generate alerts.
 
-\textbf{AU-2 — Події аудиту.}
-\texttt{ias} є першоджерелом більшості подій безпеки: вхід/вихід, невдалі автентифікації, зміни профілів, делегування привілеїв. Перелік подій визначений у конфігурації та відповідає вимогам НД ТЗІ 2.3-025-24 щодо обов'язкового журналювання.
+\textbf{AU-9 --- Protection of Audit Information.}
+Audit records are stored in \texttt{kvs} with DSTU 7564-2014 (Kupyna) hashing. Any unauthorized modification of a record is detected upon the next chain verification.
 
-\textbf{AU-3 — Вміст записів аудиту.}
-Кожен запис аудиту \texttt{ias} містить: \texttt{timestamp} (з точністю до мілісекунди, синхронізований з NTP), \texttt{subject\_id}, \texttt{event\_type}, \texttt{resource\_id}, \texttt{action}, \texttt{outcome} (success/failure), \texttt{source\_ip}, \texttt{session\_id}, \texttt{signature} (HMAC підпис запису).
+\textbf{AU-10 --- Non-Repudiation.}
+Critical events (document signing, approvals, certificate issuance) are recorded with RFC 3161 TSP timestamps from a trusted TSA provider, guaranteeing the legal evidentiary weight of records in judicial proceedings.
 
-\textbf{AU-6 — Аналіз та звітність про аудит.}
-Журнали \texttt{ias} автоматично пересилаються у SIEM (Wazuh) через захищений syslog. Wazuh застосовує кореляційні правила NIST та CIS для виявлення аномалій та генерації алертів.
-
-\textbf{AU-9 — Захист інформації аудиту.}
-Записи аудиту зберігаються у \texttt{kvs} з хешуванням DSTU 7564-2014 (Kupyna). Будь-яке несанкціоноване змінення запису детектується при наступній верифікації ланцюга.
-
-\textbf{AU-10 — Незаперечність (Non-Repudiation).}
-Критичні події (підпис документів, затвердження, видача сертифікатів) фіксуються з TSP-мітками часу (RFC 3161) від довіреного постачальника TSA, що гарантує юридичну силу доказів в судовому провадженні.
-
-\textbf{AU-12 — Генерація записів аудиту.}
-\texttt{ias} генерує записи аудиту в режимі реального часу для всіх сконфігурованих подій. Відмова від журналювання (наприклад, через переповнення буфера) призводить до відмови самої операції — принцип "Fail Secure".
+\textbf{AU-12 --- Audit Record Generation.}
+\texttt{ias} generates audit records in real time for all configured events. A logging failure (e.g., due to buffer overflow) causes the operation itself to fail --- the "Fail Secure" principle.
 
 % =========================================================
-\subsection{Клас CA: Оцінка, авторизація та моніторинг}
+\subsection{Assessment, Authorization, and Monitoring (CA)}
 % =========================================================
 
 \subsubsection{\texttt{synrc/ca}: CA-2, CA-6, CA-7, CA-8, CA-9}
 
-\textbf{CA-2 — Оцінка заходів безпеки та конфіденційності.}
-\texttt{synrc/ca} автоматизує збір доказів відповідності через CMDB API. Перед кожним аудитом (державна експертиза ДССЗЗІ) виконується \texttt{mix run -e 'CA.TeX.generate()'}, що формує повний пакет документації з актуального стану системи.
+\textbf{CA-2 --- Control Assessments.}
+\texttt{synrc/ca} automates the collection of compliance evidence via the CMDB API. Before each audit (DSSZZI state expertise), \texttt{mix run -e 'CA.TeX.generate()'} is executed, generating a complete documentation package from the current system state.
 
-\textbf{CA-6 — Авторизація платформи.}
-Авторизація системи формалізована через L3-профіль безпеки (\texttt{legal\_l3\_profile\_erp.pdf}), сформований програмно з CMDB та підписаний. Оновлення авторизації відбувається при будь-якій суттєвій зміні архітектури.
+\textbf{CA-6 --- Authorization.}
+System authorization is formalized through the L3 security profile (\texttt{legal\_l3\_profile\_erp.pdf}), programmatically generated from the CMDB and cryptographically signed. Authorization is updated upon any significant architectural change.
 
-\textbf{CA-7 — Безперервний моніторинг.}
-Постійний моніторинг реалізований через тріаду: Wazuh SIEM (події безпеки), Zabbix (доступність та продуктивність), \texttt{synrc/ca} CMDB (відповідність конфігурації). Відхилення від зафіксованого базового стану (CMDB drift) негайно генерує інцидент у \texttt{itsm}.
+\textbf{CA-7 --- Continuous Monitoring.}
+Continuous monitoring is implemented through a triad: Wazuh SIEM (security events), Zabbix (availability and performance), and \texttt{synrc/ca} CMDB (configuration compliance). Any deviation from the recorded baseline state (CMDB drift) immediately generates an incident in \texttt{itsm}.
 
-\textbf{CA-8 — Тестування проникнення.}
-Регулярні пентести (принаймні щорічно) охоплюють всі компоненти ERP/1. Результати формалізуються як CMDB-записи ризиків та відстежуються через Plan of Action \& Milestones (POA\&M — контроль PM-4).
+\textbf{CA-8 --- Penetration Testing.}
+Regular penetration tests (at least annually) cover all ERP/1 components. Results are formalized as CMDB risk records and tracked through Plan of Action \& Milestones (POA\&M --- control PM-4).
 
-\textbf{CA-9 — Внутрішні системні з'єднання.}
-Усі внутрішні з'єднання між сервісами ERP/1 авторизуються через mTLS (mutual TLS) з сертифікатами від \texttt{synrc/ca}. Неавторизоване або несертифіковане з'єднання технічно неможливе.
+\textbf{CA-9 --- Internal System Connections.}
+All internal connections between ERP/1 services are authorized via mTLS (mutual TLS) with certificates from \texttt{synrc/ca}. An unauthorized or non-certificated connection is technically impossible.
 
 % =========================================================
-\subsection{Клас CM: Конфігураційне управління}
+\subsection{Configuration Management (CM)}
 % =========================================================
 
 \subsubsection{\texttt{synrc/ca} CMDB: CM-2, CM-3, CM-6, CM-7, CM-8, CM-9}
 
-\textbf{CM-2, CM-3 — Базова конфігурація та контроль змін.}
-Еталонна конфігурація всіх компонентів зафіксована у CMDB Elixir-модулях (\texttt{hw.ex}, \texttt{sys.ex}, \texttt{net.ex}). Кожна зміна у виробничому середовищі повинна спочатку відобразитися у відповідному CMDB-файлі та пройти Code Review у Git. Відхилення від еталону (configuration drift) детектується Wazuh FIM (File Integrity Monitoring).
+\textbf{CM-2, CM-3 --- Baseline Configuration and Configuration Change Control.}
+The baseline configuration of all components is captured in CMDB Elixir modules (\texttt{hw.ex}, \texttt{sys.ex}, \texttt{net.ex}). Every change in the production environment must first be reflected in the corresponding CMDB file and pass Code Review in Git. Deviation from the baseline (configuration drift) is detected by Wazuh FIM (File Integrity Monitoring).
 
-\textbf{CM-6 — Налаштування конфігурації.}
-Усі сервіси ERP/1 запускаються зі строгими безпечними конфігураційними шаблонами (Security Hardening Baselines): UA Linux ДСТУ-hardened, SELinux Enforcing, Windows Server DISA STIG. Відхилення від базових налаштувань технічно заблоковані через механізми SCM (Puppet/Ansible).
+\textbf{CM-6 --- Configuration Settings.}
+All ERP/1 services are launched with strict security hardening baselines: UA Linux DSTU-hardened, SELinux Enforcing, Windows Server DISA STIG. Deviations from baseline settings are technically blocked through SCM mechanisms (Puppet/Ansible).
 
-\textbf{CM-7 — Мінімальна функціональність.}
-Кожен сервіс ERP/1 запускається лише з тими компонентами, що необхідні для виконання його функції. Непотрібні модулі, протоколи та порти відключені. Перелік дозволених компонентів задокументований у відповідному \texttt{sys.ex} записі CMDB.
+\textbf{CM-7 --- Least Functionality.}
+Each ERP/1 service runs only with the components required to perform its function. Unnecessary modules, protocols, and ports are disabled. The list of permitted components is documented in the corresponding \texttt{sys.ex} CMDB entry.
 
-\textbf{CM-8 — Інвентаризація компонентів системи.}
-CMDB \texttt{synrc/ca} є "живим" реєстром всіх апаратних, програмних та мережевих компонентів. Кожен ресурс має унікальний інвентаризаційний номер, прив'язаний до криптографічного сертифіката та зафіксований у \texttt{hw.ex} або \texttt{sys.ex}.
+\textbf{CM-8 --- System Component Inventory.}
+The \texttt{synrc/ca} CMDB is a "living" registry of all hardware, software, and network components. Each resource has a unique inventory number, bound to a cryptographic certificate and recorded in \texttt{hw.ex} or \texttt{sys.ex}.
 
-\textbf{CM-9 — План конфігураційного управління.}
-Замість окремого текстового документа, план КМ безпосередньо закодований у Git-репозиторії: pipeline CI/CD, Elixir CMDB-модулі, Ansible-плейбуки та цей PDF-звіт разом утворюють повний, само-верифікований план управління конфігурацією.
+\textbf{CM-9 --- Configuration Management Plan.}
+Instead of a separate textual document, the CM plan is directly encoded in the Git repository: the CI/CD pipeline, Elixir CMDB modules, Ansible playbooks, and this PDF report together form a complete, self-verifying configuration management plan.
 
 % =========================================================
-\subsection{Клас CP: Планування безперервності}
+\subsection{Contingency Planning (CP)}
 % =========================================================
 
 \subsubsection{\texttt{erlang/otp}: CP-2, CP-7, CP-9, CP-10}
 
-\textbf{CP-2 — План безперервності.}
-Erlang/OTP є фундаментом відмовостійкості ERP/1. Архітектура Supervision Tree гарантує автоматичний перезапуск будь-якого відмовилого процесу. На рівні кластера, наявність мінімум трьох вузлів (quorum) забезпечує доступність навіть при відмові одного вузла.
+\textbf{CP-2 --- Contingency Plan.}
+Erlang/OTP is the foundation of ERP/1 fault tolerance. The Supervision Tree architecture guarantees the automatic restart of any failed process. At the cluster level, a minimum of three nodes (quorum) ensures availability even upon failure of one node.
 
-\textbf{CP-7 — Альтернативний майданчик обробки.}
-Erlang/OTP підтримує "гаряче" перемикання (hot failover) між вузлами кластера без втрати поточних сесій. Розподілений реєстр процесів (\texttt{:pg} або через \texttt{synrc/kvs}) дозволяє іншому вузлу взяти на себе обробку після відмови первинного.
+\textbf{CP-7 --- Alternate Processing Site.}
+Erlang/OTP supports hot failover between cluster nodes without loss of current sessions. The distributed process registry (\texttt{:pg} or via \texttt{synrc/kvs}) allows another node to take over processing upon primary node failure.
 
-\textbf{CP-9 — Резервне копіювання інформаційної системи.}
-Дані \texttt{kvs} безперервно реплікуються на всі вузли кластера (синхронна реплікація Mnesia/RocksDB). Щодобово виконується знімок (snapshot) на стрічковий архів (HPE StoreEver) для офлайн-зберігання.
+\textbf{CP-9 --- Information System Backup.}
+\texttt{kvs} data is continuously replicated to all cluster nodes (synchronous Mnesia/RocksDB replication). Daily snapshots are written to a tape archive (HPE StoreEver) for offline storage.
 
-\textbf{CP-10 — Відновлення інформаційної системи.}
-Процедури відновлення відпрацьовані у рамках тренінгів (AT-3) на ізольованому середовищі. Вбудована функція \texttt{:hot\_code\_upgrade} дозволяє оновлювати компоненти без зупинки системи, що мінімізує RTO (Recovery Time Objective).
+\textbf{CP-10 --- Information System Recovery and Reconstitution.}
+Recovery procedures are rehearsed as part of training (AT-3) in an isolated environment. The built-in \texttt{:hot\_code\_upgrade} function allows components to be updated without system downtime, minimizing RTO (Recovery Time Objective).
 
 % =========================================================
-\subsection{Клас IA: Ідентифікація та автентифікація}
+\subsection{Identification and Authentication (IA)}
 % =========================================================
 
 \subsubsection{\texttt{synrc/ca} + \texttt{zencrypted/ias}: IA-2, IA-5, IA-8}
 
-\textbf{IA-2 — Ідентифікація та автентифікація організаційних користувачів.}
-\texttt{ias} реалізує суворий MFA: перший фактор — сертифікат X.509 (смарт-карта або HSM-токен IIT Gryada), другий фактор — OTP (TOTP/HOTP або апаратний токен). Жодна функція системи не доступна без успішного проходження обох факторів.
+\textbf{IA-2 --- Identification and Authentication (Organizational Users).}
+\texttt{ias} enforces strict MFA: the first factor is an X.509 certificate (smart card or IIT Gryada HSM token), the second factor is an OTP (TOTP/HOTP or hardware token). No system function is accessible without successful completion of both factors.
 
-\textbf{IA-2(1) — MFA для привілейованих облікових записів (мережевий доступ).}
-Адміністративні облікові записи додатково вимагають третій фактор — підтвердження через push-сповіщення на зареєстрований пристрій. Вхід зі "спільного" пристрою технічно заблокований.
+\textbf{IA-2(1) --- MFA for Privileged Accounts (Network Access).}
+Administrative accounts additionally require a third factor --- push-notification confirmation on a registered device. Login from a "shared" device is technically blocked.
 
-\textbf{IA-2(2) — MFA для непривілейованих облікових записів.}
-Стандартні користувачі автентифікуються мінімум двома факторами. Перший — сертифікат на смарт-карті (PKCS\#15, алгоритм ДСТУ 4145-2002), другий — ПІН до смарт-карти.
+\textbf{IA-2(2) --- MFA for Non-Privileged Accounts.}
+Standard users authenticate with a minimum of two factors. The first is a certificate on a smart card (PKCS\#15, DSTU 4145-2002 algorithm), the second is the smart-card PIN.
 
-\textbf{IA-5 — Управління автентифікаторами.}
-\texttt{synrc/ca} є авторизованим джерелом криптографічних автентифікаторів (сертифікатів). Управління включає: реєстрацію (Certificate Enrollment via EST), оновлення (ACME/CMP), відкликання (OCSP/CRL) та архівування (Long-Term Validation, LTV). Усі автентифікатори прив'язані до апаратного носія (e-Токен, Гряда-301).
+\textbf{IA-5 --- Authenticator Management.}
+\texttt{synrc/ca} is the authoritative source of cryptographic authenticators (certificates). Management includes: enrollment (Certificate Enrollment via EST), renewal (ACME/CMP), revocation (OCSP/CRL), and archiving (Long-Term Validation, LTV). All authenticators are bound to a hardware carrier (e-Token, Gryada-301).
 
-\textbf{IA-5(1) — Автентифікатори на основі пароля.}
-Для сервісних облікових записів, де паролі все ж застосовуються, \texttt{ias} примусово застосовує мінімальну складність та зберігає паролі у форматі Argon2id (переможець PHC, стійкий до GPU-атак). Паролі ніколи не передаються у відкритому вигляді.
+\textbf{IA-5(1) --- Password-Based Authentication.}
+For service accounts where passwords are still used, \texttt{ias} enforces minimum complexity and stores passwords in Argon2id format (PHC winner, resistant to GPU attacks). Passwords are never transmitted in plaintext.
 
-\textbf{IA-8 — Ідентифікація та автентифікація неорганізаційних користувачів.}
-Для зовнішніх систем (наприклад, ЄДР, Дія) \texttt{ias} підтримує федерацію ідентичностей через SAML 2.0 та OIDC, де зовнішній IdP верифікує особу, а \texttt{ias} видає локальний токен з обмеженими правами на основі атрибутів, отриманих від зовнішнього провайдера.
-
-% =========================================================
-\subsection{Клас IR: Реагування на інциденти}
-% =========================================================
-
-\subsubsection{\texttt{erpuno/itsm}: IR-1, IR-4, IR-5, IR-6, IR-8}
-
-\textbf{IR-1 — Політика та процедури реагування.}
-Процеси реагування на інциденти формалізовані як BPMN-процеси в \texttt{synrc/bpmn} та виконуються через \texttt{erpuno/itsm}. Кожен тип інциденту (зі своїм кодом MITRE ATT\&CK) має призначений BPMN-шаблон із чіткими etapами: виявлення, класифікація, ескалація, усунення, пост-аналіз.
-
-\textbf{IR-4 — Обробка інцидентів.}
-\texttt{itsm} автоматично отримує інциденти від Wazuh (via webhook) та \texttt{ias} (при виявленні аномалій AC-2(12)). Кожен інцидент отримує унікальний INC-ідентифікатор, прив'язаний до CMDB-запису компоненту, якого стосується.
-
-\textbf{IR-5 — Відстеження інцидентів.}
-Повний аудит-трейл кожного інциденту (всі дії, коментарі, зміни статусу) зберігається в \texttt{kvs} та доступний для запиту. Тривалість зберігання — не менше 3 років.
-
-\textbf{IR-6 — Звітність про інциденти.}
-\texttt{itsm} автоматично генерує щомісячні звіти про інциденти у форматі PDF (з використанням \texttt{synrc/ca} LaTeX-генератора) та надсилає їх CISO та відповідному регулятору (ДССЗЗІ).
+\textbf{IA-8 --- Identification and Authentication (Non-Organizational Users).}
+For external systems (e.g., Unified State Register, Diia), \texttt{ias} supports identity federation via SAML 2.0 and OIDC, where the external IdP verifies the identity and \texttt{ias} issues a local token with limited rights based on attributes received from the external provider.
 
 % =========================================================
-\subsection{Клас MA: Технічне обслуговування}
+\subsection{Incident Response (IR)}
+% =========================================================
+
+\subsubsection{\texttt{erpuno/itsm}: IR-1, IR-4, IR-5, IR-6}
+
+\textbf{IR-1 --- Incident Response Policy and Procedures.}
+Incident response processes are formalized as BPMN processes in \texttt{synrc/bpmn} and executed via \texttt{erpuno/itsm}. Each incident type (with its MITRE ATT\&CK code) has an assigned BPMN template with clear stages: detection, classification, escalation, remediation, post-analysis.
+
+\textbf{IR-4 --- Incident Handling.}
+\texttt{itsm} automatically receives incidents from Wazuh (via webhook) and \texttt{ias} (upon detecting anomalies per AC-2(12)). Each incident receives a unique INC identifier, bound to the CMDB record of the affected component.
+
+\textbf{IR-5 --- Incident Monitoring.}
+The complete audit trail of each incident (all actions, comments, status changes) is stored in \texttt{kvs} and available for query. Retention period is a minimum of 3 years.
+
+\textbf{IR-6 --- Incident Reporting.}
+\texttt{itsm} automatically generates monthly incident reports in PDF format (using the \texttt{synrc/ca} LaTeX generator) and forwards them to the CISO and the relevant regulator (DSSZZI).
+
+% =========================================================
+\subsection{Maintenance (MA)}
 % =========================================================
 
 \subsubsection{\texttt{erpuno/itsm}: MA-2, MA-4, MA-5}
 
-\textbf{MA-2 — Контрольоване обслуговування.}
-Будь-яка планова технічна робота (обслуговування сервера, мережевого обладнання, HSM) оформлюється як Change Request (CR) в \texttt{itsm}. CR має обов'язкові поля: \texttt{maintainer\_id}, \texttt{authorization\_certificate} (X.509 підпис від авторизованого інженера), \texttt{maintenance\_window}, \texttt{rollback\_plan}.
+\textbf{MA-2 --- Controlled Maintenance.}
+Any scheduled maintenance work (server, network equipment, HSM servicing) is registered as a Change Request (CR) in \texttt{itsm}. A CR has mandatory fields: \texttt{maintainer\_id}, \texttt{authorization\_certificate} (X.509 signature from an authorized engineer), \texttt{maintenance\_window}, \texttt{rollback\_plan}.
 
-\textbf{MA-4 — Дистанційне обслуговування.}
-Весь дистанційний доступ для обслуговування (SSH, RDP) маршрутизується через виділений Jump-сервер у Management VLAN. Доступ до Jump-сервера можливий лише з фіксованих IP через VPN-тунель \texttt{synrc/vpn} з обов'язковим MFA.
+\textbf{MA-4 --- Nonlocal Maintenance.}
+All remote maintenance access (SSH, RDP) is routed through a dedicated Jump server in the Management VLAN. Access to the Jump server is possible only from fixed IPs via an \texttt{synrc/vpn} tunnel with mandatory MFA.
 
-\textbf{MA-5 — Персонал з обслуговування.}
-Перелік авторизованого персоналу з обслуговування ведеться у CMDB (\texttt{roles.ex}) та верифікується \texttt{ias} перед наданням доступу. Несертифікований персонал технічно не може отримати доступ до систем.
+\textbf{MA-5 --- Maintenance Personnel.}
+The list of authorized maintenance personnel is maintained in the CMDB (\texttt{roles.ex}) and verified by \texttt{ias} before granting access. Non-certified personnel are technically unable to access the systems.
 
 % =========================================================
-\subsection{Клас MP: Захист носіїв інформації}
+\subsection{Media Protection (MP)}
 % =========================================================
 
 \subsubsection{\texttt{synrc/kvs}: MP-2, MP-4, MP-5, MP-6, MP-7}
 
-\textbf{MP-2, MP-4 — Доступ та зберігання носіїв.}
-\texttt{kvs} є основним сховищем для усіх критичних даних ERP/1. Дані шифруються на рівні записів алгоритмами ДСТУ (Kalyna AES-256 GCM) ключами, що зберігаються в HSM IIT Gryada. Фізичний доступ до серверів з \texttt{kvs} обмежений Policy Engine та засобами PE-контролів.
+\textbf{MP-2, MP-4 --- Media Access and Storage.}
+\texttt{kvs} is the primary storage for all critical ERP/1 data. Data is encrypted at the record level using DSTU algorithms (Kalyna AES-256 GCM) with keys stored in an IIT Gryada HSM. Physical access to servers running \texttt{kvs} is restricted via the Policy Engine and PE controls.
 
-\textbf{MP-5 — Транспортування носіїв.}
-Резервні копії на стрічку (HPE MSL3040) шифруються перед записом. Фізичні стрічки зберігаються у сейфі з подвійним контролем. Процедура виносу стрічки за периметр потребує авторизованого CR в \texttt{itsm}.
+\textbf{MP-5 --- Media Transport.}
+Tape backups (HPE MSL3040) are encrypted before writing. Physical tapes are stored in a safe with dual control. The procedure for removing a tape from the perimeter requires an authorized CR in \texttt{itsm}.
 
-\textbf{MP-6 — Знищення носіїв.}
-Процедура знищення (DoD 5220.22-M або фізичне знищення для SSD/флеш) задокументована у \texttt{itsm} та реєструється у CMDB як факт деінвентаризації компоненту.
+\textbf{MP-6 --- Media Sanitization.}
+The sanitization procedure (DoD 5220.22-M or physical destruction for SSD/flash) is documented in \texttt{itsm} and recorded in the CMDB as a component de-inventory event.
 
-\textbf{MP-7 — Використання носіїв.}
-Використання знімних носіїв (USB) технічно заблоковано на рівні ОС (udev rules, Group Policy) для всіх робочих станцій, крім спеціально авторизованих технічних АРМ з дозволом CISO.
-
-% =========================================================
-\subsection{Клас SC: Захист систем та комунікацій}
-% =========================================================
-
-\subsubsection{\texttt{synrc/vpn}: SC-7, SC-8, SC-10, SC-12, SC-28}
-
-\textbf{SC-7 — Захист периметра.}
-\texttt{synrc/vpn} реалізує строгий мережевий периметр на основі IPsec IKEv2 з автентифікацією через сертифікати X.509. Всі зовнішні підключення (між майданчиками, з віддаленими користувачами) проходять через VPN-тунелі. Cisco Firepower 4145 NGFW (задокументований у CMDB) фільтрує трафік на периметрі.
-
-\textbf{SC-7(3) — Точки доступу.}
-Кількість зовнішніх мережевих підключень мінімізована та строго задокументована у \texttt{net.ex} CMDB. Кожна нова точка доступу потребує окремого CR та затвердження CISO.
-
-\textbf{SC-8 — Цілісність та конфіденційність передачі.}
-Весь трафік між компонентами ERP/1 захищений mTLS 1.3 з обов'язковими ДСТУ-сумісними шифронаборами. Незашифрований трафік технічно неможливий — \texttt{ias} відхиляє запити без валідного TLS-сертифіката.
-
-\textbf{SC-12 — Встановлення та управління криптографічними ключами.}
-\texttt{synrc/ca} є авторизованим ключовим центром. Кореневі ключі зберігаються виключно в HSM (Гряда-301) і ніколи не покидають апаратного модуля. Ротація ключів виконується за регламентом Церемонії Ключа з Dual Control.
-
-\textbf{SC-28 — Захист даних у стані спокою.}
-PostgreSQL та Oracle використовують TDE (Transparent Data Encryption) з ключами від HSM. \texttt{kvs} виконує додаткове шифрування на рівні записів.
+\textbf{MP-7 --- Media Use.}
+Removable media (USB) usage is technically blocked at the OS level (udev rules, Group Policy) for all workstations, except specifically authorized technical workstations with CISO approval.
 
 % =========================================================
-\subsection{Клас SI: Цілісність системи та інформації}
+\subsection{System and Communications Protection (SC)}
+% =========================================================
+
+\subsubsection{\texttt{synrc/vpn}: SC-7, SC-8, SC-12, SC-28}
+
+\textbf{SC-7 --- Boundary Protection.}
+\texttt{synrc/vpn} implements a strict network perimeter based on IPsec IKEv2 with X.509 certificate authentication. All external connections (between sites, with remote users) pass through VPN tunnels. The Cisco Firepower 4145 NGFW (documented in CMDB) filters traffic at the perimeter.
+
+\textbf{SC-7(3) --- Access Points.}
+The number of external network connections is minimized and strictly documented in the \texttt{net.ex} CMDB. Each new access point requires a separate CR and CISO approval.
+
+\textbf{SC-8 --- Transmission Confidentiality and Integrity.}
+All traffic between ERP/1 components is protected by mTLS 1.3 with mandatory DSTU-compatible cipher suites. Unencrypted traffic is technically impossible --- \texttt{ias} rejects requests without a valid TLS certificate.
+
+\textbf{SC-12 --- Cryptographic Key Establishment and Management.}
+\texttt{synrc/ca} is the authoritative key center. Root keys are stored exclusively in the HSM (Gryada-301) and never leave the hardware module. Key rotation is performed according to the Key Ceremony procedure with Dual Control.
+
+\textbf{SC-28 --- Protection of Information at Rest.}
+PostgreSQL and Oracle use TDE (Transparent Data Encryption) with keys from the HSM. \texttt{kvs} performs additional encryption at the record level.
+
+% =========================================================
+\subsection{System and Information Integrity (SI)}
 % =========================================================
 
 \subsubsection{\texttt{synrc/chat}: SI-3, SI-4, SI-7, SI-10}
 
-\textbf{SI-3 — Захист від шкідливого коду.}
-Всі вузли кластера захищені Wazuh HIDS з актуальними сигнатурами. На рівні CI/CD-пайплайну виконується автоматичне сканування залежностей (SBOM, OWASP Dependency Check) при кожному коміті.
+\textbf{SI-3 --- Malicious Code Protection.}
+All cluster nodes are protected by Wazuh HIDS with up-to-date signatures. At the CI/CD pipeline level, automatic dependency scanning (SBOM, OWASP Dependency Check) is executed on every commit.
 
-\textbf{SI-4 — Моніторинг системи.}
-Комбінація Wazuh (події безпеки) та Zabbix (метрики продуктивності) забезпечує 24/7 моніторинг всіх компонентів. Корелятор подій Wazuh детектує паттерни атак (MITRE ATT\&CK) та автоматично ескалує їх до \texttt{itsm}.
+\textbf{SI-4 --- System Monitoring.}
+The combination of Wazuh (security events) and Zabbix (performance metrics) provides 24/7 monitoring of all components. The Wazuh event correlator detects attack patterns (MITRE ATT\&CK) and automatically escalates them to \texttt{itsm}.
 
-\textbf{SI-7 — Цілісність програмного забезпечення та інформації.}
-Всі релізи ERP/1 підписуються цифровим підписом ДСТУ 4145-2002 від \texttt{synrc/ca} та публікуються разом з підписами. Контрольні суми (ДСТУ 7564-2014 Kupyna-512) перевіряються перед встановленням кожного оновлення.
+\textbf{SI-7 --- Software, Firmware, and Information Integrity.}
+All ERP/1 releases are signed with a DSTU 4145-2002 digital signature from \texttt{synrc/ca} and published together with signatures. Checksums (DSTU 7564-2014 Kupyna-512) are verified before installing any update.
 
-\textbf{SI-10 — Перевірка вхідних даних.}
-\texttt{synrc/chat} та всі веб-компоненти ERP/1 (через \texttt{synrc/ws}) застосовують строгу схемну валідацію (JSON Schema / XSD) вхідних даних на рівні API Gateway перед передачею до бізнес-логіки.
-
-% =========================================================
-\subsection{Клас SR: Ризики ланцюга постачання}
-% =========================================================
-
-\subsubsection{\texttt{synrc/chat} + \texttt{synrc/ca}: SR-3, SR-4, SR-5, SR-11}
-
-\textbf{SR-3 — Заходи безпеки ланцюга постачання.}
-ERP/1 використовує виключно компоненти з відкритим кодом (Erlang/OTP, Elixir), вихідний код яких верифікується перед включенням. SBOM (Software Bill of Materials) генерується автоматично при кожному збірці.
-
-\textbf{SR-4 — Провенанс.}
-Всі компоненти мають криптографічно верифіковане походження. Підписи релізів перевіряються через \texttt{synrc/ca}-кореневий ЦСК. Незадокументований або непідписаний компонент не може бути встановлений у виробниче середовище.
-
-\textbf{SR-11 — Автентичність компоненту.}
-Апаратні компоненти (HSM, комутатори, сервери) верифікуються через Serial Number та інвентаризаційний запис CMDB. Постачальники (5HT Technology, IIT, Cisco) мають підписані угоди про безпеку ланцюга постачання.
+\textbf{SI-10 --- Information Input Validation.}
+\texttt{synrc/chat} and all ERP/1 web components (via \texttt{synrc/ws}) apply strict schema validation (JSON Schema / XSD) of input data at the API Gateway level before passing it to business logic.
 
 % =========================================================
-\subsection{Блоки PL, PS, RA, SA, PM, PT}
+\subsection{Supply Chain Risk Management (SR)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca} CMDB: PL-2, RA-2, RA-3, SA-5}
+\subsubsection{\texttt{synrc/chat} + \texttt{synrc/ca}: SR-3, SR-4, SR-11}
 
-\textbf{PL-2 — Системний план безпеки.}
-Цей самий PDF-звіт, що генерується програмно з CMDB та LaTeX-шаблонів, є системним планом безпеки ERP/1. Він оновлюється автоматично при кожній зміні архітектури (що фіксується у Git).
+\textbf{SR-3 --- Supply Chain Controls and Processes.}
+ERP/1 uses exclusively open-source components (Erlang/OTP, Elixir), whose source code is verified before inclusion. An SBOM (Software Bill of Materials) is generated automatically at every build.
 
-\textbf{RA-2 — Категоризація безпеки.}
-Категоризація даних ERP/1 (Public, PII, Internal, Confidential) реалізована у \texttt{data.ex} CMDB та автоматично прив'язується до вимог щодо криптографічного захисту та контролів доступу.
+\textbf{SR-4 --- Provenance.}
+All components have cryptographically verified provenance. Release signatures are verified through the \texttt{synrc/ca} root CA. An undocumented or unsigned component cannot be installed in the production environment.
 
-\textbf{RA-3 — Оцінка ризику.}
-Реєстр ризиків \texttt{risk.ex} CMDB містить більше 40 задокументованих загроз (RISK-OS-01 … RISK-DAT-02), прив'язаних до конкретних сімейств контролів NIST, що автоматично включаються до аналізу відповідності.
+\textbf{SR-11 --- Component Authenticity.}
+Hardware components (HSM, switches, servers) are verified via serial number and CMDB inventory record. Vendors (5HT Technology, IIT, Cisco) have signed supply chain security agreements.
 
-\textbf{SA-5 — Системна документація.}
-Вся архітектурна та безпекова документація ERP/1 генерується автоматично з вихідного коду (Documentation as Code). Це усуває феномен "documentation drift" та гарантує, що аудитори завжди оцінюють актуальний стан системи.
+% =========================================================
+\subsection{Planning, Risk Assessment, System Acquisition, Privacy (PL, RA, SA, PM, PT)}
+% =========================================================
 
-\textbf{PM-2, PM-5, PM-6 — Програма безпеки, інвентаризація та метрики.}
-Програма безпеки ERP/1 матеріалізована у CMDB \texttt{synrc/ca}: ролі (PM-2), інвентаризація (PM-5), та ключові показники ефективності заходів (PM-6) є безпосередньо запитуваними через CMDB API.
+\subsubsection{\texttt{synrc/ca} CMDB: PL-2, RA-2, RA-3, SA-5, PM-2, PM-5, PM-6, PT-2, PT-4}
 
-\textbf{PT-2, PT-4 — Повноваження та згода на обробку ПД.}
-Обробка персональних даних (реєстр підписників ЦСК) здійснюється виключно в рамках цілей, задекларованих у CPS (Certificate Practice Statement). Згода суб'єкта ПД фіксується у \texttt{kvs} з криптографічним підписом.
+\textbf{PL-2 --- System Security and Privacy Plans.}
+This very PDF report, generated programmatically from the CMDB and LaTeX templates, serves as the ERP/1 system security plan. It is updated automatically upon every architectural change (recorded in Git).
 
-\selectlanguage{english}
+\textbf{RA-2 --- Security Categorization.}
+ERP/1 data categorization (Public, PII, Internal, Confidential) is implemented in the \texttt{data.ex} CMDB module and automatically bound to cryptographic protection requirements and access controls.
+
+\textbf{RA-3 --- Risk Assessment.}
+The \texttt{risk.ex} CMDB risk register contains more than 40 documented threats (RISK-OS-01 through RISK-DAT-02), mapped to specific NIST control families and automatically included in compliance analysis.
+
+\textbf{SA-5 --- System Documentation.}
+All ERP/1 architectural and security documentation is generated automatically from source code (Documentation as Code). This eliminates the "documentation drift" phenomenon and guarantees that auditors always assess the current state of the system.
+
+\textbf{PM-2, PM-5, PM-6 --- Security Program, System Inventory, and Performance Measures.}
+The ERP/1 security program is materialized in the \texttt{synrc/ca} CMDB: roles (PM-2), system inventory (PM-5), and key security performance indicators (PM-6) are directly queryable through the CMDB API.
+
+\textbf{PT-2, PT-4 --- Authority and Consent for PII Processing.}
+Processing of personal data (CA subscriber registry) is conducted exclusively within the purposes declared in the Certificate Practice Statement (CPS). The data subject's consent is recorded in \texttt{kvs} with a cryptographic signature.
+
+\section{Organizational Security Profile}
+% =========================================================
+\subsection{Awareness and Training}
+% =========================================================
+
+\subsubsection{\texttt{synrc/ca}: AT-2, AT-3 --- Security Awareness and Role-Based Training}
+\texttt{synrc/ca} serves as a platform for role-based security training (AT-3). Specifically, for CA operators, a simulation mode is implemented where all signing operations occur on a test HSM with test keys. This allows critical procedures (Key Ceremony, OCSP operations) to be rehearsed without risk to the production environment.
+
+\textbf{AT-2(2) --- Phishing Simulations.}
+Integration of \texttt{ias} with the ERP/MAIL module allows automated sending of simulated phishing emails and recording of user responses. Results are automatically bound to user profiles in \texttt{ias} and influence the subject's risk assessment score.
 
 \newpage
-\selectlanguage{english}
-\section{Codebase Overview for Copyright Registration}
+\section{Conclusion}
+By treating the Information Security Management System (ISMS) and the KSZI documentation as "Infrastructure as Code" (IaC) via Elixir maps, ERPUNO LLC achieves a continuous, verifiable, and strictly compliant security posture. This approach significantly reduces the friction typically associated with DSSZZI and NIST audits by ensuring that the actual state of the system is always perfectly synchronized with its certified documentation.
+
+\newpage
+\subsection{Codebase Overview for Copyright Registration}
 The entire Configuration Management Database (CMDB), Continuous Accountability System, and PKI Certificate Authority components discussed in this document are implemented as a cohesive software suite. This software suite forms the basis for the formal registration of the copyright work.
 
 The core architectural blocks of the codebase include:
@@ -786,15 +785,11 @@ The software is continuously developed, documented, and published at the followi
     \item \textbf{Developer Documentation}: \url{https://ca.n2o.dev}
 \end{itemize}
 
-\newpage
-\section{Conclusion}
-By treating the Information Security Management System (ISMS) and the KSZI documentation as "Infrastructure as Code" (IaC) via Elixir maps, ERPUNO LLC achieves a continuous, verifiable, and strictly compliant security posture. This approach significantly reduces the friction typically associated with DSSZZI and NIST audits by ensuring that the actual state of the system is always perfectly synchronized with its certified documentation.
-
 \begin{thebibliography}{9}
-\bibitem{nist53} 
+\bibitem{nist53}
 National Institute of Standards and Technology. \textit{Security and Privacy Controls for Information Systems and Organizations}. NIST Special Publication 800-53, Revision 5.
 
-\bibitem{ndtzi37} 
+\bibitem{ndtzi37}
 \foreignlanguage{ukrainian}{Державна служба спеціального зв'язку та захисту інформації України. \textit{НД ТЗІ 3.7-003-2023. Порядок проведення державної експертизи в сфері технічного захисту інформації}.}
 
 \bibitem{ndtzi25} 
