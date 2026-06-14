@@ -673,7 +673,8 @@ defmodule CA.TeX do
               params = Enum.zip(desc_list, params_list)
 
               if params == [] do
-                "#{col1} & #{col2} & & #{escape_latex(cid)} & \\\\ #{line_cmd}\n"
+                safe_desc = spec.description |> escape_latex() |> String.replace("\\\\ \n", "\\newline ")
+                "#{col1} & #{col2} & #{safe_desc} & #{escape_latex(cid)} & \\\\ #{line_cmd}\n"
               else
                 params
                 |> Enum.with_index()
