@@ -484,7 +484,7 @@ defmodule CA.TeX do
   end
 
   def legal_l2_profile(opts \\ []) do
-    controls = CA.L2.Court.controls() -- CA.L1.controls()
+    controls = CA.L2.Court.controls() # -- CA.L1.controls()
     {body, _count} = generate_legal_l2_table_body(controls)
 
     opts =
