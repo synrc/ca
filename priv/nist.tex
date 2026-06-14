@@ -3,7 +3,7 @@
 \usepackage[T2A,T1]{fontenc}
 \usepackage[english,ukrainian]{babel}
 \usepackage{hyperref}
- \usepackage{indentfirst}
+% \usepackage{indentfirst}
  
 \title{Building a Compliant Security Profile:\\ \foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} and NIST Certification \\ for ERP/1 and \foreignlanguage{ukrainian}{ЦОД} Security Profiles}
 \author{maxim@synrc.com}
@@ -256,10 +256,10 @@ organizational commitment.
 \subsection{Awareness and Training (AT)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca}: AT-2, AT-3 --- Security Awareness and Role-Based Training}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} provides ERP/1's Awareness and Training controls (AT-2, AT-3). The repository supplies a dedicated test HSM environment and test CA hierarchy for role-based rehearsal, while \href{https://github.com/zencrypted/ias}{\texttt{zencrypted/ias}} enforces training completion programmatically via account attributes.
 
 \textbf{AT-2 --- Literacy Training and Awareness.}
-All ERP/1 users complete mandatory annual security awareness training covering phishing recognition, credential hygiene, incident reporting procedures, and acceptable use of cryptographic tokens. Completion is tracked via \texttt{zencrypted/ias}: the \texttt{training\_completed\_at} attribute must be current for the account to retain access. An expired training record triggers automatic account downgrade to read-only until training is renewed.
+All ERP/1 users complete mandatory annual security awareness training covering phishing recognition, credential hygiene, incident reporting procedures, and acceptable use of cryptographic tokens. Completion is tracked via \texttt{zencrypted/ias}: the \texttt{completed} attribute must be current for the account to retain access. An expired training record triggers automatic account downgrade to read-only until training is renewed.
 
 \textbf{AT-2(2) --- Phishing Simulations.}
 \texttt{ias} integrates with the ERP/MAIL module to send automated simulated phishing campaigns quarterly. User responses (clicks, credential entry) are silently logged and bound to the user profile as a behavioral risk score attribute. High-risk users are automatically enrolled in remedial training and their sessions are subjected to enhanced monitoring by the SIEM.
@@ -271,7 +271,7 @@ All ERP/1 users complete mandatory annual security awareness training covering p
 \subsection{Incident Response (IR)}
 % =========================================================
 
-\subsubsection{\texttt{erpuno/itsm}: IR-1, IR-4, IR-5, IR-6}
+\href{https://github.com/erpuno/itsm}{\texttt{erpuno/itsm}} is the Incident Response hub for ERP/1 (IR-1, IR-4, IR-5, IR-6). It receives alerts from Wazuh and \href{https://github.com/zencrypted/ias}{\texttt{zencrypted/ias}}, orchestrates BPMN incident workflows via \href{https://github.com/synrc/bpmn}{\texttt{synrc/bpmn}}, and stores the complete audit trail of every incident in \href{https://github.com/synrc/kvs}{\texttt{synrc/kvs}}.
 
 \textbf{IR-1 --- Incident Response Policy and Procedures.}
 Incident response processes are formalized as BPMN processes in \texttt{synrc/bpmn} and executed via \texttt{erpuno/itsm}. Each incident type (with its MITRE ATT\&CK code) has an assigned BPMN template with clear stages: detection, classification, escalation, remediation, post-analysis.
@@ -290,10 +290,10 @@ The complete audit trail of each incident (all actions, comments, status changes
 \subsection{Maintenance (MA)}
 % =========================================================
 
-\subsubsection{\texttt{erpuno/itsm}: MA-2, MA-4, MA-5}
+\href{https://github.com/erpuno/itsm}{\texttt{erpuno/itsm}} manages all controlled and remote maintenance activities for ERP/1 (MA-2, MA-4, MA-5). Maintenance windows are modeled as Change Requests, approved via dual-authorization workflow, and logged to the immutable audit trail in \href{https://github.com/synrc/kvs}{\texttt{synrc/kvs}}.
 
 \textbf{MA-2 --- Controlled Maintenance.}
-Any scheduled maintenance work (server, network equipment, HSM servicing) is registered as a Change Request (CR) in \texttt{itsm}. A CR has mandatory fields: \texttt{maintainer\_id}, \texttt{authorization\_certificate} (X.509 signature from an authorized engineer), \texttt{maintenance\_window}, \texttt{rollback\_plan}.
+Any scheduled maintenance work (server, network equipment, HSM servicing) is registered as a Change Request (CR) in \texttt{itsm}. A CR has mandatory fields: \texttt{maintainer}, \texttt{authorization} (X.509 signature from an authorized engineer), \texttt{maintenance\_window}, \texttt{rollback\_plan}.
 
 \textbf{MA-4 --- Nonlocal Maintenance.}
 All remote maintenance access (SSH, RDP) is routed through a dedicated Jump server in the Management VLAN. Access to the Jump server is possible only from fixed IPs via an \texttt{synrc/vpn} tunnel with mandatory MFA.
@@ -306,7 +306,7 @@ The list of authorized maintenance personnel is maintained in the CMDB (\texttt{
 \subsection{Personnel Security (PS)}
 % =========================================================
 
-\subsubsection{\texttt{zencrypted/ias}: PS-3, PS-4, PS-5, PS-6, PS-7 --- Personnel Lifecycle}
+\href{https://github.com/zencrypted/ias}{\texttt{zencrypted/ias}} enforces the full personnel lifecycle (PS-3, PS-4, PS-5, PS-6, PS-7) for ERP/1. It integrates with HR via SCIM 2.0 to automate onboarding, role transfers, and termination off-boarding, triggering certificate revocation in \href{https://github.com/synrc/ca}{\texttt{synrc/ca}} within one minute of a termination event.
 
 \textbf{PS-3 --- Personnel Screening.}
 Background verification requirements for each role are encoded as mandatory attributes in \texttt{ias} account profiles. An account with role \texttt{security\_admin} or \texttt{global\_root\_admin} cannot be activated without the \texttt{background\_check\_completed} attribute set by an authorized HR officer. This creates a technical enforcement of the screening policy.
@@ -321,13 +321,13 @@ Role transfers are handled via the Joiner-Mover-Leaver (JML) workflow in \texttt
 As described in PL-4, access agreements (rules of behavior) are accepted cryptographically during certificate enrollment. The signed enrollment request itself constitutes the access agreement. Changes to the rules of behavior trigger a new certificate enrollment cycle, requiring fresh cryptographic acceptance.
 
 \textbf{PS-7 --- External Personnel Security.}
-Third-party contractors and external auditors receive time-limited X.509 certificates from a dedicated sub-CA with a restricted OID scope in \texttt{synrc/ca}. These certificates have a hard expiration aligned with the contract period, after which access terminates automatically without any manual action. The ABAC policies for the \texttt{external\_contractor} role enforce a strict Default Deny posture, granting only explicitly scoped resource access.
+Third-party contractors and external auditors receive time-limited X.509 certificates from a dedicated sub-CA with a restricted OID scope in \texttt{synrc/ca}. These certificates have a hard expiration aligned with the contract period, after which access terminates automatically without any manual action. The ABAC policies for the \texttt{contractor} role enforce a strict Default Deny posture, granting only explicitly scoped resource access.
 
 % =========================================================
 \subsection{Physical and Environmental Protection (PE)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca} CMDB: PE-2, PE-3, PE-6, PE-12 --- Physical Access and Environment}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} CMDB governs physical and environmental protection (PE-2, PE-3, PE-6, PE-12) by maintaining authoritative records of all physical zones, access authorizations, and infrastructure components (\texttt{hw.ex}). Physical access control systems query the CMDB and \texttt{zencrypted/ias} OCSP to validate smart-card credentials at the server-room mantrap in real time.
 
 \textbf{PE-2 --- Physical Access Authorizations.}
 Physical access to the server room and HSM storage area is controlled via a PKI-based electronic access control system. The authorized persons list is maintained as a CMDB record (\texttt{hw.ex} physical zone policy), cross-referenced with active \texttt{ias} accounts. A deactivated account automatically triggers removal from the physical access list within one synchronization cycle.
@@ -366,7 +366,7 @@ The Metainformational Security Profile covers the governance, planning, and prog
 \subsection{Planning (PL)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca}: PL-2, PL-4, PL-8 --- System Security Plans and Rules of Behavior}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} implements the Planning controls (PL-2, PL-4, PL-8) for ERP/1 through the Documentation as Code (DaC) paradigm: the entire system security plan, rules of behavior, and security architecture are generated on demand from live CMDB modules (\texttt{mix run -e 'CA.TeX.gen\_bible()'}) and cryptographically signed as part of the L3 Target Security Profile.
 
 \textbf{PL-2 --- System Security and Privacy Plans.}
 The system security plan for ERP/1 is not a Word document filed in a binder. It is this very PDF report, generated on demand via \texttt{mix run -e 'CA.TeX.gen\_bible()'} from the live CMDB state. Every section --- hardware inventory, risk taxonomy, role definitions, network architecture --- is extracted programmatically, ensuring 100\% fidelity between documentation and deployed reality. The plan is updated automatically upon every git commit that changes a CMDB module.
@@ -375,13 +375,13 @@ The system security plan for ERP/1 is not a Word document filed in a binder. It 
 Acceptable use rules are defined declaratively in \texttt{roles.ex} and embedded as machine-readable OID extensions in X.509 certificates. Every certificate holder cryptographically acknowledges the rules of behavior by accepting and installing their certificate, creating an auditable, non-repudiable consent record stored in \texttt{kvs}.
 
 \textbf{PL-8 --- Security and Privacy Architectures.}
-The security architecture of ERP/1 is codified as the L3 Target Security Profile (\texttt{legal\_l3\_profile\_erp.pdf}), generated from CMDB and cryptographically signed. Any deviation from the declared architecture is detectable by comparing the current CMDB state against the signed baseline, enabling automated drift detection.
+The security architecture of ERP/1 is codified as the L3 Target Security Profile\footnote{\url{https://ca.n2o.dev/priv/legal_l3_profile_erp.pdf}}, generated from CMDB and cryptographically signed. Any deviation from the declared architecture is detectable by comparing the current CMDB state against the signed baseline, enabling automated drift detection.
 
 % =========================================================
 \subsection{Program Management (PM)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca} CMDB: PM-2, PM-5, PM-6, PM-9 --- Security Program Infrastructure}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} CMDB materializes the Program Management controls (PM-2, PM-5, PM-6, PM-9) as Elixir source code: \texttt{roles.ex} defines security leadership roles enforced via X.509 extensions; \texttt{hw.ex} delivers a real-time machine-queryable hardware inventory; and \texttt{risk.ex} maintains the organizational risk management strategy as a structured, version-controlled registry.
 
 \textbf{PM-2 --- Information Security Program Leadership Roles.}
 The CMDB \texttt{roles.ex} module formally defines the organizational security roles: Security Administrator (\texttt{security\_admin}), Auditor (\texttt{auditor}), Registration Operator (\texttt{reg\_operator}), and Global Superadministrator (\texttt{global\_root\_admin}). These roles are not notional --- they are enforced cryptographically via X.509 certificate extensions and ABAC policies.
@@ -399,7 +399,7 @@ The organizational risk management strategy is materialized in \texttt{risk.ex} 
 \subsection{Risk Assessment (RA)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca} risk.ex: RA-2, RA-3, RA-5 --- Programmatic Risk Taxonomy}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} \texttt{risk.ex} implements the Risk Assessment family (RA-2, RA-3, RA-5) as a live, programmatic threat model. Data categorization (\texttt{data.ex}) automatically enforces cryptographic requirements per classification level, while the risk taxonomy cross-references Wazuh SIEM feeds and SBOM dependency scans to keep vulnerability records synchronized with the current system state.
 
 \textbf{RA-2 --- Security Categorization.}
 Data categorization for ERP/1 (Public, PII, Internal, Confidential) is encoded in \texttt{data.ex}. Each category is automatically coupled to mandatory cryptographic and access control requirements: PII data triggers PostgreSQL TDE + ABAC restrictions; Confidential data mandates HSM-backed encryption and air-gapped backup routing. Categorization is machine-enforced, not advisory.
@@ -414,7 +414,7 @@ Vulnerability data from the \texttt{risk.ex} taxonomy is cross-referenced agains
 \subsection{System and Services Acquisition (SA)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca} + CI/CD: SA-5, SA-9, SA-11 --- Documentation as Code and Vendor Security}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} combined with the ERP/1 CI/CD pipeline implements the System and Services Acquisition controls (SA-5, SA-9, SA-11). All system documentation is generated programmatically; all external service dependencies are declared in \texttt{sys.ex} CMDB; and every artifact undergoes automated SBOM generation, OWASP Dependency Check, and cryptographic signature verification before reaching the production registry.
 
 \textbf{SA-5 --- System Documentation.}
 The cornerstone of the ERP/1 metainformational approach is the "Documentation as Code" (DaC) paradigm. The entire \foreignlanguage{ukrainian}{КСЗІ} documentation package --- security plans, asset registries, risk matrices, network diagrams, this PDF --- is generated from live Elixir source code. The command \texttt{mix run} produces a complete, audit-ready documentation set. Documentation is never manually edited; it is always a faithful projection of the code state.
@@ -429,7 +429,7 @@ All ERP/1 components undergo automated security testing at the CI/CD pipeline le
 \subsection{Privacy (PT)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca} CPS: PT-2, PT-4, PT-6 --- Authority, Consent, and PII Accuracy}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} Certificate Practice Statement (CPS) implements the Privacy controls (PT-2, PT-4, PT-6). Legal authority for processing personal data is declared in the CPS and embedded as OIDs in every issued certificate. Subscriber consent is captured as a digitally signed XAdES-BES record stored in \href{https://github.com/synrc/kvs}{\texttt{synrc/kvs}} with an RFC 3161 timestamp for legal non-repudiation.
 
 \textbf{PT-2 --- Authority to Process Personally Identifiable Information.}
 The legal basis and specific purposes for processing personal data (subscriber registry: passport data, RNOKPP) are declared in the Certificate Practice Statement (CPS), published at \url{https://ca.n2o.dev}. The CPS is a legally binding document, version-controlled in Git, and referenced by OID in every issued certificate.
@@ -693,7 +693,7 @@ Each platform product is a purpose-built solution for a specific security domain
 % =========================================================
 \subsection{Access Control (AC)}
 % =========================================================
-\subsubsection{\texttt{zencrypted/ias}: AC-2 --- Account Management}
+\href{https://github.com/zencrypted/ias}{\texttt{zencrypted/ias}} is the primary account management engine for ERP/1 (AC-2). It provides a full identity lifecycle (create, modify, disable, remove), enforces separation of duties via role constraints, and integrates with \href{https://github.com/synrc/ca}{\texttt{synrc/ca}} to issue and revoke X.509 certificates bound to each account.
 
 The \texttt{ias} server (Identity and Access Server) is the platform's central Identity Provider (IdP), implementing the full account lifecycle through a single programmatic interface. Unlike fragmented LDAP directories, \texttt{ias} operates with declarative user profiles directly bound to the role registry in \texttt{roles.ex}.
 
@@ -736,14 +736,14 @@ Behavioral metrics (request frequency, geography, unusual hours) are aggregated 
 \textbf{AC-2(13) --- Disable Accounts of High-Risk Individuals.}
 SIEM integration allows \texttt{ias} to receive webhook signals about compromise. Upon receiving a \texttt{high\_risk\_account\_detected} signal, the corresponding profile is transitioned to \texttt{:suspended} within one second, regardless of any currently active sessions.
 
-\subsubsection{\texttt{zencrypted/ias}: AC-7 --- Unsuccessful Logon Attempts}
+\href{https://github.com/zencrypted/ias}{\texttt{zencrypted/ias}} enforces lockout policy (AC-7): configurable consecutive failure thresholds trigger automatic account locking, SIEM alerting, and optionally step-up MFA prompts on the next successful authentication.
 \textbf{AC-7 (Base Control).}
 \texttt{ias} maintains a counter of failed authentication attempts bound to the subject and IP address. After a configurable threshold (default: 5 attempts in 10 minutes), the account is temporarily locked (account lockout) with an automatic notification to the administrator.
 
 \textbf{AC-7(2) --- Purge or Wipe Mobile Device.}
 Upon receiving a signal from a Mobile Device Management (MDM) system about device theft or compromise, \texttt{ias} immediately revokes all tokens and certificates associated with that device via the OCSP revocation mechanism in \texttt{synrc/ca}.
 
-\subsubsection{\texttt{synrc/ca}: AC-3 --- Access Enforcement}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} implements the Reference Monitor (AC-3, AC-25) for ERP/1. Every service-to-service and user-to-service request is validated against ABAC policies before any resource access is permitted; there is no pathway around this enforcement point.
 
 The \texttt{synrc/ca} module implements the Reference Monitor (AC-25) --- a centralized control mechanism that verifies every request to a protected resource based on X.509 certificates and ABAC policies.
 
@@ -771,7 +771,7 @@ Subject attributes are stored in \texttt{ias} and \texttt{synrc/ca}; resource at
 \textbf{AC-3(15) --- Discretionary and Mandatory Access Control.}
 The system supports the simultaneous operation of two models: MAC (based on classification labels in X.509) and DAC (delegation via \texttt{ias}). MAC always takes priority: if a mandatory label denies access, a DAC rule cannot override it.
 
-\subsubsection{\texttt{synrc/bpmn}: AC-4 --- Information Flow Enforcement}
+\href{https://github.com/synrc/bpmn}{\texttt{synrc/bpmn}} enforces information flow control (AC-4) for ERP/1 business processes. Data flows between organizational units, external partners, and system components are modeled as BPMN lanes with explicit boundary controls; unauthorized cross-boundary flows are technically blocked by the process engine.
 
 The BPMN engine \texttt{synrc/bpmn} is the central orchestrator of business processes, and all information flows between platform components pass through it.
 
@@ -784,7 +784,7 @@ Artifacts (documents, case files) passed between tasks carry a mandatory \texttt
 \textbf{AC-4(4) --- Flow Control of Encrypted Information.}
 At boundaries between organizational units, \texttt{bpmn} performs schema validation of transferred documents (JSON Schema, XSD) and verification of CMS/XAdES signatures before continuing the process.
 
-\subsubsection{\texttt{erpuno/abac}: AC-5 and AC-6 --- Separation of Duties and Least Privilege}
+\href{https://github.com/erpuno/abac}{\texttt{erpuno/abac}} implements Separation of Duties and Least Privilege (AC-5, AC-6) for ERP/1. Attribute-Based Access Control policies are evaluated at the application boundary; conflicting role combinations are defined as constraints and are technically impossible to activate simultaneously.
 
 \textbf{AC-5 --- Separation of Duties.}
 \texttt{abac} implements Separation of Duties (SoD) via declarative XACML-like rules specifying sets of mutually exclusive roles (SSD: Static Separation of Duties). For example, the same individual cannot hold both the \texttt{initiator} and \texttt{approver} roles for financial transactions. SoD rules are verified not only at action execution but also at role assignment --- the system rejects an assignment that would create a conflict.
@@ -821,7 +821,7 @@ Technically enforced through the combination of ABAC rules and X.509 cryptograph
 \subsection{Audit and Accountability (AU)}
 % =========================================================
 
-\subsubsection{\texttt{zencrypted/ias}: AU-2, AU-3, AU-6, AU-9, AU-10, AU-12}
+\href{https://github.com/zencrypted/ias}{\texttt{zencrypted/ias}} is the primary audit event source for ERP/1 (AU-2, AU-3, AU-6, AU-9, AU-10, AU-12). All security-relevant events — logins, failures, privilege changes, certificate operations — are written to the append-only log in \href{https://github.com/synrc/kvs}{\texttt{synrc/kvs}} and forwarded to the Wazuh SIEM for real-time correlation and alerting.
 
 \textbf{AU-2 --- Event Logging.}
 \texttt{ias} is the primary source of most security events: login/logout, failed authentications, profile changes, privilege delegation. The event list is defined in configuration and complies with \foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} 2.3-025-24} mandatory logging requirements.
@@ -845,7 +845,7 @@ Critical events (document signing, approvals, certificate issuance) are recorded
 \subsection{Assessment, Authorization, and Monitoring (CA)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca}: CA-2, CA-6, CA-7, CA-8, CA-9}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} implements the Assessment, Authorization, and Monitoring family (CA-2, CA-6, CA-7, CA-8, CA-9) by generating audit-ready documentation packages on demand, maintaining a continuous monitoring pipeline via Wazuh integration, and operating internal penetration-test tooling against the test CA hierarchy without impacting production.
 
 \textbf{CA-2 --- Control Assessments.}
 \texttt{synrc/ca} automates the collection of compliance evidence via the CMDB API. Before each audit (\foreignlanguage{ukrainian}{ДССЗЗІ} state expertise), \texttt{mix run -e 'CA.TeX.generate()'} is executed, generating a complete documentation package from the current system state.
@@ -866,7 +866,7 @@ All internal connections between ERP/1 services are authorized via mTLS (mutual 
 \subsection{Configuration Management (CM)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca} CMDB: CM-2, CM-3, CM-6, CM-7, CM-8, CM-9}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} CMDB implements the Configuration Management family (CM-2, CM-3, CM-6, CM-7, CM-8, CM-9) by expressing the entire baseline configuration as Elixir source code modules (\texttt{hw.ex}, \texttt{sys.ex}, \texttt{net.ex}). Any deviation from the declared baseline is detectable by diffing the current CMDB state against the cryptographically signed production commit.
 
 \textbf{CM-2, CM-3 --- Baseline Configuration and Configuration Change Control.}
 The baseline configuration of all components is captured in CMDB Elixir modules (\texttt{hw.ex}, \texttt{sys.ex}, \texttt{net.ex}). Every change in the production environment must first be reflected in the corresponding CMDB file and pass Code Review in Git. Deviation from the baseline (configuration drift) is detected by Wazuh FIM (File Integrity Monitoring).
@@ -887,7 +887,7 @@ Instead of a separate textual document, the CM plan is directly encoded in the G
 \subsection{Contingency Planning (CP)}
 % =========================================================
 
-\subsubsection{\texttt{erlang/otp}: CP-2, CP-7, CP-9, CP-10}
+\href{https://github.com/erlang/otp}{\texttt{erlang/otp}} provides the runtime foundation for ERP/1's Contingency Planning controls (CP-2, CP-7, CP-9, CP-10). The OTP supervision tree implements automatic failover and process restart; distributed Mnesia/KVS replication provides continuous data backup; and the hot-code-upgrade mechanism enables recovery from software faults without downtime.
 
 \textbf{CP-2 --- Contingency Plan.}
 Erlang/OTP is the foundation of ERP/1 fault tolerance. The Supervision Tree architecture guarantees the automatic restart of any failed process. At the cluster level, a minimum of three nodes (quorum) ensures availability even upon failure of one node.
@@ -905,7 +905,7 @@ Recovery procedures are rehearsed as part of training (AT-3) in an isolated envi
 \subsection{Identification and Authentication (IA)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/ca} + \texttt{zencrypted/ias}: IA-2, IA-5, IA-8}
+\href{https://github.com/synrc/ca}{\texttt{synrc/ca}} and \href{https://github.com/zencrypted/ias}{\texttt{zencrypted/ias}} jointly implement the Identification and Authentication family (IA-2, IA-5, IA-8) for ERP/1. \texttt{synrc/ca} issues PKI credentials (X.509 certificates) backed by IIT Gryada-301 HSMs, while \texttt{zencrypted/ias} enforces MFA at every authentication boundary and manages authenticator lifecycle.
 
 \textbf{IA-2 --- Identification and Authentication (Organizational Users).}
 \texttt{ias} enforces strict MFA: the first factor is an X.509 certificate (smart card or IIT Gryada HSM token), the second factor is an OTP (TOTP/HOTP or hardware token). No system function is accessible without successful completion of both factors.
@@ -929,7 +929,7 @@ For external systems (e.g., Unified State Register, Diia), \texttt{ias} supports
 \subsection{Media Protection (MP)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/kvs}: MP-2, MP-4, MP-5, MP-6, MP-7}
+\href{https://github.com/synrc/kvs}{\texttt{synrc/kvs}} implements the Media Protection family (MP-2, MP-4, MP-5, MP-6, MP-7) for ERP/1. All records are encrypted at the storage level using \foreignlanguage{ukrainian}{ДСТУ}-compatible Kalyna AES-256-GCM with keys held in an IIT Gryada HSM; physical media access is restricted by PE controls enforced via the CMDB Policy Engine.
 
 \textbf{MP-2, MP-4 --- Media Access and Storage.}
 \texttt{kvs} is the primary storage for all critical ERP/1 data. Data is encrypted at the record level using \foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{ДСТУ} algorithms} (Kalyna AES-256 GCM) with keys stored in an IIT Gryada HSM. Physical access to servers running \texttt{kvs} is restricted via the Policy Engine and PE controls.
@@ -947,7 +947,7 @@ Removable media (USB) usage is technically blocked at the OS level (udev rules, 
 \subsection{System and Communications Protection (SC)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/vpn}: SC-7, SC-8, SC-12, SC-28}
+\href{https://github.com/synrc/vpn}{\texttt{synrc/vpn}} implements the System and Communications Protection family (SC-7, SC-8, SC-12, SC-28) for ERP/1. All inter-component traffic is protected by mTLS 1.3 with \foreignlanguage{ukrainian}{ДСТУ}-compatible cipher suites; boundary protection is enforced at the L3 VPN gateway; cryptographic key management is centralized in \href{https://github.com/synrc/ca}{\texttt{synrc/ca}} backed by IIT Gryada HSMs.
 
 \textbf{SC-7 --- Boundary Protection.}
 \texttt{synrc/vpn} implements a strict network perimeter based on IPsec IKEv2 with X.509 certificate authentication. All external connections (between sites, with remote users) pass through VPN tunnels. The Cisco Firepower 4145 NGFW (documented in CMDB) filters traffic at the perimeter.
@@ -968,7 +968,7 @@ PostgreSQL and Oracle use TDE (Transparent Data Encryption) with keys from the H
 \subsection{System and Information Integrity (SI)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/chat}: SI-3, SI-4, SI-7, SI-10}
+\href{https://github.com/synrc/chat}{\texttt{synrc/chat}} implements the System and Information Integrity family (SI-3, SI-4, SI-7, SI-10) for ERP/1. CMS/S-MIME end-to-end encryption with mandatory digital signatures provides malicious code protection and message integrity; all messages are archived with RFC 3161 timestamps in \href{https://github.com/synrc/kvs}{\texttt{synrc/kvs}} for non-repudiation.
 
 \textbf{SI-3 --- Malicious Code Protection.}
 All cluster nodes are protected by Wazuh HIDS with up-to-date signatures. At the CI/CD pipeline level, automatic dependency scanning (SBOM, OWASP Dependency Check) is executed on every commit.
@@ -986,7 +986,7 @@ All ERP/1 releases are signed with a DSTU 4145-2002 digital signature from \text
 \subsection{Supply Chain Risk Management (SR)}
 % =========================================================
 
-\subsubsection{\texttt{synrc/chat} + \texttt{synrc/ca}: SR-3, SR-4, SR-11}
+\href{https://github.com/synrc/chat}{\texttt{synrc/chat}} and \href{https://github.com/synrc/ca}{\texttt{synrc/ca}} together address the Supply Chain Risk Management family (SR-3, SR-4, SR-11). The entire ERP/1 software stack is delivered as reproducible, cryptographically signed OCI images with attached SBOMs; hardware components are verified against CMDB serial-number records and vendor supply chain agreements.
 
 \textbf{SR-3 --- Supply Chain Controls and Processes.}
 ERP/1 uses exclusively open-source components (Erlang/OTP, Elixir), whose source code is verified before inclusion. An SBOM (Software Bill of Materials) is generated automatically at every build.
