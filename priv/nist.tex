@@ -3,9 +3,10 @@
 \usepackage[T2A,T1]{fontenc}
 \usepackage[english,ukrainian]{babel}
 \usepackage{hyperref}
-
-\title{Building a Compliant Security Profile: ND TZI and NIST Certification for ERPUNO, COURT and COD security profiles}
-\author{ERPUNO Security Team}
+ \usepackage{indentfirst}
+ 
+\title{Building a Compliant Security Profile:\\ \foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} and NIST Certification \\ for ERP/1 and \foreignlanguage{ukrainian}{ЦОД} Security Profiles}
+\author{maxim@synrc.com}
 \date{\today}
 
 \begin{document}
@@ -14,33 +15,128 @@
 \selectlanguage{english}
 
 \begin{abstract}
-This article details the methodology for constructing a Comprehensive Information Security System (KSZI) that complies with
-Ukrainian state standards (ND TZI) and the international NIST SP 800-53 framework. Using SYNRC/CA --- an open source CMDB
-we demonstrate how to programmatically define, track, and audit a security profile. The approach utilizes Elixir-based Configuration
-Management Database (CMDB) profiles to maintain strict accountability over hardware, software, networks, data, roles, and risks.
-For security reasons we can only demo/showcase of ERPUNO security (sample) profile.
+This article details the methodology for constructing a Comprehensive Information Security System
+(\foreignlanguage{ukrainian}{КСЗІ}) that complies with Ukrainian state standards
+(\foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}}) and the international NIST SP 800-53 framework.
+Using SYNRC/CA --- an open source CMDB we demonstrate how to programmatically define, track, and audit a security profile.
+The approach utilizes Elixir-based Configuration Management Database (CMDB) profiles to maintain strict accountability over hardware,
+software, networks, data, roles, and risks. For security reasons we can only demo/showcase of ERP/1 security (sample) profile.
 \end{abstract}
 
 \setcounter{tocdepth}{2}
 \newpage
 \tableofcontents
 
-\newpage\section{Introduction}
-ERPUNO LLC provides high-tech telecommunication solutions for the automation of commercial and state enterprises. Their platform is architecturally divided into two primary layers:
+\newpage
+\section{Introduction}
+
+\subsection{Terms and Abbreviations}
+
+\begin{description}
+
+    \item[ABAC] Attribute-Based Access Control. An access control model where authorization decisions are based on policies that combine attributes of subjects, resources, actions, and the environment.
+    \item[BPMN] Business Process Model and Notation. A graphical standard for specifying business processes; used in ERP/1 as the orchestration layer for security workflows.
+    \item[CA] Certificate Authority. A trusted entity that issues, manages, and revokes digital certificates.
+    \item[CMDB] Configuration Management Database. A repository that stores structured data about IT assets and their relationships; in ERP/1, expressed as Elixir source code modules.
+    \item[CPS] Certificate Practice Statement. A document that describes the practices of a CA in issuing and managing digital certificates.
+    \item[CRL] Certificate Revocation List. A signed list of certificates that have been revoked before their expiration date.
+    \item[DaC] Documentation as Code. A paradigm where system documentation is generated programmatically from source code, eliminating manual maintenance and documentation drift.
+    \item[\foreignlanguage{ukrainian}{ДССЗЗІ}] {\selectlanguage{ukrainian}Державна служба спеціального зв'язку та захисту інформації\selectlanguage{english}} (State Service of Special Communications and Information Protection of Ukraine). The regulatory authority responsible for \foreignlanguage{ukrainian}{КСЗІ} certification and information security oversight.
+    \item[\foreignlanguage{ukrainian}{ДСТУ}] {\selectlanguage{ukrainian}Державний Стандарт України\selectlanguage{english}} (State Standard of Ukraine). A national standardization document issued by the National Standardization Body of Ukraine. Key standards include \foreignlanguage{ukrainian}{ДСТУ} 4145-2002 (ECDSA digital signature) and \foreignlanguage{ukrainian}{ДСТУ} 7564-2014 (Kupyna hash function).
+    \item[HSM] Hardware Security Module. A physical computing device that safeguards and manages cryptographic keys. ERP/1 uses IIT Gryada-301 HSMs.
+    \item[IA] Identity and Access (NIST control family). Controls for identifying and authenticating system users, processes, and devices.
+    \item[IaC] Infrastructure as Code. The practice of managing and provisioning infrastructure through machine-readable configuration files.
+    \item[ISMS] Information Security Management System. A framework of policies and procedures for systematically managing an organization's sensitive data (ISO/IEC 27001).
+    \item[JML] Joiner-Mover-Leaver. A lifecycle model for managing identity provisioning events: new hires (joiners), role changes (movers), and departures (leavers).
+    \item[\foreignlanguage{ukrainian}{КСЗІ}] {\selectlanguage{ukrainian}Комплексна Система Захисту Інформації\selectlanguage{english}} (Comprehensive Information Security System). A Ukrainian regulatory concept for a certified, holistic set of organizational and technical measures protecting information in an information system.
+    \item[\foreignlanguage{ukrainian}{КВС} / KVS] Key-Value Store (\texttt{synrc/kvs}). A distributed, append-only data storage layer used in ERP/1 for immutable audit logs and encrypted data storage.
+    \item[MFA] Multi-Factor Authentication. An authentication method requiring two or more verification factors from different categories.
+    \item[mTLS] Mutual TLS. An extension of TLS where both the client and server authenticate each other with X.509 certificates.
+    \item[\foreignlanguage{ukrainian}{НД ТЗІ}] {\selectlanguage{ukrainian}Нормативний Документ Технічного Захисту Інформації\selectlanguage{english}} (Normative Document on Technical Information Protection). Technical standards issued by \foreignlanguage{ukrainian}{ДССЗЗІ} defining mandatory requirements for \foreignlanguage{ukrainian}{КСЗІ} construction and certification.
+    \item[NIST SP 800-53] National Institute of Standards and Technology Special Publication 800-53. ``Security and Privacy Controls for Information Systems and Organizations,'' the primary international framework used for ERP/1 control mapping.
+    \item[\foreignlanguage{ukrainian}{НПА}] {\selectlanguage{ukrainian}Нормативно-Правовий Акт\selectlanguage{english}} (Regulatory Legal Act). A binding legal instrument (law, order, resolution) issued by a Ukrainian state authority.
+    \item[OCSP] Online Certificate Status Protocol. A protocol for checking the revocation status of an X.509 certificate in real time.
+    \item[OID] Object Identifier. A globally unique identifier used in X.509 certificates and ASN.1 structures to denote security policies, certificate extensions, and cryptographic algorithms.
+    \item[PKI] Public Key Infrastructure. A framework of roles, policies, hardware, software, and procedures for creating, managing, distributing, using, storing, and revoking digital certificates.
+    \item[POA\&M] Plan of Action and Milestones. A document tracking identified security weaknesses, the resources required to address them, and the milestones for remediation.
+    \item[RBAC] Role-Based Access Control. An access control model where permissions are associated with roles, and users are assigned to those roles.
+    \item[SIEM] Security Information and Event Management. A system for real-time analysis of security alerts generated by hardware and applications.
+    \item[SBOM] Software Bill of Materials. A formal record of the components, libraries, and modules that make up a software product.
+    \item[\foreignlanguage{ukrainian}{ТЗІ}] {\selectlanguage{ukrainian}Технічний Захист Інформації\selectlanguage{english}} (Technical Information Protection). The Ukrainian regulatory domain covering technical measures for protecting information from unauthorized access.
+    \item[TSA] Time Stamping Authority. A trusted third party that issues RFC 3161 timestamps, proving that a specific piece of data existed at a specific moment in time.
+    \item[\foreignlanguage{ukrainian}{ЦОД}] {\selectlanguage{ukrainian}Центр Обробки Даних\selectlanguage{english}} (Data Processing Center / Data Center). The physical or virtual facility housing ERP/1 infrastructure components.
+
+\end{description}
+
+\subsection{Legal and Regulatory Framework}
+
+ERP/1 is developed and certified under a layered regulatory hierarchy that combines Ukrainian national law, state technical standards, and international frameworks. Understanding this hierarchy is essential to interpreting the control mappings throughout this document.
+
+\textbf{Ukrainian National Law.}
+The legal basis for information security in Ukraine is established by the Law of Ukraine ``On Information'' (No.~2657-XII), the Law ``On Protection of Information in Information and Communication Systems'' (No.~80/94-VR), and the Law ``On Electronic Trust Services'' (No.~2155-VIII). These laws mandate the creation of \foreignlanguage{ukrainian}{КСЗІ} for state information systems and define the enforcement authority of \foreignlanguage{ukrainian}{ДССЗЗІ}.
+
+\textbf{Normative Documents on Technical Information Protection (\foreignlanguage{ukrainian}{НД ТЗІ}).}
+\foreignlanguage{ukrainian}{НД ТЗІ} ({\selectlanguage{ukrainian}Нормативний Документ Технічного Захисту Інформації\selectlanguage{english}}) are technical standards issued by \foreignlanguage{ukrainian}{ДССЗЗІ}. They define mandatory requirements for constructing \foreignlanguage{ukrainian}{КСЗІ}. Key \foreignlanguage{ukrainian}{НД ТЗІ} documents referenced in this paper include:
+
+\paragraph{}
+
+{\small
+\begin{tabular}{@{}p{0.28\textwidth}p{0.72\textwidth}@{}}
+\hline
+\textbf{\foreignlanguage{ukrainian}{НД ТЗІ 1.1-002-99}}  & General provisions on technical information protection. \\[2pt]
+\textbf{\foreignlanguage{ukrainian}{НД ТЗІ 2.5-004-99}}  & Criteria for evaluating the security of automated systems. \\[2pt]
+\textbf{\foreignlanguage{ukrainian}{НД ТЗІ 2.5-005-99}}  & Classification and evaluation methodology. \\[2pt]
+\textbf{\foreignlanguage{ukrainian}{НД ТЗІ 2.5-008-02}}  & Requirements for confidential information protection. \\[2pt]
+\textbf{\foreignlanguage{ukrainian}{НД ТЗІ 2.5-010-03}}  & Requirements for web application protection. \\[2pt]
+\textbf{\foreignlanguage{ukrainian}{НД ТЗІ 1.6-005-22}}  & Requirements for \foreignlanguage{ukrainian}{КСЗІ} state expertise audit trails. \\[2pt]
+\textbf{\foreignlanguage{ukrainian}{НД ТЗІ 2.3-025-24}}  & Requirements for audit logging and accountability. \\[2pt]
+\textbf{\foreignlanguage{ukrainian}{НД ТЗІ 2.6-001-11}}  & \foreignlanguage{ukrainian}{КСЗІ} two-stage certification. \\[2pt]
+\textbf{\foreignlanguage{ukrainian}{НД ТЗІ 3.6-006-24}}  & Security requirements for critical state registries. \\[2pt]
+\textbf{\foreignlanguage{ukrainian}{НД ТЗІ 3.7-003-23}}  & Requirements for exploitation documentation. \\
+\hline
+\end{tabular}
+}
+
+\paragraph{}
+
+\textbf{Regulatory Legal Acts (\foreignlanguage{ukrainian}{НПА} --- {\selectlanguage{ukrainian}Нормативно-Правові Акти\selectlanguage{english}}).}
+\foreignlanguage{ukrainian}{НПА} are binding orders and resolutions of the Cabinet of Ministers of Ukraine and \foreignlanguage{ukrainian}{ДССЗЗІ} that govern the certification process, licensing of \foreignlanguage{ukrainian}{КСЗІ} developers and expertise organizations, and the mandatory protection of specific categories of state information resources.
+
+\textbf{International Standards.}
+ERP/1 simultaneously complies with: NIST SP 800-53 Rev.5 (Security and Privacy Controls for Information Systems), ISO/IEC 27001:2022 (ISMS), FIPS 140-3 (Cryptographic Module Validation), and ITU-T X.509 (Public-Key and Attribute Certificate Frameworks).
+
+\newpage
+\subsection{Security Target}
+
+LLC "e-Government Systems" provides high-tech telecommunication solutions for the automation of commercial and state enterprises.
+Their platform is architecturally divided into two primary layers:
+
 \begin{itemize}
     \item \textbf{Platform (SYS-APP-SYNRC):} The systemic foundation, including the Certificate Authority (CA), L2/L3 VPN tunnels, PKI-aware LDAP, Communicator (CHAT), BPMN process engine, MQTT broker, and KVS storage.
     \item \textbf{Products (SYS-APP-ERP):} Corporate and state enterprise systems such as Education (Edu), Healthcare (Health), Electronic Documents (Mail), Accounting (Acc), Warehouse Management, and Registries (Cart).
 \end{itemize}
 
-The company's architecture is built to support critical state and defense sector needs. It offers special licensing conditions for government applications, provided there is strict adherence to architectural compatibility and certification requirements (like DSSZZI). The system strictly follows ITU-T X-series, IETF RFC, NIST/FIPS, DSTU, and ISO/IEC standards (e.g., X.509, CMS/S-MIME, AES-GCM, Kyber, DSTU 4145-2002).
+The company's architecture is built to support critical state and defense sector needs.
+It offers special licensing conditions for government applications,
+provided there is strict adherence to architectural compatibility and certification requirements.
+The system strictly follows ITU-T X-series, IETF RFC, NIST/FIPS, DSTU,
+and ISO/IEC standards (e.g., X.509, CMS/S-MIME, AES-GCM, Kyber, DSTU 4145-2002).
 
-In this paper, we demonstrate how to build a unified security profile for this complex architecture. The CMDB system maps operational instances directly to NIST SP 800-53 controls (such as CM-8 for System Component Inventory, PM-5 for System Inventory) and ND TZI requirements (e.g., ND TZI 3.7-003-2023 for inventory and exploitation documentation).
+In this paper, we demonstrate how to build a unified security profile for this complex architecture.
+The CMDB system maps operational instances directly to NIST SP 800-53 controls (such as CM-8 for
+System Component Inventory, PM-5 for System Inventory) and \foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}}
+requirements (e.g., \foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} 3.7-003-2023}
+for inventory and exploitation documentation).
 
 \subsection{Hierarchical Security Profiles (L1, L2, L3)}
-The system supports the automated construction of KSZI security profiles based on the regulatory and legal acts in the field of technical protection of information (TZI NPA). This automates documentation generation and the mapping of legislative requirements to technical settings. All certificates are issued with OID imprints of their respective security profiles.
-
+The system supports the automated construction of \foreignlanguage{ukrainian}{КСЗІ} security profiles
+based on the regulatory and legal acts in the field of technical protection of
+information (\foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} \foreignlanguage{ukrainian}{НПА}}).
+This automates documentation generation and the mapping of legislative requirements to technical settings.
+All certificates are issued with OID imprints of their respective security profiles.
 The architecture is divided into three levels of profiles:
 
+\newpage
 \subsubsection{L1: Basic Security Profiles}
 These profiles define the fundamental sets of controls required by the regulations.
 \begin{itemize}
@@ -53,49 +149,85 @@ These profiles define the fundamental sets of controls required by the regulatio
 \subsubsection{L2: Industry Profiles}
 Industry-specific adaptations that expand upon the baseline controls to meet the requirements of specific sectors.
 \begin{itemize}
-    \item \textbf{COURT INDUSTRY PROFILE}\footnote{\url{https://ca.n2o.dev/priv/legal_l2_court_profile.pdf}}: Industry security profile for the judicial system. It describes an extended set of baseline controls for processing sensitive information in state registries and courts, taking into account the requirements for high availability and data integrity based on ND TZI 3.6-006-24.
-    \item \textbf{THE DIGITAL UKRAINIAN GOVERNMENT INDUSTRY PROFILE}\footnote{\url{https://ca.n2o.dev/priv/digital-profile.pdf}}: Industry security profile for the Ministry of Digital Transformation of Ukraine.
+    \item \textbf{COURT INDUSTRY PROFILE}\footnote{\url{https://ca.n2o.dev/priv/legal_l2_court_profile.pdf}}:
+      Industry security profile for the judicial system. It describes an extended set of baseline controls for
+      processing sensitive information in state registries and courts, taking into account the requirements for
+      high availability and data integrity based on \foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} 3.6-006-24}.
+    \item \textbf{THE DIGITAL UKRAINIAN GOVERNMENT INDUSTRY PROFILE}\footnote{\url{https://ca.n2o.dev/priv/digital-profile.pdf}}:
+      Industry security profile for the Ministry of Digital Transformation of Ukraine.
 \end{itemize}
 
 \subsubsection{L3: Target Security Profiles}
 Specific implementation targets for individual systems and components.
 \begin{itemize}
-    \item \textbf{ERP/1 SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/legal_l3_profile_erp.pdf}}: Target profile for the ERP/1 telecommunications system. Describes the implementation of Attribute-Based Access Control (ABAC), information flow management (BPE), Public Key Infrastructure (PKI), and reliable auditing (KVS) for securing critical business processes.
-    \item \textbf{X.509 CMS MESSAGING SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/chat_profile.pdf}}: Target profile for corporate messenger systems. Based on X.509 and CMS (Cryptographic Message Syntax) cryptographic protocols, providing end-to-end encryption (E2EE), strict authentication, and non-repudiation for legally significant communications.
-    \item \textbf{VPN SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/vpn_profile.pdf}}: Target profile for Virtual Private Network (VPN) and PKI infrastructures. Defines mechanisms for tunneling, node authentication (SC-8), and network traffic protection at the transport layer to secure communication channels against interception and modification.
+    \item \textbf{ERP/1 SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/legal_l3_profile_erp.pdf}}:
+      Target profile for the ERP/1 telecommunications system. Describes the implementation of Attribute-Based
+      Access Control (ABAC), information flow management (BPE), Public Key Infrastructure (PKI), and reliable
+      auditing (KVS) for securing critical business processes.
+    \item \textbf{X.509 CMS MESSAGING SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/chat_profile.pdf}}:
+      Target profile for corporate messenger systems. Based on X.509 and CMS (Cryptographic Message Syntax)
+      cryptographic protocols, providing end-to-end encryption (E2EE), strict authentication, and non-repudiation
+      for legally significant communications.
+    \item \textbf{VPN SECURITY TARGET}\footnote{\url{https://ca.n2o.dev/priv/vpn_profile.pdf}}:
+      Target profile for Virtual Private Network (VPN) and PKI infrastructures. Defines mechanisms for tunneling,
+      node authentication (SC-8), and network traffic protection at the transport layer to secure communication
+      channels against interception and modification.
 \end{itemize}
 
-\subsection{Segregation of Duties: The Two-Stage KSZI Certification Process}
-According to the regulatory framework of Ukraine (e.g., ND TZI 2.6-001-11) and best global practices (the \textit{Maker/Checker} principle), building and certifying a Comprehensive Information Security System (KSZI) is strictly a \textbf{two-stage procedure}. It requires the involvement of two completely independent licensed providers to eliminate any conflict of interest.
+\subsection{Segregation of Duties}
+According to the regulatory framework of Ukraine (e.g., \foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} 2.6-001-11}) and best global practices (the \textit{Maker/Checker} principle), building and certifying a Comprehensive Information Security System (\foreignlanguage{ukrainian}{КСЗІ}) is strictly a \textbf{two-stage procedure}. It requires the involvement of two completely independent licensed providers to eliminate any conflict of interest.
 
 \begin{itemize}
-    \item \textbf{Stage 1: The Developer (Provider 1).} The first provider performs the risk assessment, inspects the environment, and creates the "technical instructions" --- the \textbf{Target Security Profile (Technical Specification)}. This provider is also responsible for the physical implementation of the security architecture: configuring cryptography, setting up the Reference Monitor (AC-25), installing certificates, and delivering the system into trial operation.
-    \item \textbf{Stage 2: The Expertise Organizer (Provider 2).} The second provider receives the Technical Specification from the Developer and designs the \textbf{Expertise Program}. This provider conducts an independent technical audit, instrumental testing, and live verification of all implemented controls. Upon successful verification, they issue the Expert Conclusion for the State Service of Special Communications and Information Protection (DSSZZI).
+    \item \textbf{Stage 1: The Developer (Provider 1).} The first provider performs the risk assessment,
+      inspects the environment, and creates the "technical instructions" --- the \textbf{Target Security Profile (Technical Specification)}.
+      This provider is also responsible for the physical implementation of the security architecture: configuring cryptography,
+      setting up the Reference Monitor (AC-25), installing certificates, and delivering the system into trial operation.
+    \item \textbf{Stage 2: The Expertise Organizer (Provider 2).} The second provider receives the Technical Specification
+      from the Developer and designs the \textbf{Expertise Program}. This provider conducts an independent technical audit,
+      instrumental testing, and live verification of all implemented controls. Upon successful verification, they issue the
+      Expert Conclusion for the State Service of Special Communications and Information Protection (\foreignlanguage{ukrainian}{ДССЗЗІ}).
 \end{itemize}
 
-This segregation guarantees that the organization creating the security profiles and writing the Elixir CMDB structures is legally and practically distinct from the organization auditing and approving them.
+This segregation guarantees that the organization creating the security profiles and writing the Elixir CMDB structures
+is legally and practically distinct from the organization auditing and approving them.
 
-\subsection{The Three-Layer Security Profile Development Process}
+\subsection{Security Profile Development Process}
 
-Constructing a comprehensive KSZI for ERP/1 follows a rigorous, sequential three-layer process. This sequence is not arbitrary --- it mirrors the natural dependency chain of a security program: you must first organize your people and processes, then capture that organization into authoritative documentation and risk records, and only then implement the technical controls that enforce what the documentation prescribes.
+Constructing a comprehensive \foreignlanguage{ukrainian}{КСЗІ} for ERP/1 follows a rigorous, sequential three-layer process.
+This sequence is not arbitrary --- it mirrors the natural dependency chain of a security program: you must first organize
+your people and processes, then capture that organization into authoritative documentation and risk records,
+and only then implement the technical controls that enforce what the documentation prescribes.
 
 \begin{enumerate}
 
     \item \textbf{Layer 1 --- Organizational Security Profile (Who and How).}
-    The first layer establishes the human and procedural foundation. This includes defining roles and responsibilities (personnel security), establishing training and awareness programs, codifying incident response and maintenance procedures, and securing the physical environment. Without this layer, technical controls have no owner and no organizational context. \texttt{erpuno/itsm} and \texttt{zencrypted/ias} are the primary products that enforce this layer programmatically.
+    The first layer establishes the human and procedural foundation. This includes defining roles and
+    responsibilities (personnel security), establishing training and awareness programs, codifying
+    incident response and maintenance procedures, and securing the physical environment. Without this layer,
+    technical controls have no owner and no organizational context. \texttt{erpuno/itsm} and \texttt{zencrypted/ias} are
+    the primary products that enforce this layer programmatically.
 
     \item \textbf{Layer 2 --- Metainformational Security Profile (What and Why).}
-    The second layer translates the organizational decisions of Layer 1 into authoritative, machine-verifiable documentation: system security plans, risk taxonomies, data categorization matrices, privacy records, and acquisition policies. The key innovation of ERP/1 is that this layer is not paper-based --- it is expressed as live Elixir source code in the \texttt{synrc/ca} CMDB and automatically projected into audit-ready PDF reports. This eliminates documentation drift and guarantees that what auditors read is exactly what the system does.
+    The second layer translates the organizational decisions of Layer 1 into authoritative,
+    machine-verifiable documentation: system security plans, risk taxonomies, data categorization matrices,
+    privacy records, and acquisition policies. The key innovation of ERP/1 is that this layer is not paper-based ---
+    it is expressed as live Elixir source code in the \texttt{synrc/ca} CMDB and automatically projected into
+    audit-ready PDF reports. This eliminates documentation drift and guarantees that what auditors read is
+    exactly what the system does.
 
     \item \textbf{Layer 3 --- Technical Security Profile (How Enforced).}
-    The third layer implements the technical enforcement mechanisms that the first two layers define. Cryptographic access control, audit logging, network segmentation, integrity checking, and supply chain verification are all realized in specific ERP/1 products (\texttt{zencrypted/ias}, \texttt{erpuno/abac}, \texttt{synrc/vpn}, \texttt{synrc/kvs}, etc.). Technical controls reference and enforce the policies established in Layer 1 and documented in Layer 2.
+    The third layer implements the technical enforcement mechanisms that the first two layers define.
+    Cryptographic access control, audit logging, network segmentation, integrity checking, and supply
+    chain verification are all realized in specific ERP/1 products (\texttt{zencrypted/ias}, \texttt{erpuno/abac},
+    \texttt{synrc/vpn}, \texttt{synrc/kvs}, etc.). Technical controls reference and enforce the policies
+    established in Layer 1 and documented in Layer 2.
 
 \end{enumerate}
 
-This layered development model ensures full traceability: every technical control in Layer 3 can be traced back to a documented policy in Layer 2, which in turn traces back to an organizational decision in Layer 1. The entire chain is expressed in version-controlled source code, making the compliance posture continuously auditable and self-consistent.
+This layered development model ensures full traceability: every technical control in Layer 3 can be traced back
+to a documented policy in Layer 2, which in turn traces back to an organizational decision in Layer 1.
+The entire chain is expressed in version-controlled source code, making the compliance posture continuously auditable and self-consistent.
 
-
-\newpage
 \newpage
 \section{Organizational Security Profile}
 
@@ -108,10 +240,17 @@ This layered development model ensures full traceability: every technical contro
 % Primary products: erpuno/itsm, zencrypted/ias, synrc/ca training
 % ============================================================
 
-The Organizational Security Profile establishes the human and procedural foundation of ERP/1 security. These controls define \textit{who} is responsible for security, \textit{how} they are trained, \textit{how} incidents and maintenance are handled, \textit{how} personnel are screened and off-boarded, and \textit{how} the physical environment is protected. This layer must exist before the Metainformational layer can capture it in documentation, and before the Technical layer can enforce it in code.
+The Organizational Security Profile establishes the human and procedural foundation of ERP/1 security.
+These controls define \textit{who} is responsible for security, \textit{how} they are trained,
+\textit{how} incidents and maintenance are handled, \textit{how} personnel are screened and off-boarded,
+and \textit{how} the physical environment is protected. This layer must exist before the Metainformational
+layer can capture it in documentation, and before the Technical layer can enforce it in code.
 
-
-The Organizational Security Profile covers the people, process, and physical environment controls of ERP/1. These are controls whose primary implementation vehicle is human procedure, training, and physical infrastructure, rather than software. The platform products in this section (\texttt{erpuno/itsm}, \texttt{zencrypted/ias}, \texttt{synrc/ca}) support and enforce these controls programmatically, but the controls themselves mandate organizational commitment.
+The Organizational Security Profile covers the people, process, and physical environment controls of ERP/1.
+These are controls whose primary implementation vehicle is human procedure, training, and physical infrastructure,
+rather than software. The platform products in this section (\texttt{erpuno/itsm}, \texttt{zencrypted/ias},
+\texttt{synrc/ca}) support and enforce these controls programmatically, but the controls themselves mandate
+organizational commitment.
 
 % =========================================================
 \subsection{Awareness and Training (AT)}
@@ -144,7 +283,7 @@ Incident response processes are formalized as BPMN processes in \texttt{synrc/bp
 The complete audit trail of each incident (all actions, comments, status changes) is stored in \texttt{kvs} and available for query. Retention period is a minimum of 3 years.
 
 \textbf{IR-6 --- Incident Reporting.}
-\texttt{itsm} automatically generates monthly incident reports in PDF format (using the \texttt{synrc/ca} LaTeX generator) and forwards them to the CISO and the relevant regulator (DSSZZI).
+\texttt{itsm} automatically generates monthly incident reports in PDF format (using the \texttt{synrc/ca} LaTeX generator) and forwards them to the CISO and the relevant regulator (\foreignlanguage{ukrainian}{ДССЗЗІ}).
 
 % =========================================================
 
@@ -221,7 +360,7 @@ The data center is equipped with UPS (HPE R/T3000) and diesel generator backup p
 The Metainformational Security Profile translates the organizational decisions established in Layer 1 into authoritative, machine-verifiable governance artifacts. Rather than static paper documents, ERP/1 expresses all security plans, risk taxonomies, data categorizations, and privacy records as live, version-controlled Elixir source code within \texttt{synrc/ca}. These artifacts are the formal bridge between organizational intent and technical enforcement: technical controls in Layer 3 enforce exactly what this layer documents, and this layer documents exactly what Layer 1 mandates.
 
 
-The Metainformational Security Profile covers the governance, planning, and programmatic documentation layer of ERP/1. These controls are realized through the CMDB paradigm: instead of static paper artifacts, all policy and risk information is expressed as live, version-controlled Elixir source code in \texttt{synrc/ca}. This makes the security documentation self-verifying, continuously synchronized with the deployed system, and automatically auditable by state regulators (DSSZZI) and international auditors (ISO/IEC 27001, NIST).
+The Metainformational Security Profile covers the governance, planning, and programmatic documentation layer of ERP/1. These controls are realized through the CMDB paradigm: instead of static paper artifacts, all policy and risk information is expressed as live, version-controlled Elixir source code in \texttt{synrc/ca}. This makes the security documentation self-verifying, continuously synchronized with the deployed system, and automatically auditable by state regulators (\foreignlanguage{ukrainian}{ДССЗЗІ}) and international auditors (ISO/IEC 27001, NIST).
 
 % =========================================================
 \subsection{Planning (PL)}
@@ -278,7 +417,7 @@ Vulnerability data from the \texttt{risk.ex} taxonomy is cross-referenced agains
 \subsubsection{\texttt{synrc/ca} + CI/CD: SA-5, SA-9, SA-11 --- Documentation as Code and Vendor Security}
 
 \textbf{SA-5 --- System Documentation.}
-The cornerstone of the ERP/1 metainformational approach is the "Documentation as Code" (DaC) paradigm. The entire KSZI documentation package --- security plans, asset registries, risk matrices, network diagrams, this PDF --- is generated from live Elixir source code. The command \texttt{mix run} produces a complete, audit-ready documentation set. Documentation is never manually edited; it is always a faithful projection of the code state.
+The cornerstone of the ERP/1 metainformational approach is the "Documentation as Code" (DaC) paradigm. The entire \foreignlanguage{ukrainian}{КСЗІ} documentation package --- security plans, asset registries, risk matrices, network diagrams, this PDF --- is generated from live Elixir source code. The command \texttt{mix run} produces a complete, audit-ready documentation set. Documentation is never manually edited; it is always a faithful projection of the code state.
 
 \textbf{SA-9 --- External System Services.}
 All external services used by ERP/1 (TSA providers for RFC 3161, OCSP endpoints, external IdP federation) are formally declared in \texttt{sys.ex} CMDB with their security classification, interface type, and contractual agreements. Undeclared external dependencies are blocked at the mTLS boundary, since they cannot possess a certificate issued by \texttt{synrc/ca}.
@@ -301,9 +440,7 @@ Every subscriber provides a digitally signed consent form (XAdES-BES) during the
 \textbf{PT-6 --- Disassociation.}
 Upon subscriber request or legal obligation, personal data is pseudonymized or erased from the active database. The immutable audit log in \texttt{kvs} retains only the cryptographic hash of the erased record and the legal basis for the erasure, satisfying both the right to erasure and the obligation to maintain an audit trail of security-relevant events.
 
-% =========================================================
-\newpage
-\subsection{Security Evaluation Framework}
+\subsection{Security Evaluation Framework (CMDB)}
 
 The following sections provide the complete execution traces of the CMDB profile extraction for the "ERP" system. These outputs demonstrate how the infrastructure is documented, maintained, and continuously monitored.
 
@@ -335,7 +472,7 @@ iex> CA.PRO.risk("ERP")
   {"RISK-CRY-04", "Компрометація ПАК «Гряда» (ІІТ HSM)", ["PE", "SC", "AC"]},
   {"RISK-CRY-05", "Екстракція ключів з НКІ е-Токен (ІІТ)", ["PE", "SC"]},
   {"RISK-CRY-06", "Вразливості ASN.1 парсерів X.509 / CMS", ["SI", "SA"]},
-  {"RISK-CRY-07", "Вразливості криптобібліотек ДСТУ (Калина, Купина, Padding Oracle)", ["SA", "SI"]},
+  {"RISK-CRY-07", "Вразливості криптобібліотек \foreignlanguage{ukrainian}{ДСТУ} (Калина, Купина, Padding Oracle)", ["SA", "SI"]},
   {"RISK-CRY-08", "Недостатня ентропія генератора псевдовипадкових чисел (PRNG)", ["SC"]},
   {"RISK-CRY-09", "Втрата або перехоплення PIN-кодів HSM (кейлогери)", ["IA", "AT", "PE"]},
   {"RISK-CRY-10", "Фізична деструкція носіїв «Автор» (CryptoCard)", ["PE", "MP"]},
@@ -379,11 +516,11 @@ The system inventory documents all OS, middleware, platform, and application-lev
 \begin{verbatim}
 iex> CA.PRO.sys("ERP")
 [
-  {"SYS-OS-01-UAL", "UA Linux 24.04 LTS (ДСТУ-hardened, SELINUX Enforcing) (24.04 LTS)", []},
+  {"SYS-OS-01-UAL", "UA Linux 24.04 LTS (\foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{ДСТУ}-hardened}, SELINUX Enforcing) (24.04 LTS)", []},
   {"SYS-OS-01-WIN", "Windows Server 2025 Datacenter (NATO STIG + DISA hardened) (2025 Datacenter)", []},
   {"SYS-OS-01-ESX", "VMware ESXi 8.0 Update 3 (vSphere Foundation) (8.0 U3)", []},
   {"SYS-OS-02-W11", "Windows 11 Pro 24H2 (DISA STIG + Windows Defender Credential Guard) (24H2 (Build 26100))", []},
-  {"SYS-OS-02-UAL", "UA Linux Desktop 24.04 LTS (ДСТУ, GNOME Hardened) (24.04 LTS Desktop)", []},
+  {"SYS-OS-02-UAL", "UA Linux Desktop 24.04 LTS (\foreignlanguage{ukrainian}{ДСТУ}, GNOME Hardened) (24.04 LTS Desktop)", []},
   {"SYS-APP-00-ERL", "Erlang/OTP 27.3 (SMP, BEAM VM, distribution TLS) (27.3)", []},
   {"SYS-APP-00-ELX", "Elixir 1.18.3 (N2O, NITRO, FORM, Bandit) (1.18.3)", []},
   {"SYS-APP-00-EMQ", "EMQ X 2.12 (MQTT 5.0 / MQTT-SN, Erlang/OTP cluster) (2.12)", []},
@@ -535,10 +672,6 @@ iex> CA.PRO.net("ERP")
 
 
 \newpage
-\newpage
-\newpage
-\newpage
-\newpage
 \section{Technical Security Profile}
 
 % ============================================================
@@ -554,7 +687,7 @@ iex> CA.PRO.net("ERP")
 The Technical Security Profile implements the enforcement mechanisms that the organizational procedures of Layer 1 mandate and the governance documentation of Layer 2 describes. Every control in this section is traceable: \texttt{AC-2} enforces the personnel lifecycle defined in PS-4 and documented in PM-2; \texttt{AU-12} enforces the audit event catalog defined in AU-2 policy and encoded in the CMDB. The ERP/1 architecture ensures that no technical control exists without organizational ownership, and no organizational policy exists without technical enforcement.
 
 
-The following section is a comprehensive, control-by-control scientific analysis of how the components of the ERP/1 platform (ecosystem \texttt{ERP.UNO}, \texttt{N2O.DEV}, \texttt{SYNRC.COM}) naturally and architecturally satisfy the requirements of NIST SP 800-53 Rev.5 and ND TZI 2.3-025-24.
+The following section is a comprehensive, control-by-control scientific analysis of how the components of the ERP/1 platform (ecosystem \texttt{ERP.UNO}, \texttt{N2O.DEV}, \texttt{SYNRC.COM}) naturally and architecturally satisfy the requirements of NIST SP 800-53 Rev.5 and \foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} 2.3-025-24}.
 Each platform product is a purpose-built solution for a specific security domain, enabling maximally organic --- without artificial mappings --- standard compliance. The analysis covers all 20 control families: AC, AT, AU, CA, CM, CP, IA, IR, MA, MP, PE, PL, PM, PS, PT, RA, SA, SC, SI, SR.
 
 % =========================================================
@@ -691,7 +824,7 @@ Technically enforced through the combination of ABAC rules and X.509 cryptograph
 \subsubsection{\texttt{zencrypted/ias}: AU-2, AU-3, AU-6, AU-9, AU-10, AU-12}
 
 \textbf{AU-2 --- Event Logging.}
-\texttt{ias} is the primary source of most security events: login/logout, failed authentications, profile changes, privilege delegation. The event list is defined in configuration and complies with ND TZI 2.3-025-24 mandatory logging requirements.
+\texttt{ias} is the primary source of most security events: login/logout, failed authentications, profile changes, privilege delegation. The event list is defined in configuration and complies with \foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} 2.3-025-24} mandatory logging requirements.
 
 \textbf{AU-3 --- Content of Audit Records.}
 Each \texttt{ias} audit record contains: \texttt{timestamp} (millisecond precision, NTP-synchronized), \texttt{subject\_id}, \texttt{event\_type}, \texttt{resource\_id}, \texttt{action}, \texttt{outcome} (success/failure), \texttt{source\_ip}, \texttt{session\_id}, \texttt{signature} (HMAC record signature).
@@ -715,7 +848,7 @@ Critical events (document signing, approvals, certificate issuance) are recorded
 \subsubsection{\texttt{synrc/ca}: CA-2, CA-6, CA-7, CA-8, CA-9}
 
 \textbf{CA-2 --- Control Assessments.}
-\texttt{synrc/ca} automates the collection of compliance evidence via the CMDB API. Before each audit (DSSZZI state expertise), \texttt{mix run -e 'CA.TeX.generate()'} is executed, generating a complete documentation package from the current system state.
+\texttt{synrc/ca} automates the collection of compliance evidence via the CMDB API. Before each audit (\foreignlanguage{ukrainian}{ДССЗЗІ} state expertise), \texttt{mix run -e 'CA.TeX.generate()'} is executed, generating a complete documentation package from the current system state.
 
 \textbf{CA-6 --- Authorization.}
 System authorization is formalized through the L3 security profile (\texttt{legal\_l3\_profile\_erp.pdf}), programmatically generated from the CMDB and cryptographically signed. Authorization is updated upon any significant architectural change.
@@ -739,7 +872,7 @@ All internal connections between ERP/1 services are authorized via mTLS (mutual 
 The baseline configuration of all components is captured in CMDB Elixir modules (\texttt{hw.ex}, \texttt{sys.ex}, \texttt{net.ex}). Every change in the production environment must first be reflected in the corresponding CMDB file and pass Code Review in Git. Deviation from the baseline (configuration drift) is detected by Wazuh FIM (File Integrity Monitoring).
 
 \textbf{CM-6 --- Configuration Settings.}
-All ERP/1 services are launched with strict security hardening baselines: UA Linux DSTU-hardened, SELinux Enforcing, Windows Server DISA STIG. Deviations from baseline settings are technically blocked through SCM mechanisms (Puppet/Ansible).
+All ERP/1 services are launched with strict security hardening baselines: UA Linux \foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{ДСТУ}-hardened}, SELinux Enforcing, Windows Server DISA STIG. Deviations from baseline settings are technically blocked through SCM mechanisms (Puppet/Ansible).
 
 \textbf{CM-7 --- Least Functionality.}
 Each ERP/1 service runs only with the components required to perform its function. Unnecessary modules, protocols, and ports are disabled. The list of permitted components is documented in the corresponding \texttt{sys.ex} CMDB entry.
@@ -799,7 +932,7 @@ For external systems (e.g., Unified State Register, Diia), \texttt{ias} supports
 \subsubsection{\texttt{synrc/kvs}: MP-2, MP-4, MP-5, MP-6, MP-7}
 
 \textbf{MP-2, MP-4 --- Media Access and Storage.}
-\texttt{kvs} is the primary storage for all critical ERP/1 data. Data is encrypted at the record level using DSTU algorithms (Kalyna AES-256 GCM) with keys stored in an IIT Gryada HSM. Physical access to servers running \texttt{kvs} is restricted via the Policy Engine and PE controls.
+\texttt{kvs} is the primary storage for all critical ERP/1 data. Data is encrypted at the record level using \foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{ДСТУ} algorithms} (Kalyna AES-256 GCM) with keys stored in an IIT Gryada HSM. Physical access to servers running \texttt{kvs} is restricted via the Policy Engine and PE controls.
 
 \textbf{MP-5 --- Media Transport.}
 Tape backups (HPE MSL3040) are encrypted before writing. Physical tapes are stored in a safe with dual control. The procedure for removing a tape from the perimeter requires an authorized CR in \texttt{itsm}.
@@ -823,7 +956,7 @@ Removable media (USB) usage is technically blocked at the OS level (udev rules, 
 The number of external network connections is minimized and strictly documented in the \texttt{net.ex} CMDB. Each new access point requires a separate CR and CISO approval.
 
 \textbf{SC-8 --- Transmission Confidentiality and Integrity.}
-All traffic between ERP/1 components is protected by mTLS 1.3 with mandatory DSTU-compatible cipher suites. Unencrypted traffic is technically impossible --- \texttt{ias} rejects requests without a valid TLS certificate.
+All traffic between ERP/1 components is protected by mTLS 1.3 with mandatory \foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{ДСТУ}-compatible} cipher suites. Unencrypted traffic is technically impossible --- \texttt{ias} rejects requests without a valid TLS certificate.
 
 \textbf{SC-12 --- Cryptographic Key Establishment and Management.}
 \texttt{synrc/ca} is the authoritative key center. Root keys are stored exclusively in the HSM (Gryada-301) and never leave the hardware module. Key rotation is performed according to the Key Ceremony procedure with Dual Control.
@@ -864,13 +997,9 @@ All components have cryptographically verified provenance. Release signatures ar
 \textbf{SR-11 --- Component Authenticity.}
 Hardware components (HSM, switches, servers) are verified via serial number and CMDB inventory record. Vendors (5HT Technology, IIT, Cisco) have signed supply chain security agreements.
 
-
-
-\newpage
 \section{Conclusion}
-By treating the Information Security Management System (ISMS) and the KSZI documentation as "Infrastructure as Code" (IaC) via Elixir maps, ERPUNO LLC achieves a continuous, verifiable, and strictly compliant security posture. This approach significantly reduces the friction typically associated with DSSZZI and NIST audits by ensuring that the actual state of the system is always perfectly synchronized with its certified documentation.
+By treating the Information Security Management System (ISMS) and the \foreignlanguage{ukrainian}{КСЗІ} documentation as "Infrastructure as Code" (IaC) via Elixir maps, ERPUNO LLC achieves a continuous, verifiable, and strictly compliant security posture. This approach significantly reduces the friction typically associated with \foreignlanguage{ukrainian}{ДССЗЗІ} and NIST audits by ensuring that the actual state of the system is always perfectly synchronized with its certified documentation.
 
-\newpage
 \subsection{Codebase Overview for Copyright Registration}
 The entire Configuration Management Database (CMDB), Continuous Accountability System, and PKI Certificate Authority components discussed in this document are implemented as a cohesive software suite. This software suite forms the basis for the formal registration of the copyright work.
 
@@ -893,10 +1022,10 @@ The software is continuously developed, documented, and published at the followi
 National Institute of Standards and Technology. \textit{Security and Privacy Controls for Information Systems and Organizations}. NIST Special Publication 800-53, Revision 5.
 
 \bibitem{ndtzi37}
-\foreignlanguage{ukrainian}{Державна служба спеціального зв'язку та захисту інформації України. \textit{НД ТЗІ 3.7-003-2023. Порядок проведення державної експертизи в сфері технічного захисту інформації}.}
+\foreignlanguage{ukrainian}{{\selectlanguage{ukrainian}Державна служба спеціального зв'язку та захисту інформації\selectlanguage{english}} України. \textit{\foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} 3.7-003-2023}. Порядок проведення державної експертизи в сфері технічного захисту інформації}.}
 
 \bibitem{ndtzi25} 
-\foreignlanguage{ukrainian}{Державна служба спеціального зв'язку та захисту інформації України. \textit{НД ТЗІ 2.5-004-99. Критерії оцінки захищеності інформації в комп'ютерних системах від несанкціонованого доступу}.}
+\foreignlanguage{ukrainian}{{\selectlanguage{ukrainian}Державна служба спеціального зв'язку та захисту інформації\selectlanguage{english}} України. \textit{\foreignlanguage{ukrainian}{\foreignlanguage{ukrainian}{НД \foreignlanguage{ukrainian}{ТЗІ}} 2.5-004-99}. Критерії оцінки захищеності інформації в комп'ютерних системах від несанкціонованого доступу}.}
 
 \bibitem{iso27001} 
 International Organization for Standardization. \textit{ISO/IEC 27001:2022. Information security, cybersecurity and privacy protection — Information security management systems — Requirements}.
