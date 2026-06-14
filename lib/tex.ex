@@ -267,7 +267,13 @@ defmodule CA.TeX do
     params_paragraphs =
       params
       |> Enum.with_index(1)
-      |> Enum.map(fn {{name, desc, opts}, idx} ->
+      |> Enum.map(fn {param, idx} ->
+        {name, desc, opts} =
+          case param do
+            {n, d, o} -> {n, d, o}
+            {n, d} -> {n, d, []}
+          end
+
         type = Keyword.get(opts, :type, "") |> to_string() |> escape_latex()
         default = Keyword.get(opts, :default, "") |> inspect() |> escape_latex()
 
