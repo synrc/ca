@@ -76,79 +76,89 @@ According to the regulatory framework of Ukraine (e.g., ND TZI 2.6-001-11) and b
 
 This segregation guarantees that the organization creating the security profiles and writing the Elixir CMDB structures is legally and practically distinct from the organization auditing and approving them.
 
-\newpage
-\section{Metainformational Security Profile (CMDB)}
-Traditional KSZI (Comprehensive Information Security Systems) are often treated as static, paper-based compliance artifacts. However, for ERPUNO LLC, we engineered the KSZI as a live, programmable \textbf{Configuration Management Database (CMDB)} and \textbf{Continuous Accountability System}.
+\newpage\section{Metainformational Security Profile}
 
-This system is inherently built into the source code using Elixir modules (e.g., \texttt{hw.ex}, \texttt{sys.ex}, \texttt{net.ex}). The core Certificate Authority (\texttt{SYS-SYNRC-CA}) acts not only as the PKI infrastructure but also as the central registry for this accountability system. The profile of this system explicitly implements the following security controls:
+The Metainformational Security Profile covers the governance, planning, and programmatic documentation layer of ERP/1. These controls are realized through the CMDB paradigm: instead of static paper artifacts, all policy and risk information is expressed as live, version-controlled Elixir source code in \texttt{synrc/ca}. This makes the security documentation self-verifying, continuously synchronized with the deployed system, and automatically auditable by state regulators (DSSZZI) and international auditors (ISO/IEC 27001, NIST).
 
-\subsection{Detailed NIST SP 800-53 Rev.5 Control Integrations}
+% =========================================================
+\subsection{Planning (PL)}
+% =========================================================
 
-\subsubsection{CM-8: System Component Inventory}
-The CMDB maintains a strict, programmatically queryable registry of all hardware, software, and firmware components across the entire infrastructure. This is not merely a static spreadsheet; it is an active Elixir dataset (\texttt{hw.ex}, \texttt{sys.ex}) that tracks inventory numbers, physical locations, operational status, and cryptographic module certifications. By natively linking every physical switch, server, and HSM to its exact operational context, the system completely eradicates drift between actual infrastructure and security documentation. The inventory control ensures full visibility and reduces the attack surface by identifying rogue or unauthorized devices instantaneously.
+\subsubsection{\texttt{synrc/ca}: PL-2, PL-4, PL-8 --- System Security Plans and Rules of Behavior}
 
-\subsubsection{CM-8(1) \& CM-8(2): Inventory Updates \& Tracking}
-The architecture guarantees the automated maintenance and tracking of component updates during all installations, removals, or migrations. Because the CMDB is stored as Elixir source code within a secure Git repository, every single alteration to the infrastructure creates an immutable, cryptographically signed commit. This mechanism automatically fulfills the requirement for strict version control and historical auditing of hardware and software lifecycles. It provides an unbroken chain of custody for all system components, essential for forensic analysis and compliance verification.
+\textbf{PL-2 --- System Security and Privacy Plans.}
+The system security plan for ERP/1 is not a Word document filed in a binder. It is this very PDF report, generated on demand via \texttt{mix run -e 'CA.TeX.gen\_bible()'} from the live CMDB state. Every section --- hardware inventory, risk taxonomy, role definitions, network architecture --- is extracted programmatically, ensuring 100\% fidelity between documentation and deployed reality. The plan is updated automatically upon every git commit that changes a CMDB module.
 
-\subsubsection{CM-9: Configuration Management Plan}
-Rather than maintaining a separate textual document that inevitably becomes obsolete, the entire Configuration Management Plan is directly codified within the repository itself, treating policy strictly as code. The build, deployment, and auditing pipelines are governed by these exact declarative profiles. Any deviation in production from the CMDB profile immediately triggers a compliance alert, ensuring the configuration management plan is actively enforced at all times. This shift from prescriptive documentation to declarative code enforces continuous compliance inherently.
+\textbf{PL-4 --- Rules of Behavior.}
+Acceptable use rules are defined declaratively in \texttt{roles.ex} and embedded as machine-readable OID extensions in X.509 certificates. Every certificate holder cryptographically acknowledges the rules of behavior by accepting and installing their certificate, creating an auditable, non-repudiable consent record stored in \texttt{kvs}.
 
-\subsubsection{PM-5 \& PM-6: System Inventory \& Measures of Performance}
-The \texttt{CA.PRO} API delivers real-time, system-wide inventory tracking and verifiable measures of performance to organizational stakeholders. Instead of relying on manual quarterly audits, security officers can execute programmatic queries against the CMDB to instantly extract precise metrics, asset valuations, and compliance coverage ratios, significantly reducing administrative overhead and human error. This control effectively shifts the compliance burden from human operators to automated, highly reliable programmatic interfaces.
+\textbf{PL-8 --- Security and Privacy Architectures.}
+The security architecture of ERP/1 is codified as the L3 Target Security Profile (\texttt{legal\_l3\_profile\_erp.pdf}), generated from CMDB and cryptographically signed. Any deviation from the declared architecture is detectable by comparing the current CMDB state against the signed baseline, enabling automated drift detection.
 
-\subsubsection{CA-7: Continuous Monitoring}
-The security architecture integrates natively with SIEM/XDR solutions (such as Wazuh) to provide a constant, real-time status feed of all critical security controls and operational events. This continuous monitoring pipeline digests syslog, eBPF telemetry, and application logs, correlating them directly against the risk taxonomies and compliance profiles defined in the CMDB. This ensures that any degradation in security posture is immediately detected and addressed, shifting the paradigm from point-in-time assessment to perpetual situational awareness.
+% =========================================================
+\subsection{Program Management (PM)}
+% =========================================================
 
-\subsubsection{PL-2, RA-2, RA-3: Security Plans \& Risk Assessments}
-The system implements automated system security plans, data categorization matrices, and risk taxonomies directly through the \texttt{CA.Data} and \texttt{CA.Risk} modules. Risks are not just listed; they are systematically mapped to the exact software vulnerabilities, network segments, and data stores they impact. This programmatic risk assessment allows for dynamic recalculation of the system's risk profile whenever new infrastructure is introduced. It provides a living threat model that continuously aligns security mitigations with actual business risks.
+\subsubsection{\texttt{synrc/ca} CMDB: PM-2, PM-5, PM-6, PM-9 --- Security Program Infrastructure}
 
-\subsubsection{AC-2, AC-3 \& AC-25: Access Control Enforcement \& Reference Monitor}
-Role-based (RBAC) and Attribute-based (ABAC) access control mechanisms are centrally defined within the \texttt{roles.ex} hierarchy. These policies dictate precise permissions across all environments and are strictly enforced at the application boundary via a unified Reference Monitor (\texttt{AC-25}). This guarantees that all access decisions---whether for a standard user or a global administrator---are verified against the immutable policy engine before any action is permitted. Centralizing access control logically prevents bypasses and privilege escalation across disparate subsystems.
+\textbf{PM-2 --- Information Security Program Leadership Roles.}
+The CMDB \texttt{roles.ex} module formally defines the organizational security roles: Security Administrator (\texttt{security\_admin}), Auditor (\texttt{auditor}), Registration Operator (\texttt{reg\_operator}), and Global Superadministrator (\texttt{global\_root\_admin}). These roles are not notional --- they are enforced cryptographically via X.509 certificate extensions and ABAC policies.
 
-\subsubsection{SC-8 \& SC-28: Transmission Confidentiality \& Data at Rest}
-Mandatory cryptographic controls are bound directly to the hardware and network profiles. For data in transit, the CMDB mandates IPsec/MACsec tunnels across all core switches and border gateways, explicitly defining the cryptographic suites. For data at rest, Transparent Data Encryption (TDE) and hardware-level SAN encryption are mandated for all storage arrays, ensuring that physical theft or unauthorized access to drives yields zero intelligible data. These controls provide an impenetrable cryptographic envelope protecting the state's most sensitive data assets.
+\textbf{PM-5 --- System Inventory.}
+\texttt{CA.PRO.inventory/1} delivers a real-time, programmatically queryable hardware inventory (\texttt{hw.ex}), satisfying PM-5 in a machine-verifiable form. The inventory is linked to cryptographic certificates, so any undocumented asset lacks a valid mTLS credential and is automatically rejected by the platform.
 
-\subsubsection{SC-12: Cryptographic Key Establishment and Management}
-The \texttt{SYS-SYNRC-CA} core functions as the centralized Public Key Infrastructure (PKI), managing the entire lifecycle of all symmetric and asymmetric keys. Backed by certified Hardware Security Modules (HSMs, e.g., IIT Gryada-301), the system ensures secure key generation, escrow, rotation, and revocation. This provides an unassailable cryptographic foundation for the entire e-government platform. The rigorous key management protocol eliminates the risk of key compromise or weak cryptography being introduced ad-hoc by system administrators.
+\textbf{PM-6 --- Measures of Performance.}
+Security performance metrics (control coverage ratios, incident counts, certificate expiration timelines) are extracted via \texttt{CA.PRO} queries and embedded in automatically generated PDF reports. This eliminates manual metric collection and guarantees that reported figures reflect the actual system state at the moment of report generation.
 
-\subsubsection{AU-2 \& AU-6: Audit Events \& Analysis}
-The platform defines its auditable events explicitly within the CMDB outputs, ensuring that all security-relevant activities (logons, privilege escalations, key accesses) are definitively logged. Automated mechanisms and SIEM integrations are deployed to continuously analyze these audit records for anomalous behavior, satisfying the requirement for proactive threat detection and non-repudiation of user actions. This closed-loop auditing ensures that incidents are not merely logged, but actively responded to in near real-time.
+\textbf{PM-9 --- Risk Management Strategy.}
+The organizational risk management strategy is materialized in \texttt{risk.ex} --- a structured registry of over 40 threat scenarios (RISK-OS-01 through RISK-DAT-02), each tagged to specific NIST control families. This ensures that every identified risk has a corresponding mapped control, and every unmapped risk generates a POA\&M entry tracked in \texttt{erpuno/itsm}.
 
-\subsubsection{IA-2: Identification and Authentication}
-Organizational users, administrators, and automated service accounts are uniquely identified and authenticated using strict multi-factor authentication (MFA) protocols, including PKI smart cards and OTP tokens. These identities are irrevocably tied to the \texttt{roles.ex} taxonomy, preventing identity spoofing and ensuring that every session is cryptographically bound to an authorized entity. The rigorous identity management protocol establishes a zero-trust foundation where no user is trusted inherently without verifiable cryptographic proof.
+% =========================================================
+\subsection{Risk Assessment (RA)}
+% =========================================================
 
-\subsubsection{SA-5 \& PL-2: Automated System Documentation \& Security Plans}
-The most innovative aspect of the CMDB architecture is the fulfillment of SA-5 (System Documentation) and PL-2 (System Security Plan). Instead of maintaining static text documents, the entirety of the KSZI documentation---including the overarching security plans, asset registries, risk matrices, and this very PDF report---is automatically generated directly from the live Elixir source code. By compiling the current system state into documentation on demand via a "Documentation as Code" (DaC) paradigm, the organization completely eliminates the phenomenon of "documentation drift." This guarantees that auditors and state regulators always evaluate a 100\% accurate reflection of the deployed system, significantly reducing the cost and friction of DSSZZI and NIST compliance audits.
+\subsubsection{\texttt{synrc/ca} risk.ex: RA-2, RA-3, RA-5 --- Programmatic Risk Taxonomy}
 
-\subsubsection{CP-9 \& CP-10: Information System Backup \& Recovery}
-The categorization of data assets within the CMDB directly governs the automated backup schedules. Critical databases and file stores are subjected to continuous replication, while sensitive offline archives are routed to air-gapped tape libraries (e.g., HPE StoreEver). This guarantees robust disaster recovery capabilities and strict protection against ransomware or catastrophic hardware failures. The recovery protocols ensure minimal recovery point objectives (RPO) and recovery time objectives (RTO), crucial for high-availability enterprise services.
+\textbf{RA-2 --- Security Categorization.}
+Data categorization for ERP/1 (Public, PII, Internal, Confidential) is encoded in \texttt{data.ex}. Each category is automatically coupled to mandatory cryptographic and access control requirements: PII data triggers PostgreSQL TDE + ABAC restrictions; Confidential data mandates HSM-backed encryption and air-gapped backup routing. Categorization is machine-enforced, not advisory.
 
-\subsection{Detailed ND TZI (State Standard) \& ISO Compliance}
+\textbf{RA-3 --- Risk Assessment.}
+The \texttt{risk.ex} module maintains a living threat model. Risks are classified by attack vector (OS, Crypto, Network, Infrastructure, Personnel, Synchronization, Data) and mapped to specific NIST control families. The taxonomy is re-evaluated on every system change: when a new hardware component appears in \texttt{hw.ex}, the risk engine automatically checks for unmitigated threats applicable to that component class.
 
-\subsubsection{ND TZI 3.7-003-2023 \S4.2 \& \S5: Exploitation Documentation}
-According to Ukrainian state standards, the accountability of protected objects and the generation of exploitation documentation are critical for state expertise. This system automatically generates all required technical passports, inventory logs, and component registries directly from the \texttt{inventory\_num} and \texttt{serial} fields within the CMDB. This completely eliminates manual paperwork and ensures absolute accuracy during DSSZZI audits. This automation accelerates the certification process and removes the human error typically associated with maintaining extensive paper-based documentation.
+\textbf{RA-5 --- Vulnerability Monitoring and Scanning.}
+Vulnerability data from the \texttt{risk.ex} taxonomy is cross-referenced against the Wazuh SIEM feed and automated SBOM dependency scans in the CI/CD pipeline. Any newly disclosed CVE matching a component in \texttt{sys.ex} triggers an automatic risk record update and incident creation in \texttt{erpuno/itsm}.
 
-\subsubsection{ND TZI 1.6-005-22 \& 2.6-001-11: State Expertise Audit Trails}
-Security requirements and audit trails required for the State Expertise of the KSZI are dynamically extracted from the \texttt{controls} field embedded within each profile. The system can instantly produce a complete mapping of implemented controls against the regulatory requirements, providing auditors with transparent, code-backed evidence of compliance rather than unverifiable assertions. This verifiable link between state regulation and physical implementation provides unparalleled assurance during regulatory inspections.
+% =========================================================
+\subsection{System and Services Acquisition (SA)}
+% =========================================================
 
-\subsubsection{ND TZI 2.5-004-99 \& 2.5-005-99: System Classification \& Evaluation}
-The automated system classification and security evaluation criteria are continuously verified against the defined target profile. Instead of periodic manual assessments, the CMDB mechanism ensures that any architectural change triggers a re-evaluation of the system class (e.g., Class 2 or 3), ensuring that the protection profile remains consistently aligned with the nature of the processed data. This continuous classification guarantees that the system never inadvertently drifts into a non-compliant state due to infrastructure modifications.
+\subsubsection{\texttt{synrc/ca} + CI/CD: SA-5, SA-9, SA-11 --- Documentation as Code and Vendor Security}
 
-\subsubsection{ND TZI 3.6-006-24: Critical State Registries}
-The architecture fully supports the strict baseline requirements for critical state registries and judicial systems. It guarantees exceptional high availability (HA) across all nodes and mandates deep cryptographic integrity of evidentiary data utilizing national cryptographic algorithms (DSTU 4145-2002 for digital signatures, DSTU 7564-2014 for hashing), fulfilling the most stringent requirements for electronic governance. Compliance with this standard ensures the legal validity of electronic documents processed within the ERP system.
+\textbf{SA-5 --- System Documentation.}
+The cornerstone of the ERP/1 metainformational approach is the "Documentation as Code" (DaC) paradigm. The entire KSZI documentation package --- security plans, asset registries, risk matrices, network diagrams, this PDF --- is generated from live Elixir source code. The command \texttt{mix run} produces a complete, audit-ready documentation set. Documentation is never manually edited; it is always a faithful projection of the code state.
 
-\subsubsection{ND TZI 2.5-008-02: Confidential Information Protection}
-The system strictly adheres to the requirements for protecting confidential and restricted state information. The dynamic categorization mechanism evaluates the sensitivity of each data asset and dictates the requisite level of cryptographic segregation and physical protection (e.g., mandating air-gapped environments or specific HSM usage) required to legally process that data. The classification matrix automatically enforces the principle of least privilege, isolating highly sensitive segments away from standard user workflows.
+\textbf{SA-9 --- External System Services.}
+All external services used by ERP/1 (TSA providers for RFC 3161, OCSP endpoints, external IdP federation) are formally declared in \texttt{sys.ex} CMDB with their security classification, interface type, and contractual agreements. Undeclared external dependencies are blocked at the mTLS boundary, since they cannot possess a certificate issued by \texttt{synrc/ca}.
 
-\subsubsection{ND TZI 2.5-010-03: Web Application Protection}
-Protection of web-facing applications from unauthorized access and malicious exploitation is handled proactively. The network profiles (\texttt{net.ex}) explicitly declare the placement and configuration of Web Application Firewalls (WAF) and deep packet inspection (DPI) mechanisms. Coupled with the ABAC filters, this ensures that web vulnerabilities are mitigated at the network boundary before reaching the application logic. The defense-in-depth approach nullifies common web exploitation vectors prior to authentication.
+\textbf{SA-11 --- Developer Testing and Evaluation.}
+All ERP/1 components undergo automated security testing at the CI/CD pipeline level: SBOM generation, OWASP Dependency Check, static analysis (Credo), and cryptographic signature verification before any artifact reaches the production registry. Test results are stored as CMDB events and are queryable by auditors.
 
-\subsubsection{ISO/IEC 27001:2022 \& DSTU ISO/IEC 27001:2015: ISMS Alignment}
-The entire CMDB-driven approach aligns perfectly with the core tenets of an Information Security Management System (ISMS). By treating the inventory, risk assessment, and access control matrices as live code, the system intrinsically supports the ISO requirements for continuous improvement (Clause 10), comprehensive asset management (Annex A.8), and stringent logical access controls (Annex A.9). This programmatic integration effectively transforms the ISMS from a theoretical framework into an operational enforcement mechanism.
+% =========================================================
+\subsection{Privacy (PT)}
+% =========================================================
 
+\subsubsection{\texttt{synrc/ca} CPS: PT-2, PT-4, PT-6 --- Authority, Consent, and PII Accuracy}
 
-By transforming compliance into code, the CMDB guarantees that the operational reality of the infrastructure is continuously synchronized with the certified KSZI documentation.
+\textbf{PT-2 --- Authority to Process Personally Identifiable Information.}
+The legal basis and specific purposes for processing personal data (subscriber registry: passport data, RNOKPP) are declared in the Certificate Practice Statement (CPS), published at \url{https://ca.n2o.dev}. The CPS is a legally binding document, version-controlled in Git, and referenced by OID in every issued certificate.
 
+\textbf{PT-4 --- Consent Management.}
+Every subscriber provides a digitally signed consent form (XAdES-BES) during the registration process. This consent is stored in \texttt{kvs} as an immutable event, preserving the exact scope of consent accepted, the version of the CPS in force at the time, and the timestamp (RFC 3161). This provides legally valid evidence of informed consent for the entire duration of the certificate's validity.
+
+\textbf{PT-6 --- Disassociation.}
+Upon subscriber request or legal obligation, personal data is pseudonymized or erased from the active database. The immutable audit log in \texttt{kvs} retains only the cryptographic hash of the erased record and the legal basis for the erasure, satisfying both the right to erasure and the obligation to maintain an audit trail of security-relevant events.
+
+% =========================================================
 \newpage
 \subsection{Security Evaluation Framework}
 
@@ -383,7 +393,8 @@ iex> CA.PRO.net("ERP")
 
 \newpage
 \newpage
-\section{Technical Security Profile: ERP/1 Control-by-Control NIST SP 800-53 Compliance}
+\newpage
+\section{Technical Security Profile}
 
 The following section is a comprehensive, control-by-control scientific analysis of how the components of the ERP/1 platform (ecosystem \texttt{ERP.UNO}, \texttt{N2O.DEV}, \texttt{SYNRC.COM}) naturally and architecturally satisfy the requirements of NIST SP 800-53 Rev.5 and ND TZI 2.3-025-24.
 Each platform product is a purpose-built solution for a specific security domain, enabling maximally organic --- without artificial mappings --- standard compliance. The analysis covers all 20 control families: AC, AT, AU, CA, CM, CP, IA, IR, MA, MP, PE, PL, PM, PS, PT, RA, SA, SC, SI, SR.
@@ -624,39 +635,6 @@ For service accounts where passwords are still used, \texttt{ias} enforces minim
 For external systems (e.g., Unified State Register, Diia), \texttt{ias} supports identity federation via SAML 2.0 and OIDC, where the external IdP verifies the identity and \texttt{ias} issues a local token with limited rights based on attributes received from the external provider.
 
 % =========================================================
-\subsection{Incident Response (IR)}
-% =========================================================
-
-\subsubsection{\texttt{erpuno/itsm}: IR-1, IR-4, IR-5, IR-6}
-
-\textbf{IR-1 --- Incident Response Policy and Procedures.}
-Incident response processes are formalized as BPMN processes in \texttt{synrc/bpmn} and executed via \texttt{erpuno/itsm}. Each incident type (with its MITRE ATT\&CK code) has an assigned BPMN template with clear stages: detection, classification, escalation, remediation, post-analysis.
-
-\textbf{IR-4 --- Incident Handling.}
-\texttt{itsm} automatically receives incidents from Wazuh (via webhook) and \texttt{ias} (upon detecting anomalies per AC-2(12)). Each incident receives a unique INC identifier, bound to the CMDB record of the affected component.
-
-\textbf{IR-5 --- Incident Monitoring.}
-The complete audit trail of each incident (all actions, comments, status changes) is stored in \texttt{kvs} and available for query. Retention period is a minimum of 3 years.
-
-\textbf{IR-6 --- Incident Reporting.}
-\texttt{itsm} automatically generates monthly incident reports in PDF format (using the \texttt{synrc/ca} LaTeX generator) and forwards them to the CISO and the relevant regulator (DSSZZI).
-
-% =========================================================
-\subsection{Maintenance (MA)}
-% =========================================================
-
-\subsubsection{\texttt{erpuno/itsm}: MA-2, MA-4, MA-5}
-
-\textbf{MA-2 --- Controlled Maintenance.}
-Any scheduled maintenance work (server, network equipment, HSM servicing) is registered as a Change Request (CR) in \texttt{itsm}. A CR has mandatory fields: \texttt{maintainer\_id}, \texttt{authorization\_certificate} (X.509 signature from an authorized engineer), \texttt{maintenance\_window}, \texttt{rollback\_plan}.
-
-\textbf{MA-4 --- Nonlocal Maintenance.}
-All remote maintenance access (SSH, RDP) is routed through a dedicated Jump server in the Management VLAN. Access to the Jump server is possible only from fixed IPs via an \texttt{synrc/vpn} tunnel with mandatory MFA.
-
-\textbf{MA-5 --- Maintenance Personnel.}
-The list of authorized maintenance personnel is maintained in the CMDB (\texttt{roles.ex}) and verified by \texttt{ias} before granting access. Non-certified personnel are technically unable to access the systems.
-
-% =========================================================
 \subsection{Media Protection (MP)}
 % =========================================================
 
@@ -728,40 +706,101 @@ All components have cryptographically verified provenance. Release signatures ar
 \textbf{SR-11 --- Component Authenticity.}
 Hardware components (HSM, switches, servers) are verified via serial number and CMDB inventory record. Vendors (5HT Technology, IIT, Cisco) have signed supply chain security agreements.
 
-% =========================================================
-\subsection{Planning, Risk Assessment, System Acquisition, Privacy (PL, RA, SA, PM, PT)}
-% =========================================================
 
-\subsubsection{\texttt{synrc/ca} CMDB: PL-2, RA-2, RA-3, SA-5, PM-2, PM-5, PM-6, PT-2, PT-4}
-
-\textbf{PL-2 --- System Security and Privacy Plans.}
-This very PDF report, generated programmatically from the CMDB and LaTeX templates, serves as the ERP/1 system security plan. It is updated automatically upon every architectural change (recorded in Git).
-
-\textbf{RA-2 --- Security Categorization.}
-ERP/1 data categorization (Public, PII, Internal, Confidential) is implemented in the \texttt{data.ex} CMDB module and automatically bound to cryptographic protection requirements and access controls.
-
-\textbf{RA-3 --- Risk Assessment.}
-The \texttt{risk.ex} CMDB risk register contains more than 40 documented threats (RISK-OS-01 through RISK-DAT-02), mapped to specific NIST control families and automatically included in compliance analysis.
-
-\textbf{SA-5 --- System Documentation.}
-All ERP/1 architectural and security documentation is generated automatically from source code (Documentation as Code). This eliminates the "documentation drift" phenomenon and guarantees that auditors always assess the current state of the system.
-
-\textbf{PM-2, PM-5, PM-6 --- Security Program, System Inventory, and Performance Measures.}
-The ERP/1 security program is materialized in the \texttt{synrc/ca} CMDB: roles (PM-2), system inventory (PM-5), and key security performance indicators (PM-6) are directly queryable through the CMDB API.
-
-\textbf{PT-2, PT-4 --- Authority and Consent for PII Processing.}
-Processing of personal data (CA subscriber registry) is conducted exclusively within the purposes declared in the Certificate Practice Statement (CPS). The data subject's consent is recorded in \texttt{kvs} with a cryptographic signature.
 
 \section{Organizational Security Profile}
+
+The Organizational Security Profile covers the people, process, and physical environment controls of ERP/1. These are controls whose primary implementation vehicle is human procedure, training, and physical infrastructure, rather than software. The platform products in this section (\texttt{erpuno/itsm}, \texttt{zencrypted/ias}, \texttt{synrc/ca}) support and enforce these controls programmatically, but the controls themselves mandate organizational commitment.
+
 % =========================================================
-\subsection{Awareness and Training}
+\subsection{Awareness and Training (AT)}
 % =========================================================
 
 \subsubsection{\texttt{synrc/ca}: AT-2, AT-3 --- Security Awareness and Role-Based Training}
-\texttt{synrc/ca} serves as a platform for role-based security training (AT-3). Specifically, for CA operators, a simulation mode is implemented where all signing operations occur on a test HSM with test keys. This allows critical procedures (Key Ceremony, OCSP operations) to be rehearsed without risk to the production environment.
+
+\textbf{AT-2 --- Literacy Training and Awareness.}
+All ERP/1 users complete mandatory annual security awareness training covering phishing recognition, credential hygiene, incident reporting procedures, and acceptable use of cryptographic tokens. Completion is tracked via \texttt{zencrypted/ias}: the \texttt{training\_completed\_at} attribute must be current for the account to retain access. An expired training record triggers automatic account downgrade to read-only until training is renewed.
 
 \textbf{AT-2(2) --- Phishing Simulations.}
-Integration of \texttt{ias} with the ERP/MAIL module allows automated sending of simulated phishing emails and recording of user responses. Results are automatically bound to user profiles in \texttt{ias} and influence the subject's risk assessment score.
+\texttt{ias} integrates with the ERP/MAIL module to send automated simulated phishing campaigns quarterly. User responses (clicks, credential entry) are silently logged and bound to the user profile as a behavioral risk score attribute. High-risk users are automatically enrolled in remedial training and their sessions are subjected to enhanced monitoring by the SIEM.
+
+\textbf{AT-3 --- Role-Based Training.}
+\texttt{synrc/ca} provides a dedicated simulation environment (test HSM, test CA hierarchy) where security-critical roles --- CA operators, HSM custodians, auditors --- rehearse their procedures without impacting the production system. Key Ceremony rehearsals, OCSP failover drills, and CRL generation procedures are executed in this environment before being authorized for production.
+
+% =========================================================
+\subsection{Incident Response (IR)}
+% =========================================================
+
+\subsubsection{\texttt{erpuno/itsm}: IR-1, IR-4, IR-5, IR-6}
+
+\textbf{IR-1 --- Incident Response Policy and Procedures.}
+Incident response processes are formalized as BPMN processes in \texttt{synrc/bpmn} and executed via \texttt{erpuno/itsm}. Each incident type (with its MITRE ATT\&CK code) has an assigned BPMN template with clear stages: detection, classification, escalation, remediation, post-analysis.
+
+\textbf{IR-4 --- Incident Handling.}
+\texttt{itsm} automatically receives incidents from Wazuh (via webhook) and \texttt{ias} (upon detecting anomalies per AC-2(12)). Each incident receives a unique INC identifier, bound to the CMDB record of the affected component.
+
+\textbf{IR-5 --- Incident Monitoring.}
+The complete audit trail of each incident (all actions, comments, status changes) is stored in \texttt{kvs} and available for query. Retention period is a minimum of 3 years.
+
+\textbf{IR-6 --- Incident Reporting.}
+\texttt{itsm} automatically generates monthly incident reports in PDF format (using the \texttt{synrc/ca} LaTeX generator) and forwards them to the CISO and the relevant regulator (DSSZZI).
+
+% =========================================================
+
+\subsection{Maintenance (MA)}
+% =========================================================
+
+\subsubsection{\texttt{erpuno/itsm}: MA-2, MA-4, MA-5}
+
+\textbf{MA-2 --- Controlled Maintenance.}
+Any scheduled maintenance work (server, network equipment, HSM servicing) is registered as a Change Request (CR) in \texttt{itsm}. A CR has mandatory fields: \texttt{maintainer\_id}, \texttt{authorization\_certificate} (X.509 signature from an authorized engineer), \texttt{maintenance\_window}, \texttt{rollback\_plan}.
+
+\textbf{MA-4 --- Nonlocal Maintenance.}
+All remote maintenance access (SSH, RDP) is routed through a dedicated Jump server in the Management VLAN. Access to the Jump server is possible only from fixed IPs via an \texttt{synrc/vpn} tunnel with mandatory MFA.
+
+\textbf{MA-5 --- Maintenance Personnel.}
+The list of authorized maintenance personnel is maintained in the CMDB (\texttt{roles.ex}) and verified by \texttt{ias} before granting access. Non-certified personnel are technically unable to access the systems.
+
+% =========================================================
+% =========================================================
+\subsection{Personnel Security (PS)}
+% =========================================================
+
+\subsubsection{\texttt{zencrypted/ias}: PS-3, PS-4, PS-5, PS-6, PS-7 --- Personnel Lifecycle}
+
+\textbf{PS-3 --- Personnel Screening.}
+Background verification requirements for each role are encoded as mandatory attributes in \texttt{ias} account profiles. An account with role \texttt{security\_admin} or \texttt{global\_root\_admin} cannot be activated without the \texttt{background\_check\_completed} attribute set by an authorized HR officer. This creates a technical enforcement of the screening policy.
+
+\textbf{PS-4 --- Personnel Termination.}
+When an employee termination event is received from the HR module (via SCIM 2.0 or webhook), \texttt{ias} executes a deterministic off-boarding sequence within one minute: (1) all active sessions are revoked, (2) the account is suspended, (3) all X.509 certificates are submitted for OCSP revocation to \texttt{synrc/ca}, (4) group memberships are removed, and (5) a termination audit event is written to \texttt{kvs}. This eliminates the risk of access persisting after termination.
+
+\textbf{PS-5 --- Personnel Transfer.}
+Role transfers are handled via the Joiner-Mover-Leaver (JML) workflow in \texttt{erpuno/itsm}. A transfer Change Request must be approved by both the origin and destination supervisors. Upon approval, \texttt{ias} simultaneously removes old role attributes and adds new ones, then requests issuance of a new X.509 certificate reflecting the updated role set from \texttt{synrc/ca}.
+
+\textbf{PS-6 --- Access Agreements.}
+As described in PL-4, access agreements (rules of behavior) are accepted cryptographically during certificate enrollment. The signed enrollment request itself constitutes the access agreement. Changes to the rules of behavior trigger a new certificate enrollment cycle, requiring fresh cryptographic acceptance.
+
+\textbf{PS-7 --- External Personnel Security.}
+Third-party contractors and external auditors receive time-limited X.509 certificates from a dedicated sub-CA with a restricted OID scope in \texttt{synrc/ca}. These certificates have a hard expiration aligned with the contract period, after which access terminates automatically without any manual action. The ABAC policies for the \texttt{external\_contractor} role enforce a strict Default Deny posture, granting only explicitly scoped resource access.
+
+% =========================================================
+\subsection{Physical and Environmental Protection (PE)}
+% =========================================================
+
+\subsubsection{\texttt{synrc/ca} CMDB: PE-2, PE-3, PE-6, PE-12 --- Physical Access and Environment}
+
+\textbf{PE-2 --- Physical Access Authorizations.}
+Physical access to the server room and HSM storage area is controlled via a PKI-based electronic access control system. The authorized persons list is maintained as a CMDB record (\texttt{hw.ex} physical zone policy), cross-referenced with active \texttt{ias} accounts. A deactivated account automatically triggers removal from the physical access list within one synchronization cycle.
+
+\textbf{PE-3 --- Physical Access Control.}
+The server room enforces a mantrap entry with dual authentication: PKI smart card (verified against \texttt{synrc/ca} OCSP) plus biometric. The HSM area additionally requires dual-person integrity (two authorized persons must enter together) --- a physical enforcement of the Dual Control principle mandated for all cryptographic key operations.
+
+\textbf{PE-6 --- Monitoring Physical Access.}
+CCTV feeds from all access points are retained for 90 days. Motion events and access log entries are correlated by Wazuh: an access event without a corresponding \texttt{ias} login event (or vice versa) generates an anomaly alert, detecting tailgating, piggybacking, or account sharing.
+
+\textbf{PE-12 --- Emergency Lighting.}
+The data center is equipped with UPS (HPE R/T3000) and diesel generator backup power, documented in \texttt{hw.ex} as \texttt{ERP-PE-UPS-01} and \texttt{ERP-PE-GEN-01}. Emergency lighting and environmental monitoring (temperature, humidity, fire suppression status) feed into Zabbix, with threshold alerts routed to the on-call infrastructure team via \texttt{erpuno/itsm}.
+
 
 \newpage
 \section{Conclusion}
