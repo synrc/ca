@@ -77,4 +77,4 @@ defmodule FamilyDescGenerator do
   end
 end
 
-FamilyDescGenerator.run()
+#FamilyDescGenerator.run()

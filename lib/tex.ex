@@ -826,7 +826,7 @@ defmodule CA.TeX do
             Enum.join(chunk, "\\vspace{1mm}\\newline\\noindent\\rule{\\linewidth}{0.4pt}\\vspace{1mm}\n")
           end)
 
-        p_chunks = 
+        p_chunks =
           if custom_text == "" do
             if grouped_params == [], do: [""], else: grouped_params
           else
@@ -866,9 +866,7 @@ defmodule CA.TeX do
             c1 = if chunk_idx == 0, do: "#{row_idx}", else: ""
             c2 = if chunk_idx == 0, do: "#{title}", else: ""
             c4 = if chunk_idx == 0, do: "#{escape_latex(control_id)}", else: ""
-            
             line_cmd = if chunk_idx == max_chunks - 1, do: "\\hline\n", else: "\n"
-            
             "#{c1} & #{c2} & #{t} & #{c4} & #{p} \\\\ #{line_cmd}"
           end)
           |> Enum.join("")
