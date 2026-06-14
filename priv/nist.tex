@@ -25,8 +25,7 @@ For security reasons we can only demo/showcase of ERPUNO security (sample) profi
 \newpage
 \tableofcontents
 
-\newpage
-\section{Introduction}
+\newpage\section{Introduction}
 ERPUNO LLC provides high-tech telecommunication solutions for the automation of commercial and state enterprises. Their platform is architecturally divided into two primary layers:
 \begin{itemize}
     \item \textbf{Platform (SYS-APP-SYNRC):} The systemic foundation, including the Certificate Authority (CA), L2/L3 VPN tunnels, PKI-aware LDAP, Communicator (CHAT), BPMN process engine, MQTT broker, and KVS storage.
@@ -76,7 +75,151 @@ According to the regulatory framework of Ukraine (e.g., ND TZI 2.6-001-11) and b
 
 This segregation guarantees that the organization creating the security profiles and writing the Elixir CMDB structures is legally and practically distinct from the organization auditing and approving them.
 
-\newpage\section{Metainformational Security Profile}
+\subsection{The Three-Layer Security Profile Development Process}
+
+Constructing a comprehensive KSZI for ERP/1 follows a rigorous, sequential three-layer process. This sequence is not arbitrary --- it mirrors the natural dependency chain of a security program: you must first organize your people and processes, then capture that organization into authoritative documentation and risk records, and only then implement the technical controls that enforce what the documentation prescribes.
+
+\begin{enumerate}
+
+    \item \textbf{Layer 1 --- Organizational Security Profile (Who and How).}
+    The first layer establishes the human and procedural foundation. This includes defining roles and responsibilities (personnel security), establishing training and awareness programs, codifying incident response and maintenance procedures, and securing the physical environment. Without this layer, technical controls have no owner and no organizational context. \texttt{erpuno/itsm} and \texttt{zencrypted/ias} are the primary products that enforce this layer programmatically.
+
+    \item \textbf{Layer 2 --- Metainformational Security Profile (What and Why).}
+    The second layer translates the organizational decisions of Layer 1 into authoritative, machine-verifiable documentation: system security plans, risk taxonomies, data categorization matrices, privacy records, and acquisition policies. The key innovation of ERP/1 is that this layer is not paper-based --- it is expressed as live Elixir source code in the \texttt{synrc/ca} CMDB and automatically projected into audit-ready PDF reports. This eliminates documentation drift and guarantees that what auditors read is exactly what the system does.
+
+    \item \textbf{Layer 3 --- Technical Security Profile (How Enforced).}
+    The third layer implements the technical enforcement mechanisms that the first two layers define. Cryptographic access control, audit logging, network segmentation, integrity checking, and supply chain verification are all realized in specific ERP/1 products (\texttt{zencrypted/ias}, \texttt{erpuno/abac}, \texttt{synrc/vpn}, \texttt{synrc/kvs}, etc.). Technical controls reference and enforce the policies established in Layer 1 and documented in Layer 2.
+
+\end{enumerate}
+
+This layered development model ensures full traceability: every technical control in Layer 3 can be traced back to a documented policy in Layer 2, which in turn traces back to an organizational decision in Layer 1. The entire chain is expressed in version-controlled source code, making the compliance posture continuously auditable and self-consistent.
+
+
+\newpage
+\newpage
+\section{Organizational Security Profile}
+
+% ============================================================
+% LAYER 1: The Human and Procedural Foundation
+% This section covers the "who" and "how" of security:
+% people, processes, physical environment, and culture.
+% It must be established before documentation (Layer 2) or
+% technical controls (Layer 3) can be meaningfully implemented.
+% Primary products: erpuno/itsm, zencrypted/ias, synrc/ca training
+% ============================================================
+
+The Organizational Security Profile establishes the human and procedural foundation of ERP/1 security. These controls define \textit{who} is responsible for security, \textit{how} they are trained, \textit{how} incidents and maintenance are handled, \textit{how} personnel are screened and off-boarded, and \textit{how} the physical environment is protected. This layer must exist before the Metainformational layer can capture it in documentation, and before the Technical layer can enforce it in code.
+
+
+The Organizational Security Profile covers the people, process, and physical environment controls of ERP/1. These are controls whose primary implementation vehicle is human procedure, training, and physical infrastructure, rather than software. The platform products in this section (\texttt{erpuno/itsm}, \texttt{zencrypted/ias}, \texttt{synrc/ca}) support and enforce these controls programmatically, but the controls themselves mandate organizational commitment.
+
+% =========================================================
+\subsection{Awareness and Training (AT)}
+% =========================================================
+
+\subsubsection{\texttt{synrc/ca}: AT-2, AT-3 --- Security Awareness and Role-Based Training}
+
+\textbf{AT-2 --- Literacy Training and Awareness.}
+All ERP/1 users complete mandatory annual security awareness training covering phishing recognition, credential hygiene, incident reporting procedures, and acceptable use of cryptographic tokens. Completion is tracked via \texttt{zencrypted/ias}: the \texttt{training\_completed\_at} attribute must be current for the account to retain access. An expired training record triggers automatic account downgrade to read-only until training is renewed.
+
+\textbf{AT-2(2) --- Phishing Simulations.}
+\texttt{ias} integrates with the ERP/MAIL module to send automated simulated phishing campaigns quarterly. User responses (clicks, credential entry) are silently logged and bound to the user profile as a behavioral risk score attribute. High-risk users are automatically enrolled in remedial training and their sessions are subjected to enhanced monitoring by the SIEM.
+
+\textbf{AT-3 --- Role-Based Training.}
+\texttt{synrc/ca} provides a dedicated simulation environment (test HSM, test CA hierarchy) where security-critical roles --- CA operators, HSM custodians, auditors --- rehearse their procedures without impacting the production system. Key Ceremony rehearsals, OCSP failover drills, and CRL generation procedures are executed in this environment before being authorized for production.
+
+% =========================================================
+\subsection{Incident Response (IR)}
+% =========================================================
+
+\subsubsection{\texttt{erpuno/itsm}: IR-1, IR-4, IR-5, IR-6}
+
+\textbf{IR-1 --- Incident Response Policy and Procedures.}
+Incident response processes are formalized as BPMN processes in \texttt{synrc/bpmn} and executed via \texttt{erpuno/itsm}. Each incident type (with its MITRE ATT\&CK code) has an assigned BPMN template with clear stages: detection, classification, escalation, remediation, post-analysis.
+
+\textbf{IR-4 --- Incident Handling.}
+\texttt{itsm} automatically receives incidents from Wazuh (via webhook) and \texttt{ias} (upon detecting anomalies per AC-2(12)). Each incident receives a unique INC identifier, bound to the CMDB record of the affected component.
+
+\textbf{IR-5 --- Incident Monitoring.}
+The complete audit trail of each incident (all actions, comments, status changes) is stored in \texttt{kvs} and available for query. Retention period is a minimum of 3 years.
+
+\textbf{IR-6 --- Incident Reporting.}
+\texttt{itsm} automatically generates monthly incident reports in PDF format (using the \texttt{synrc/ca} LaTeX generator) and forwards them to the CISO and the relevant regulator (DSSZZI).
+
+% =========================================================
+
+\subsection{Maintenance (MA)}
+% =========================================================
+
+\subsubsection{\texttt{erpuno/itsm}: MA-2, MA-4, MA-5}
+
+\textbf{MA-2 --- Controlled Maintenance.}
+Any scheduled maintenance work (server, network equipment, HSM servicing) is registered as a Change Request (CR) in \texttt{itsm}. A CR has mandatory fields: \texttt{maintainer\_id}, \texttt{authorization\_certificate} (X.509 signature from an authorized engineer), \texttt{maintenance\_window}, \texttt{rollback\_plan}.
+
+\textbf{MA-4 --- Nonlocal Maintenance.}
+All remote maintenance access (SSH, RDP) is routed through a dedicated Jump server in the Management VLAN. Access to the Jump server is possible only from fixed IPs via an \texttt{synrc/vpn} tunnel with mandatory MFA.
+
+\textbf{MA-5 --- Maintenance Personnel.}
+The list of authorized maintenance personnel is maintained in the CMDB (\texttt{roles.ex}) and verified by \texttt{ias} before granting access. Non-certified personnel are technically unable to access the systems.
+
+% =========================================================
+% =========================================================
+\subsection{Personnel Security (PS)}
+% =========================================================
+
+\subsubsection{\texttt{zencrypted/ias}: PS-3, PS-4, PS-5, PS-6, PS-7 --- Personnel Lifecycle}
+
+\textbf{PS-3 --- Personnel Screening.}
+Background verification requirements for each role are encoded as mandatory attributes in \texttt{ias} account profiles. An account with role \texttt{security\_admin} or \texttt{global\_root\_admin} cannot be activated without the \texttt{background\_check\_completed} attribute set by an authorized HR officer. This creates a technical enforcement of the screening policy.
+
+\textbf{PS-4 --- Personnel Termination.}
+When an employee termination event is received from the HR module (via SCIM 2.0 or webhook), \texttt{ias} executes a deterministic off-boarding sequence within one minute: (1) all active sessions are revoked, (2) the account is suspended, (3) all X.509 certificates are submitted for OCSP revocation to \texttt{synrc/ca}, (4) group memberships are removed, and (5) a termination audit event is written to \texttt{kvs}. This eliminates the risk of access persisting after termination.
+
+\textbf{PS-5 --- Personnel Transfer.}
+Role transfers are handled via the Joiner-Mover-Leaver (JML) workflow in \texttt{erpuno/itsm}. A transfer Change Request must be approved by both the origin and destination supervisors. Upon approval, \texttt{ias} simultaneously removes old role attributes and adds new ones, then requests issuance of a new X.509 certificate reflecting the updated role set from \texttt{synrc/ca}.
+
+\textbf{PS-6 --- Access Agreements.}
+As described in PL-4, access agreements (rules of behavior) are accepted cryptographically during certificate enrollment. The signed enrollment request itself constitutes the access agreement. Changes to the rules of behavior trigger a new certificate enrollment cycle, requiring fresh cryptographic acceptance.
+
+\textbf{PS-7 --- External Personnel Security.}
+Third-party contractors and external auditors receive time-limited X.509 certificates from a dedicated sub-CA with a restricted OID scope in \texttt{synrc/ca}. These certificates have a hard expiration aligned with the contract period, after which access terminates automatically without any manual action. The ABAC policies for the \texttt{external\_contractor} role enforce a strict Default Deny posture, granting only explicitly scoped resource access.
+
+% =========================================================
+\subsection{Physical and Environmental Protection (PE)}
+% =========================================================
+
+\subsubsection{\texttt{synrc/ca} CMDB: PE-2, PE-3, PE-6, PE-12 --- Physical Access and Environment}
+
+\textbf{PE-2 --- Physical Access Authorizations.}
+Physical access to the server room and HSM storage area is controlled via a PKI-based electronic access control system. The authorized persons list is maintained as a CMDB record (\texttt{hw.ex} physical zone policy), cross-referenced with active \texttt{ias} accounts. A deactivated account automatically triggers removal from the physical access list within one synchronization cycle.
+
+\textbf{PE-3 --- Physical Access Control.}
+The server room enforces a mantrap entry with dual authentication: PKI smart card (verified against \texttt{synrc/ca} OCSP) plus biometric. The HSM area additionally requires dual-person integrity (two authorized persons must enter together) --- a physical enforcement of the Dual Control principle mandated for all cryptographic key operations.
+
+\textbf{PE-6 --- Monitoring Physical Access.}
+CCTV feeds from all access points are retained for 90 days. Motion events and access log entries are correlated by Wazuh: an access event without a corresponding \texttt{ias} login event (or vice versa) generates an anomaly alert, detecting tailgating, piggybacking, or account sharing.
+
+\textbf{PE-12 --- Emergency Lighting.}
+The data center is equipped with UPS (HPE R/T3000) and diesel generator backup power, documented in \texttt{hw.ex} as \texttt{ERP-PE-UPS-01} and \texttt{ERP-PE-GEN-01}. Emergency lighting and environmental monitoring (temperature, humidity, fire suppression status) feed into Zabbix, with threshold alerts routed to the on-call infrastructure team via \texttt{erpuno/itsm}.
+
+
+\newpage
+\newpage
+\newpage
+\section{Metainformational Security Profile}
+
+% ============================================================
+% LAYER 2: The Documentation and Governance Layer
+% This section captures organizational decisions (Layer 1) into
+% authoritative, machine-verifiable artifacts: security plans,
+% risk registries, data categorizations, privacy records.
+% The key principle: documentation IS code — generated from
+% the live CMDB state, never manually maintained.
+% Primary product: synrc/ca (CMDB, risk.ex, data.ex, roles.ex)
+% ============================================================
+
+The Metainformational Security Profile translates the organizational decisions established in Layer 1 into authoritative, machine-verifiable governance artifacts. Rather than static paper documents, ERP/1 expresses all security plans, risk taxonomies, data categorizations, and privacy records as live, version-controlled Elixir source code within \texttt{synrc/ca}. These artifacts are the formal bridge between organizational intent and technical enforcement: technical controls in Layer 3 enforce exactly what this layer documents, and this layer documents exactly what Layer 1 mandates.
+
 
 The Metainformational Security Profile covers the governance, planning, and programmatic documentation layer of ERP/1. These controls are realized through the CMDB paradigm: instead of static paper artifacts, all policy and risk information is expressed as live, version-controlled Elixir source code in \texttt{synrc/ca}. This makes the security documentation self-verifying, continuously synchronized with the deployed system, and automatically auditable by state regulators (DSSZZI) and international auditors (ISO/IEC 27001, NIST).
 
@@ -394,7 +537,22 @@ iex> CA.PRO.net("ERP")
 \newpage
 \newpage
 \newpage
+\newpage
+\newpage
 \section{Technical Security Profile}
+
+% ============================================================
+% LAYER 3: The Technical Enforcement Layer
+% This section implements the controls that Layers 1 and 2 define.
+% Every cryptographic mechanism, access policy, and audit trail
+% here enforces a specific organizational procedure (Layer 1)
+% documented in a specific governance artifact (Layer 2).
+% Primary products: zencrypted/ias, erpuno/abac, synrc/vpn,
+%   synrc/kvs, synrc/chat, erlang/otp, synrc/ca
+% ============================================================
+
+The Technical Security Profile implements the enforcement mechanisms that the organizational procedures of Layer 1 mandate and the governance documentation of Layer 2 describes. Every control in this section is traceable: \texttt{AC-2} enforces the personnel lifecycle defined in PS-4 and documented in PM-2; \texttt{AU-12} enforces the audit event catalog defined in AU-2 policy and encoded in the CMDB. The ERP/1 architecture ensures that no technical control exists without organizational ownership, and no organizational policy exists without technical enforcement.
+
 
 The following section is a comprehensive, control-by-control scientific analysis of how the components of the ERP/1 platform (ecosystem \texttt{ERP.UNO}, \texttt{N2O.DEV}, \texttt{SYNRC.COM}) naturally and architecturally satisfy the requirements of NIST SP 800-53 Rev.5 and ND TZI 2.3-025-24.
 Each platform product is a purpose-built solution for a specific security domain, enabling maximally organic --- without artificial mappings --- standard compliance. The analysis covers all 20 control families: AC, AT, AU, CA, CM, CP, IA, IR, MA, MP, PE, PL, PM, PS, PT, RA, SA, SC, SI, SR.
@@ -706,100 +864,6 @@ All components have cryptographically verified provenance. Release signatures ar
 \textbf{SR-11 --- Component Authenticity.}
 Hardware components (HSM, switches, servers) are verified via serial number and CMDB inventory record. Vendors (5HT Technology, IIT, Cisco) have signed supply chain security agreements.
 
-
-
-\section{Organizational Security Profile}
-
-The Organizational Security Profile covers the people, process, and physical environment controls of ERP/1. These are controls whose primary implementation vehicle is human procedure, training, and physical infrastructure, rather than software. The platform products in this section (\texttt{erpuno/itsm}, \texttt{zencrypted/ias}, \texttt{synrc/ca}) support and enforce these controls programmatically, but the controls themselves mandate organizational commitment.
-
-% =========================================================
-\subsection{Awareness and Training (AT)}
-% =========================================================
-
-\subsubsection{\texttt{synrc/ca}: AT-2, AT-3 --- Security Awareness and Role-Based Training}
-
-\textbf{AT-2 --- Literacy Training and Awareness.}
-All ERP/1 users complete mandatory annual security awareness training covering phishing recognition, credential hygiene, incident reporting procedures, and acceptable use of cryptographic tokens. Completion is tracked via \texttt{zencrypted/ias}: the \texttt{training\_completed\_at} attribute must be current for the account to retain access. An expired training record triggers automatic account downgrade to read-only until training is renewed.
-
-\textbf{AT-2(2) --- Phishing Simulations.}
-\texttt{ias} integrates with the ERP/MAIL module to send automated simulated phishing campaigns quarterly. User responses (clicks, credential entry) are silently logged and bound to the user profile as a behavioral risk score attribute. High-risk users are automatically enrolled in remedial training and their sessions are subjected to enhanced monitoring by the SIEM.
-
-\textbf{AT-3 --- Role-Based Training.}
-\texttt{synrc/ca} provides a dedicated simulation environment (test HSM, test CA hierarchy) where security-critical roles --- CA operators, HSM custodians, auditors --- rehearse their procedures without impacting the production system. Key Ceremony rehearsals, OCSP failover drills, and CRL generation procedures are executed in this environment before being authorized for production.
-
-% =========================================================
-\subsection{Incident Response (IR)}
-% =========================================================
-
-\subsubsection{\texttt{erpuno/itsm}: IR-1, IR-4, IR-5, IR-6}
-
-\textbf{IR-1 --- Incident Response Policy and Procedures.}
-Incident response processes are formalized as BPMN processes in \texttt{synrc/bpmn} and executed via \texttt{erpuno/itsm}. Each incident type (with its MITRE ATT\&CK code) has an assigned BPMN template with clear stages: detection, classification, escalation, remediation, post-analysis.
-
-\textbf{IR-4 --- Incident Handling.}
-\texttt{itsm} automatically receives incidents from Wazuh (via webhook) and \texttt{ias} (upon detecting anomalies per AC-2(12)). Each incident receives a unique INC identifier, bound to the CMDB record of the affected component.
-
-\textbf{IR-5 --- Incident Monitoring.}
-The complete audit trail of each incident (all actions, comments, status changes) is stored in \texttt{kvs} and available for query. Retention period is a minimum of 3 years.
-
-\textbf{IR-6 --- Incident Reporting.}
-\texttt{itsm} automatically generates monthly incident reports in PDF format (using the \texttt{synrc/ca} LaTeX generator) and forwards them to the CISO and the relevant regulator (DSSZZI).
-
-% =========================================================
-
-\subsection{Maintenance (MA)}
-% =========================================================
-
-\subsubsection{\texttt{erpuno/itsm}: MA-2, MA-4, MA-5}
-
-\textbf{MA-2 --- Controlled Maintenance.}
-Any scheduled maintenance work (server, network equipment, HSM servicing) is registered as a Change Request (CR) in \texttt{itsm}. A CR has mandatory fields: \texttt{maintainer\_id}, \texttt{authorization\_certificate} (X.509 signature from an authorized engineer), \texttt{maintenance\_window}, \texttt{rollback\_plan}.
-
-\textbf{MA-4 --- Nonlocal Maintenance.}
-All remote maintenance access (SSH, RDP) is routed through a dedicated Jump server in the Management VLAN. Access to the Jump server is possible only from fixed IPs via an \texttt{synrc/vpn} tunnel with mandatory MFA.
-
-\textbf{MA-5 --- Maintenance Personnel.}
-The list of authorized maintenance personnel is maintained in the CMDB (\texttt{roles.ex}) and verified by \texttt{ias} before granting access. Non-certified personnel are technically unable to access the systems.
-
-% =========================================================
-% =========================================================
-\subsection{Personnel Security (PS)}
-% =========================================================
-
-\subsubsection{\texttt{zencrypted/ias}: PS-3, PS-4, PS-5, PS-6, PS-7 --- Personnel Lifecycle}
-
-\textbf{PS-3 --- Personnel Screening.}
-Background verification requirements for each role are encoded as mandatory attributes in \texttt{ias} account profiles. An account with role \texttt{security\_admin} or \texttt{global\_root\_admin} cannot be activated without the \texttt{background\_check\_completed} attribute set by an authorized HR officer. This creates a technical enforcement of the screening policy.
-
-\textbf{PS-4 --- Personnel Termination.}
-When an employee termination event is received from the HR module (via SCIM 2.0 or webhook), \texttt{ias} executes a deterministic off-boarding sequence within one minute: (1) all active sessions are revoked, (2) the account is suspended, (3) all X.509 certificates are submitted for OCSP revocation to \texttt{synrc/ca}, (4) group memberships are removed, and (5) a termination audit event is written to \texttt{kvs}. This eliminates the risk of access persisting after termination.
-
-\textbf{PS-5 --- Personnel Transfer.}
-Role transfers are handled via the Joiner-Mover-Leaver (JML) workflow in \texttt{erpuno/itsm}. A transfer Change Request must be approved by both the origin and destination supervisors. Upon approval, \texttt{ias} simultaneously removes old role attributes and adds new ones, then requests issuance of a new X.509 certificate reflecting the updated role set from \texttt{synrc/ca}.
-
-\textbf{PS-6 --- Access Agreements.}
-As described in PL-4, access agreements (rules of behavior) are accepted cryptographically during certificate enrollment. The signed enrollment request itself constitutes the access agreement. Changes to the rules of behavior trigger a new certificate enrollment cycle, requiring fresh cryptographic acceptance.
-
-\textbf{PS-7 --- External Personnel Security.}
-Third-party contractors and external auditors receive time-limited X.509 certificates from a dedicated sub-CA with a restricted OID scope in \texttt{synrc/ca}. These certificates have a hard expiration aligned with the contract period, after which access terminates automatically without any manual action. The ABAC policies for the \texttt{external\_contractor} role enforce a strict Default Deny posture, granting only explicitly scoped resource access.
-
-% =========================================================
-\subsection{Physical and Environmental Protection (PE)}
-% =========================================================
-
-\subsubsection{\texttt{synrc/ca} CMDB: PE-2, PE-3, PE-6, PE-12 --- Physical Access and Environment}
-
-\textbf{PE-2 --- Physical Access Authorizations.}
-Physical access to the server room and HSM storage area is controlled via a PKI-based electronic access control system. The authorized persons list is maintained as a CMDB record (\texttt{hw.ex} physical zone policy), cross-referenced with active \texttt{ias} accounts. A deactivated account automatically triggers removal from the physical access list within one synchronization cycle.
-
-\textbf{PE-3 --- Physical Access Control.}
-The server room enforces a mantrap entry with dual authentication: PKI smart card (verified against \texttt{synrc/ca} OCSP) plus biometric. The HSM area additionally requires dual-person integrity (two authorized persons must enter together) --- a physical enforcement of the Dual Control principle mandated for all cryptographic key operations.
-
-\textbf{PE-6 --- Monitoring Physical Access.}
-CCTV feeds from all access points are retained for 90 days. Motion events and access log entries are correlated by Wazuh: an access event without a corresponding \texttt{ias} login event (or vice versa) generates an anomaly alert, detecting tailgating, piggybacking, or account sharing.
-
-\textbf{PE-12 --- Emergency Lighting.}
-The data center is equipped with UPS (HPE R/T3000) and diesel generator backup power, documented in \texttt{hw.ex} as \texttt{ERP-PE-UPS-01} and \texttt{ERP-PE-GEN-01}. Emergency lighting and environmental monitoring (temperature, humidity, fire suppression status) feed into Zabbix, with threshold alerts routed to the on-call infrastructure team via \texttt{erpuno/itsm}.
 
 
 \newpage
