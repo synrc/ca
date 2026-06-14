@@ -142,8 +142,7 @@ defmodule CA.TeX do
       legal_l1_profile_1(),
       legal_l1_profile_2(),
       legal_l2_profile(),
-      legal_l3_profile(CA.L3.Cod),
-      legal_l3_profile(CA.L3.Court),
+      legal_l3_profile(CA.L3.ERP),
       # В Шаблоні ТОВ "Криптографічні Телесистеми"
       gen_bible(),
     ])
