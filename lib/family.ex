@@ -3,7 +3,7 @@ defmodule FamilyDescGenerator do
     all_specs = CA.Profile.Data.specs()
 
     # Filter only top-level families and main controls (no sub-controls like AC-2(1))
-    specs_by_id = Map.new(all_specs, &{&1.id, &1})
+    _specs_by_id = Map.new(all_specs, &{&1.id, &1})
 
     families =
       all_specs
