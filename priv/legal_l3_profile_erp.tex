@@ -30,7 +30,7 @@
 \vspace{1cm}
 \textbf{\Large ЦІЛЬОВИЙ ПРОФІЛЬ БЕЗПЕКИ}\\
 \vspace{0.5cm}
-\large UA.47850061.СЗІ.ДП-19
+\large UA.47850061.СЗІ.ДП-75
 \end{center}
 
 \newpage
@@ -271,7 +271,7 @@
 Параметр: risk\_\allowbreak{}assessment\newline Тип: boolean\newline Значення: \textbf{true} \\ \hline
 103 & Сканування вразливостей &  & RA-5 & Система передбачає можливість інтеграції зовнішніх сканерів вразливостей, звіти яких автоматично перетворюються на тикети усунення ризиків в системі `itsm`.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
 Параметр: vulnerability\_\allowbreak{}scanning\newline Тип: boolean\newline Значення: \textbf{true} \\ \hline
-\multicolumn{5}{|>{\raggedright\arraybackslash}p{16cm}|}{\textbf{11. SC}} \\* \noalign{\hrule height 0.4pt}
+\multicolumn{5}{|>{\raggedright\arraybackslash}p{16cm}|}{\textbf{11. ЗАХИСТ СИСТЕМ ТА КОМУНІКАЦІЙ (SC)}} \\* \noalign{\hrule height 0.4pt}
 104 & Ізоляція функції безпеки & Розділяти функціональність користувача, включно зі службами, що призначені для користувача інтерфейсу, від функціональності системного управління. & SC-2 & Функції безпеки (шифрування, авторизація) виконуються в ізольованих процесах Erlang VM, окремо від бізнес-логіки системи. Ця архітектура Actor Model унеможливлює втручання несанкціонованих процесів у роботу механізмів безпеки.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
 Параметр: security\_\allowbreak{}function\_\allowbreak{}isolation\newline Тип: boolean\newline Значення: \textbf{true} \\ \hline
 105 & Інформація в загальних ресурсах системи & Запобігати несанкціонованій та ненавмисній передачі інформації через спільні системні ресурси. & SC-4 & Erlang VM не використовує спільну пам'ять (shared memory) між процесами сесій N2O. Пам'ять звільняється автоматично (Garbage Collection) після обробки запиту, запобігаючи витоку залишкової інформації між різними користувачами.\vspace{1mm}\newline\noindent\rule{\linewidth}{0.4pt}\vspace{1mm}
