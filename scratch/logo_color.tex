@@ -1,0 +1,21 @@
+\documentclass[tikz,border=2pt]{standalone}
+\usetikzlibrary{svg.path}
+\begin{document}
+\begin{tikzpicture}[x=1pt, y=1pt, yscale=-1]
+  % Blue shield
+  \fill[color={rgb,255:red,0;green,91;blue,187}, draw={rgb,255:red,255;green,213;blue,0}, line width=1.5pt] 
+    svg {m5 5h650v689c0 48-29 97-76 117l-251 105-251-105c-44-20-76-65-72-117z};
+  
+  % Center line reference
+  \draw[red, thin] (330,0) -- (330,1000);
+
+  % Right half of Tryzub (Yellow)
+  \fill[color={rgb,255:red,255;green,213;blue,0}] 
+    svg {m329 53c-6 4-2 396 0 401 12 43 29 81 48 112-104 31-63 146-48 287 7-12 17-21 28-28 43-34 70-81 79-132h133v-580c-148 88-132 213-148 361 59-10 75 76-3 83-92-149-59-257-59-419 0-37-9-62-30-85zm200 143v297h-22c-6-23-21-41-42-51 8-85 10-189 64-246zm-22 337h22v120h-89c0-19-3-39-8-58 36-4 68-29 75-62zm-114 71c4 16 6 33 6 49h-50c1-27 19-44 44-49zm-44 89h46c-7 31-23 61-46 85z};
+
+  % Left half of Tryzub (Mirrored SVG Path directly, colored Green for distinction)
+  \fill[color={rgb,255:red,255;green,213;blue,0}] 
+    svg {m331 53c6 4 2 396 0 401-12 43-29 81-48 112 104 31 63 146 48 287-7-12-17-21-28-28-43-34-70-81-79-132h-133v-580c148 88 132 213 148 361-59-10-75 76 3 83 92-149 59-257 59-419 0-37 9-62 30-85zm-200 143v297h22c6-23 21-41 42-51-8-85-10-189-64-246zm22 337h-22v120h89c0-19 3-39 8-58-36-4-68-29-75-62zm114 71c-4 16-6 33-6 49h50c-1-27-19-44-44-49zm44 89h-46c7 31 23 61 46 85z};
+
+\end{tikzpicture}
+\end{document}
