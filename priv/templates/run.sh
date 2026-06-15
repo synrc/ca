@@ -1,0 +1,6 @@
+
+pdflatex order_admin_appointment.tex
+pdflatex order_at_ir_ma_ps_pe.tex
+pdflatex order_kszi_development.tex
+pdflatex order_physical_access.tex
+pdflatex order_szi_establishment.tex

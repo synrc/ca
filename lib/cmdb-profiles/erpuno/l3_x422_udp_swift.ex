@@ -3,7 +3,7 @@ defmodule CA.L3.X422.Light do
   Level 3: Target Security Profile for X.422.1 UDP Multicast (Pure Swift / Zero Deps)
   """
 
-  def org_name, do: "ТОВ \"Криптографічні Телесистеми\""
+  def org_name, do: "ДП \"УСС\""
   def system_desc, do: "Pure Swift (Zero Deps) X.422.1 Implementation"
   def system_name, do: "Chat X.422.1 (Swift)"
 

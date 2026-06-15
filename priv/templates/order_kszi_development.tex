@@ -1,0 +1,113 @@
+\documentclass[12pt]{article}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage[left=30mm,right=15mm,top=20mm,bottom=20mm]{geometry}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{tikz}
+\usetikzlibrary{svg.path}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+
+\newcommand{\tryzub}[1][1]{%
+  \begin{tikzpicture}[scale=0.03*#1, yscale=-1, baseline=(current bounding box.center)]
+    % Shield: transparent background, black stroke
+    \filldraw[fill=white, draw=black, line width=1.5pt]
+      svg {m5 5h650v689c0 48-29 97-76 117l-251 105-251-105c-44-20-76-65-72-117z};
+
+    % Right half of Tryzub (Black)
+    \fill[color=black] 
+      svg {m329 53c-6 4-2 396 0 401 12 43 29 81 48 112-104 31-63 146-48 287 7-12 17-21 28-28 43-34 70-81 79-132h133v-580c-148 88-132 213-148 361 59-10 75 76-3 83-92-149-59-257-59-419 0-37-9-62-30-85zm200 143v297h-22c-6-23-21-41-42-51 8-85 10-189 64-246zm-22 337h22v120h-89c0-19-3-39-8-58 36-4 68-29 75-62zm-114 71c4 16 6 33 6 49h-50c1-27 19-44 44-49zm-44 89h46c-7 31-23 61-46 85z};
+
+    % Left (mirrored) half of Tryzub (Black)
+    \fill[color=black] 
+      svg {m331 53c6 4 2 396 0 401-12 43-29 81-48 112 104 31 63 146 48 287-7-12-17-21-28-28-43-34-70-81-79-132h-133v-580c148 88 132 213 148 361-59-10-75 76 3 83 92-149 59-257 59-419 0-37 9-62 30-85zm-200 143v297h22c6-23 21-41 42-51-8-85-10-189-64-246zm22 337h-22v120h89c0-19 3-39 8-58-36-4-68-29-75-62zm114 71c-4 16-6 33-6 49h50c-1-27-19-44-44-49zm44 89h-46c7 31 23 61 46 85z};
+  \end{tikzpicture}%
+}
+
+
+\begin{document}
+
+\begin{center}
+  \tryzub[0.8]\\[0.3cm]
+  {\selectlanguage{ukrainian}\small\MakeUppercase{Державна судова адміністрація України}\\}
+  {\selectlanguage{ukrainian}\small\bfseries\MakeUppercase{Державне підприємство «Інформаційні судові системи»}\\}
+  \vspace{0.2cm}
+  \hrule height 1.5pt
+  \vspace{0.5cm}
+  {\selectlanguage{ukrainian}\Large\bfseries НАКАЗ\\}
+\end{center}
+
+\vspace{0.2cm}
+
+\noindent
+\parbox[t]{0.33\textwidth}{\selectlanguage{ukrainian} 05.02.2024}%
+\parbox[t]{0.33\textwidth}{\centering\selectlanguage{ukrainian} Київ}%
+\parbox[t]{0.33\textwidth}{\raggedleft\selectlanguage{ukrainian} № 22\_\allowbreak{}ОД}
+
+\vspace{0.8cm}
+
+\noindent\textbf{Про організацію робіт із розробки та впровадження Комплексної системи захисту інформації}
+
+\vspace{0.5cm}
+
+З метою створення належних умов безпеки та захисту інформації в Єдиній судовій інформаційно-комунікаційній системі «ЄСІКС» (далі -- ЄСІКС), відповідно до Закону України «Про захист інформації в інформаційно-комунікаційних системах», Постанови Кабінету Міністрів України від 29.03.2006 № 373 «Про затвердження Правил забезпечення захисту інформації в інформаційних, телекомунікаційних та інформаційно-комунікаційних системах», вимог НД ТЗІ 3.7-001-99 «Методичні вказівки щодо розробки технічного завдання на створення комплексної системи захисту інформації в автоматизованій системі», та на виконання контролів планування (PL), оцінки ризиків (RA) та придбання послуг (SA),
+
+\noindent\textbf{НАКАЗУЮ:}
+
+1. Розпочати роботи з проектування та створення Комплексної системи захисту інформації (далі -- КСЗІ) в ЄСІКС.
+
+2. Залучити в установленому законодавством порядку ліцензованого розробника ДП «УСС» для проведення обстеження середовища функціонування ЄСІКС, проведення аналізу ризиків та розробки Технічного завдання на створення КСЗІ.
+
+3. Створити спільну робочу групу з розробки та впровадження КСЗІ у складі:
+\begin{itemize}
+  \item Керівник робочої групи -- Петро СИДОРЕНКО;
+  \item Члени робочої групи -- представники СЗІ, IT-департаменту підприємства та представники розробника.
+\end{itemize}
+
+4. Робочій групі спільно з розробником ДП «УСС»:
+\begin{itemize}
+  \item у строк до 20.02.2024 провести інвентаризацію апаратних та програмних засобів ЄСІКС та скласти Акт обстеження середовища;
+  \item у строк до 28.02.2024 провести первинну оцінку ризиків безпеки (RA-3) та визначити категорію безпеки інформації (RA-2);
+  \item розробити та погодити в Держспецзв'язку Технічне завдання на створення КСЗІ (PL-2).
+\end{itemize}
+
+5. Фінансовому департаменту забезпечити фінансування зазначених робіт відповідно до умов укладеного договору з ДП «УСС».
+
+6. Контроль за виконанням наказу покласти на керівника СЗІ.
+
+\vspace{1.5cm}
+
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}\bfseries Генеральний директор}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian}\bfseries Василь ШЕВЧЕНКО}
+
+\newpage
+
+\begin{center}
+  \textbf{\selectlanguage{ukrainian}АРКУШ ПОГОДЖЕННЯ}
+\end{center}
+
+\vspace{0.8cm}
+
+\noindent
+\textbf{ПОГОДЖЕНО:}
+
+\vspace{0.5cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Керівник робочої групи}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} Петро СИДОРЕНКО}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Керівник СЗІ}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Директор фінансового департаменту}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\end{document}

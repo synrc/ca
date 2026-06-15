@@ -7,6 +7,8 @@ defmodule CA.SPE do
   # {36, "УПРАВЛІННЯ ОБЛІКОВИМИ ЗАПИСАМИ (AC-2)"},
   # {2,  "УПРАВЛІННЯ ОБЛІКОВИМИ ЗАПИСАМИ - АВТОМАТИЗОВАНЕ УПРАВЛІННЯ ОБЛІКОВИМИ ЗАПИСАМИ СИСТЕМИ (AC-2(1))"},
 
+  def dump(x) do :lists.map fn x -> {:maps.get(:id, x, []),:maps.get(:title,x,[])} end, CA.TeX.unfold x end
+
   def controls do
       CA.PRO.terminal_width()
       :lists.map(fn y ->

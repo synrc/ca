@@ -42,7 +42,7 @@ defmodule CA.L3.Mail do
      * `AU-12`: Логування транзицій станів процесу.
   """
 
-  def org_name, do: "ТОВ \"Криптографічні Телесистеми\""
+  def org_name, do: "ДП \"УСС\""
   def system_desc, do: "Телекомунікаційна система ERP/1"
   def system_name, do: "X.420 Mail"
 

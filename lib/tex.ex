@@ -104,7 +104,7 @@ defmodule CA.TeX do
     * `:subtitle` - subtitle on title page and footer (default: "ПК КЗІ КЗЗІ")
     * `:title` - title on title page and footer (default: "Профілі безпеки")
     * `:year` - copyright year (default: "2026")
-    * `:copyright` - copyright owner (default: "Криптографічні Телесистеми")
+    * `:copyright` - copyright owner (default: "ДП «УСС»")
     * `:toc_title` - title for Table of Contents (default: "Зміст")
     * `:abstract` - abstract content
     * `:body` - document body content
@@ -125,7 +125,7 @@ defmodule CA.TeX do
           subtitle: "Комплексна система захисту інформації",
           title: "Профіль безпеки",
           year: "2026",
-          copyright: "Критпографічні Телесистеми",
+          copyright: "ДП «УСС»",
           toc_title: "Зміст",
           abstract: "",
           body: ""
@@ -143,8 +143,14 @@ defmodule CA.TeX do
       legal_l1_profile_2(),
       legal_l2_profile(),
       legal_l3_profile(CA.L3.ERP),
-      # В Шаблоні ТОВ "Криптографічні Телесистеми"
+      # В Шаблоні ДП 
       gen_bible(),
+      # Типові накази підприємства (перенесені до CA.NPA)
+      CA.NPA.gen_order_szi_establishment(),
+      CA.NPA.gen_order_kszi_development(),
+      CA.NPA.gen_order_at_ir_ma_ps_pe(),
+      CA.NPA.gen_order_admin_appointment(),
+      CA.NPA.gen_order_physical_access()
     ])
   end
 
@@ -322,6 +328,25 @@ defmodule CA.TeX do
     |> String.replace("\"", "\\textquotedbl{}")
     |> String.replace("\n", "\\\\ \n")
   end
+
+  def escape_val(list) when is_list(list) do
+    Enum.map(list, &escape_val/1)
+  end
+
+  def escape_val(map) when is_map(map) do
+    Map.new(map, fn {k, v} -> {k, escape_val(v)} end)
+  end
+
+  def escape_val(binary) when is_binary(binary) do
+    escape_latex(binary)
+  end
+
+  def escape_val(other), do: other
+
+  def tryzub_def(style \\ :mono) do
+    CA.NPA.tryzub_def(style)
+  end
+
 
   @legal_template_l2 """
   \\documentclass[10pt]{article}

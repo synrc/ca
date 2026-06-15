@@ -42,6 +42,8 @@ defmodule CA.L2.Court do
   SC-12 (Криптографічне управління ключами) — додав як логічне підсилення, що покриває життєвий цикл управління цими ж апаратними та ECC ключами (генерація, розповсюдження, зберігання, відкликання).
   """
 
+  def dump do :lists.map fn x -> {:maps.get(:id, x, []),:maps.get(:title,x,[])} end, CA.TeX.unfold controls() end
+
   def controls do
     CA.L1.controls() ++
       [

@@ -3,7 +3,7 @@ defmodule CA.L3.X422.Flutter do
   Level 3: Target Security Profile for X.422.1 UDP Multicast (Flutter)
   """
 
-  def org_name, do: "ТОВ \"Криптографічні Телесистеми\""
+  def org_name, do: "ДП \"УСС\""
   def system_desc, do: "Flutter based X.422.1 Implementation"
   def system_name, do: "Chat X.422.1 (Flutter)"
 

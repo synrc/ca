@@ -1,0 +1,137 @@
+\documentclass[12pt]{article}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage[left=30mm,right=15mm,top=20mm,bottom=20mm]{geometry}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{svg.path}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\newcommand{\tryzub}[1][1]{%
+  \begin{tikzpicture}[scale=0.03*#1, yscale=-1, baseline=(current bounding box.center)]
+    % Shield: transparent background, black stroke
+    \filldraw[fill=white, draw=black, line width=1.5pt]
+      svg {m5 5h650v689c0 48-29 97-76 117l-251 105-251-105c-44-20-76-65-72-117z};
+
+    % Right half of Tryzub (Black)
+    \fill[color=black] 
+      svg {m329 53c-6 4-2 396 0 401 12 43 29 81 48 112-104 31-63 146-48 287 7-12 17-21 28-28 43-34 70-81 79-132h133v-580c-148 88-132 213-148 361 59-10 75 76-3 83-92-149-59-257-59-419 0-37-9-62-30-85zm200 143v297h-22c-6-23-21-41-42-51 8-85 10-189 64-246zm-22 337h22v120h-89c0-19-3-39-8-58 36-4 68-29 75-62zm-114 71c4 16 6 33 6 49h-50c1-27 19-44 44-49zm-44 89h46c-7 31-23 61-46 85z};
+
+    % Left (mirrored) half of Tryzub (Black)
+    \fill[color=black] 
+      svg {m331 53c6 4 2 396 0 401-12 43-29 81-48 112 104 31 63 146 48 287-7-12-17-21-28-28-43-34-70-81-79-132h-133v-580c148 88 132 213 148 361-59-10-75 76 3 83 92-149 59-257 59-419 0-37 9-62 30-85zm-200 143v297h22c6-23 21-41 42-51-8-85-10-189-64-246zm22 337h-22v120h89c0-19 3-39 8-58-36-4-68-29-75-62zm114 71c-4 16-6 33-6 49h50c-1-27-19-44-44-49zm44 89h-46c7 31 23 61 46 85z};
+  \end{tikzpicture}%
+}
+
+
+\begin{document}
+
+\begin{center}
+  \tryzub[0.8]\\[0.3cm]
+  {\selectlanguage{ukrainian}\small\MakeUppercase{Державна судова адміністрація України}\\}
+  {\selectlanguage{ukrainian}\small\bfseries\MakeUppercase{Державне підприємство «Інформаційні судові системи»}\\}
+  \vspace{0.2cm}
+  \hrule height 1.5pt
+  \vspace{0.5cm}
+  {\selectlanguage{ukrainian}\Large\bfseries НАКАЗ\\}
+\end{center}
+
+\vspace{0.2cm}
+
+\noindent
+\parbox[t]{0.33\textwidth}{\selectlanguage{ukrainian} 28.05.2026}%
+\parbox[t]{0.33\textwidth}{\centering\selectlanguage{ukrainian} Київ}%
+\parbox[t]{0.33\textwidth}{\raggedleft\selectlanguage{ukrainian} № 96\_\allowbreak{}ОД}
+
+\vspace{0.8cm}
+
+\noindent\textbf{Про внесення змін до наказу від 13.04.2023 № 53\_\allowbreak{}ОД «Про затвердження Переліку осіб, які мають право доступу до приміщення серверної кімнати ЦОД, в новій редакції»}
+
+\vspace{0.5cm}
+
+У зв'язку з кадровими змінами на Державне підприємство «Інформаційні судові системи» (далі -- Підприємство) та з метою обмеження доступу до приміщення серверної кімнати центру обробки даних Підприємства та захисту інформаційних ресурсів, які циркулюють на серверному та комутаційному обладнанні, відповідно до вимог НД ТЗІ 2.5-008-2002 та на виконання контролів фізичного захисту (PE-2, PE-3),
+
+\noindent\textbf{НАКАЗУЮ:}
+
+1. Внести зміни до наказу Підприємства від 13.04.2023 № 53\_\allowbreak{}ОД «Про затвердження Переліку осіб, які мають право доступу до приміщення серверної кімнати центру обробки даних в новій редакції», виклавши додаток до пункту 1 «Перелік осіб, які мають право доступу до приміщення серверної кімнати ЦОД Підприємства, розташованого за адресою: м. Київ, вул. Липська, 18/5» у новій редакції, що додається (Додаток 1).
+
+2. В усьому іншому наказ залишити без змін.
+
+3. Визнати таким, що втратив чинність, наказ Підприємства від 16.05.2025 № 67\_\allowbreak{}ОД «Про внесення змін до наказу від 13.04.2023 № 53\_\allowbreak{}ОД».
+
+4. Контроль за виконанням цього наказу залишаю за собою.
+
+\vspace{1.5cm}
+
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}\bfseries Генеральний директор}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian}\bfseries Василь ШЕВЧЕНКО}
+
+\newpage
+
+\begin{flushright}
+ЗАТВЕРДЖЕНО\\
+наказ державного підприємства\\
+«Державне підприємство «Інформаційні судові системи»»\\
+від 28.05.2026 р. № 96\_\allowbreak{}ОД
+\end{flushright}
+
+\vspace{0.5cm}
+
+\begin{center}
+  \textbf{\Large\selectlanguage{ukrainian}ПЕРЕЛІК}\\
+  \textbf{\large\selectlanguage{ukrainian}осіб, які мають право доступу до приміщення серверної кімнати ЦОД}\\
+  \selectlanguage{ukrainian}Підприємства за адресою: м. Київ, вул. Липська, 18/5
+\end{center}
+
+\vspace{0.8cm}
+
+\noindent
+\begin{longtable}{|C{1.5cm}|L{6cm}|L{7.5cm}|}
+  \hline
+  \textbf{№ з/п} & \textbf{Прізвище та власне ім'я} & \textbf{Посада} \\
+  \hline
+  \endfirsthead
+  \hline
+  \textbf{№ з/п} & \textbf{Прізвище та власне ім'я} & \textbf{Посада} \\
+  \hline
+  \endhead
+  \hline
+  \endfoot
+  \hline
+  \endlastfoot
+  
+    1 & КЛИМЕНКО Володимир & Головний інженер \\ \hline
+  
+    2 & ІВАНЕНКО Юрій & Директор департаменту централізованого адміністрування мереж та системного супроводу \\ \hline
+  
+    3 & ГЕРАСИМЧУК Микола & Директор департаменту розробки програмного забезпечення \\ \hline
+  
+    4 & КУЗЬМЕНКО Петро & Директор департаменту підтримки користувачів \\ \hline
+  
+    5 & СИДОРЕНКО Юрій & Начальник відділу інформаційної безпеки \\ \hline
+  
+    6 & ПАВЛЕНКО Михайло & Адміністратор системи відділу адміністрування IT-інфраструктури \\ \hline
+  
+    7 & КОЛОМІЄЦЬ Денис & Адміністратор системи \\ \hline
+  
+    8 & ЛЕБЕДЄВ Олександр & Фахівець з інформаційних технологій \\ \hline
+  
+\end{longtable}
+
+\vspace{1.5cm}
+
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Погоджено:\\Керівник СЗІ}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} Дмитро КОВАЛЕНКО}
+
+\end{document}

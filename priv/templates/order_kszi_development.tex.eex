@@ -1,0 +1,98 @@
+\documentclass[12pt]{article}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage[left=30mm,right=15mm,top=20mm,bottom=20mm]{geometry}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{tikz}
+\usetikzlibrary{svg.path}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+
+<%= @tryzub_def %>
+
+\begin{document}
+
+\begin{center}
+  \tryzub[0.8]\\[0.3cm]
+  {\selectlanguage{ukrainian}\small\MakeUppercase{<%= @parent_org %>}\\}
+  {\selectlanguage{ukrainian}\small\bfseries\MakeUppercase{<%= @org_name %>}\\}
+  \vspace{0.2cm}
+  \hrule height 1.5pt
+  \vspace{0.5cm}
+  {\selectlanguage{ukrainian}\Large\bfseries НАКАЗ\\}
+\end{center}
+
+\vspace{0.2cm}
+
+\noindent
+\parbox[t]{0.33\textwidth}{\selectlanguage{ukrainian} <%= @date %>}%
+\parbox[t]{0.33\textwidth}{\centering\selectlanguage{ukrainian} <%= @city %>}%
+\parbox[t]{0.33\textwidth}{\raggedleft\selectlanguage{ukrainian} № <%= @number %>}
+
+\vspace{0.8cm}
+
+\noindent\textbf{Про організацію робіт із розробки та впровадження Комплексної системи захисту інформації}
+
+\vspace{0.5cm}
+
+З метою створення належних умов безпеки та захисту інформації в Єдиній судовій інформаційно-комунікаційній системі «<%= @system_name %>» (далі -- ЄСІКС), відповідно до Закону України «Про захист інформації в інформаційно-комунікаційних системах», Постанови Кабінету Міністрів України від 29.03.2006 № 373 «Про затвердження Правил забезпечення захисту інформації в інформаційних, телекомунікаційних та інформаційно-комунікаційних системах», вимог НД ТЗІ 3.7-001-99 «Методичні вказівки щодо розробки технічного завдання на створення комплексної системи захисту інформації в автоматизованій системі», та на виконання контролів планування (PL), оцінки ризиків (RA) та придбання послуг (SA),
+
+\noindent\textbf{НАКАЗУЮ:}
+
+1. Розпочати роботи з проектування та створення Комплексної системи захисту інформації (далі -- КСЗІ) в ЄСІКС.
+
+2. Залучити в установленому законодавством порядку ліцензованого розробника <%= @developer_name %> для проведення обстеження середовища функціонування ЄСІКС, проведення аналізу ризиків та розробки Технічного завдання на створення КСЗІ.
+
+3. Створити спільну робочу групу з розробки та впровадження КСЗІ у складі:
+\begin{itemize}
+  \item Керівник робочої групи -- <%= @head_of_group %>;
+  \item Члени робочої групи -- представники СЗІ, IT-департаменту підприємства та представники розробника.
+\end{itemize}
+
+4. Робочій групі спільно з розробником <%= @developer_name %>:
+\begin{itemize}
+  \item у строк до <%= @survey_deadline %> провести інвентаризацію апаратних та програмних засобів ЄСІКС та скласти Акт обстеження середовища;
+  \item у строк до <%= @risk_deadline %> провести первинну оцінку ризиків безпеки (RA-3) та визначити категорію безпеки інформації (RA-2);
+  \item розробити та погодити в Держспецзв'язку Технічне завдання на створення КСЗІ (PL-2).
+\end{itemize}
+
+5. Фінансовому департаменту забезпечити фінансування зазначених робіт відповідно до умов укладеного договору з <%= @developer_name %>.
+
+6. Контроль за виконанням наказу покласти на керівника СЗІ.
+
+\vspace{1.5cm}
+
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}\bfseries <%= @director_title %>}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian}\bfseries <%= @director_name %>}
+
+\newpage
+
+\begin{center}
+  \textbf{\selectlanguage{ukrainian}АРКУШ ПОГОДЖЕННЯ}
+\end{center}
+
+\vspace{0.8cm}
+
+\noindent
+\textbf{ПОГОДЖЕНО:}
+
+\vspace{0.5cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Керівник робочої групи}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} <%= @head_of_group %>}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Керівник СЗІ}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Директор фінансового департаменту}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\end{document}

@@ -1,0 +1,134 @@
+\documentclass[12pt]{article}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage[left=30mm,right=15mm,top=20mm,bottom=20mm]{geometry}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{tikz}
+\usetikzlibrary{svg.path}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+
+<%= @tryzub_def %>
+
+\begin{document}
+
+\begin{center}
+  \tryzub[0.8]\\[0.3cm]
+  {\selectlanguage{ukrainian}\small\MakeUppercase{<%= @parent_org %>}\\}
+  {\selectlanguage{ukrainian}\small\bfseries\MakeUppercase{<%= @org_name %>}\\}
+  \vspace{0.2cm}
+  \hrule height 1.5pt
+  \vspace{0.5cm}
+  {\selectlanguage{ukrainian}\Large\bfseries НАКАЗ\\}
+\end{center}
+
+\vspace{0.2cm}
+
+\noindent
+\parbox[t]{0.33\textwidth}{\selectlanguage{ukrainian} <%= @date %>}%
+\parbox[t]{0.33\textwidth}{\centering\selectlanguage{ukrainian} <%= @city %>}%
+\parbox[t]{0.33\textwidth}{\raggedleft\selectlanguage{ukrainian} № <%= @number %>}
+
+\vspace{0.8cm}
+
+\noindent\textbf{Про визначення адміністраторів}
+
+\vspace{0.5cm}
+
+У зв'язку з кадровими змінами на <%= @org_name %> (далі -- Підприємство), пов'язаними із введенням в дію штатного розпису Підприємства, та з метою організаційного забезпечення взаємодії адміністраторів Єдиної судової інформаційно-комунікаційної системи «<%= @system_name %>» (далі -- ЄСІКС), функціонування якої забезпечується Підприємством, відповідно до Законів України «Про інформацію», «Про захист інформації в інформаційно-комунікаційних системах» та Положення про розподіл відповідальності, прав та обов'язків адміністраторів, затвердженого наказом від <%= @pol_date %> № <%= @pol_num %>,
+
+\noindent\textbf{НАКАЗУЮ:}
+
+1. Визначити:
+
+  \textbf{1.1 Адміністраторами домену (Active Directory):}
+  \begin{itemize}
+    <%= for admin <- @domain_admins do %>
+      \item <%= admin.name %>, <%= admin.title %>;
+    <% end %>
+  \end{itemize}
+
+  \textbf{1.2 Адміністраторами мережі:}
+  \begin{itemize}
+    <%= for admin <- @network_admins do %>
+      \item <%= admin.name %>, <%= admin.title %>;
+    <% end %>
+  \end{itemize}
+
+  \textbf{1.3 Адміністраторами загальносистемного та прикладного програмного забезпечення:}
+  \begin{itemize}
+    <%= for admin <- @app_admins do %>
+      \item <%= admin.name %>, <%= admin.title %>;
+    <% end %>
+  \end{itemize}
+
+  \textbf{1.4 Адміністраторами баз даних:}
+  \begin{itemize}
+    <%= for admin <- @db_admins do %>
+      \item <%= admin.name %>, <%= admin.title %>;
+    <% end %>
+  \end{itemize}
+
+  \textbf{1.5 Адміністраторами безпеки:}
+  \begin{itemize}
+    <%= for admin <- @security_admins do %>
+      \item <%= admin.name %>, <%= admin.title %>;
+    <% end %>
+  \end{itemize}
+
+  \textbf{1.6 Адміністраторами резервного копіювання:}
+  \begin{itemize}
+    <%= for admin <- @backup_admins do %>
+      \item <%= admin.name %>, <%= admin.title %>;
+    <% end %>
+  \end{itemize}
+
+2. Визнати таким, що втратив чинність, наказ від <%= @prev_date %> № <%= @prev_num %> «Про визначення адміністраторів».
+
+3. Контроль за виконанням цього наказу залишаю за собою.
+
+\vspace{1.5cm}
+
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}\bfseries <%= @director_title %>}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian}\bfseries <%= @director_name %>}
+
+\newpage
+
+\begin{center}
+  \textbf{\selectlanguage{ukrainian}НАКАЗ ПОДАНО ТА ПОГОДЖЕНО}
+\end{center}
+
+\vspace{0.8cm}
+
+\noindent
+\textbf{ПОДАНО:}
+
+\vspace{0.5cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Начальник відділу інформаційної безпеки}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} <%= @ciso_name %>}
+
+\vspace{0.8cm}
+\noindent
+\textbf{ПОГОДЖЕНО:}
+
+\vspace{0.5cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Головний інженер}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Директор департаменту підтримки користувачів}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Начальник відділу юридичного супроводження}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\end{document}

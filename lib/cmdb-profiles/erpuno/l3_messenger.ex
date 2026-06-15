@@ -52,7 +52,7 @@ defmodule CA.L3.Messenger do
       * SC-28: Захист інформації у стані спокою (Шифрування БД).
   """
 
-  def org_name, do: "ТОВ \"Криптографічні Телесистеми\""
+  def org_name, do: "ДП \"УСС\""
   def system_desc, do: "Телекомунікаційна система ERP/1"
   def system_name, do: "X.422 Messenger"
 

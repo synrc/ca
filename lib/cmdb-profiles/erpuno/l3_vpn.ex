@@ -29,7 +29,7 @@ defmodule CA.L3.VPN do
      * `SC-28(1)`: Шифрування баз даних каталогів (LDAP) та інформації у стані спокою.
   """
 
-  def org_name, do: "ТОВ \"Криптографічні Телесистеми\""
+  def org_name, do: "ДП \"УСС\""
   def system_desc, do: "Телекомунікаційна система ERP/1"
   def system_name, do: "VPN & PKI"
 

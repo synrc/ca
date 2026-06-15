@@ -1,0 +1,191 @@
+\documentclass[12pt]{article}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage[left=30mm,right=15mm,top=20mm,bottom=20mm]{geometry}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{tikz}
+\usetikzlibrary{svg.path}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+
+\newcommand{\tryzub}[1][1]{%
+  \begin{tikzpicture}[scale=0.03*#1, yscale=-1, baseline=(current bounding box.center)]
+    % Shield: transparent background, black stroke
+    \filldraw[fill=white, draw=black, line width=1.5pt]
+      svg {m5 5h650v689c0 48-29 97-76 117l-251 105-251-105c-44-20-76-65-72-117z};
+
+    % Right half of Tryzub (Black)
+    \fill[color=black] 
+      svg {m329 53c-6 4-2 396 0 401 12 43 29 81 48 112-104 31-63 146-48 287 7-12 17-21 28-28 43-34 70-81 79-132h133v-580c-148 88-132 213-148 361 59-10 75 76-3 83-92-149-59-257-59-419 0-37-9-62-30-85zm200 143v297h-22c-6-23-21-41-42-51 8-85 10-189 64-246zm-22 337h22v120h-89c0-19-3-39-8-58 36-4 68-29 75-62zm-114 71c4 16 6 33 6 49h-50c1-27 19-44 44-49zm-44 89h46c-7 31-23 61-46 85z};
+
+    % Left (mirrored) half of Tryzub (Black)
+    \fill[color=black] 
+      svg {m331 53c6 4 2 396 0 401-12 43-29 81-48 112 104 31 63 146 48 287-7-12-17-21-28-28-43-34-70-81-79-132h-133v-580c148 88 132 213 148 361-59-10-75 76 3 83 92-149 59-257 59-419 0-37 9-62 30-85zm-200 143v297h22c6-23 21-41 42-51-8-85-10-189-64-246zm22 337h-22v120h89c0-19 3-39 8-58-36-4-68-29-75-62zm114 71c-4 16-6 33-6 49h50c-1-27-19-44-44-49zm44 89h-46c7 31 23 61 46 85z};
+  \end{tikzpicture}%
+}
+
+
+\begin{document}
+
+\begin{center}
+  \tryzub[0.8]\\[0.3cm]
+  {\selectlanguage{ukrainian}\small\MakeUppercase{Державна судова адміністрація України}\\}
+  {\selectlanguage{ukrainian}\small\bfseries\MakeUppercase{Державне підприємство «Інформаційні судові системи»}\\}
+  \vspace{0.2cm}
+  \hrule height 1.5pt
+  \vspace{0.5cm}
+  {\selectlanguage{ukrainian}\Large\bfseries НАКАЗ\\}
+\end{center}
+
+\vspace{0.2cm}
+
+\noindent
+\parbox[t]{0.33\textwidth}{\selectlanguage{ukrainian} 30.01.2024}%
+\parbox[t]{0.33\textwidth}{\centering\selectlanguage{ukrainian} Київ}%
+\parbox[t]{0.33\textwidth}{\raggedleft\selectlanguage{ukrainian} № 19\_\allowbreak{}ОД}
+
+\vspace{0.8cm}
+
+\noindent\textbf{Про визначення адміністраторів}
+
+\vspace{0.5cm}
+
+У зв'язку з кадровими змінами на Державне підприємство «Інформаційні судові системи» (далі -- Підприємство), пов'язаними із введенням в дію штатного розпису Підприємства, та з метою організаційного забезпечення взаємодії адміністраторів Єдиної судової інформаційно-комунікаційної системи «ЄСІКС» (далі -- ЄСІКС), функціонування якої забезпечується Підприємством, відповідно до Законів України «Про інформацію», «Про захист інформації в інформаційно-комунікаційних системах» та Положення про розподіл відповідальності, прав та обов'язків адміністраторів, затвердженого наказом від 09.01.2023 № 3\_\allowbreak{}ОД,
+
+\noindent\textbf{НАКАЗУЮ:}
+
+1. Визначити:
+
+  \textbf{1.1 Адміністраторами домену (Active Directory):}
+  \begin{itemize}
+    
+      \item Олександр ІВАНЕНКО, начальник відділу адміністрування IT-інфраструктури;
+    
+      \item Юрій ПЕТРЕНКО, адміністратор системи;
+    
+      \item Олександр СИДОРЕНКО, інженер відділу адміністрування мереж;
+    
+  \end{itemize}
+
+  \textbf{1.2 Адміністраторами мережі:}
+  \begin{itemize}
+    
+      \item Михайло ДМИТРЕНКО, адміністратор системи;
+    
+      \item Юрій ПЕТРЕНКО, адміністратор системи;
+    
+      \item Олександр СИДОРЕНКО, інженер;
+    
+      \item Андрій КОВАЛЬЧУК, адміністратор системи;
+    
+  \end{itemize}
+
+  \textbf{1.3 Адміністраторами загальносистемного та прикладного програмного забезпечення:}
+  \begin{itemize}
+    
+      \item Олександр ІВАНЕНКО, начальник відділу;
+    
+      \item Михайло ПАВЛЕНКО, адміністратор системи;
+    
+      \item Петро КУЗЬМЕНКО, директор департаменту;
+    
+      \item Олексій МОРОЗ, начальник відділу СУБД;
+    
+      \item Олександр ЛЕБЕДЄВ, фахівець з інформаційних технологій;
+    
+      \item Юрій ПЕТРЕНКО, адміністратор системи;
+    
+      \item Олександр СИДОРЕНКО, інженер;
+    
+      \item Андрій КОВАЛЬЧУК, адміністратор системи;
+    
+      \item Роман ТКАЧЕНКО, адміністратор бази даних;
+    
+      \item Іван КРАВЧЕНКО, адміністратор бази даних;
+    
+  \end{itemize}
+
+  \textbf{1.4 Адміністраторами баз даних:}
+  \begin{itemize}
+    
+      \item Петро КУЗЬМЕНКО, директор департаменту;
+    
+      \item Олексій МОРОЗ, начальник відділу СУБД;
+    
+      \item Роман ТКАЧЕНКО, адміністратор бази даних;
+    
+      \item Іван КРАВЧЕНКО, адміністратор бази даних;
+    
+  \end{itemize}
+
+  \textbf{1.5 Адміністраторами безпеки:}
+  \begin{itemize}
+    
+      \item Євген РОМАНЕНКО, начальник відділу адміністрування мереж;
+    
+      \item В'ячеслав БОЙКО, адміністратор системи відділу інформаційної безпеки;
+    
+  \end{itemize}
+
+  \textbf{1.6 Адміністраторами резервного копіювання:}
+  \begin{itemize}
+    
+      \item Олександр ІВАНЕНКО, начальник відділу;
+    
+      \item Євген РОМАНЕНКО, начальник відділу;
+    
+      \item Петро КУЗЬМЕНКО, директор департаменту;
+    
+      \item Олексій МОРОЗ, начальник відділу СУБД;
+    
+  \end{itemize}
+
+2. Визнати таким, що втратив чинність, наказ від 17.01.2023 № 08\_\allowbreak{}ОД «Про визначення адміністраторів».
+
+3. Контроль за виконанням цього наказу залишаю за собою.
+
+\vspace{1.5cm}
+
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}\bfseries Генеральний директор}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian}\bfseries Микола МЕЛЬНИК}
+
+\newpage
+
+\begin{center}
+  \textbf{\selectlanguage{ukrainian}НАКАЗ ПОДАНО ТА ПОГОДЖЕНО}
+\end{center}
+
+\vspace{0.8cm}
+
+\noindent
+\textbf{ПОДАНО:}
+
+\vspace{0.5cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Начальник відділу інформаційної безпеки}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} Дмитро КОВАЛЕНКО}
+
+\vspace{0.8cm}
+\noindent
+\textbf{ПОГОДЖЕНО:}
+
+\vspace{0.5cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Головний інженер}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Директор департаменту підтримки користувачів}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Начальник відділу юридичного супроводження}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\end{document}

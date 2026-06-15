@@ -1,0 +1,92 @@
+\documentclass[12pt]{article}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage[left=30mm,right=15mm,top=20mm,bottom=20mm]{geometry}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{tikz}
+\usetikzlibrary{svg.path}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+
+<%= @tryzub_def %>
+
+\begin{document}
+
+\begin{center}
+  \tryzub[0.8]\\[0.3cm]
+  {\selectlanguage{ukrainian}\small\MakeUppercase{<%= @parent_org %>}\\}
+  {\selectlanguage{ukrainian}\small\bfseries\MakeUppercase{<%= @org_name %>}\\}
+  \vspace{0.2cm}
+  \hrule height 1.5pt
+  \vspace{0.5cm}
+  {\selectlanguage{ukrainian}\Large\bfseries НАКАЗ\\}
+\end{center}
+
+\vspace{0.2cm}
+
+\noindent
+\parbox[t]{0.33\textwidth}{\selectlanguage{ukrainian} <%= @date %>}%
+\parbox[t]{0.33\textwidth}{\centering\selectlanguage{ukrainian} <%= @city %>}%
+\parbox[t]{0.33\textwidth}{\raggedleft\selectlanguage{ukrainian} № <%= @number %>}
+
+\vspace{0.8cm}
+
+\noindent\textbf{Про створення Служби захисту інформації}
+
+\vspace{0.5cm}
+
+З метою організації робіт із забезпечення захисту інформації в Єдиній судовій інформаційно-комунікаційній системі «<%= @system_name %>» (далі -- ЄСІКС), відповідно до Закону України «Про захист інформації в інформаційно-комунікаційних системах», вимог НД ТЗІ 1.4-001-2000 «Типове положення про службу захисту інформації в автоматизованій системі», затвердженого наказом Департаменту спеціальних телекомунікаційних систем та захисту інформації СБ України від 02.01.2000 № 4, та з метою забезпечення виконання вимог контролів безпеки PM (Керування програмою безпеки) та PS (Безпека персоналу),
+
+\noindent\textbf{НАКАЗУЮ:}
+
+1. Створити на підприємстві <%= @org_name %> Службу захисту інформації (далі -- СЗІ) як самостійний структурний підрозділ (або призначити <%= @ciso_name %> відповідальним за організацію захисту інформації).
+
+2. Призначити <%= @ciso_title %> <%= @ciso_name %> керівником Служби захисту інформації (служби безпеки інформації / CISO).
+
+3. Керівнику СЗІ <%= @ciso_name %>:
+\begin{itemize}
+  \item протягом одного місяця розробити та подати на затвердження Положення про СЗІ відповідно до вимог НД ТЗІ 1.4-001-2000;
+  \item організувати розробку комплексної системи захисту інформації (КСЗІ) в ЄСІКС;
+  \item забезпечити контроль за дотриманням користувачами та адміністраторами правил безпеки інформації.
+\end{itemize}
+
+4. Визначити, що діяльність СЗІ безпосередньо підпорядковується Генеральному директору підприємства.
+
+5. Контроль за виконанням цього наказу залишаю за собою.
+
+\vspace{1.5cm}
+
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}\bfseries <%= @director_title %>}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian}\bfseries <%= @director_name %>}
+
+\newpage
+
+\begin{center}
+  \textbf{\selectlanguage{ukrainian}АРКУШ ОЗНАЙОМЛЕННЯ ТА ПОГОДЖЕННЯ}
+\end{center}
+
+\vspace{0.8cm}
+
+\noindent
+\textbf{ПОГОДЖЕНО:}
+
+\vspace{0.5cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Керівник СЗІ}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} <%= @ciso_name %>}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Начальник юридичного відділу}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Начальник відділу кадрів}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\end{document}

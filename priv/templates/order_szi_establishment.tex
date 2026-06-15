@@ -1,0 +1,107 @@
+\documentclass[12pt]{article}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage[left=30mm,right=15mm,top=20mm,bottom=20mm]{geometry}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{tikz}
+\usetikzlibrary{svg.path}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+
+\newcommand{\tryzub}[1][1]{%
+  \begin{tikzpicture}[scale=0.03*#1, yscale=-1, baseline=(current bounding box.center)]
+    % Shield: transparent background, black stroke
+    \filldraw[fill=white, draw=black, line width=1.5pt]
+      svg {m5 5h650v689c0 48-29 97-76 117l-251 105-251-105c-44-20-76-65-72-117z};
+
+    % Right half of Tryzub (Black)
+    \fill[color=black] 
+      svg {m329 53c-6 4-2 396 0 401 12 43 29 81 48 112-104 31-63 146-48 287 7-12 17-21 28-28 43-34 70-81 79-132h133v-580c-148 88-132 213-148 361 59-10 75 76-3 83-92-149-59-257-59-419 0-37-9-62-30-85zm200 143v297h-22c-6-23-21-41-42-51 8-85 10-189 64-246zm-22 337h22v120h-89c0-19-3-39-8-58 36-4 68-29 75-62zm-114 71c4 16 6 33 6 49h-50c1-27 19-44 44-49zm-44 89h46c-7 31-23 61-46 85z};
+
+    % Left (mirrored) half of Tryzub (Black)
+    \fill[color=black] 
+      svg {m331 53c6 4 2 396 0 401-12 43-29 81-48 112 104 31 63 146 48 287-7-12-17-21-28-28-43-34-70-81-79-132h-133v-580c148 88 132 213 148 361-59-10-75 76 3 83 92-149 59-257 59-419 0-37 9-62 30-85zm-200 143v297h22c6-23 21-41 42-51-8-85-10-189-64-246zm22 337h-22v120h89c0-19 3-39 8-58-36-4-68-29-75-62zm114 71c-4 16-6 33-6 49h50c-1-27-19-44-44-49zm44 89h-46c7 31 23 61 46 85z};
+  \end{tikzpicture}%
+}
+
+
+\begin{document}
+
+\begin{center}
+  \tryzub[0.8]\\[0.3cm]
+  {\selectlanguage{ukrainian}\small\MakeUppercase{Державна судова адміністрація України}\\}
+  {\selectlanguage{ukrainian}\small\bfseries\MakeUppercase{Державне підприємство «Інформаційні судові системи»}\\}
+  \vspace{0.2cm}
+  \hrule height 1.5pt
+  \vspace{0.5cm}
+  {\selectlanguage{ukrainian}\Large\bfseries НАКАЗ\\}
+\end{center}
+
+\vspace{0.2cm}
+
+\noindent
+\parbox[t]{0.33\textwidth}{\selectlanguage{ukrainian} 30.01.2024}%
+\parbox[t]{0.33\textwidth}{\centering\selectlanguage{ukrainian} Київ}%
+\parbox[t]{0.33\textwidth}{\raggedleft\selectlanguage{ukrainian} № 18\_\allowbreak{}ОД}
+
+\vspace{0.8cm}
+
+\noindent\textbf{Про створення Служби захисту інформації}
+
+\vspace{0.5cm}
+
+З метою організації робіт із забезпечення захисту інформації в Єдиній судовій інформаційно-комунікаційній системі «ЄСІКС» (далі -- ЄСІКС), відповідно до Закону України «Про захист інформації в інформаційно-комунікаційних системах», вимог НД ТЗІ 1.4-001-2000 «Типове положення про службу захисту інформації в автоматизованій системі», затвердженого наказом Департаменту спеціальних телекомунікаційних систем та захисту інформації СБ України від 02.01.2000 № 4, та з метою забезпечення виконання вимог контролів безпеки PM (Керування програмою безпеки) та PS (Безпека персоналу),
+
+\noindent\textbf{НАКАЗУЮ:}
+
+1. Створити на підприємстві Державне підприємство «Інформаційні судові системи» Службу захисту інформації (далі -- СЗІ) як самостійний структурний підрозділ (або призначити Іван ПЕТРЕНКО відповідальним за організацію захисту інформації).
+
+2. Призначити начальник відділу інформаційної безпеки Іван ПЕТРЕНКО керівником Служби захисту інформації (служби безпеки інформації / CISO).
+
+3. Керівнику СЗІ Іван ПЕТРЕНКО:
+\begin{itemize}
+  \item протягом одного місяця розробити та подати на затвердження Положення про СЗІ відповідно до вимог НД ТЗІ 1.4-001-2000;
+  \item організувати розробку комплексної системи захисту інформації (КСЗІ) в ЄСІКС;
+  \item забезпечити контроль за дотриманням користувачами та адміністраторами правил безпеки інформації.
+\end{itemize}
+
+4. Визначити, що діяльність СЗІ безпосередньо підпорядковується Генеральному директору підприємства.
+
+5. Контроль за виконанням цього наказу залишаю за собою.
+
+\vspace{1.5cm}
+
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}\bfseries Генеральний директор}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian}\bfseries Василь ШЕВЧЕНКО}
+
+\newpage
+
+\begin{center}
+  \textbf{\selectlanguage{ukrainian}АРКУШ ОЗНАЙОМЛЕННЯ ТА ПОГОДЖЕННЯ}
+\end{center}
+
+\vspace{0.8cm}
+
+\noindent
+\textbf{ПОГОДЖЕНО:}
+
+\vspace{0.5cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Керівник СЗІ}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} Іван ПЕТРЕНКО}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Начальник юридичного відділу}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\vspace{0.8cm}
+\noindent
+\parbox[t]{0.5\textwidth}{\selectlanguage{ukrainian}Начальник відділу кадрів}%
+\parbox[t]{0.5\textwidth}{\raggedleft\selectlanguage{ukrainian} \rule{4cm}{0.5pt}}
+
+\end{document}
