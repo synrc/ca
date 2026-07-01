@@ -9,7 +9,7 @@ defmodule CA.ESTTest do
     der_path = Path.join(@openssl_dir, "test_est_der.csr")
     base64_path = Path.join(@openssl_dir, "test_est_b64.csr")
 
-    cn = "maxim_est_#{System.system_time(:nanosecond)}"
+    cn = "maxim-#{:crypto.strong_rand_bytes(3) |> Base.encode16(case: :lower)}"
 
     # Generate a fresh EC key and a CSR (PEM)
     {_, 0} = System.cmd("openssl", ["ecparam", "-name", "secp384r1", "-genkey", "-noout", "-out", key_path], cd: @openssl_dir)
@@ -32,10 +32,10 @@ defmodule CA.ESTTest do
       File.rm(Path.expand("synrc/ecc/secp384r1/#{cn}.cer"))
     end)
 
-    {:ok, pem_path: csr_path, der_path: der_path, base64_path: base64_path}
+    {:ok, pem_path: csr_path, der_path: der_path, base64_path: base64_path, cn: cn}
   end
 
-  defp verify_est_response!(body) do
+  defp verify_est_response!(body, cn) do
     # 1. Base64-decode the response
     cms_der = :base64.decode(body)
 
@@ -54,7 +54,7 @@ defmodule CA.ESTTest do
     {:ok, cert_der} = :"PKIX1Explicit-2009".encode(:Certificate, pkix_cert)
     {:ok, otp_cert} = X509.Certificate.from_der(cert_der)
 
-    assert inspect(X509.Certificate.subject(otp_cert)) =~ "maxim_est"
+    assert inspect(X509.Certificate.subject(otp_cert)) =~ cn
   end
 
   defp parse_curl_response(response_text) do
@@ -64,7 +64,7 @@ defmodule CA.ESTTest do
     end
   end
 
-  test "EST simpleenroll with PEM CSR", %{pem_path: csr_path} do
+  test "EST simpleenroll with PEM CSR", %{pem_path: csr_path, cn: cn} do
     # Call curl with headers and body
     {res, 0} = System.cmd("curl", [
       "-s", "-i",
@@ -79,10 +79,10 @@ defmodule CA.ESTTest do
     assert String.downcase(headers) =~ "content-type: application/pkcs7-mime"
     assert String.downcase(headers) =~ "content-transfer-encoding: base64"
 
-    verify_est_response!(body)
+    verify_est_response!(body, cn)
   end
 
-  test "EST simpleenroll with raw DER CSR", %{der_path: der_path} do
+  test "EST simpleenroll with raw DER CSR", %{der_path: der_path, cn: cn} do
     {res, 0} = System.cmd("curl", [
       "-s", "-i",
       "-X", "POST",
@@ -92,10 +92,10 @@ defmodule CA.ESTTest do
     ])
 
     {_headers, body} = parse_curl_response(res)
-    verify_est_response!(body)
+    verify_est_response!(body, cn)
   end
 
-  test "EST simpleenroll with Base64 CSR", %{base64_path: base64_path} do
+  test "EST simpleenroll with Base64 CSR", %{base64_path: base64_path, cn: cn} do
     {res, 0} = System.cmd("curl", [
       "-s", "-i",
       "-X", "POST",
@@ -105,10 +105,10 @@ defmodule CA.ESTTest do
     ])
 
     {_headers, body} = parse_curl_response(res)
-    verify_est_response!(body)
+    verify_est_response!(body, cn)
   end
 
-  test "EST simpleenroll with explicit profile in URL", %{pem_path: csr_path} do
+  test "EST simpleenroll with explicit profile in URL", %{pem_path: csr_path, cn: cn} do
     {res, 0} = System.cmd("curl", [
       "-s", "-i",
       "-X", "POST",
@@ -118,10 +118,10 @@ defmodule CA.ESTTest do
     ])
 
     {_headers, body} = parse_curl_response(res)
-    verify_est_response!(body)
+    verify_est_response!(body, cn)
   end
 
-  test "EST simplereenroll with PEM CSR", %{pem_path: csr_path} do
+  test "EST simplereenroll with PEM CSR", %{pem_path: csr_path, cn: cn} do
     {res, 0} = System.cmd("curl", [
       "-s", "-i",
       "-X", "POST",
@@ -131,6 +131,6 @@ defmodule CA.ESTTest do
     ])
 
     {_headers, body} = parse_curl_response(res)
-    verify_est_response!(body)
+    verify_est_response!(body, cn)
   end
 end

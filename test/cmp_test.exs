@@ -18,7 +18,7 @@ defmodule CA.CMPTest do
   end
 
   test "CMP certificate enrollment (p10cr) using openssl client", %{key: key_path, csr: csr_path, cert: cert_path} do
-    cn = "maxim_cmp_#{System.system_time(:nanosecond)}"
+    cn = "maxim-#{:crypto.strong_rand_bytes(3) |> Base.encode16(case: :lower)}"
 
     on_exit(fn ->
       File.rm(Path.expand("synrc/ecc/secp384r1/#{cn}.csr"))
