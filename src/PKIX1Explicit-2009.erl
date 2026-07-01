@@ -342,6 +342,8 @@ enc_X520name(Val, TagIn) ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -437,6 +439,8 @@ enc_X520CommonName(Val, TagIn) ->
       universalString ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
@@ -534,6 +538,8 @@ enc_X520LocalityName(Val, TagIn) ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -629,6 +635,8 @@ enc_X520StateOrProvinceName(Val, TagIn) ->
       universalString ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
@@ -726,6 +734,8 @@ enc_X520OrganizationName(Val, TagIn) ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -821,6 +831,8 @@ enc_X520OrganizationalUnitName(Val, TagIn) ->
       universalString ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
@@ -2475,6 +2487,8 @@ Res1.
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -2570,6 +2584,8 @@ enc_RelativeDistinguishedName_DirectoryString(Val, TagIn) ->
       universalString ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
@@ -2667,6 +2683,8 @@ end};
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -2762,6 +2780,8 @@ end};
       universalString ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
@@ -2859,6 +2879,8 @@ end};
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -2954,6 +2976,8 @@ end};
       universalString ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})

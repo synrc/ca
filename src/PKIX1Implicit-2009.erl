@@ -1254,6 +1254,8 @@ enc_EDIPartyName_nameAssigner(Val, TagIn) ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -1278,6 +1280,8 @@ enc_EDIPartyName_partyName(Val, TagIn) ->
       universalString ->
          encode_universal_string(element(2,Val), [<<28>>]);
       uTF8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})

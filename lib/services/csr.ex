@@ -130,12 +130,18 @@ defmodule CA.CSR do
   end
 
   defp map_utf8_tags({:rdnSequence, list}) do
+    tag =
+      case System.otp_release() |> String.to_integer() do
+        ver when ver >= 26 -> :utf8String
+        _ -> :uTF8String
+      end
+
     {:rdnSequence, Enum.map(list, fn sub_list ->
       Enum.map(sub_list, fn
-        {:SingleAttribute, oid, {:utf8String, val}} ->
-          {:SingleAttribute, oid, {:uTF8String, val}}
-        {:AttributeTypeAndValue, oid, {:utf8String, val}} ->
-          {:AttributeTypeAndValue, oid, {:uTF8String, val}}
+        {:SingleAttribute, oid, {t, val}} when t in [:utf8String, :uTF8String] ->
+          {:SingleAttribute, oid, {tag, val}}
+        {:AttributeTypeAndValue, oid, {t, val}} when t in [:utf8String, :uTF8String] ->
+          {:AttributeTypeAndValue, oid, {tag, val}}
         other -> other
       end)
     end)}

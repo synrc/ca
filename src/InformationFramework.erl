@@ -2869,6 +2869,8 @@ enc_SearchRuleDescription_name_SETOF(Val, TagIn) ->
          encode_BMP_string(element(2,Val), [<<30>>]);
       uTF8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -2893,6 +2895,8 @@ enc_SearchRuleDescription_description(Val, TagIn) ->
       bmpString ->
          encode_BMP_string(element(2,Val), [<<30>>]);
       uTF8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
@@ -5421,6 +5425,8 @@ enc_subentryNameForm_DirectoryString(Val, TagIn) ->
          encode_BMP_string(element(2,Val), [<<30>>]);
       uTF8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})
    end,
@@ -5516,6 +5522,8 @@ enc_subentry_DirectoryString(Val, TagIn) ->
       bmpString ->
          encode_BMP_string(element(2,Val), [<<30>>]);
       uTF8String ->
+         encode_UTF8_string(element(2,Val), [<<12>>]);
+      utf8String ->
          encode_UTF8_string(element(2,Val), [<<12>>]);
       Else -> 
          exit({error,{asn1,{invalid_choice_type,Else}}})

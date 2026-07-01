@@ -1,21 +1,31 @@
 defmodule CA.RDN do
   @moduledoc "CA RDN OIDs."
 
+  def utf8_tag do
+    case System.otp_release() |> String.to_integer() do
+      ver when ver >= 26 -> :utf8String
+      _ -> :uTF8String
+    end
+  end
+
   def encodeAttrs({:rdnSequence, attrs}) do
       {:rdnSequence, :lists.map(fn
-          [{t,oid,{:uTF8String,x}}]      -> encodeString(t,oid,x,12)
-          [{t,oid,x}] when is_list(x)    -> encodeString(t,oid,x,19)
+           [{t,oid,{:uTF8String,x}}]      -> encodeString(t,oid,x,12)
+           [{t,oid,{:utf8String,x}}]      -> encodeString(t,oid,x,12)
+           [{t,oid,x}] when is_list(x)    -> encodeString(t,oid,x,19)
                                        x -> x end, attrs)}
   end
 
   def decodeAttrs({:rdnSequence, attrs}) do
+      tag = utf8_tag()
       {:rdnSequence, :lists.map(fn
-           [{t,oid,{:uTF8String,x}}]      -> decodeString(t,oid,x,:uTF8String)
-           [{t,oid,{:printableString,x}}] -> decodeString(t,oid,x,:printableString)
-           [{t,oid,x}] when is_list(x)    -> decodeString(t,oid,x,:correct) # OTP 28
-#          [{t,oid,x}] when is_list(x)    -> [{t,oid,x}] # OTP 27
-           [{t,oid,x}] when is_binary(x)  -> decodeString(t,oid,x,:uTF8String)
-                                       x  -> x end, attrs)}
+            [{t,oid,{:uTF8String,x}}]      -> decodeString(t,oid,x,tag)
+            [{t,oid,{:utf8String,x}}]      -> decodeString(t,oid,x,tag)
+            [{t,oid,{:printableString,x}}] -> decodeString(t,oid,x,:printableString)
+            [{t,oid,x}] when is_list(x)    -> decodeString(t,oid,x,:correct) # OTP 28
+#           [{t,oid,x}] when is_list(x)    -> [{t,oid,x}] # OTP 27
+            [{t,oid,x}] when is_binary(x)  -> decodeString(t,oid,x,tag)
+                                        x  -> x end, attrs)}
   end
 
   def decodeString(t,oid,x,tag) do [{t,oid,{tag,x}}] end
