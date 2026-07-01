@@ -12,8 +12,8 @@ defmodule CA.ESTTest do
     cn = "maxim-#{:crypto.strong_rand_bytes(4) |> Base.encode16(case: :lower)}-est"
 
     # Generate a fresh EC key and a CSR (PEM)
-    {_, 0} = System.cmd("openssl", ["ecparam", "-name", "secp384r1", "-genkey", "-noout", "-out", key_path], cd: @openssl_dir)
-    {_, 0} = System.cmd("openssl", ["req", "-new", "-key", key_path, "-out", csr_path, "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"], cd: @openssl_dir)
+    {_, 0} = CA.Test.OpenSSL.cmd(["ecparam", "-name", "secp384r1", "-genkey", "-noout", "-out", key_path], cd: @openssl_dir)
+    {_, 0} = CA.Test.OpenSSL.cmd(["req", "-new", "-key", key_path, "-out", csr_path, "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"], cd: @openssl_dir)
 
     pem_csr = File.read!(csr_path)
     [{:CertificationRequest, der_csr, _}] = :public_key.pem_decode(pem_csr)
