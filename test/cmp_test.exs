@@ -18,7 +18,12 @@ defmodule CA.CMPTest do
   end
 
   test "CMP certificate enrollment (p10cr) using openssl client", %{key: key_path, csr: csr_path, cert: cert_path} do
-    cn = "maxim_cmp_#{System.unique_integer([:positive])}"
+    cn = "maxim_cmp_#{System.system_time(:nanosecond)}"
+
+    on_exit(fn ->
+      File.rm(Path.expand("synrc/ecc/secp384r1/#{cn}.csr"))
+      File.rm(Path.expand("synrc/ecc/secp384r1/#{cn}.cer"))
+    end)
 
     # 1. Generate EC private key
     {_, 0} = System.cmd("openssl", ["ecparam", "-name", "secp384r1", "-genkey", "-noout", "-out", key_path], cd: @openssl_dir)

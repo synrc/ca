@@ -9,9 +9,11 @@ defmodule CA.ESTTest do
     der_path = Path.join(@openssl_dir, "test_est_der.csr")
     base64_path = Path.join(@openssl_dir, "test_est_b64.csr")
 
+    cn = "maxim_est_#{System.system_time(:nanosecond)}"
+
     # Generate a fresh EC key and a CSR (PEM)
     {_, 0} = System.cmd("openssl", ["ecparam", "-name", "secp384r1", "-genkey", "-noout", "-out", key_path], cd: @openssl_dir)
-    {_, 0} = System.cmd("openssl", ["req", "-new", "-key", key_path, "-out", csr_path, "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=maxim_est"], cd: @openssl_dir)
+    {_, 0} = System.cmd("openssl", ["req", "-new", "-key", key_path, "-out", csr_path, "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"], cd: @openssl_dir)
 
     pem_csr = File.read!(csr_path)
     [{:CertificationRequest, der_csr, _}] = :public_key.pem_decode(pem_csr)
@@ -26,6 +28,8 @@ defmodule CA.ESTTest do
       File.rm(csr_path)
       File.rm(der_path)
       File.rm(base64_path)
+      File.rm(Path.expand("synrc/ecc/secp384r1/#{cn}.csr"))
+      File.rm(Path.expand("synrc/ecc/secp384r1/#{cn}.cer"))
     end)
 
     {:ok, pem_path: csr_path, der_path: der_path, base64_path: base64_path}
