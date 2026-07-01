@@ -9,7 +9,7 @@ defmodule CA.ESTTest do
     der_path = Path.join(@openssl_dir, "test_est_der.csr")
     base64_path = Path.join(@openssl_dir, "test_est_b64.csr")
 
-    cn = "maxim-#{:crypto.strong_rand_bytes(3) |> Base.encode16(case: :lower)}"
+    cn = "maxim-#{:crypto.strong_rand_bytes(4) |> Base.encode16(case: :lower)}-est"
 
     # Generate a fresh EC key and a CSR (PEM)
     {_, 0} = System.cmd("openssl", ["ecparam", "-name", "secp384r1", "-genkey", "-noout", "-out", key_path], cd: @openssl_dir)
@@ -28,8 +28,6 @@ defmodule CA.ESTTest do
       File.rm(csr_path)
       File.rm(der_path)
       File.rm(base64_path)
-      File.rm(Path.expand("synrc/ecc/secp384r1/#{cn}.csr"))
-      File.rm(Path.expand("synrc/ecc/secp384r1/#{cn}.cer"))
     end)
 
     {:ok, pem_path: csr_path, der_path: der_path, base64_path: base64_path, cn: cn}
@@ -71,7 +69,7 @@ defmodule CA.ESTTest do
       "-X", "POST",
       "-H", "Content-Type: application/pkcs10",
       "--data-binary", "@" <> csr_path,
-      "http://localhost:8047/.well-known/est/simpleenroll"
+      "http://127.0.0.1:8047/.well-known/est/simpleenroll"
     ])
 
     {headers, body} = parse_curl_response(res)
@@ -88,7 +86,7 @@ defmodule CA.ESTTest do
       "-X", "POST",
       "-H", "Content-Type: application/pkcs10",
       "--data-binary", "@" <> der_path,
-      "http://localhost:8047/.well-known/est/simpleenroll"
+      "http://127.0.0.1:8047/.well-known/est/simpleenroll"
     ])
 
     {_headers, body} = parse_curl_response(res)
@@ -101,7 +99,7 @@ defmodule CA.ESTTest do
       "-X", "POST",
       "-H", "Content-Type: application/pkcs10",
       "--data-binary", "@" <> base64_path,
-      "http://localhost:8047/.well-known/est/simpleenroll"
+      "http://127.0.0.1:8047/.well-known/est/simpleenroll"
     ])
 
     {_headers, body} = parse_curl_response(res)
@@ -114,7 +112,7 @@ defmodule CA.ESTTest do
       "-X", "POST",
       "-H", "Content-Type: application/pkcs10",
       "--data-binary", "@" <> csr_path,
-      "http://localhost:8047/.well-known/est/secp384r1-client/simpleenroll"
+      "http://127.0.0.1:8047/.well-known/est/secp384r1-client/simpleenroll"
     ])
 
     {_headers, body} = parse_curl_response(res)
@@ -127,7 +125,7 @@ defmodule CA.ESTTest do
       "-X", "POST",
       "-H", "Content-Type: application/pkcs10",
       "--data-binary", "@" <> csr_path,
-      "http://localhost:8047/.well-known/est/simplereenroll"
+      "http://127.0.0.1:8047/.well-known/est/simplereenroll"
     ])
 
     {_headers, body} = parse_curl_response(res)
