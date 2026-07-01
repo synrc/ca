@@ -74,7 +74,7 @@ defmodule CA.CMP do
         __MODULE__.message(socket, header, body, code)
 
       {:error, reason} ->
-        Logger.debug("Malformed CMP request: #{inspect(reason)}, body: #{inspect(binary_body)}")
+        Logger.info("Malformed CMP request: #{inspect(reason)}, body: #{inspect(binary_body)}")
         bad_request(socket, "Malformed CMP request")
         {:error, {:invalid_pki_message, reason}}
     end

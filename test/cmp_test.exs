@@ -18,24 +18,28 @@ defmodule CA.CMPTest do
   end
 
 
+  import ExUnit.CaptureLog
+
   test "CMP server rejects malformed DER without leaving the client waiting" do
-    {:ok, socket} =
-      :gen_tcp.connect(~c"127.0.0.1", CA.port(:cmp), [:binary, active: false], 1_000)
+    capture_log(fn ->
+      {:ok, socket} =
+        :gen_tcp.connect(~c"127.0.0.1", CA.port(:cmp), [:binary, active: false], 1_000)
 
-    invalid_der = <<48, 3, 2, 1, 1>>
+      invalid_der = <<48, 3, 2, 1, 1>>
 
-    request =
-      "POST / HTTP/1.0\r\n" <>
-        "Host: 127.0.0.1\r\n" <>
-        "Content-Type: application/pkixcmp\r\n" <>
-        "Content-Length: #{byte_size(invalid_der)}\r\n\r\n" <>
-        invalid_der
+      request =
+        "POST / HTTP/1.0\r\n" <>
+          "Host: 127.0.0.1\r\n" <>
+          "Content-Type: application/pkixcmp\r\n" <>
+          "Content-Length: #{byte_size(invalid_der)}\r\n\r\n" <>
+          invalid_der
 
-    assert :ok = :gen_tcp.send(socket, request)
-    assert {:ok, response} = :gen_tcp.recv(socket, 0, 1_000)
-    assert response =~ "HTTP/1.0 400 Bad Request"
-    assert response =~ "Malformed CMP request"
-    assert {:error, :closed} = :gen_tcp.recv(socket, 0, 1_000)
+      assert :ok = :gen_tcp.send(socket, request)
+      assert {:ok, response} = :gen_tcp.recv(socket, 0, 1_000)
+      assert response =~ "HTTP/1.0 400 Bad Request"
+      assert response =~ "Malformed CMP request"
+      assert {:error, :closed} = :gen_tcp.recv(socket, 0, 1_000)
+    end)
   end
 
   @tag :openssl_cmp
