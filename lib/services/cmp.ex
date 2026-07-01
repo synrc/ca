@@ -67,12 +67,14 @@ defmodule CA.CMP do
   end
 
   def handleMessage(socket, body) do
-    case :"PKIXCMP-2009".decode(:PKIMessage, body) do
+    binary_body = IO.iodata_to_binary(body)
+
+    case :"PKIXCMP-2009".decode(:PKIMessage, binary_body) do
       {:ok, {:PKIMessage, header, body, code, _extra}} ->
         __MODULE__.message(socket, header, body, code)
 
       {:error, reason} ->
-        Logger.warning("Malformed CMP request: #{inspect(reason)}")
+        Logger.debug("Malformed CMP request: #{inspect(reason)}, body: #{inspect(binary_body)}")
         bad_request(socket, "Malformed CMP request")
         {:error, {:invalid_pki_message, reason}}
     end
