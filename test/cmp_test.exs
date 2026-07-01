@@ -99,7 +99,7 @@ defmodule CA.CMPTest do
         "-srvcert", "synrc.pem",
         "-certout", cert_path,
         "-newkey", key_path,
-        "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"
+        "-subject", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"
       ],
       cd: @openssl_dir,
       stderr_to_stdout: true
@@ -127,7 +127,7 @@ defmodule CA.CMPTest do
         "-srvcert", "synrc.pem",
         "-certout", cert_path,
         "-newkey", key_path,
-        "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"
+        "-subject", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"
       ],
       cd: @openssl_dir,
       stderr_to_stdout: true
@@ -151,7 +151,7 @@ defmodule CA.CMPTest do
         "-server", "127.0.0.1:8829", "-secret", "pass:0000",
         "-ref", "cmptestir", "-path", ".",
         "-srvcert", "synrc.pem", "-certout", cert_path,
-        "-newkey", key_path, "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"
+        "-newkey", key_path, "-subject", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"
       ],
       cd: @openssl_dir
     )
@@ -192,7 +192,7 @@ defmodule CA.CMPTest do
         "-server", "127.0.0.1:8829", "-secret", "pass:0000",
         "-ref", "cmptestir", "-path", ".",
         "-srvcert", "synrc.pem", "-certout", cert_path,
-        "-newkey", key_path, "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"
+        "-newkey", key_path, "-subject", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"
       ],
       cd: @openssl_dir
     )

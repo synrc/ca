@@ -116,15 +116,29 @@ defmodule CA.CMP do
 
   def clean_for_encode(term) do
     case term do
-      {:namedCurve, {1, 3, 132, 0, 34}} -> <<6, 5, 43, 129, 4, 0, 34>>
-      {:namedCurve, {1, 3, 132, 0, 10}} -> <<6, 5, 43, 129, 4, 0, 10>>
-      {:namedCurve, {1, 3, 132, 0, 35}} -> <<6, 5, 43, 129, 4, 0, 35>>
-      [namedCurve: oid] -> clean_for_encode({:namedCurve, oid})
+      {:InfoTypeAndValue, type, value} ->
+        {:InfoTypeAndValue, type, clean_open_type(value)}
       list when is_list(list) -> Enum.map(list, &clean_for_encode/1)
       tuple when is_tuple(tuple) ->
         tuple
         |> Tuple.to_list()
         |> Enum.map(&clean_for_encode/1)
+        |> List.to_tuple()
+      other -> other
+    end
+  end
+
+  def clean_open_type(term) do
+    case term do
+      {:namedCurve, {1, 3, 132, 0, 34}} -> <<6, 5, 43, 129, 4, 0, 34>>
+      {:namedCurve, {1, 3, 132, 0, 10}} -> <<6, 5, 43, 129, 4, 0, 10>>
+      {:namedCurve, {1, 3, 132, 0, 35}} -> <<6, 5, 43, 129, 4, 0, 35>>
+      [namedCurve: oid] -> clean_open_type({:namedCurve, oid})
+      list when is_list(list) -> Enum.map(list, &clean_open_type/1)
+      tuple when is_tuple(tuple) ->
+        tuple
+        |> Tuple.to_list()
+        |> Enum.map(&clean_open_type/1)
         |> List.to_tuple()
       other -> other
     end
@@ -386,11 +400,11 @@ defmodule CA.CMP do
       {ca_key, ca} = CA.CSR.read_ca(profile)
 
       {:ok, der_pub} = :"PKIX1Explicit-2009".encode(:SubjectPublicKeyInfo, pubkey_info)
-      otp_pub = :public_key.der_decode(:SubjectPublicKeyInfo, der_pub)
+      {:ok, public_key} = X509.PublicKey.from_der(der_pub)
 
       cert =
         X509.Certificate.new(
-          otp_pub,
+          public_key,
           subject,
           ca,
           ca_key,
