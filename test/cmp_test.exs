@@ -17,6 +17,7 @@ defmodule CA.CMPTest do
     {:ok, key: key_path, csr: csr_path, cert: cert_path}
   end
 
+  @tag :openssl_cmp
   test "CMP certificate enrollment (p10cr) using openssl client", %{key: key_path, csr: csr_path, cert: cert_path} do
     cn = "maxim-#{:crypto.strong_rand_bytes(4) |> Base.encode16(case: :lower)}-cmp"
 
