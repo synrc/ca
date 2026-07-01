@@ -67,9 +67,30 @@ defmodule CA.CMP do
   end
 
   def handleMessage(socket, body) do
-    {:ok, dec} = :"PKIXCMP-2009".decode(:PKIMessage, body)
-    {:PKIMessage, header, body, code, _extra} = dec
-    __MODULE__.message(socket, header, body, code)
+    case :"PKIXCMP-2009".decode(:PKIMessage, body) do
+      {:ok, {:PKIMessage, header, body, code, _extra}} ->
+        __MODULE__.message(socket, header, body, code)
+
+      {:error, reason} ->
+        Logger.warning("Malformed CMP request: #{inspect(reason)}")
+        bad_request(socket, "Malformed CMP request")
+        {:error, {:invalid_pki_message, reason}}
+    end
+  end
+
+  defp bad_request(socket, message) do
+    body = message <> "\n"
+
+    response =
+      "HTTP/1.0 400 Bad Request\r\n" <>
+        "Server: SYNRC CA/CMP\r\n" <>
+        "Content-Length: #{byte_size(body)}\r\n" <>
+        "Content-Type: text/plain; charset=utf-8\r\n" <>
+        "Connection: close\r\n\r\n" <>
+        body
+
+    _ = :gen_tcp.send(socket, response)
+    :gen_tcp.close(socket)
   end
 
   def baseKey(pass, salt, iter, owf \\ :sha256),
