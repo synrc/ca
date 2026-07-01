@@ -137,7 +137,7 @@ defmodule CA.CMP do
     :gen_tcp.send(socket, res)
   end
 
-  def storeReply(csr, cert, cn, profile) do
+  def storeReply(csr, cert, cn, profile, certReqId \\ -1) do
     {:ok, _} = :"PKCS-10".encode(:CertificationRequest, csr)
     :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.csr", X509.CSR.to_pem(csr))
     :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer", X509.Certificate.to_pem(cert))
@@ -145,7 +145,7 @@ defmodule CA.CMP do
 
     [
       CA.CMP.Scheme."CertResponse"(
-        certReqId: 0,
+        certReqId: certReqId,
         certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert: {:certificate, {:x509v3PKCert, cert}}),
         status: CA.CMP.Scheme."PKIStatusInfo"(status: 0)
       )
