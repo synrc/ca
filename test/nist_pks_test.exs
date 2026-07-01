@@ -16,7 +16,7 @@ defmodule CA.NIST.PrivateKeyStorageTest do
 
   test "private keys are stored encrypted at rest and backward compatible" do
     profile = "secp384r1"
-    cn = "maxim-#{:crypto.strong_rand_bytes(3) |> Base.encode16(case: :lower)}-nist"
+    cn = "maxim-#{:crypto.strong_rand_bytes(4) |> Base.encode16(case: :lower)}-nist"
 
     # Backup existing CA key & pem if they exist so we do not overwrite active developer keys
     ca_key_path = Path.expand("synrc/ecc/#{profile}/ca.key")
