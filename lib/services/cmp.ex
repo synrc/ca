@@ -114,13 +114,30 @@ defmodule CA.CMP do
     {oid, salt, owf, mac, counter}
   end
 
+  def clean_for_encode(term) do
+    case term do
+      {:namedCurve, {1, 3, 132, 0, 34}} -> <<6, 5, 43, 129, 4, 0, 34>>
+      {:namedCurve, {1, 3, 132, 0, 10}} -> <<6, 5, 43, 129, 4, 0, 10>>
+      {:namedCurve, {1, 3, 132, 0, 35}} -> <<6, 5, 43, 129, 4, 0, 35>>
+      [namedCurve: oid] -> clean_for_encode({:namedCurve, oid})
+      list when is_list(list) -> Enum.map(list, &clean_for_encode/1)
+      tuple when is_tuple(tuple) ->
+        tuple
+        |> Tuple.to_list()
+        |> Enum.map(&clean_for_encode/1)
+        |> List.to_tuple()
+      other -> other
+    end
+  end
+
   def validateProtection(header, body, code) do
     {:PKIHeader, _, _, _, _, protectionAlg, _, _, _, _, _, _, _} = header
     {oid, salt, owfoid, macoid, counter} = protection(protectionAlg)
 
     case CA.ALG.lookup(oid) do
       {:"id-PasswordBasedMac", _} ->
-        incomingProtection = CA.CMP.Scheme."ProtectedPart"(header: header, body: body)
+        clean_body = clean_for_encode(body)
+        incomingProtection = CA.CMP.Scheme."ProtectedPart"(header: header, body: clean_body)
         {:ok, bin} = :"PKIXCMP-2009".encode(:ProtectedPart, incomingProtection)
         # SHA-2
         {owf, _} = CA.ALG.lookup(owfoid)
@@ -175,18 +192,241 @@ defmodule CA.CMP do
     ]
   end
 
-  def message(_socket, _header, {:ir, req}, _) do
-    :lists.map(
-      fn {:CertReqMsg, req, sig, code} ->
-        :logger.info(~c"request: ~p ~p ~p~n", [req, sig, code])
-      end,
-      req
-    )
+  def message(socket, header, {:ir, req} = body, code) do
+    {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID, transactionID, senderNonce,
+     _recipNonce, _freeText, _generalInfo} = header
+
+    val_prot = validateProtection(header, body, code)
+    true = code == val_prot
+
+    # ir matches curve from profile or falls back
+    profile = case req do
+      [{:CertReqMsg, cert_req, _, _} | _] ->
+        cert_template = elem(cert_req, 2)
+        pubkey_info = elem(cert_template, 7)
+        profile_from_pubkey(pubkey_info)
+      _ -> "secp384r1"
+    end
+
+    reply = process_cert_reqs(req, profile)
+    pkibody = {:ip, CA.CMP.Scheme."CertRepMessage"(response: reply)}
+
+    pkiheader =
+      CA.CMP.Scheme."PKIHeader"(
+        sender: to,
+        recipient: from,
+        pvno: pvno,
+        recipNonce: senderNonce,
+        transactionID: transactionID,
+        protectionAlg: protectionAlg,
+        messageTime: messageTime
+      )
+
+    :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
   end
 
-  def message(_socket, _header, {:genm, req} = _body, _code) do
-    :io.format(~c"generalMessage: ~p~n", [req])
+  def message(socket, header, {:cr, req} = body, code) do
+    {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID, transactionID, senderNonce,
+     _recipNonce, _freeText, _generalInfo} = header
+
+    val_prot = validateProtection(header, body, code)
+    true = code == val_prot
+
+    profile = case req do
+      [{:CertReqMsg, cert_req, _, _} | _] ->
+        cert_template = elem(cert_req, 2)
+        pubkey_info = elem(cert_template, 7)
+        profile_from_pubkey(pubkey_info)
+      _ -> "secp384r1"
+    end
+
+    reply = process_cert_reqs(req, profile)
+    pkibody = {:cp, CA.CMP.Scheme."CertRepMessage"(response: reply)}
+
+    pkiheader =
+      CA.CMP.Scheme."PKIHeader"(
+        sender: to,
+        recipient: from,
+        pvno: pvno,
+        recipNonce: senderNonce,
+        transactionID: transactionID,
+        protectionAlg: protectionAlg,
+        messageTime: messageTime
+      )
+
+    :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
   end
+
+  def message(socket, header, {:kur, req} = body, code) do
+    {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID, transactionID, senderNonce,
+     _recipNonce, _freeText, _generalInfo} = header
+
+    val_prot = validateProtection(header, body, code)
+    true = code == val_prot
+
+    profile = case req do
+      [{:CertReqMsg, cert_req, _, _} | _] ->
+        cert_template = elem(cert_req, 2)
+        pubkey_info = elem(cert_template, 7)
+        profile_from_pubkey(pubkey_info)
+      _ -> "secp384r1"
+    end
+
+    reply = process_cert_reqs(req, profile)
+    pkibody = {:kup, CA.CMP.Scheme."CertRepMessage"(response: reply)}
+
+    pkiheader =
+      CA.CMP.Scheme."PKIHeader"(
+        sender: to,
+        recipient: from,
+        pvno: pvno,
+        recipNonce: senderNonce,
+        transactionID: transactionID,
+        protectionAlg: protectionAlg,
+        messageTime: messageTime
+      )
+
+    :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
+  end
+
+  def message(socket, header, {:rr, req} = body, code) do
+    {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID, transactionID, senderNonce,
+     _recipNonce, _freeText, _generalInfo} = header
+
+    val_prot = validateProtection(header, body, code)
+    true = code == val_prot
+    profile = "secp384r1"
+
+    statuses =
+      Enum.map(req, fn {:RevDetails, cert_details, _crl_entry} ->
+        serial =
+          case elem(cert_details, 2) do
+            :asn1_NOVALUE -> nil
+            {:asn1_OutmostTag, s} -> s
+            s when is_integer(s) -> s
+            _ -> nil
+          end
+
+        if serial do
+          CA.EST.CRL.revoke(profile, serial)
+          CA.CMP.Scheme."PKIStatusInfo"(status: 0)
+        else
+          CA.CMP.Scheme."PKIStatusInfo"(status: 2, statusString: [~c"Missing serial number"])
+        end
+      end)
+
+    pkibody = {:rp, CA.CMP.Scheme."RevRepContent"(status: statuses)}
+
+    pkiheader =
+      CA.CMP.Scheme."PKIHeader"(
+        sender: to,
+        recipient: from,
+        pvno: pvno,
+        recipNonce: senderNonce,
+        transactionID: transactionID,
+        protectionAlg: protectionAlg,
+        messageTime: messageTime
+      )
+
+    :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
+  end
+
+  def message(socket, header, {:genm, req} = body, code) do
+    {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID, transactionID, senderNonce,
+     _recipNonce, _freeText, _generalInfo} = header
+
+    val_prot = validateProtection(header, body, code)
+    true = code == val_prot
+
+    responses =
+      Enum.map(req, fn {:InfoTypeAndValue, info_type, _info_val} ->
+        case info_type do
+          {1, 3, 6, 1, 5, 5, 7, 4, 17} ->
+            ca_der = CA.CSR.read_ca_public("secp384r1")
+            {:InfoTypeAndValue, info_type, {:asn1_OPENTYPE, ca_der}}
+
+          {1, 3, 6, 1, 5, 5, 7, 4, 18} ->
+            ca_der = CA.CSR.read_ca_public("secp384r1")
+            {:InfoTypeAndValue, info_type, {:asn1_OPENTYPE, ca_der}}
+
+          {1, 3, 6, 1, 5, 5, 7, 4, 19} ->
+            crl_der = CA.EST.CRL.generate("secp384r1")
+            {:InfoTypeAndValue, info_type, {:asn1_OPENTYPE, crl_der}}
+
+          _ ->
+            {:InfoTypeAndValue, info_type, :asn1_NOVALUE}
+        end
+      end)
+
+    pkibody = {:genp, responses}
+
+    pkiheader =
+      CA.CMP.Scheme."PKIHeader"(
+        sender: to,
+        recipient: from,
+        pvno: pvno,
+        recipNonce: senderNonce,
+        transactionID: transactionID,
+        protectionAlg: protectionAlg,
+        messageTime: messageTime
+      )
+
+    :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
+  end
+
+  def process_cert_reqs(req_list, profile) do
+    Enum.map(req_list, fn {:CertReqMsg, cert_req, _pop, _reg_info} ->
+      cert_req_id = elem(cert_req, 1)
+      cert_template = elem(cert_req, 2)
+      subject_rdn = elem(cert_template, 6)
+      subject = CA.RDN.decodeAttrs(subject_rdn)
+
+      pubkey_info = elem(cert_template, 7)
+
+      {ca_key, ca} = CA.CSR.read_ca(profile)
+
+      {:ok, der_pub} = :"PKIX1Explicit-2009".encode(:SubjectPublicKeyInfo, pubkey_info)
+      otp_pub = :public_key.der_decode(:SubjectPublicKeyInfo, der_pub)
+
+      cert =
+        X509.Certificate.new(
+          otp_pub,
+          subject,
+          ca,
+          ca_key,
+          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"])]
+        )
+
+      cn =
+        case Keyword.get(CA.RDN.rdn(subject), :cn) do
+          nil -> ref()
+          val -> val
+        end
+
+      storeReplyCert(cert, cn, profile, cert_req_id)
+    end)
+    |> List.flatten()
+  end
+
+  def storeReplyCert(cert, cn, profile, certReqId) do
+    :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer", X509.Certificate.to_pem(cert))
+    cert_otp = :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
+
+    [
+      CA.CMP.Scheme."CertResponse"(
+        certReqId: certReqId,
+        certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert: {:certificate, {:x509v3PKCert, cert_otp}}),
+        status: CA.CMP.Scheme."PKIStatusInfo"(status: 0)
+      )
+    ]
+  end
+
+  def profile_from_pubkey({:SubjectPublicKeyInfo, {:AlgorithmIdentifier, {1, 2, 840, 10045, 2, 1}, {:asn1_OPENTYPE, x}}, _}) do
+    {{6, oid}, _} = :asn1rt_nif.decode_ber_tlv(x)
+    {alg, _} = CA.ALG.lookup(:oid.decode(oid))
+    "#{alg}"
+  end
+  def profile_from_pubkey(_), do: "secp384r1"
 
   def message(socket, header, {:p10cr, csr} = body, code) do
     {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID, transactionID, senderNonce,

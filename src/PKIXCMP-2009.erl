@@ -3187,12 +3187,14 @@ ObjinfoType =
 %%-------------------------------------------------
 %% attribute infoValue(2) with type typefieldType
 %%-------------------------------------------------
-   {TmpBytes2,_} = ObjinfoType('Type', Cindex2, []),
-   {EncBytes2,EncLen2} = encode_open_type(TmpBytes2, [])
-,
-
-   BytesSoFar = [EncBytes1, EncBytes2],
-LenSoFar = EncLen1 + EncLen2,
+   {BytesSoFar, LenSoFar} = case Cindex2 of
+     asn1_NOVALUE ->
+       {[EncBytes1], EncLen1};
+     _ ->
+       {TmpBytes2,_} = ObjinfoType('Type', Cindex2, []),
+       {EncBytes2,EncLen2} = encode_open_type(TmpBytes2, []),
+       {[EncBytes1, EncBytes2], EncLen1 + EncLen2}
+   end,
 encode_tags(TagIn, BytesSoFar, LenSoFar).
 
 
@@ -3214,19 +3216,19 @@ Term1 = decode_object_identifier(V1, [6]),
 %%-------------------------------------------------
 %% attribute infoValue(2) with type typefieldType
 %%-------------------------------------------------
-[V2|Tlv3] = Tlv2, 
-
-  Tmpterm1 = decode_open_type(V2, []),
-
-DecObjinfoTypeTerm1 =
-   'PKIXCMP-2009':'getdec_SupportedInfoSet'(Term1),
-Term2 = 
-   case (catch DecObjinfoTypeTerm1('Type', Tmpterm1, [])) of
-      {'EXIT', Reason1} ->
-         exit({'Type not compatible with table constraint',Reason1});
-      Tmpterm2 ->
-         Tmpterm2
-   end,
+{Term2, Tlv3} = case Tlv2 of
+  [] -> {asn1_NOVALUE, []};
+  [V2|T3] ->
+    Tmpterm1 = decode_open_type(V2, []),
+    DecObjinfoTypeTerm1 = 'PKIXCMP-2009':'getdec_SupportedInfoSet'(Term1),
+    T2 = case (catch DecObjinfoTypeTerm1('Type', Tmpterm1, [])) of
+       {'EXIT', Reason1} ->
+          exit({'Type not compatible with table constraint',Reason1});
+       Tmpterm2 ->
+          Tmpterm2
+    end,
+    {T2, T3}
+end,
 
 case Tlv3 of
 [] -> true;_ -> exit({error,{asn1, {unexpected,Tlv3}}}) % extra fields not allowed
