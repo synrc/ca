@@ -51,44 +51,12 @@ defmodule CA.EST.Post do
     |> send_resp()
   end
 
-  def parse_csr(body) do
-    case :public_key.pem_decode(body) do
-      [{:CertificationRequest, bin, _} | _] ->
-        :"PKCS-10".decode(:CertificationRequest, bin)
-      _ ->
-        case :"PKCS-10".decode(:CertificationRequest, body) do
-          {:ok, csr} ->
-            {:ok, csr}
-          _ ->
-            try do
-              clean_body = String.replace(body, ~r/\s+/, "")
-              decoded = :base64.decode(clean_body)
-              :"PKCS-10".decode(:CertificationRequest, decoded)
-            rescue
-              _ -> {:error, :invalid_csr}
-            end
-        end
-    end
-  end
-
-  defp try_valid_csr(csr) do
-    try do
-      X509.CSR.valid?(csr)
-    rescue
-      _ -> false
-    catch
-      _ -> false
-    end
-  end
-
-  def post(conn, "CA", curve, template, op) when op in ["ENROLL", "RE-ENROLL"] do
+  def post(conn, "CA", curve, _template, op) when op in ["ENROLL", "RE-ENROLL"] do
     {:ok, body, _} = Plug.Conn.read_body(conn, [])
 
     case parse_csr(body) do
       {:ok, csr} ->
         curve_name = if curve in @profiles, do: curve, else: CA.RDN.profile(csr)
-        template_name = if template in @classes, do: template, else: "client"
-
         if curve_name in @profiles do
           {ca_key, ca} = CA.CSR.read_ca(curve_name)
           subject = CA.RDN.decodeAttrs(X509.CSR.subject(csr))
@@ -149,5 +117,35 @@ defmodule CA.EST.Post do
 
   def post(conn, _, curve, _template, op) when curve in @profiles do
     send_resp(conn, 200, CA.EST.encode(%{"curve" => curve, "operation" => op}))
+  end
+
+  def parse_csr(body) do
+    case :public_key.pem_decode(body) do
+      [{:CertificationRequest, bin, _} | _] ->
+        :"PKCS-10".decode(:CertificationRequest, bin)
+      _ ->
+        case :"PKCS-10".decode(:CertificationRequest, body) do
+          {:ok, csr} ->
+            {:ok, csr}
+          _ ->
+            try do
+              clean_body = String.replace(body, ~r/\s+/, "")
+              decoded = :base64.decode(clean_body)
+              :"PKCS-10".decode(:CertificationRequest, decoded)
+            rescue
+              _ -> {:error, :invalid_csr}
+            end
+        end
+    end
+  end
+
+  defp try_valid_csr(csr) do
+    try do
+      X509.CSR.valid?(csr)
+    rescue
+      _ -> false
+    catch
+      _ -> false
+    end
   end
 end

@@ -17,19 +17,19 @@ defmodule CA.CMPTest do
     {:ok, key: key_path, csr: csr_path, cert: cert_path}
   end
 
+  @tag :openssl_cmp
   test "CMP certificate enrollment (p10cr) using openssl client", %{key: key_path, csr: csr_path, cert: cert_path} do
     cn = "maxim-#{:crypto.strong_rand_bytes(4) |> Base.encode16(case: :lower)}-cmp"
 
     # 1. Generate EC private key
-    {_, 0} = System.cmd("openssl", ["ecparam", "-name", "secp384r1", "-genkey", "-noout", "-out", key_path], cd: @openssl_dir)
+    {_, 0} = CA.Test.OpenSSL.cmd(["ecparam", "-name", "secp384r1", "-genkey", "-noout", "-out", key_path], cd: @openssl_dir)
 
     # 2. Generate PKCS#10 CSR
-    {_, 0} = System.cmd("openssl", ["req", "-new", "-key", key_path, "-out", csr_path, "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"], cd: @openssl_dir)
+    {_, 0} = CA.Test.OpenSSL.cmd(["req", "-new", "-key", key_path, "-out", csr_path, "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"], cd: @openssl_dir)
 
     # 3. Call openssl cmp to issue the certificate
     # The server is already running under supervision on port 8829
-    {output, status} = System.cmd(
-      "openssl",
+    {output, status} = CA.Test.OpenSSL.cmd(
       [
         "cmp",
         "-cmd", "p10cr",
@@ -53,7 +53,7 @@ defmodule CA.CMPTest do
     assert File.exists?(cert_path)
 
     # 4. Verify the issued certificate contains the correct subject
-    {cert_info, 0} = System.cmd("openssl", ["x509", "-noout", "-subject", "-in", cert_path], cd: @openssl_dir)
+    {cert_info, 0} = CA.Test.OpenSSL.cmd(["x509", "-noout", "-subject", "-in", cert_path], cd: @openssl_dir)
     assert cert_info =~ "CN=#{cn}"
   end
 end

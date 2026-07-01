@@ -12,8 +12,8 @@ defmodule CA.ESTTest do
     cn = "maxim-#{:crypto.strong_rand_bytes(4) |> Base.encode16(case: :lower)}-est"
 
     # Generate a fresh EC key and a CSR (PEM)
-    {_, 0} = System.cmd("openssl", ["ecparam", "-name", "secp384r1", "-genkey", "-noout", "-out", key_path], cd: @openssl_dir)
-    {_, 0} = System.cmd("openssl", ["req", "-new", "-key", key_path, "-out", csr_path, "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"], cd: @openssl_dir)
+    {_, 0} = CA.Test.OpenSSL.cmd(["ecparam", "-name", "secp384r1", "-genkey", "-noout", "-out", key_path], cd: @openssl_dir)
+    {_, 0} = CA.Test.OpenSSL.cmd(["req", "-new", "-key", key_path, "-out", csr_path, "-subj", "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}"], cd: @openssl_dir)
 
     pem_csr = File.read!(csr_path)
     [{:CertificationRequest, der_csr, _}] = :public_key.pem_decode(pem_csr)
@@ -62,73 +62,55 @@ defmodule CA.ESTTest do
     end
   end
 
+  defp est_request!(csr_path, path) do
+    {response, status} =
+      System.cmd("curl", [
+        "-sS", "-i",
+        "-X", "POST",
+        "-H", "Content-Type: application/pkcs10",
+        "--data-binary", "@" <> csr_path,
+        "http://127.0.0.1:8047" <> path
+      ], stderr_to_stdout: true)
+
+    assert status == 0, "curl failed with status #{status}:\n#{response}"
+
+    {headers, body} = parse_curl_response(response)
+    normalized_headers = String.downcase(headers)
+
+    assert normalized_headers =~ "http/1.1 200",
+           "EST request failed. Response headers:\n#{headers}\nResponse body:\n#{body}"
+
+    assert normalized_headers =~ "content-type: application/pkcs7-mime",
+           "Unexpected EST content type. Response headers:\n#{headers}\nResponse body:\n#{body}"
+
+    assert normalized_headers =~ "content-transfer-encoding: base64",
+           "EST response is not Base64 encoded. Response headers:\n#{headers}\nResponse body:\n#{body}"
+
+    body
+  end
+
   test "EST simpleenroll with PEM CSR", %{pem_path: csr_path, cn: cn} do
-    # Call curl with headers and body
-    {res, 0} = System.cmd("curl", [
-      "-s", "-i",
-      "-X", "POST",
-      "-H", "Content-Type: application/pkcs10",
-      "--data-binary", "@" <> csr_path,
-      "http://127.0.0.1:8047/.well-known/est/simpleenroll"
-    ])
-
-    {headers, body} = parse_curl_response(res)
-
-    assert String.downcase(headers) =~ "content-type: application/pkcs7-mime"
-    assert String.downcase(headers) =~ "content-transfer-encoding: base64"
-
+    body = est_request!(csr_path, "/.well-known/est/simpleenroll")
     verify_est_response!(body, cn)
   end
 
   test "EST simpleenroll with raw DER CSR", %{der_path: der_path, cn: cn} do
-    {res, 0} = System.cmd("curl", [
-      "-s", "-i",
-      "-X", "POST",
-      "-H", "Content-Type: application/pkcs10",
-      "--data-binary", "@" <> der_path,
-      "http://127.0.0.1:8047/.well-known/est/simpleenroll"
-    ])
-
-    {_headers, body} = parse_curl_response(res)
+    body = est_request!(der_path, "/.well-known/est/simpleenroll")
     verify_est_response!(body, cn)
   end
 
   test "EST simpleenroll with Base64 CSR", %{base64_path: base64_path, cn: cn} do
-    {res, 0} = System.cmd("curl", [
-      "-s", "-i",
-      "-X", "POST",
-      "-H", "Content-Type: application/pkcs10",
-      "--data-binary", "@" <> base64_path,
-      "http://127.0.0.1:8047/.well-known/est/simpleenroll"
-    ])
-
-    {_headers, body} = parse_curl_response(res)
+    body = est_request!(base64_path, "/.well-known/est/simpleenroll")
     verify_est_response!(body, cn)
   end
 
   test "EST simpleenroll with explicit profile in URL", %{pem_path: csr_path, cn: cn} do
-    {res, 0} = System.cmd("curl", [
-      "-s", "-i",
-      "-X", "POST",
-      "-H", "Content-Type: application/pkcs10",
-      "--data-binary", "@" <> csr_path,
-      "http://127.0.0.1:8047/.well-known/est/secp384r1-client/simpleenroll"
-    ])
-
-    {_headers, body} = parse_curl_response(res)
+    body = est_request!(csr_path, "/.well-known/est/secp384r1-client/simpleenroll")
     verify_est_response!(body, cn)
   end
 
   test "EST simplereenroll with PEM CSR", %{pem_path: csr_path, cn: cn} do
-    {res, 0} = System.cmd("curl", [
-      "-s", "-i",
-      "-X", "POST",
-      "-H", "Content-Type: application/pkcs10",
-      "--data-binary", "@" <> csr_path,
-      "http://127.0.0.1:8047/.well-known/est/simplereenroll"
-    ])
-
-    {_headers, body} = parse_curl_response(res)
+    body = est_request!(csr_path, "/.well-known/est/simplereenroll")
     verify_est_response!(body, cn)
   end
 end

@@ -7,3 +7,15 @@ ebin/
 .elixir_ls/
 ca.log
 mix.lock
+csr/
+*.csr
+/synrc
+/keys
+/openssl
+/.idea
+.tool-versions
+/*-packs
+*.sh
+*.pem
+*.enc
+*.ovpn
