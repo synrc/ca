@@ -22,8 +22,10 @@ defmodule CA.CSR do
     ca_key = X509.PrivateKey.new_ec(:erlang.binary_to_atom(profile))
     :logger.info(~c"CSR CMP DN ~p~n", [rdn])
 
+    subject_rdn = map_utf8_tags(X509.RDNSequence.new(rdn))
+
     ca =
-      X509.Certificate.self_signed(ca_key, rdn,
+      X509.Certificate.self_signed(ca_key, subject_rdn,
         template: %X509.Certificate.Template{
           # 25 years
           validity: round(25 * 365.2425),
@@ -37,8 +39,8 @@ defmodule CA.CSR do
         }
       )
 
-    der = :public_key.der_encode(:ECPrivateKey, ca_key)
-    pem = :public_key.pem_encode([{:ECPrivateKey, der, :not_encrypted}])
+    password = :application.get_env(:ca, :password, "0000")
+    pem = X509.PrivateKey.to_pem(ca_key, password: password)
     :file.write_file("#{dir(profile)}/ca.key", pem)
     :file.write_file("#{dir(profile)}/ca.pem", X509.Certificate.to_pem(ca))
     {ca_key, ca}
@@ -48,13 +50,15 @@ defmodule CA.CSR do
     {ca_key, ca} = read_ca(profile)
     :filelib.ensure_dir(dir(profile))
     priv = X509.PrivateKey.new_ec(:erlang.binary_to_atom(profile))
-    der = :public_key.der_encode(:ECPrivateKey, priv)
-    pem = :public_key.pem_encode([{:ECPrivateKey, der, :not_encrypted}])
+    password = :application.get_env(:ca, :password, "0000")
+    pem = X509.PrivateKey.to_pem(priv, password: password)
     :file.write_file("#{dir(profile)}/#{user}.key", pem)
     :logger.info(~c"CSR SERVER DN ~p~n", [rdn])
 
+    subject_rdn = map_utf8_tags(X509.RDNSequence.new(rdn))
+
     csr =
-      X509.CSR.new(priv, rdn,
+      X509.CSR.new(priv, subject_rdn,
         extension_request: [
           X509.Certificate.Extension.subject_alt_name(["synrc.com"])
         ]
@@ -62,7 +66,7 @@ defmodule CA.CSR do
 
     :file.write_file("#{dir(profile)}/#{user}.csr", X509.CSR.to_pem(csr))
     true = X509.CSR.valid?(csr)
-    subject = X509.CSR.subject(csr)
+    subject = X509.CSR.subject(csr) |> map_utf8_tags()
 
     server =
       X509.Certificate.new(X509.CSR.public_key(csr), subject, ca, ca_key,
@@ -75,13 +79,15 @@ defmodule CA.CSR do
 
   def client(profile, rdn: rdn, cn: user) do
     priv = X509.PrivateKey.new_ec(:erlang.binary_to_atom(profile))
-    der = :public_key.der_encode(:ECPrivateKey, priv)
-    pem = :public_key.pem_encode([{:ECPrivateKey, der, :not_encrypted}])
+    password = :application.get_env(:ca, :password, "0000")
+    pem = X509.PrivateKey.to_pem(priv, password: password)
     :file.write_file("#{dir(profile)}/#{user}.key", pem)
     :logger.info(~c"CSR CLIENT DN ~p~n", [rdn])
 
+    subject_rdn = map_utf8_tags(X509.RDNSequence.new(rdn))
+
     csr =
-      X509.CSR.new(priv, rdn,
+      X509.CSR.new(priv, subject_rdn,
         extension_request: [
           X509.Certificate.Extension.subject_alt_name(["synrc.com"])
         ]
@@ -102,7 +108,15 @@ defmodule CA.CSR do
     init(profile)
     {:ok, ca_key_bin} = :file.read_file("#{CA.CSR.dir(profile)}/ca.key")
     {:ok, ca_bin} = :file.read_file("#{CA.CSR.dir(profile)}/ca.pem")
-    {:ok, ca_key} = X509.PrivateKey.from_pem(ca_key_bin)
+    password = :application.get_env(:ca, :password, "0000")
+    ca_key =
+      case X509.PrivateKey.from_pem(ca_key_bin, password: password) do
+        {:ok, key} -> key
+        _ ->
+          case X509.PrivateKey.from_pem(ca_key_bin) do
+            {:ok, key} -> key
+          end
+      end
     {:ok, ca} = X509.Certificate.from_pem(ca_bin)
     {ca_key, ca}
   end
@@ -114,4 +128,17 @@ defmodule CA.CSR do
     {:ok, bin} = :PKIX1Explicit88.encode(:Certificate, CA.RDN.encodeAttrsCert(ca))
     bin
   end
+
+  defp map_utf8_tags({:rdnSequence, list}) do
+    {:rdnSequence, Enum.map(list, fn sub_list ->
+      Enum.map(sub_list, fn
+        {:SingleAttribute, oid, {:utf8String, val}} ->
+          {:SingleAttribute, oid, {:uTF8String, val}}
+        {:AttributeTypeAndValue, oid, {:utf8String, val}} ->
+          {:AttributeTypeAndValue, oid, {:uTF8String, val}}
+        other -> other
+      end)
+    end)}
+  end
+  defp map_utf8_tags(other), do: other
 end

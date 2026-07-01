@@ -14,7 +14,18 @@ defmodule CA.ECDSA do
     {r, s}
   end
 
-  def private(bin), do: numberFromString(:erlang.element(3, :erlang.element(2, X509.PrivateKey.from_pem(bin))))
+  def private(bin) do
+    password = :application.get_env(:ca, :password, "0000")
+    key =
+      case X509.PrivateKey.from_pem(bin, password: password) do
+        {:ok, k} -> k
+        _ ->
+          case X509.PrivateKey.from_pem(bin) do
+            {:ok, k} -> k
+          end
+      end
+    numberFromString(:erlang.element(3, key))
+  end
   def public(bin), do: :public_key.pem_entry_decode(hd(:public_key.pem_decode(bin)))
 
   def numberFromString(string) do
