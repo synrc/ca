@@ -77,8 +77,7 @@ defmodule CA.CMPTest do
     assert status == 0
     assert File.exists?(cert_path)
 
-    # 4. Verify the issued certificate contains the correct subject
     {cert_info, 0} = CA.Test.OpenSSL.cmd(["x509", "-noout", "-subject", "-in", cert_path], cd: @openssl_dir)
-    assert cert_info =~ "CN=#{cn}"
+    assert String.replace(cert_info, " ", "") =~ "CN=#{cn}"
   end
 end
