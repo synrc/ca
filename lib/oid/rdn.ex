@@ -50,17 +50,22 @@ defmodule CA.RDN do
   end
 
   def decodeAttrsCert(cert) do
-      {cCertificate,{tTBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,_pki},p3},b,c,ext},ai,code} =
+      {cCertificate,{tTBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,_pki},p3},b,c,ext},ai_outer,code} =
          :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
       {cCertificate,{tTBSCertificate,:v3,a,ai,decodeAttrs(rdn1),v,decodeAttrs(rdn2),
-           {p1,{p21,p22,{:namedCurve,{1,3,132,0,34}}},p3},b,c,ext},ai,code}
+           {p1,{p21,p22,{:namedCurve,{1,3,132,0,34}}},p3},b,c,ext},ai_outer,code}
   end
 
+  def curve_der({:namedCurve, {1, 3, 132, 0, 34}}), do: <<6, 5, 43, 129, 4, 0, 34>>
+  def curve_der({:namedCurve, {1, 3, 132, 0, 10}}), do: <<6, 5, 43, 129, 4, 0, 10>>
+  def curve_der({:namedCurve, {1, 3, 132, 0, 35}}), do: <<6, 5, 43, 129, 4, 0, 35>>
+  def curve_der(pki), do: pki
+
   def encodeAttrsCert(cert) do
-      {cCertificate,{tTBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,pki},p3},b,c,ext},ai,code} =
+      {cCertificate,{tTBSCertificate,:v3,a,ai,rdn1,v,rdn2,{p1,{p21,p22,pki},p3},b,c,ext},ai_outer,code} =
          :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
       {cCertificate,{tTBSCertificate,:v3,a,ai,encodeAttrs(rdn1),v,encodeAttrs(rdn2),
-           {p1,{p21,p22,pki},p3},b,c,ext},ai,code}
+           {p1,{p21,p22,curve_der(pki)},p3},b,c,ext},ai_outer,code}
   end
 
   def rdn({0,9,2342,19200300,100,1,25}), do: :dc # "domainComponent"
