@@ -25,7 +25,6 @@ jobs:
           pkg-config \
           libtss2-dev \
           libtss2-esys-3.0.2-0 \
-          libtss2-mu-4.1.3-0 \
           libtss2-rc0
     - uses: erlef/setup-beam@v1
       with:
