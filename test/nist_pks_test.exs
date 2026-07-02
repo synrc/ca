@@ -19,8 +19,8 @@ defmodule CA.NIST.PrivateKeyStorageTest do
     cn = "maxim-#{:crypto.strong_rand_bytes(4) |> Base.encode16(case: :lower)}-nist"
 
     # Backup existing CA key & pem if they exist so we do not overwrite active developer keys
-    ca_key_path = Path.expand("synrc/ecc/#{profile}/ca.key")
-    ca_pem_path = Path.expand("synrc/ecc/#{profile}/ca.pem")
+    ca_key_path = Path.expand("synrc/ecc/#{profile}/se/ca.key")
+    ca_pem_path = Path.expand("synrc/ecc/#{profile}/se/ca.pem")
 
     has_backup? = File.exists?(ca_key_path)
     if has_backup? do
@@ -30,7 +30,7 @@ defmodule CA.NIST.PrivateKeyStorageTest do
 
     on_exit(fn ->
       # Restore backups if they were created, overwriting the test CA files.
-      # If there was no backup, we do NOT delete ca.key/ca.pem so they remain in ./synrc/
+      # If there was no backup, we do NOT delete ca.key/ca.pem so they remain in ./synrc/ecc/*/se/
       if has_backup? do
         File.rename!(ca_key_path <> ".bak", ca_key_path)
         File.rename!(ca_pem_path <> ".bak", ca_pem_path)

@@ -289,7 +289,7 @@ end
 | SC-13       | OpenSSL (FIPS provider)     | FIPS 140-2/3 L2+ SEP       | FIPS 140-2 L2 TPM           |
 | SC-28       | Filesystem permissions      | Key never leaves SEP        | Key never leaves TPM        |
 | SC-28(1)    | PEM passphrase (AES-256-CBC)| AES-256-GCM Keychain wrap   | SRK AES-256 NV wrap         |
-| MP-4        | `synrc/ecc/secp384r1/`      | Keychain (no FS path)       | `/dev/tpm0` (no FS path)    |
+| MP-4        | `synrc/ecc/secp384r1/`      | `synrc/ecc/secp384r1/se/`   | `/dev/tpm0` (no FS path)    |
 | MP-6        | `File.rm/1` + shred         | `SecItemDelete` irreversible| `Esys_EvictControl` + Clear |
 
 **Module references**:

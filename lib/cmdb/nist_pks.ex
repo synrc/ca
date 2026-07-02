@@ -25,6 +25,17 @@ defmodule CA.NIST.SecureEnclaveStorage do
 
   Hardware backend: macOS Security.framework / kSecAttrTokenIDSecureEnclave
   Keychain label convention: \"synrc.ca.secp384r1\"
+
+  ## Storage layout: `synrc/ecc/*/se/`
+
+  Public artifacts are written to a dedicated subfolder by `CA.SecureEnclave.provision/1`:
+
+      synrc/ecc/secp384r1/se/
+        se.label   — Keychain label (UTF-8)
+        pub.key    — raw 65-byte uncompressed EC point
+        pub.pem    — PEM SubjectPublicKeyInfo (OpenSSL-readable)
+
+  The private key is NEVER stored here or anywhere on disk.
   """
   def controls do
     [
@@ -35,8 +46,8 @@ defmodule CA.NIST.SecureEnclaveStorage do
       CA.SPE.oid(:"id-spe-sc-13"),    # FIPS 140-2/3 Level 2+ P-384 ECDSA in SEP
       CA.SPE.oid(:"id-spe-sc-28"),    # Private key never leaves SEP boundary
       CA.SPE.oid(:"id-spe-sc-28-1"),  # Keychain blob wrapped with AES-256-GCM by SEP
-      CA.SPE.oid(:"id-spe-mp-4"),     # Key reference in macOS Keychain (not removable media)
-      CA.SPE.oid(:"id-spe-mp-6")      # SecItemDelete irreversible; no data remanence
+      CA.SPE.oid(:"id-spe-mp-4"),     # Public artifacts in synrc/ecc/secp384r1/se/ (no private key)
+      CA.SPE.oid(:"id-spe-mp-6")      # SecItemDelete irreversible; se/ folder deletable safely
     ]
   end
 end

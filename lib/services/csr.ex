@@ -13,12 +13,28 @@ defmodule CA.CSR do
     client("secp384r1", rdn: "/C=UA/L=Київ/O=SYNRC/CN=#{name}", cn: "#{name}")
   end
 
+  @doc "Base directory for a curve profile, e.g. `synrc/ecc/secp384r1/`."
   def dir(profile) do
     "synrc/ecc/#{profile}/"
   end
 
+  @doc """
+  Dedicated subdirectory for the CA root key pair.
+
+  `ca.key` and `ca.pem` live here rather than in `dir/1` so the root
+  credentials are separated from issued client/server artefacts and
+  co-located with any hardware-backend files (`se.label`, `pub.key`…).
+
+      synrc/ecc/secp384r1/se/ca.key   ← encrypted private key
+      synrc/ecc/secp384r1/se/ca.pem   ← self-signed CA certificate
+  """
+  def dir_se(profile) do
+    "synrc/ecc/#{profile}/se"
+  end
+
   def root(profile, rdn: rdn) do
     :filelib.ensure_dir(dir(profile))
+    File.mkdir_p!(dir_se(profile))
     ca_key = X509.PrivateKey.new_ec(:erlang.binary_to_atom(profile))
     :logger.info(~c"CSR CMP DN ~p~n", [rdn])
     subject_rdn = CA.RDN.decodeAttrs(X509.RDNSequence.new(rdn))
@@ -40,8 +56,8 @@ defmodule CA.CSR do
 
     password = :application.get_env(:ca, :password, "0000")
     pem = X509.PrivateKey.to_pem(ca_key, password: password)
-    :file.write_file("#{dir(profile)}/ca.key", pem)
-    :file.write_file("#{dir(profile)}/ca.pem", X509.Certificate.to_pem(ca))
+    :file.write_file("#{dir_se(profile)}/ca.key", pem)
+    :file.write_file("#{dir_se(profile)}/ca.pem", X509.Certificate.to_pem(ca))
     {ca_key, ca}
   end
 
@@ -97,16 +113,16 @@ defmodule CA.CSR do
   end
 
   def init(profile) do
-    case :filelib.is_regular("#{CA.CSR.dir(profile)}/ca.key") do
+    case :filelib.is_regular("#{dir_se(profile)}/ca.key") do
       false -> root(profile, rdn: "/C=UA/L=Київ/O=SYNRC/CN=CA")
-      true -> []
+      true  -> []
     end
   end
 
   def read_ca(profile) do
     init(profile)
-    {:ok, ca_key_bin} = :file.read_file("#{CA.CSR.dir(profile)}/ca.key")
-    {:ok, ca_bin} = :file.read_file("#{CA.CSR.dir(profile)}/ca.pem")
+    {:ok, ca_key_bin} = :file.read_file("#{dir_se(profile)}/ca.key")
+    {:ok, ca_bin}     = :file.read_file("#{dir_se(profile)}/ca.pem")
     password = :application.get_env(:ca, :password, "0000")
     ca_key =
       case X509.PrivateKey.from_pem(ca_key_bin, password: password) do
@@ -122,11 +138,10 @@ defmodule CA.CSR do
 
   def read_ca_public(profile) do
     init(profile)
-    {:ok, ca_bin} = :file.read_file("#{CA.CSR.dir(profile)}/ca.pem")
+    {:ok, ca_bin} = :file.read_file("#{dir_se(profile)}/ca.pem")
     {:ok, ca} = X509.Certificate.from_pem(ca_bin)
     {:ok, bin} = :PKIX1Explicit88.encode(:Certificate, CA.RDN.encodeAttrsCert(ca))
     bin
   end
-
 
 end
