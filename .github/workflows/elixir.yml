@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: ['25.x', '26.x', '27.x', '28.x']
+        otp: ['25.x', '26.x', '27.x', '28.x', '29.x']
         include:
           - otp: '25.x'
             elixir: '1.17.x'
@@ -15,6 +15,8 @@ jobs:
             elixir: '1.18.x'
           - otp: '28.x'
             elixir: '1.19.x'
+          - otp: '29.x'
+            elixir: '1.20.x'
     steps:
     - uses: actions/checkout@v4
     - name: System packages
