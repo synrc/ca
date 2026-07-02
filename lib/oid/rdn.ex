@@ -5,7 +5,7 @@ defmodule CA.RDN do
 
   def utf8_tag do
     case System.otp_release() |> String.to_integer() do
-      ver when ver >= 26 -> :utf8String
+      ver when ver >= 25 -> :utf8String
       _ -> :uTF8String
     end
   end
