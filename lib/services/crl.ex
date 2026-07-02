@@ -33,9 +33,14 @@ defmodule CA.EST.CRL do
 
   def generate(profile) do
     {ca_key, ca} = CA.CSR.read_ca(profile)
+
     issuer_raw = elem(elem(ca, 1), 4)
+
     # Ensure proper UTF8 encoding for issuer RDN on OTP 27+
-    issuer = CA.RDN.encodeAttrs(issuer_raw)
+    issuer = case System.otp_release() |> String.to_integer() do
+      ver when ver >= 27 -> issuer_raw
+      _ -> CA.RDN.encodeAttrs(issuer_raw)
+    end
 
     {sig_oid, digest} = sig_alg_and_digest(profile)
     sig_alg = {:AlgorithmIdentifier, sig_oid, :asn1_NOVALUE}
