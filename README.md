@@ -60,9 +60,9 @@ The backend is chosen by `CA.SecureEnclave.detect_backend/1` at startup:
 
 | Priority | Backend | Platform | Key location |
 |----------|---------|----------|--------------|
-| 1 | **Secure Enclave** (`CA.SecureEnclave`) | macOS — Apple Silicon / T2 | Inside SEP; `se.label` holds Keychain label |
-| 2 | **TPM 2.0** (`CA.TPM`) | Linux + TPM chip | Inside TPM NV; `se.label` holds persistent handle |
-| 3 | **Software** (`CA.SE.Software`) | Any platform | `se/ca.key` — PKCS#8 AES-256-CBC |
+| 1 | **Secure Enclave** | macOS — Apple Silicon / T2 | Inside SEP; `se.label` holds Keychain label |
+| 2 | **TPM 2.0** | Linux + TPM chip | Inside TPM NV; `se.label` holds persistent handle |
+| 3 | **Software** | Any platform | `se/ca.key` — PKCS#8 AES-256-CBC |
 
 NIST SP 800-53 compliance profiles: `CA.NIST.SecureEnclaveStorage`,
 `CA.NIST.TPMStorage`, `CA.NIST.PrivateKeyStorage`.
@@ -256,11 +256,11 @@ openssl pkey -pubin -in synrc/ecc/secp384r1/se/pub.pem -text -noout
 
 | Artefact | Can back up? | Notes |
 |----------|-------------|-------|
-| `ca.pem` | ✅ Yes | Public — archive freely |
-| `pub.pem` / `pub.key` | ✅ Yes | Public — hardware backends |
-| `se.label` | ✅ Yes | Label string only; useless without the chip |
-| `ca.key` (software) | ⚠️ With care | Encrypted — secure offline storage |
-| SE / TPM private key | ❌ Never | Hardware-bound; non-exportable by design |
+| `ca.pem` | Yes | Public — archive freely |
+| `pub.pem` / `pub.key` | Yes | Public — hardware backends |
+| `se.label` | Yes | Label string only; useless without the chip |
+| `ca.key` (software) | No | Encrypted — secure offline storage |
+| SE / TPM private key | Never | Hardware-bound; non-exportable by design |
 
 > **Note**: Secure Enclave and TPM keys survive reboots but are permanently
 > lost if the device is wiped or the TPM is cleared.  There is no recovery
