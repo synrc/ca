@@ -46,13 +46,14 @@ defmodule CA.CMPTest do
   test "CMP certificate enrollment (p10cr) using openssl client", %{key: key_path, csr: csr_path, cert: cert_path} do
     cn = "maxim-#{:crypto.strong_rand_bytes(4) |> Base.encode16(case: :lower)}-cmp"
 
-    # 1. Generate EC private key and CSR using CA.CSR
-    CA.CSR.client("secp384r1", rdn: "/C=UA/ST=Kyiv/O=SYNRC/CN=#{cn}", cn: cn)
-    # Ensure source directory exists
+    # Ensure source directory exists before generating CSR
     File.mkdir_p!(CA.CSR.dir("secp384r1"))
+    # 1. Generate EC private key and CSR using CA.CSR
+    CA.CSR.client(cn)
     # Copy generated key and CSR to the test directory paths
     File.cp!(Path.join(CA.CSR.dir("secp384r1"), "#{cn}.key"), key_path)
     File.cp!(Path.join(CA.CSR.dir("secp384r1"), "#{cn}.csr"), csr_path)
+    
     # Cleanup source files so server treats enrollment as new
     File.rm!(Path.join(CA.CSR.dir("secp384r1"), "#{cn}.key"))
     File.rm!(Path.join(CA.CSR.dir("secp384r1"), "#{cn}.csr"))

@@ -5,7 +5,7 @@ defmodule CA.Mixfile do
   def project() do
     [
       app: :ca,
-      version: "2.7.14",
+      version: "7.6.2",
       description: "CA  CXC 138 21 Certificate Authority",
       releases: [ca: [include_executables_for: [:unix], cookie: "SYNRC:CA"]],
       package: [
