@@ -60,7 +60,7 @@ The backend is chosen by `CA.SecureEnclave.detect_backend/1` at startup:
 
 | Priority | Backend | Platform | Key location |
 |----------|---------|----------|--------------|
-| 1 | **Secure Enclave** | macOS — Apple Silicon / T2 | Inside SEP; `se.label` holds Keychain label |
+| 1 | **Secure Enclave** | macOS — Apple T2 | Inside SEP; `se.label` holds Keychain label |
 | 2 | **TPM 2.0** | Linux + TPM chip | Inside TPM NV; `se.label` holds persistent handle |
 | 3 | **Software** | Any platform | `se/ca.key` — PKCS#8 AES-256-CBC |
 
