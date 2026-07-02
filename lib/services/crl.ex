@@ -38,8 +38,8 @@ defmodule CA.EST.CRL do
 
     # Ensure proper UTF8 encoding for issuer RDN on OTP 27+
     issuer = case System.otp_release() |> String.to_integer() do
-      ver when ver >= 27 -> CA.RDN.encodeAttrs(issuer_raw)
-      _ -> issuer_raw
+      ver when ver < 27 -> CA.RDN.encodeAttrs(issuer_raw)
+      ver when ver >= 27 -> issuer_raw
     end
 
     {sig_oid, digest} = sig_alg_and_digest(profile)
