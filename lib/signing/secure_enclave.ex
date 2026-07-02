@@ -35,7 +35,61 @@ defmodule CA.SecureEnclave do
   Use `CA.TPM` for Linux hardware-backed storage.
   """
 
-  @nif_path :filename.join(:code.priv_dir(:ca), ~c"se_nif")
+  # Platform-specific NIF library extension
+  @nif_ext (case :os.type() do {:unix, :darwin} -> ~c".dylib" ; _ -> ~c".so" end)
+  @nif_path :filename.join(:code.priv_dir(:ca), ~c"se_nif" ++ @nif_ext)
+
+  # ------------------------------------------------------------------ #
+  #  Pure-Elixir folder helpers — available on all platforms             #
+  #  (defined BEFORE @on_load so they work even if NIF load fails)       #
+  # ------------------------------------------------------------------ #
+
+  @doc "Returns the `se.label` path inside `se_dir`."
+  @spec label_path(Path.t()) :: Path.t()
+  def label_path(se_dir),  do: Path.join(se_dir, "se.label")
+
+  @doc "Returns the raw public key path (`pub.key`) inside `se_dir`."
+  @spec pubkey_path(Path.t()) :: Path.t()
+  def pubkey_path(se_dir), do: Path.join(se_dir, "pub.key")
+
+  @doc "Returns the PEM public key path (`pub.pem`) inside `se_dir`."
+  @spec pem_path(Path.t()) :: Path.t()
+  def pem_path(se_dir),    do: Path.join(se_dir, "pub.pem")
+
+  @doc """
+  Load the Keychain label from an existing `se_dir` folder.
+  Returns `{:ok, label}` or `{:error, :not_provisioned}`.
+  """
+  @spec load(Path.t()) :: {:ok, binary()} | {:error, :not_provisioned | term()}
+  def load(se_dir) do
+    case File.read(label_path(se_dir)) do
+      {:ok, label}      -> {:ok, String.trim(label)}
+      {:error, :enoent} -> {:error, :not_provisioned}
+      {:error, _} = err -> err
+    end
+  end
+
+  @doc "Returns `true` if `se_dir` has been provisioned."
+  @spec provisioned?(Path.t()) :: boolean()
+  def provisioned?(se_dir), do: File.exists?(label_path(se_dir))
+
+  @doc """
+  Select the active key backend for a given curve directory.
+
+  Priority:
+  1. **Secure Enclave** — `se/se.label` exists (macOS).
+  2. **Software** — falls back to `se/ca.key`.
+
+  Returns `{:secure_enclave, label}` or `{:software, key_path}`.
+  """
+  @spec detect_backend(Path.t()) :: {:secure_enclave, binary()} | {:software, Path.t()}
+  def detect_backend(curve_dir \\ "synrc/ecc/secp384r1") do
+    se_dir = Path.join(curve_dir, "se")
+    case load(se_dir) do
+      {:ok, label} -> {:secure_enclave, label}
+      _            -> {:software, Path.join(se_dir, "ca.key")}
+    end
+  end
 
   @on_load :load_nif
 

@@ -113,26 +113,38 @@ defmodule CA.CSR do
   end
 
   def init(profile) do
-    case :filelib.is_regular("#{dir_se(profile)}/ca.key") do
-      false -> root(profile, rdn: "/C=UA/L=Київ/O=SYNRC/CN=CA")
-      true  -> []
+    case Application.get_env(:ca, :key_backend) do
+      {:secure_enclave, _label} ->
+        # Hardware-backed key — no software ca.key needed
+        :ok
+      _ ->
+        case :filelib.is_regular("#{dir_se(profile)}/ca.key") do
+          false -> root(profile, rdn: "/C=UA/L=Київ/O=SYNRC/CN=CA")
+          true  -> []
+        end
     end
   end
 
   def read_ca(profile) do
     init(profile)
-    {:ok, ca_key_bin} = :file.read_file("#{dir_se(profile)}/ca.key")
-    {:ok, ca_bin}     = :file.read_file("#{dir_se(profile)}/ca.pem")
-    password = :application.get_env(:ca, :password, "0000")
+    {:ok, ca_bin} = :file.read_file("#{dir_se(profile)}/ca.pem")
+    {:ok, ca} = X509.Certificate.from_pem(ca_bin)
+
     ca_key =
-      case X509.PrivateKey.from_pem(ca_key_bin, password: password) do
-        {:ok, key} -> key
+      case Application.get_env(:ca, :key_backend) do
+        {:secure_enclave, label} ->
+          {:secure_enclave, label}
         _ ->
-          case X509.PrivateKey.from_pem(ca_key_bin) do
+          {:ok, ca_key_bin} = :file.read_file("#{dir_se(profile)}/ca.key")
+          password = :application.get_env(:ca, :password, "0000")
+          case X509.PrivateKey.from_pem(ca_key_bin, password: password) do
             {:ok, key} -> key
+            _ ->
+              {:ok, key} = X509.PrivateKey.from_pem(ca_key_bin)
+              key
           end
       end
-    {:ok, ca} = X509.Certificate.from_pem(ca_bin)
+
     {ca_key, ca}
   end
 

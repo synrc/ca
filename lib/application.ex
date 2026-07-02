@@ -11,6 +11,7 @@ defmodule CA do
 
   def start(_type, _args) do
     :logger.add_handlers(:ca)
+    :logger.info(~c"CA KEY BACKEND: ~p", [CA.SecureEnclave.detect_backend])
 
     Supervisor.start_link(
       [

@@ -13,6 +13,7 @@ config :ca,
   tsp: 8021,
   ldap: 8389,
   logger_level: :info,
+  key_backend: {:software, "synrc/ecc/secp384r1/se/ca.key"},
   logger: [
     {:handler, :default2, :logger_std_h,
      %{

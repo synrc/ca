@@ -14,7 +14,7 @@ PRIV_DIR     := ../priv
 CFLAGS_COMMON := -O2 -Wall -fPIC -I$(ERL_INCLUDE)
 
 # ------------------------------------------------------------------ #
-#  macOS — Secure Enclave NIF                                          #
+#  macOS — Secure Enclave NIF                                        #
 # ------------------------------------------------------------------ #
 ifeq ($(UNAME_S), Darwin)
 
@@ -30,15 +30,15 @@ LDFLAGS_SE   := -dynamiclib -undefined dynamic_lookup \
                 -framework LocalAuthentication \
                 -framework Foundation
 
-all: $(PRIV_DIR)/se_nif.dylib
+all: $(PRIV_DIR)/se_nif.dylib.so
 
-$(PRIV_DIR)/se_nif.dylib: se_nif.c
+$(PRIV_DIR)/se_nif.dylib.so: se_nif.c
 	@mkdir -p $(PRIV_DIR)
 	$(CC) $(CFLAGS_SE) $(LDFLAGS_SE) -o $@ $<
-	@echo "Built $(PRIV_DIR)/se_nif.dylib"
+	@echo "Built $(PRIV_DIR)/se_nif.dylib.so"
 
 clean:
-	rm -f $(PRIV_DIR)/se_nif.dylib
+	rm -f $(PRIV_DIR)/se_nif.dylib.so
 
 endif
 
