@@ -1,0 +1,18 @@
+# Secure Enclave key directory for synrc/ca
+#
+# This directory is the canonical on-disk home for the macOS Secure Enclave
+# (or equivalent hardware-backed) P-384 key associated with this CA instance.
+#
+# Contents written here by CA.SecureEnclave.provision/1:
+#
+#   se.label   — UTF-8 Keychain label string used by all NIF calls
+#   pub.key    — raw uncompressed EC public key (04 || X || Y, 65 bytes)
+#   pub.pem    — PEM-encoded SubjectPublicKeyInfo (for OpenSSL interop)
+#
+# The private key NEVER appears here.  It lives exclusively inside the
+# Secure Enclave Processor and is referenced only via the label in se.label.
+#
+# NIST SP 800-53 references:
+#   SC-12(4)  hardware encryption at rest (SEP UID key)
+#   SC-28     private key never leaves SEP boundary
+#   MP-4      key reference path: synrc/ecc/secp384r1/se/

@@ -9,7 +9,6 @@ ca.log
 mix.lock
 csr/
 *.csr
-/synrc
 /keys
 /openssl
 /.idea
