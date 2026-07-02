@@ -429,7 +429,7 @@ defmodule CA.CMP do
     public_key = X509.CSR.public_key(csr)
 
     cert =
-      X509.Certificate.new(public_key, subject, ca, ca_key,
+      CA.X509.new(public_key, subject, ca, ca_key,
         extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"])]
       )
 
@@ -502,7 +502,7 @@ defmodule CA.CMP do
       {:ok, public_key} = X509.PublicKey.from_der(der_pub)
 
       cert =
-        X509.Certificate.new(
+        CA.X509.new(
           public_key,
           subject,
           ca,

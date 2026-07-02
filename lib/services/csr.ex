@@ -35,30 +35,48 @@ defmodule CA.CSR do
   def root(profile, rdn: rdn) do
     :filelib.ensure_dir(dir(profile))
     File.mkdir_p!(dir_se(profile))
-    ca_key = X509.PrivateKey.new_ec(:erlang.binary_to_atom(profile))
     :logger.info(~c"CSR CMP DN ~p~n", [rdn])
     subject_rdn = CA.RDN.decodeAttrs(X509.RDNSequence.new(rdn))
 
-    ca =
-      X509.Certificate.self_signed(ca_key, subject_rdn,
-        template: %X509.Certificate.Template{
-          # 25 years
-          validity: round(25 * 365.2425),
-          hash: :sha256,
-          extensions: [
-            basic_constraints: X509.Certificate.Extension.basic_constraints(true, 1),
-            key_usage: X509.Certificate.Extension.key_usage([:digitalSignature, :keyCertSign, :cRLSign]),
-            subject_key_identifier: true,
-            authority_key_identifier: true
-          ]
-        }
-      )
+    template = %X509.Certificate.Template{
+      validity: round(25 * 365.2425),
+      hash: :sha256,
+      extensions: [
+        basic_constraints: X509.Certificate.Extension.basic_constraints(true, 1),
+        key_usage: X509.Certificate.Extension.key_usage([:digitalSignature, :keyCertSign, :cRLSign]),
+        subject_key_identifier: true,
+        authority_key_identifier: true
+      ]
+    }
 
-    password = :application.get_env(:ca, :password, "0000")
-    pem = X509.PrivateKey.to_pem(ca_key, password: password)
-    :file.write_file("#{dir_se(profile)}/ca.key", pem)
-    :file.write_file("#{dir_se(profile)}/ca.pem", X509.Certificate.to_pem(ca))
-    {ca_key, ca}
+    se_dir = dir_se(profile)
+
+    case Application.get_env(:ca, :key_backend) do
+      {:secure_enclave, label} ->
+        # Hardware-backed root: generate key in Secure Enclave
+        {:ok, pub_raw} = CA.SecureEnclave.generate_key(label)
+        {:ok, pub_pem} = CA.X509.raw_to_pem(pub_raw)
+        File.write!(CA.SecureEnclave.label_path(se_dir), label)
+        File.write!(CA.SecureEnclave.pubkey_path(se_dir), pub_raw)
+        File.write!(CA.SecureEnclave.pem_path(se_dir), pub_pem)
+
+        {:ok, public_key} = X509.PublicKey.from_pem(pub_pem)
+        ca = CA.X509.self_signed(public_key, {:secure_enclave, label}, subject_rdn,
+          template: template
+        )
+        :file.write_file("#{se_dir}/ca.pem", X509.Certificate.to_pem(ca))
+        {{:secure_enclave, label}, ca}
+
+      _ ->
+        # Software-backed root
+        ca_key = X509.PrivateKey.new_ec(:erlang.binary_to_atom(profile))
+        ca = X509.Certificate.self_signed(ca_key, subject_rdn, template: template)
+        password = :application.get_env(:ca, :password, "0000")
+        pem = X509.PrivateKey.to_pem(ca_key, password: password)
+        :file.write_file("#{se_dir}/ca.key", pem)
+        :file.write_file("#{se_dir}/ca.pem", X509.Certificate.to_pem(ca))
+        {ca_key, ca}
+    end
   end
 
   def server(profile, rdn: rdn, cn: user) do
@@ -84,7 +102,7 @@ defmodule CA.CSR do
     subject = X509.CSR.subject(csr) |> CA.RDN.decodeAttrs()
 
     server =
-      X509.Certificate.new(X509.CSR.public_key(csr), subject, ca, ca_key,
+      CA.X509.new(X509.CSR.public_key(csr), subject, ca, ca_key,
         extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"])]
       )
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Replace 45NBVDAKGU with your 10-char Apple Developer Team ID -->
+  <key>com.apple.application-identifier</key>
+  <string>45NBVDAKGU.synrc.ca</string>
+
+  <!-- Keychain group that the SE key will be stored under -->
+  <key>keychain-access-groups</key>
+  <array>
+    <string>45NBVDAKGU.synrc.ca</string>
+  </array>
+</dict>
+</plist>

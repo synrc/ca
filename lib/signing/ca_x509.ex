@@ -1,9 +1,6 @@
 defmodule CA.X509 do
   @moduledoc "Custom X.509 certificate builder with hardware backend support."
 
-  alias X509.Certificate.Template
-  alias X509.SignatureAlgorithm
-
   require Record
   Record.defrecord(:r_OTPCertificate, :OTPCertificate, Record.extract(:OTPCertificate, from_lib: "public_key/include/OTP-PUB-KEY.hrl"))
   Record.defrecord(:r_OTPTBSCertificate, :OTPTBSCertificate, Record.extract(:OTPTBSCertificate, from_lib: "public_key/include/OTP-PUB-KEY.hrl"))

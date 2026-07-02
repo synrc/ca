@@ -14,6 +14,9 @@ config :ca,
   ldap: 8389,
   logger_level: :info,
   key_backend: {:software, "synrc/ecc/secp384r1/se/ca.key"},
+  # macOS T2/M-series Secure Enclave backend (auto-detected at startup if se.label exists):
+  # key_backend: {:secure_enclave, "synrc.ca.secp384r1"},
+  profiles: ["secp384r1", "secp256k1", "secp521r1"],
   logger: [
     {:handler, :default2, :logger_std_h,
      %{
