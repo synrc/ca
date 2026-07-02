@@ -17,6 +17,16 @@ jobs:
             elixir: '1.19.x'
     steps:
     - uses: actions/checkout@v4
+    - name: System packages
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y --no-install-recommends \
+          build-essential \
+          pkg-config \
+          libtss2-dev \
+          libtss2-esys-3.0.2-0 \
+          libtss2-mu-4.1.3-0 \
+          libtss2-rc0
     - uses: erlef/setup-beam@v1
       with:
         otp-version: ${{ matrix.otp }}

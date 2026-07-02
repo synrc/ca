@@ -47,8 +47,12 @@ endif
 # ------------------------------------------------------------------ #
 ifeq ($(UNAME_S), Linux)
 
-TSS2_CFLAGS  := $(shell pkg-config --cflags tss2-esys tss2-mu tss2-rc 2>/dev/null)
-TSS2_LIBS    := $(shell pkg-config --libs   tss2-esys tss2-mu tss2-rc 2>/dev/null)
+HAS_TSS2 := $(shell pkg-config --exists tss2-esys tss2-mu tss2-rc 2>/dev/null && echo yes || echo no)
+
+ifeq ($(HAS_TSS2), yes)
+
+TSS2_CFLAGS  := $(shell pkg-config --cflags tss2-esys tss2-mu tss2-rc)
+TSS2_LIBS    := $(shell pkg-config --libs   tss2-esys tss2-mu tss2-rc)
 
 CFLAGS_TPM   := $(CFLAGS_COMMON) $(TSS2_CFLAGS)
 LDFLAGS_TPM  := -shared $(TSS2_LIBS)
@@ -63,4 +67,17 @@ $(PRIV_DIR)/tpm_nif.so: tpm_nif.c
 clean:
 	rm -f $(PRIV_DIR)/tpm_nif.so
 
-endif
+else  # HAS_TSS2 == no
+
+all:
+	@echo "\033[33mWARN: tss2 libraries not found (libtss2-dev missing). Skipping tpm_nif.so.\033[0m"
+	@echo "      Install: apt-get install libtss2-dev  (Debian/Ubuntu)"
+	@echo "               dnf install tpm2-tss-devel   (Fedora)"
+	@echo "               pacman -S tpm2-tss            (Arch)"
+
+clean:
+	@true
+
+endif  # HAS_TSS2
+
+endif  # Linux
