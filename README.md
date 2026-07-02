@@ -68,4 +68,4 @@ $ openssl cmp -cmd p10cr -server "ca.synrc.com":8829 -secret pass:0000 -ref cmpt
 
 ## Credits
 
-Максим Сохацький, Інформаційні Судові Системи
+Максим Сохацький
