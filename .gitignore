@@ -15,6 +15,5 @@ csr/
 .tool-versions
 /*-packs
 *.sh
-*.pem
 *.enc
 *.ovpn
