@@ -79,7 +79,7 @@ defmodule CA.EST.CRL do
     )
 
     der_tbs = :public_key.der_encode(:TBSCertList, tbs)
-    signature = :public_key.sign(der_tbs, digest, ca_key)
+    signature = CA.X509.sign_der(der_tbs, digest, ca_key)
 
     cert_list = r_CertificateList(
       tbsCertList: tbs,

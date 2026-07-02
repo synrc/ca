@@ -290,4 +290,30 @@ defmodule CA.CMS do
   def parseSignDataCert(:asn1_NOVALUE,_), do: []
   def parseSignDataCert(certs,si),        do: :lists.map(fn cert -> CA.CRT.parseCert(cert, si) end, certs)
 
+  @doc """
+  Encodes a list of certificates into a CMS SignedData block inside ContentInfo.
+  Each certificate in the list can be a DER binary or a decoded ASN.1 record.
+  """
+  def signed_data(certs) do
+    parsed_certs =
+      Enum.map(certs, fn
+        {:Certificate, _, _, _} = c -> {:certificate, c}
+        {:Certificate, _, _, _, _} = c -> {:certificate, c}
+        der when is_binary(der) ->
+          {:ok, decoded} = :"PKIX1Explicit-2009".decode(:Certificate, der)
+          {:certificate, decoded}
+        other ->
+          other
+      end)
+
+    ci =
+      {:ContentInfo, oid(:"id-cms-signedData"),
+       {:SignedData, :v1, [],
+        {:EncapsulatedContentInfo, oid(:"id-cms-data"), :asn1_NOVALUE},
+        parsed_certs, [], []}}
+
+    {:ok, cms} = :"CryptographicMessageSyntax-2010".encode(:ContentInfo, ci)
+    cms
+  end
+
 end

@@ -82,7 +82,7 @@ defmodule CA.EST.Post do
 
           if is_valid do
             cert =
-              X509.Certificate.new(
+              CA.X509.new(
                 X509.CSR.public_key(csr),
                 subject,
                 ca,
@@ -99,19 +99,8 @@ defmodule CA.EST.Post do
             CA.CMP.storeReply(csr, cert, cn, curve_name)
 
             der_ca = :public_key.pkix_encode(:OTPCertificate, ca, :otp)
-            {:ok, pkix_ca} = :"PKIX1Explicit-2009".decode(:Certificate, der_ca)
-
             der_cert = :public_key.pkix_encode(:OTPCertificate, cert, :otp)
-            {:ok, pkix_cert} = :"PKIX1Explicit-2009".decode(:Certificate, der_cert)
-
-            ci =
-              {:ContentInfo, {1, 2, 840, 113_549, 1, 7, 2},
-               {:SignedData, :v1, [],
-                {:EncapsulatedContentInfo, {1, 2, 840, 113_549, 1, 7, 1}, :asn1_NOVALUE},
-                [{:certificate, pkix_cert}, {:certificate, pkix_ca}], [], []}}
-
-            {:ok, cms} = :"CryptographicMessageSyntax-2010".encode(:ContentInfo, ci)
-            resp_body = :base64.encode(cms)
+            resp_body = CA.CMS.signed_data([der_cert, der_ca]) |> :base64.encode()
 
             conn
             |> put_resp_content_type("application/pkcs7-mime")
@@ -147,7 +136,7 @@ defmodule CA.EST.Post do
     new_pub = X509.PublicKey.derive(new_key)
 
     cert =
-      X509.Certificate.new(
+      CA.X509.new(
         new_pub,
         subject,
         ca,
@@ -156,19 +145,8 @@ defmodule CA.EST.Post do
       )
 
     der_ca = :public_key.pkix_encode(:OTPCertificate, ca, :otp)
-    {:ok, pkix_ca} = :"PKIX1Explicit-2009".decode(:Certificate, der_ca)
-
     der_cert = :public_key.pkix_encode(:OTPCertificate, cert, :otp)
-    {:ok, pkix_cert} = :"PKIX1Explicit-2009".decode(:Certificate, der_cert)
-
-    ci =
-      {:ContentInfo, {1, 2, 840, 113_549, 1, 7, 2},
-       {:SignedData, :v1, [],
-        {:EncapsulatedContentInfo, {1, 2, 840, 113_549, 1, 7, 1}, :asn1_NOVALUE},
-        [{:certificate, pkix_cert}, {:certificate, pkix_ca}], [], []}}
-
-    {:ok, cms} = :"CryptographicMessageSyntax-2010".encode(:ContentInfo, ci)
-    cert_b64 = :base64.encode(cms)
+    cert_b64 = CA.CMS.signed_data([der_cert, der_ca]) |> :base64.encode()
     key_pem = X509.PrivateKey.to_pem(new_key)
     key_b64 = :base64.encode(key_pem)
 
