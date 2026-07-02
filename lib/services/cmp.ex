@@ -192,15 +192,17 @@ defmodule CA.CMP do
   end
 
   def storeReply(csr, cert, cn, profile, certReqId \\ -1) do
-    {:ok, _} = :"PKCS-10".encode(:CertificationRequest, csr)
-    :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.csr", X509.CSR.to_pem(csr))
+    # {:ok, _} = :"PKCS-10".encode(:CertificationRequest, csr)
+    encoded_csr = CA.RDN.encodeAttrsCSR(csr)
+    :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.csr", X509.CSR.to_pem(encoded_csr))
     :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer", X509.Certificate.to_pem(cert))
-    cert = :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
+    cert_der = X509.Certificate.to_der(cert)
+    {:ok, cert_ast} = :"PKIX1Explicit-2009".decode(:Certificate, cert_der)
 
     [
       CA.CMP.Scheme."CertResponse"(
         certReqId: certReqId,
-        certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert: {:certificate, {:x509v3PKCert, cert}}),
+        certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert: {:certificate, {:x509v3PKCert, cert_ast}}),
         status: CA.CMP.Scheme."PKIStatusInfo"(status: 0)
       )
     ]
@@ -401,6 +403,7 @@ defmodule CA.CMP do
 
       {:ok, der_pub} = :"PKIX1Explicit-2009".encode(:SubjectPublicKeyInfo, pubkey_info)
       {:ok, public_key} = X509.PublicKey.from_der(der_pub)
+      subject = CA.RDN.decodeAttrs(subject_rdn)
 
       cert =
         X509.Certificate.new(
@@ -424,12 +427,13 @@ defmodule CA.CMP do
 
   def storeReplyCert(cert, cn, profile, certReqId) do
     :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer", X509.Certificate.to_pem(cert))
-    cert_otp = :public_key.pkix_decode_cert(:public_key.pkix_encode(:OTPCertificate, cert, :otp), :plain)
+    cert_der = X509.Certificate.to_der(cert)
+    {:ok, cert_ast} = :"PKIX1Explicit-2009".decode(:Certificate, cert_der)
 
     [
       CA.CMP.Scheme."CertResponse"(
         certReqId: certReqId,
-        certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert: {:certificate, {:x509v3PKCert, cert_otp}}),
+        certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert: {:certificate, {:x509v3PKCert, cert_ast}}),
         status: CA.CMP.Scheme."PKIStatusInfo"(status: 0)
       )
     ]
@@ -453,7 +457,8 @@ defmodule CA.CMP do
     profile = CA.RDN.profile(csr)
     {ca_key, ca} = CA.CSR.read_ca(profile)
     subject = CA.RDN.decodeAttrs(X509.CSR.subject(csr))
-    true = X509.CSR.valid?(csr)
+    encoded_csr = CA.RDN.encodeAttrsCSR(csr)
+    true = X509.CSR.valid?(encoded_csr)
     public_key = X509.CSR.public_key(csr)
 
     cert =

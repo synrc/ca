@@ -15,14 +15,14 @@ defmodule CA.EST.Post do
     {:ok, csr} = :"PKCS-10".decode(:CertificationRequest, bin)
 
     true = profile == CA.RDN.profile(csr)
-    subject = X509.CSR.subject(csr)
+    subject = CA.RDN.decodeAttrs(X509.CSR.subject(csr))
 
     :logger.info(~c"HTTP P10CR from ~tp template ~tp profile ~p~n", [CA.RDN.rdn(subject), template, CA.RDN.profile(csr)])
 
     true = X509.CSR.valid?(CA.RDN.encodeAttrsCSR(csr))
 
     cert =
-      X509.Certificate.new(X509.CSR.public_key(csr), CA.RDN.encodeAttrs(subject), ca, ca_key,
+      X509.Certificate.new(X509.CSR.public_key(csr), subject, ca, ca_key,
         extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"])]
       )
 
@@ -121,13 +121,7 @@ defmodule CA.EST.Post do
     subject =
       case parse_csr(body) do
         {:ok, csr} -> CA.RDN.decodeAttrs(X509.CSR.subject(csr))
-        _ ->
-          [
-            [{:SingleAttribute, {2, 5, 4, 6}, ~c"UA"}],
-            [{:SingleAttribute, {2, 5, 4, 8}, {:uTF8String, "Kyiv"}}],
-            [{:SingleAttribute, {2, 5, 4, 10}, {:uTF8String, "SYNRC"}}],
-            [{:SingleAttribute, {2, 5, 4, 3}, {:uTF8String, "keygen-client"}}]
-          ]
+        _ -> CA.RDN.decodeAttrs(X509.RDNSequence.new("/C=UA/ST=Kyiv/O=SYNRC/CN=keygen-client"))
       end
 
     {ca_key, ca} = CA.CSR.read_ca(curve_name)

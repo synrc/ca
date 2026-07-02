@@ -21,8 +21,7 @@ defmodule CA.CSR do
     :filelib.ensure_dir(dir(profile))
     ca_key = X509.PrivateKey.new_ec(:erlang.binary_to_atom(profile))
     :logger.info(~c"CSR CMP DN ~p~n", [rdn])
-
-    subject_rdn = map_utf8_tags(X509.RDNSequence.new(rdn))
+    subject_rdn = CA.RDN.decodeAttrs(X509.RDNSequence.new(rdn))
 
     ca =
       X509.Certificate.self_signed(ca_key, subject_rdn,
@@ -55,7 +54,7 @@ defmodule CA.CSR do
     :file.write_file("#{dir(profile)}/#{user}.key", pem)
     :logger.info(~c"CSR SERVER DN ~p~n", [rdn])
 
-    subject_rdn = map_utf8_tags(X509.RDNSequence.new(rdn))
+    subject_rdn = CA.RDN.decodeAttrs(X509.RDNSequence.new(rdn))
 
     csr =
       X509.CSR.new(priv, subject_rdn,
@@ -66,7 +65,7 @@ defmodule CA.CSR do
 
     :file.write_file("#{dir(profile)}/#{user}.csr", X509.CSR.to_pem(csr))
     true = X509.CSR.valid?(csr)
-    subject = X509.CSR.subject(csr) |> map_utf8_tags()
+    subject = X509.CSR.subject(csr) |> CA.RDN.decodeAttrs()
 
     server =
       X509.Certificate.new(X509.CSR.public_key(csr), subject, ca, ca_key,
@@ -84,7 +83,7 @@ defmodule CA.CSR do
     :file.write_file("#{dir(profile)}/#{user}.key", pem)
     :logger.info(~c"CSR CLIENT DN ~p~n", [rdn])
 
-    subject_rdn = map_utf8_tags(X509.RDNSequence.new(rdn))
+    subject_rdn = CA.RDN.decodeAttrs(X509.RDNSequence.new(rdn))
 
     csr =
       X509.CSR.new(priv, subject_rdn,
@@ -129,22 +128,5 @@ defmodule CA.CSR do
     bin
   end
 
-  defp map_utf8_tags({:rdnSequence, list}) do
-    tag =
-      case System.otp_release() |> String.to_integer() do
-        ver when ver >= 26 -> :utf8String
-        _ -> :uTF8String
-      end
 
-    {:rdnSequence, Enum.map(list, fn sub_list ->
-      Enum.map(sub_list, fn
-        {:SingleAttribute, oid, {t, val}} when t in [:utf8String, :uTF8String] ->
-          {:SingleAttribute, oid, {tag, val}}
-        {:AttributeTypeAndValue, oid, {t, val}} when t in [:utf8String, :uTF8String] ->
-          {:AttributeTypeAndValue, oid, {tag, val}}
-        other -> other
-      end)
-    end)}
-  end
-  defp map_utf8_tags(other), do: other
 end

@@ -1,6 +1,8 @@
 defmodule CA.RDN do
   @moduledoc "CA RDN OIDs."
 
+
+
   def utf8_tag do
     case System.otp_release() |> String.to_integer() do
       ver when ver >= 26 -> :utf8String
@@ -11,25 +13,35 @@ defmodule CA.RDN do
   def encodeAttrs({:rdnSequence, attrs}) do
       {:rdnSequence, :lists.map(fn
            [{t,oid,{:uTF8String,x}}]      -> encodeString(t,oid,x,12)
+           [{t,oid,[{:uTF8String,x}]}]    -> encodeString(t,oid,x,12)
            [{t,oid,{:utf8String,x}}]      -> encodeString(t,oid,x,12)
+           [{t,oid,[{:utf8String,x}]}]    -> encodeString(t,oid,x,12)
+           [{t,oid,{:printableString,x}}] -> encodeString(t,oid,x,19)
+           [{t,oid,[{:printableString,x}]}] -> encodeString(t,oid,x,19)
            [{t,oid,x}] when is_list(x)    -> encodeString(t,oid,x,19)
                                        x -> x end, attrs)}
   end
 
+  def encodeString(t,oid,x,code) do [{t,oid,:asn1rt_nif.encode_ber_tlv({code, :erlang.iolist_to_binary(x)})}] end
+
   def decodeAttrs({:rdnSequence, attrs}) do
       tag = utf8_tag()
-      {:rdnSequence, :lists.map(fn
-            [{t,oid,{:uTF8String,x}}]      -> decodeString(t,oid,x,tag)
-            [{t,oid,{:utf8String,x}}]      -> decodeString(t,oid,x,tag)
-            [{t,oid,{:printableString,x}}] -> decodeString(t,oid,x,:printableString)
-            [{t,oid,x}] when is_list(x)    -> decodeString(t,oid,x,:correct) # OTP 28
-#           [{t,oid,x}] when is_list(x)    -> [{t,oid,x}] # OTP 27
-            [{t,oid,x}] when is_binary(x)  -> decodeString(t,oid,x,tag)
-                                        x  -> x end, attrs)}
+      IO.inspect(attrs, label: "DECODE_ATTRS_INPUT")
+      res = {:rdnSequence, :lists.map(fn
+            [{_t,oid,{:uTF8String,x}}]      -> [{:AttributeTypeAndValue,oid,{tag,x}}]
+            [{_t,oid,{:utf8String,x}}]      -> [{:AttributeTypeAndValue,oid,{tag,x}}]
+            [{_t,{2,5,4,6},x}] when is_list(x) -> [{:AttributeTypeAndValue,{2,5,4,6},x}]
+            [{_t,{2,5,4,6},{:printableString,x}}] -> [{:AttributeTypeAndValue,{2,5,4,6},to_charlist(x)}]
+            [{_t,oid,{:printableString,x}}] -> [{:AttributeTypeAndValue,oid,{:printableString,x}}]
+            [{_t,oid,x}] when is_list(x)    -> [{:AttributeTypeAndValue,oid,{tag,to_string(x)}}]
+            [{_t,oid,x}] when is_binary(x)  ->
+              {:rdnSequence, [[{:AttributeTypeAndValue, ^oid, val}]]} =
+                :pubkey_cert_records.transform({:rdnSequence, [[{:AttributeTypeAndValue, oid, x}]]}, :decode)
+              [{:AttributeTypeAndValue, oid, val}]
+            [{_t,oid,x}] -> [{:AttributeTypeAndValue,oid,x}] end, attrs)}
+      IO.inspect(res, label: "DECODE_ATTRS_OUTPUT")
+      res
   end
-
-  def decodeString(t,oid,x,tag) do [{t,oid,{tag,x}}] end
-  def encodeString(t,oid,x,code) do [{t,oid,:asn1rt_nif.encode_ber_tlv({code, :erlang.iolist_to_binary(x)})}] end
 
   def profile(csr) do
       {:CertificationRequest, {:CertificationRequestInfo, _ver, _subj, subjectPKI, _attr}, _signatureAlg, _signature} = csr
