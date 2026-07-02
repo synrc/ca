@@ -194,7 +194,15 @@ defmodule CA.CMP do
   def storeReply(csr, cert, cn, profile, certReqId \\ -1) do
     # {:ok, _} = :"PKCS-10".encode(:CertificationRequest, csr)
     encoded_csr = CA.RDN.encodeAttrsCSR(csr)
-    :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.csr", X509.CSR.to_pem(encoded_csr))
+    csr_pem =
+      try do
+        X509.CSR.to_pem(encoded_csr)
+      rescue
+        _ -> X509.CSR.to_pem(csr)
+      catch
+        _ -> X509.CSR.to_pem(csr)
+      end
+    :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.csr", csr_pem)
     :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer", X509.Certificate.to_pem(cert))
     cert_der = X509.Certificate.to_der(cert)
     {:ok, cert_ast} = :"PKIX1Explicit-2009".decode(:Certificate, cert_der)
@@ -458,7 +466,22 @@ defmodule CA.CMP do
     {ca_key, ca} = CA.CSR.read_ca(profile)
     subject = CA.RDN.decodeAttrs(X509.CSR.subject(csr))
     encoded_csr = CA.RDN.encodeAttrsCSR(csr)
-    true = X509.CSR.valid?(encoded_csr)
+    is_valid =
+      try do
+        X509.CSR.valid?(csr)
+      rescue
+        _ -> false
+      catch
+        _ -> false
+      end ||
+      try do
+        X509.CSR.valid?(encoded_csr)
+      rescue
+        _ -> false
+      catch
+        _ -> false
+      end
+    true = is_valid
     public_key = X509.CSR.public_key(csr)
 
     cert =

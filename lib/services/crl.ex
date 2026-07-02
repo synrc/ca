@@ -33,7 +33,7 @@ defmodule CA.EST.CRL do
 
   def generate(profile) do
     {ca_key, ca} = CA.CSR.read_ca(profile)
-    issuer = CA.RDN.encodeAttrs(elem(elem(ca, 1), 4))
+    issuer = elem(elem(ca, 1), 4)
 
     {sig_oid, digest} = sig_alg_and_digest(profile)
     sig_alg = {:AlgorithmIdentifier, sig_oid, :asn1_NOVALUE}

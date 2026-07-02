@@ -12,6 +12,12 @@ defmodule CA.RDN do
 
   def encodeAttrs({:rdnSequence, attrs}) do
       {:rdnSequence, :lists.map(fn
+           # OTP 28: {:correct, val} wrapper for choice types
+           [{t,oid,{:correct,{:uTF8String,x}}}]     -> encodeString(t,oid,x,12)
+           [{t,oid,{:correct,{:utf8String,x}}}]     -> encodeString(t,oid,x,12)
+           [{t,oid,{:correct,{:printableString,x}}}] -> encodeString(t,oid,x,19)
+           [{t,oid,{:correct,x}}] when is_list(x)   -> encodeString(t,oid,x,19)
+           # Standard choice tuples (OTP 28 plain format or OTP 25 otp format)
            [{t,oid,{:uTF8String,x}}]      -> encodeString(t,oid,x,12)
            [{t,oid,[{:uTF8String,x}]}]    -> encodeString(t,oid,x,12)
            [{t,oid,{:utf8String,x}}]      -> encodeString(t,oid,x,12)
@@ -26,21 +32,32 @@ defmodule CA.RDN do
 
   def decodeAttrs({:rdnSequence, attrs}) do
       tag = utf8_tag()
-      IO.inspect(attrs, label: "DECODE_ATTRS_INPUT")
-      res = {:rdnSequence, :lists.map(fn
-            [{_t,oid,{:uTF8String,x}}]      -> [{:AttributeTypeAndValue,oid,{tag,x}}]
-            [{_t,oid,{:utf8String,x}}]      -> [{:AttributeTypeAndValue,oid,{tag,x}}]
-            [{_t,{2,5,4,6},x}] when is_list(x) -> [{:AttributeTypeAndValue,{2,5,4,6},x}]
-            [{_t,{2,5,4,6},{:printableString,x}}] -> [{:AttributeTypeAndValue,{2,5,4,6},to_charlist(x)}]
-            [{_t,oid,{:printableString,x}}] -> [{:AttributeTypeAndValue,oid,{:printableString,x}}]
-            [{_t,oid,x}] when is_list(x)    -> [{:AttributeTypeAndValue,oid,{tag,to_string(x)}}]
-            [{_t,oid,x}] when is_binary(x)  ->
-              {:rdnSequence, [[{:AttributeTypeAndValue, ^oid, val}]]} =
-                :pubkey_cert_records.transform({:rdnSequence, [[{:AttributeTypeAndValue, oid, x}]]}, :decode)
-              [{:AttributeTypeAndValue, oid, val}]
-            [{_t,oid,x}] -> [{:AttributeTypeAndValue,oid,x}] end, attrs)}
-      IO.inspect(res, label: "DECODE_ATTRS_OUTPUT")
-      res
+      {:rdnSequence, :lists.map(fn
+            [{t, oid, val}] ->
+              # Unwrap {:correct, val} if present (OTP 28 choice wrapping)
+              val = case val do
+                {:correct, v} -> v
+                v -> v
+              end
+              # Process based on type
+              decoded_val = case val do
+                {:uTF8String, x} -> {tag, x}
+                {:utf8String, x} -> {tag, x}
+                {:printableString, x} -> {:printableString, to_charlist(x)}
+                x when is_binary(x) ->
+                  {:rdnSequence, [[{:AttributeTypeAndValue, ^oid, dec}]]} =
+                    :pubkey_cert_records.transform({:rdnSequence, [[{:AttributeTypeAndValue, oid, x}]]}, :decode)
+                  dec
+                x -> x
+              end
+              # Normalize countryName to charlist format
+              decoded_val = case {oid, decoded_val} do
+                {{2, 5, 4, 6}, {:printableString, x}} -> to_charlist(x)
+                {{2, 5, 4, 6}, x} when is_list(x) -> to_charlist(x)
+                _ -> decoded_val
+              end
+              [{:AttributeTypeAndValue, oid, decoded_val}]
+            end, attrs)}
   end
 
   def profile(csr) do

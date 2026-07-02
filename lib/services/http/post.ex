@@ -19,7 +19,23 @@ defmodule CA.EST.Post do
 
     :logger.info(~c"HTTP P10CR from ~tp template ~tp profile ~p~n", [CA.RDN.rdn(subject), template, CA.RDN.profile(csr)])
 
-    true = X509.CSR.valid?(CA.RDN.encodeAttrsCSR(csr))
+    encoded_csr = CA.RDN.encodeAttrsCSR(csr)
+    is_valid =
+      try do
+        X509.CSR.valid?(csr)
+      rescue
+        _ -> false
+      catch
+        _ -> false
+      end ||
+      try do
+        X509.CSR.valid?(encoded_csr)
+      rescue
+        _ -> false
+      catch
+        _ -> false
+      end
+    true = is_valid
 
     cert =
       X509.Certificate.new(X509.CSR.public_key(csr), subject, ca, ca_key,
