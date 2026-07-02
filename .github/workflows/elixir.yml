@@ -5,7 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        backend: [mnesia, rocksdb]
         otp: ['25.x', '26.x', '27.x', '28.x']
         include:
           - otp: '25.x'
@@ -16,17 +15,12 @@ jobs:
             elixir: '1.18.x'
           - otp: '28.x'
             elixir: '1.19.x'
-    env:
-      BPE_BACKEND: ${{ matrix.backend }}
-      KVS_BACKEND: ${{ matrix.backend }}
     steps:
     - uses: actions/checkout@v4
     - uses: erlef/setup-beam@v1
       with:
         otp-version: ${{ matrix.otp }}
         elixir-version: ${{ matrix.elixir }}
-    - name: CMake
-      run: sudo apt-get install -y cmake libsnappy-dev
     - name: Dependencies
       run: |
         mix local.rebar --force
