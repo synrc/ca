@@ -33,29 +33,12 @@ defmodule CA.EST do
     }
   end
 
-  get "/.well-known/est/:operation" do
-    CA.EST.Get.get(conn, "CA", [], [], action(operation))
-  end
-
-  get "/.well-known/est/:profile/:operation" do
-    CA.EST.Get.get(conn, "CA", curve(profile), template(profile), action(operation))
-  end
-
-  get "/.well-known/cmp/p/:profile/:operation" do
-    CA.EST.Get.get(conn, "CA", curve(profile), template(profile), action(operation))
-  end
-
-  post "/.well-known/est/:operation" do
-    CA.EST.Post.post(conn, "CA", [], [], action(operation))
-  end
-
-  post "/.well-known/est/:profile/:operation" do
-    CA.EST.Post.post(conn, "CA", curve(profile), template(profile), action(operation))
-  end
-
-  post "/.well-known/cmp/p/:profile/:operation" do
-    CA.EST.Post.post(conn, "CA", curve(profile), template(profile), action(operation))
-  end
+  get "/.well-known/est/:operation" do CA.EST.Get.get(conn, "CA", [], [], action(operation)) end
+  get "/.well-known/est/:profile/:operation" do CA.EST.Get.get(conn, "CA", curve(profile), template(profile), action(operation)) end
+  get "/.well-known/cmp/p/:profile/:operation" do CA.EST.Get.get(conn, "CA", curve(profile), template(profile), action(operation)) end
+  post "/.well-known/est/:operation" do CA.EST.Post.post(conn, "CA", [], [], action(operation)) end
+  post "/.well-known/est/:profile/:operation" do CA.EST.Post.post(conn, "CA", curve(profile), template(profile), action(operation)) end
+  post "/.well-known/cmp/p/:profile/:operation" do CA.EST.Post.post(conn, "CA", curve(profile), template(profile), action(operation)) end
 
   def curve(profile) do
     case String.split(profile, "-") do
@@ -71,113 +54,33 @@ defmodule CA.EST do
     end
   end
 
-  def action("ca") do
-    "CA"
-  end
-
-  def action("cacerts") do
-    "CMS"
-  end
-
-  def action("csrattrs") do
-    "ABAC"
-  end
-
-  def action("simpleenroll") do
-    "ENROLL"
-  end
-
-  def action("simplereenroll") do
-    "RE-ENROLL"
-  end
-
-  def action("serverkeygen") do
-    "KEYGEN"
-  end
-
-  def action("fullcmc") do
-    "CMC"
-  end
-
-  def action("initialization") do
-    "INIT"
-  end
-
-  def action("certification") do
-    "CERT"
-  end
-
-  def action("keyupdate") do
-    "KEYUP"
-  end
-
-  def action("pkcs10") do
-    "PKCS-10"
-  end
-
-  def action("revocation") do
-    "REVOKE"
-  end
-
-  def action("getcacerts") do
-    "CMS"
-  end
-
-  def action("getrootupdate") do
-    "ROOT"
-  end
-
-  def action("getcertreqtemplate") do
-    "TEMPLATE"
-  end
-
-  def action("getcrls") do
-    "CRL"
-  end
-
-  def action("nested") do
-    "NESTED"
-  end
-
-  def action("ir") do
-    "INIT"
-  end
-
-  def action("cr") do
-    "CERT"
-  end
-
-  def action("kur") do
-    "KEYUP"
-  end
-
-  def action("p10") do
-    "PKCS-10"
-  end
-
-  def action("rr") do
-    "REVOKE"
-  end
-
-  def action("crts") do
-    "CMS"
-  end
-
-  def action("rcu") do
-    "ROOT"
-  end
-
-  def action("att") do
-    "TEMPLATE"
-  end
-
-  def action("crls") do
-    "CRL"
-  end
-
-  def action("nest") do
-    "NESTED"
-  end
+  def action("ca"),                  do: "CA"
+  def action("cacerts"),             do: "CMS"
+  def action("csrattrs"),            do: "ABAC"
+  def action("simpleenroll"),        do: "ENROLL"
+  def action("simplereenroll"),      do: "RE-ENROLL"
+  def action("serverkeygen"),        do: "KEYGEN"
+  def action("fullcmc"),             do: "CMC"
+  def action("initialization"),      do: "INIT"
+  def action("certification"),       do: "CERT"
+  def action("keyupdate"),           do: "KEYUP"
+  def action("pkcs10"),              do: "PKCS-10"
+  def action("revocation"),          do: "REVOKE"
+  def action("getcacerts"),          do: "CMS"
+  def action("getrootupdate"),       do: "ROOT"
+  def action("getcertreqtemplate"),  do: "TEMPLATE"
+  def action("getcrls"),             do: "CRL"
+  def action("nested"),              do: "NESTED"
+  def action("ir"),                  do: "INIT"
+  def action("cr"),                  do: "CERT"
+  def action("kur"),                 do: "KEYUP"
+  def action("p10"),                 do: "PKCS-10"
+  def action("rr"),                  do: "REVOKE"
+  def action("crts"),                do: "CMS"
+  def action("rcu"),                 do: "ROOT"
+  def action("att"),                 do: "TEMPLATE"
+  def action("crls"),                do: "CRL"
+  def action("nest"),                do: "NESTED"
 
   def csrattributes() do
     {:ok, bin} =
