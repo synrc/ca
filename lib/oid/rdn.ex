@@ -33,7 +33,7 @@ defmodule CA.RDN do
   def decodeAttrs({:rdnSequence, attrs}) do
       tag = utf8_tag()
       {:rdnSequence, :lists.map(fn
-            [{t, oid, val}] ->
+            [{_, oid, val}] ->
               # Unwrap {:correct, val} if present (OTP 28 choice wrapping)
               val = case val do
                 {:correct, v} -> v

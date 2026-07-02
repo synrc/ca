@@ -398,62 +398,6 @@ defmodule CA.CMP do
     :ok = answer(socket, pkiheader, pkibody, validateProtection(pkiheader, pkibody, code))
   end
 
-  def process_cert_reqs(req_list, profile) do
-    Enum.map(req_list, fn {:CertReqMsg, cert_req, _pop, _reg_info} ->
-      cert_req_id = elem(cert_req, 1)
-      cert_template = elem(cert_req, 2)
-      subject_rdn = elem(cert_template, 6)
-      subject = CA.RDN.decodeAttrs(subject_rdn)
-
-      pubkey_info = elem(cert_template, 7)
-
-      {ca_key, ca} = CA.CSR.read_ca(profile)
-
-      {:ok, der_pub} = :"PKIX1Explicit-2009".encode(:SubjectPublicKeyInfo, pubkey_info)
-      {:ok, public_key} = X509.PublicKey.from_der(der_pub)
-      subject = CA.RDN.decodeAttrs(subject_rdn)
-
-      cert =
-        X509.Certificate.new(
-          public_key,
-          subject,
-          ca,
-          ca_key,
-          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"])]
-        )
-
-      cn =
-        case Keyword.get(CA.RDN.rdn(subject), :cn) do
-          nil -> ref()
-          val -> val
-        end
-
-      storeReplyCert(cert, cn, profile, cert_req_id)
-    end)
-    |> List.flatten()
-  end
-
-  def storeReplyCert(cert, cn, profile, certReqId) do
-    :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer", X509.Certificate.to_pem(cert))
-    cert_der = X509.Certificate.to_der(cert)
-    {:ok, cert_ast} = :"PKIX1Explicit-2009".decode(:Certificate, cert_der)
-
-    [
-      CA.CMP.Scheme."CertResponse"(
-        certReqId: certReqId,
-        certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert: {:certificate, {:x509v3PKCert, cert_ast}}),
-        status: CA.CMP.Scheme."PKIStatusInfo"(status: 0)
-      )
-    ]
-  end
-
-  def profile_from_pubkey({:SubjectPublicKeyInfo, {:AlgorithmIdentifier, {1, 2, 840, 10045, 2, 1}, {:asn1_OPENTYPE, x}}, _}) do
-    {{6, oid}, _} = :asn1rt_nif.decode_ber_tlv(x)
-    {alg, _} = CA.ALG.lookup(:oid.decode(oid))
-    "#{alg}"
-  end
-  def profile_from_pubkey(_), do: "secp384r1"
-
   def message(socket, header, {:p10cr, csr} = body, code) do
     {:PKIHeader, pvno, from, to, messageTime, protectionAlg, _senderKID, _recipKID, transactionID, senderNonce,
      _recipNonce, _freeText, _generalInfo} = header
@@ -544,6 +488,59 @@ defmodule CA.CMP do
   def message(_socket, _header, body, _code) do
     :logger.info(~c"Strange PKIMessage request ~p", [body])
   end
+
+  def process_cert_reqs(req_list, profile) do
+    Enum.map(req_list, fn {:CertReqMsg, cert_req, _pop, _reg_info} ->
+      cert_req_id = elem(cert_req, 1)
+      cert_template = elem(cert_req, 2)
+      subject_rdn = elem(cert_template, 6)
+      pubkey_info = elem(cert_template, 7)
+      subject = CA.RDN.decodeAttrs(subject_rdn)
+
+      {ca_key, ca} = CA.CSR.read_ca(profile)
+      {:ok, der_pub} = :"PKIX1Explicit-2009".encode(:SubjectPublicKeyInfo, pubkey_info)
+      {:ok, public_key} = X509.PublicKey.from_der(der_pub)
+
+      cert =
+        X509.Certificate.new(
+          public_key,
+          subject,
+          ca,
+          ca_key,
+          extensions: [subject_alt_name: X509.Certificate.Extension.subject_alt_name(["synrc.com"])]
+        )
+
+      cn =
+        case Keyword.get(CA.RDN.rdn(subject), :cn) do
+          nil -> ref()
+          val -> val
+        end
+
+      storeReplyCert(cert, cn, profile, cert_req_id)
+    end)
+    |> List.flatten()
+  end
+
+  def storeReplyCert(cert, cn, profile, certReqId) do
+    :file.write_file("#{CA.CSR.dir(profile)}/#{cn}.cer", X509.Certificate.to_pem(cert))
+    cert_der = X509.Certificate.to_der(cert)
+    {:ok, cert_ast} = :"PKIX1Explicit-2009".decode(:Certificate, cert_der)
+
+    [
+      CA.CMP.Scheme."CertResponse"(
+        certReqId: certReqId,
+        certifiedKeyPair: CA.CMP.Scheme."CertifiedKeyPair"(certOrEncCert: {:certificate, {:x509v3PKCert, cert_ast}}),
+        status: CA.CMP.Scheme."PKIStatusInfo"(status: 0)
+      )
+    ]
+  end
+
+  def profile_from_pubkey({:SubjectPublicKeyInfo, {:AlgorithmIdentifier, {1, 2, 840, 10045, 2, 1}, {:asn1_OPENTYPE, x}}, _}) do
+    {{6, oid}, _} = :asn1rt_nif.decode_ber_tlv(x)
+    {alg, _} = CA.ALG.lookup(:oid.decode(oid))
+    "#{alg}"
+  end
+  def profile_from_pubkey(_), do: "secp384r1"
 
   # WSL Service
   # netsh interface portproxy add v4tov4 listenport=8829 listenaddress=192.168.0.3 connectport=8829 connectaddress=172.31.45.170
