@@ -7,6 +7,7 @@ defmodule CA.Mixfile do
       version: "7.6.3",
       description: "CA  CXC 138 21 Certificate Authority",
       releases: [ca: [include_executables_for: [:unix], cookie: "SYNRC:CA"]],
+      erlc_options: [:nowarn_deprecated_catch],
       package: [
         name: :ca,
         files: ~w(config src include priv lib c_src mix.exs LICENSE README.md),
@@ -14,7 +15,8 @@ defmodule CA.Mixfile do
         maintainers: ["Namdak Tonpa"],
         links: %{"GitHub" => "https://github.com/synrc/ca"}
       ],
-      compilers: [:nif_make] ++ Mix.compilers(),
+      compilers: Mix.compilers(),
+#      compilers: [:nif_make] ++ Mix.compilers(),
       deps: [
         {:base85, "~> 1.1.0"},
         {:cose, "~> 0.11.20"},

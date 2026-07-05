@@ -4,8 +4,6 @@ defmodule CA.EST.Post do
   @classes ["ca", "ra", "server", "client", "human", "program"]
 
   import Plug.Conn
-  require CA
-  require CA.CMP
   require CA.CMP.Scheme
 
   def post(conn, "CA", profile, template, "PKCS-10") when profile in @profiles and template in @classes do

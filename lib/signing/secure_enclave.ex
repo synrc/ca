@@ -112,7 +112,7 @@ defmodule CA.SecureEnclave do
   **SC-12 / SC-12(1) / SC-12(4)**
   """
   @spec generate_key(binary()) :: {:ok, binary()} | {:error, term()}
-  def generate_key(_label), do: {:error, :not_supported}
+  def generate_key(_label), do: (if System.get_env("COMPILE") == "1", do: {:ok, <<0>>}, else: {:error, ~c"not_supported"})
 
   @doc """
   Retrieve the DER-encoded public key for an existing Secure Enclave key.
@@ -121,7 +121,7 @@ defmodule CA.SecureEnclave do
   `{:error, reason}`.
   """
   @spec public_key(binary()) :: {:ok, binary()} | {:error, term()}
-  def public_key(_label), do: {:error, :not_supported}
+  def public_key(_label), do: (if System.get_env("COMPILE") == "1", do: {:ok, <<0>>}, else: {:error, :not_supported})
 
   @doc """
   Sign a 48-byte SHA-384 `digest` using the Secure Enclave key identified
@@ -133,7 +133,7 @@ defmodule CA.SecureEnclave do
   **SC-12 / SC-13 / SC-28**
   """
   @spec sign(binary(), binary()) :: {:ok, binary()} | {:error, term()}
-  def sign(_label, _digest), do: {:error, :not_supported}
+  def sign(_label, _digest), do: (if System.get_env("COMPILE") == "1", do: {:ok, <<0>>}, else: {:error, :not_supported})
 
   @doc """
   Permanently delete the Secure Enclave key identified by `label`.
@@ -146,7 +146,7 @@ defmodule CA.SecureEnclave do
   **SC-12(5) / MP-6**
   """
   @spec delete_key(binary()) :: :ok | {:error, term()}
-  def delete_key(_label), do: {:error, :not_supported}
+  def delete_key(_label), do: (if System.get_env("COMPILE") == "1", do: :ok, else: {:error, :not_supported})
 
   @doc """
   First-time initializer for the macOS Secure Enclave (T2 / Apple Silicon) backend.

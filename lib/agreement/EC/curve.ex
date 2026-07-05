@@ -1,7 +1,5 @@
 defmodule CA.Curve do
   @moduledoc "CA Curve library."
-  require CA.Integer
-  require CA.Point
   defstruct [:A, :B, :P, :N, :G, :name, :oid]
 
   # ANSI X9.142–2020 ECDSA http://oid-info.com/get/1.3.132.0

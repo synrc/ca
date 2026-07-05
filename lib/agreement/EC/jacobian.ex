@@ -1,7 +1,5 @@
 defmodule CA.Jacobian do
   @moduledoc "CA Jacobian library."
-  require CA.Integer
-  require CA.Point
 
   def toJacobian(p), do: %CA.Point{x: p.x, y: p.y, z: 1}
   def fromJacobian(p, cP) do

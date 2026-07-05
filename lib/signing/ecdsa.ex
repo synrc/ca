@@ -1,7 +1,4 @@
 defmodule CA.ECDSA do
-  require CA.Point
-  require CA.Integer
-  require CA.Jacobian
   @moduledoc "CA/ECDSA ECC Signature (SYNRC)."
 
   def sign(message, privateKey, options) do

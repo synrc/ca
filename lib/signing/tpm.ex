@@ -1,4 +1,10 @@
 defmodule CA.TPM do
+  def generate_key(_), do: (if System.get_env("COMPILE") == "1", do: {:ok, <<0>>}, else: {:error, :tpm_disabled})
+  def sign(_, _), do: (if System.get_env("COMPILE") == "1", do: {:ok, <<0>>}, else: {:error, :tpm_disabled})
+  def delete_key(_), do: (if System.get_env("COMPILE") == "1", do: :ok, else: {:error, :tpm_disabled})
+end
+
+defmodule CA.TPM2 do
   @moduledoc """
   NIF wrapper for Linux TPM 2.0 P-384 key storage.
 

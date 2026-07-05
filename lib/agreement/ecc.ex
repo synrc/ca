@@ -1,7 +1,5 @@
 defmodule CA.KnownCurves do
   @moduledoc "CA/ECC library."
-  require CA.Curve
-  require CA.Point
 
   @secp256k1 {1, 3, 132, 0, 10}
   @secp384r1 {1, 3, 132, 0, 34}

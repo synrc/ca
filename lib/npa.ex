@@ -2,7 +2,6 @@ defmodule CA.NPA do
   @moduledoc """
   Generates anonymized normative and legal act orders (накази) for enterprise security.
   """
-  require EEx
 
   def gen_order_szi_establishment(opts \\ []) do
     defaults = [

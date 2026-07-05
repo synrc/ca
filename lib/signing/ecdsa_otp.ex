@@ -1,6 +1,5 @@
 defmodule CA.ECDSA.OTP do
   @moduledoc "CA/ECDSA ECC Signature (Erlang/OTP)."
-  require CA
 
   # openssl ec -in $client.key -pubout -out $client.pub
   # openssl dgst -sha256 -sign $client.key mix.exs > mix.sig

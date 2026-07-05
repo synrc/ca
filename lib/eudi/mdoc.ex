@@ -1,5 +1,4 @@
 defmodule CA.MDoc do
-  require CBOR
   @moduledoc "CA/MDOC MSO mDOC library."
 
 # [1]. https://mobiledl-e5018.web.app/ISO_18013-5_E_draft.pdf
@@ -48,9 +47,10 @@ defmodule CA.MDoc do
       version = :maps.get("version", map, [])
       validityInfo = :maps.get("validityInfo", map, [])
       valueDigests = :maps.get("valueDigests", map, [])
-      digests = case :maps.to_list(valueDigests) do
-          x when is_list(x) -> :lists.map(fn a -> :lists.map(fn {_,b} -> parseTag(b) end, :maps.to_list(a)) end, x)
-          x -> x
+      digests = if is_map(valueDigests) do
+          :lists.map(fn a -> :lists.map(fn {_,b} -> parseTag(b) end, :maps.to_list(a)) end, :maps.to_list(valueDigests))
+      else
+          valueDigests
       end
       [
         docType: docType,

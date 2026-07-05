@@ -1,7 +1,6 @@
 defmodule CA.CMP do
   @moduledoc "CA/CMP TCP server."
 
-  require CA
   require CA.CMP.Scheme
   require Logger
 

@@ -1,6 +1,5 @@
 defmodule CA.OCSP do
   @moduledoc "CA/OCSP TCP server."
-  require CA
 
   def code(), do: :binary.encode_hex(:crypto.strong_rand_bytes(8))
 
