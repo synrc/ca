@@ -96,7 +96,12 @@ defmodule CA.SecureEnclave do
   @doc false
   def load_nif do
     case :os.type() do
-      {:unix, :darwin} -> :erlang.load_nif(@nif_path, 0)
+      {:unix, :darwin} ->
+        if :filelib.is_regular(@nif_path) do
+          :erlang.load_nif(@nif_path, 0)
+        else
+          :ok
+        end
       _                -> :ok
     end
   end

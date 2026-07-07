@@ -69,7 +69,13 @@ defmodule CA.TPM2 do
   @doc false
   def load_nif do
     case :os.type() do
-      {:unix, :linux} -> :erlang.load_nif(@nif_path, 0)
+      {:unix, :linux} ->
+        so_file = @nif_path ++ ~c".so"
+        if :filelib.is_regular(so_file) do
+          :erlang.load_nif(@nif_path, 0)
+        else
+          :ok
+        end
       _               -> :ok
     end
   end
