@@ -13,7 +13,7 @@ defmodule CA do
     :logger.add_handlers(:ca)
 
     # Detect and persist the active key backend so all modules use the same one
-    backend = CA.SecureEnclave.detect_backend()
+    backend = {:software, "synrc/ecc/secp384r1/se/ca.key"}
     Application.put_env(:ca, :key_backend, backend)
     :logger.info(~c"CA KEY BACKEND: ~p", [backend])
 
