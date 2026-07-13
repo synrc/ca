@@ -16,7 +16,6 @@ defmodule CA.Mixfile do
         links: %{"GitHub" => "https://github.com/synrc/ca"}
       ],
       compilers: Mix.compilers(),
-#      compilers: [:nif_make] ++ Mix.compilers(),
       deps: [
         {:base85, "~> 1.1.0"},
         {:cose, "~> 0.11.20"},
@@ -29,30 +28,3 @@ defmodule CA.Mixfile do
     ]
   end
 end
-
-#defmodule Mix.Tasks.Compile.NifMake do
-#  use Mix.Task.Compiler
-#  @shortdoc "Apple (SEP) Secure Enclave Processor (macOS) / TPM (Linux)"
-#  @impl true
-#  def run(_args) do
-#    os = :os.type()
-#    supported = match?({:unix, :darwin}, os) or match?({:unix, :linux}, os)
-#    if supported do
-#      {result, exit_code} = System.cmd("make", ["-C", "c_src"], stderr_to_stdout: true)
-#      if exit_code == 0 do
-#        Mix.shell().info([:green, "* NIF make: ", :reset, String.trim(result)])
-#        {:ok, []}
-#      else
-#        Mix.shell().error("NIF make failed:\n#{result}")
-#        {:error, []}
-#      end
-#    else
-#      {:ok, []}
-#    end
-#  end
-#  @impl true
-#  def clean do
-#    _ = System.cmd("make", ["-C", "c_src", "clean"], stderr_to_stdout: true)
-#    :ok
-#  end
-#end
