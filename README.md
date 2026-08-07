@@ -320,8 +320,6 @@ CA.NIST.PrivateKeyStorage.controls()      # Software
 
 Full control implementation details: [NIST.md](NIST.md)
 
----
-
 ## How to use?
 
 On Windows:
